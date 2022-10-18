@@ -3,7 +3,7 @@ session_start();
 $_SESSION["bd"] = $_POST["bd"];
 include("conexion.php");
 
-$urlRed = 'http://localhost/works-projects/softjm/';
+$urlRed = REDIRECT_ROUTE;
 
 
 $rst_usrE = $conexionBdPrincipal->query("SELECT usr_login, usr_id, usr_intentos_fallidos FROM usuarios 

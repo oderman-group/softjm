@@ -83,7 +83,10 @@ $configuracion = mysqli_fetch_array($consultaConfiguracion, MYSQLI_BOTH);
 
                 <input type="hidden" name="idseg" value="<?= $idSeguimiento; ?>">
                 
-                <input type="hidden" name="bd" value="odermancom_jm_crm">
+                <!-- En esta versión esta BD ya no influye para cambios en bd
+                solo es para mostrar el nombre de la compañía y el nombre de la bd
+                al ingresar al sistema -->
+                <input type="hidden" name="bd" value="<?=MAINBD;?>">
 
                 <div class="form-group">
                   <label for="exampleInputEmail">Usuario</label>

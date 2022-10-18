@@ -42,7 +42,10 @@ switch($_SESSION["bd"]){
 		<b>Sesion DB:&nbsp;</b> <?=$_SESSION["bd"]; ?>&nbsp;|&nbsp;
 		<b>ID Company:&nbsp;</b> <?=$configu['conf_id_empresa']; ?>&nbsp;|&nbsp;
 		<b>Current User ID:&nbsp;</b> <?=$_SESSION["id"]; ?>&nbsp;|&nbsp;
-		<b>ID Page:&nbsp;</b> <?=$idPagina; ?>&nbsp;|&nbsp; 
+		<b>ID Page:&nbsp;</b> <?=$idPagina; ?>&nbsp;|&nbsp;
+		<b>Versión PHP:&nbsp;</b> <?=phpversion(); ?>&nbsp;|&nbsp; 
+		<b>Server:&nbsp;</b> <?=$_SERVER['SERVER_NAME']; ?>&nbsp;|&nbsp; 
+		
 	</div>
 
 <?php }?>
