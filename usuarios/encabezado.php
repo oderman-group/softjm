@@ -25,7 +25,7 @@ switch($_SESSION["bd"]){
 	break;	
 
 	case "orioncrmcom_oscar":
-		$bdEmpresa = "OSCAR";
+		$bdEmpresa = "OSCAR B.";
 	break;	
 		
 		
