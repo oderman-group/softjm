@@ -387,9 +387,13 @@ include("head.php");
 								}
 								
 								if($datosUsuarioActual[3]!=1){
-									$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'",$conexion));
+									$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
+									WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'");
+									$numZ = $consultaNumZ->num_rows;
 									
-									$numCliente = mysql_num_rows(mysql_query("SELECT * FROM clientes_usuarios WHERE cliu_usuario='".$_SESSION["id"]."' AND cliu_cliente='".$res['cli_id']."'",$conexion));
+									$consultaNumCliente = $conexionBdPrincipal->query("SELECT * FROM clientes_usuarios 
+									WHERE cliu_usuario='".$_SESSION["id"]."' AND cliu_cliente='".$res['cli_id']."'");
+									$numCliente = $consultaNumCliente->num_rows;
 									
 									if($numZ == 0 and $numCliente == 0) continue;
 								}
@@ -444,15 +448,7 @@ include("head.php");
                                         <a href="clientes-contactos.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Contactos" target="new"><i class="icon-group"></i></a>&nbsp;
                                         <a href="clientes-tikets.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Tikets de seguimiento" target="new"><i class="icon-list-ol"></i></a>&nbsp;
                                         <a href="clientes-seguimiento.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Seguimiento de clientes" target="new"><i class="icon-list-alt"></i></a>&nbsp;
-										
-                                        <!--
-										<a href="documentos.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Documentos" target="new"><i class="icon-folder-open"></i></a>&nbsp;
-										-->
                                         <a href="facturacion.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Facturación" target="new"><i class="icon-money"></i></a>&nbsp;
-										<!--                                        
-										<a href="encuesta.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Encuestas" target="new"><i class="icon-file"></i></a> 
-										-->
-										
 										<a href="enviar-portafolios.php?cte=<?=$res[0];?>" data-toggle="tooltip" title="Enviar portafolios" target="_blank"><i class="icon-list-ul"></i></a>&nbsp;
                                 	</h4>
                                 </td>
@@ -463,13 +459,6 @@ include("head.php");
 								<td align="center" style="background:<?=$color4;?>;"><a href="clientes-contactos.php?cte=<?=$res['cli_id'];?>" target="_blank"><?=$numeros[3];?></a></td>
 								<td align="center" style="background:<?=$color5;?>;"><a href="facturacion.php?cte=<?=$res['cli_id'];?>" target="_blank"><?=$numeros[4];?></a></td>
 								<td align="center" style="background:<?=$color6;?>;"><a href="../v2.0/usuarios/empresa/lab-remisiones.php?cte=<?=$res['cli_id'];?>" target="_blank"><?=$numeros[5];?></a></td>
-								<!--
-								<td align="center">
-									<?php if($res['cli_terminado']==1){echo '<i class="icon-ok"></i>';}else{?>
-									<a href="sql.php?get=34&idR=<?=$res['cli_id'];?>" data-toggle="tooltip" title="Completar" onClick="if(!confirm('El cliente pasará al listado de clientes que ya están listos. Desea continuar?')){return false;}" style="color: green;">OK</a>
-									<?php }?>	
-								</td>
-								-->
 								<td><img src="files/<?=$estadoSesion;?>"><br><?=$res['cli_ultimo_ingreso'];?></td>
 							</tr>
                             <?php $no++;}?>

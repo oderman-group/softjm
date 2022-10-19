@@ -69,5 +69,7 @@ if(isset($_POST["grupos"])){
 		$conexionBdPrincipal->query("INSERT INTO clientes_usuarios(cliu_usuario, cliu_cliente, cliu_fecha)VALUES('" . $_POST["asesor"] . "'," . $_POST["id"] . ", now())");
 	}
 
+    include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+
 	echo '<script type="text/javascript">window.location.href="../clientes-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
 	exit();

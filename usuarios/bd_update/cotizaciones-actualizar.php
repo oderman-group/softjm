@@ -33,6 +33,7 @@ if (mysql_errno() != 0) {echo informarErrorAlUsuario(__LINE__, mysql_error()); e
 
     require('actualizar-servicios-cotizacion.php');
 
+include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
 
-    echo '<script type="text/javascript">window.location.href="../cotizaciones-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-    exit();
+echo '<script type="text/javascript">window.location.href="../cotizaciones-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
+exit();

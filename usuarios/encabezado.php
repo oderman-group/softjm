@@ -36,7 +36,7 @@ switch($_SESSION["bd"]){
 ?>
 <div class="loader"></div>
 
-<?php if($datosUsuarioActual['usr_tipo']==1){?>
+<?php if( $datosUsuarioActual['usr_tipo']==1 || isset($_SESSION['admin']) ){?>
 
 	<div style="height:50px; width:100%; background-color:black; padding:2px; color:#42FF00; display:flex; justify-content: center; align-items: center;">
 		<b>Sesion DB:&nbsp;</b> <?=$_SESSION["bd"]; ?>&nbsp;|&nbsp;
@@ -44,7 +44,11 @@ switch($_SESSION["bd"]){
 		<b>Current User ID:&nbsp;</b> <?=$_SESSION["id"]; ?>&nbsp;|&nbsp;
 		<b>ID Page:&nbsp;</b> <?=$idPagina; ?>&nbsp;|&nbsp;
 		<b>Versión PHP:&nbsp;</b> <?=phpversion(); ?>&nbsp;|&nbsp; 
-		<b>Server:&nbsp;</b> <?=$_SERVER['SERVER_NAME']; ?>&nbsp;|&nbsp; 
+		<b>Server:&nbsp;</b> <?=$_SERVER['SERVER_NAME']; ?>&nbsp;|&nbsp;
+		<?php if( isset($_SESSION['admin']) ){?>
+			<b>User Admin:&nbsp;</b> <?=$_SESSION['admin']; ?>&nbsp;|&nbsp;
+			<a href="return-admin-panel.php" style="color:white; text-decoration:underline;">RETURN TO ADMIN PANEL</a>
+		<?php }?>	
 		
 	</div>
 

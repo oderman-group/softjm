@@ -13,6 +13,8 @@ $conexionBdPrincipal->query("DELETE FROM contactos WHERE cont_cliente_principal=
 $conexionBdPrincipal->query("DELETE FROM cotizacion WHERE cotiz_cliente='" . $_GET["id"] . "'");
 
 $conexionBdPrincipal->query("DELETE FROM clientes WHERE cli_id='" . $_GET["id"] . "'");
+
+include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
 	
 echo '<script type="text/javascript">window.location.href="../clientes.php?msg=3";</script>';
 exit();

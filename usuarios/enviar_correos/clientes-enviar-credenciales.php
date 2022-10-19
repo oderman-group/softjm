@@ -72,5 +72,7 @@ $resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 		echo "Error: {$mail->ErrorInfo}";
 	}
 
+include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");	
+
 echo '<script type="text/javascript">window.location.href="../clientes-editar.php?id=' . $_GET["id"] . '&msg=13";</script>';
 exit();

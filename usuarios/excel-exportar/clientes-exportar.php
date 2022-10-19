@@ -6,6 +6,9 @@ header("Content-Type: application/vnd.ms-excel");
 header("Expires: 0");
 header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 header("content-disposition: attachment;filename=clientes_" . date("d/m/Y") . ".xls");
+
+$idPagina = 30;
+include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -86,3 +89,6 @@ include(RUTA_PROYECTO."/usuarios/head.php");
     </body>
 
 </html>
+
+<?php
+include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");

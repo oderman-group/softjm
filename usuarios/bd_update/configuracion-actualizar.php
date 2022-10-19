@@ -74,5 +74,7 @@ require("../funciones-para-el-sistema.php");
     conf_cliente_imprimir_certificado='" . $_POST["clientesImprimir"] . "' 
     WHERE conf_id=1");
 	
+	include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+	
 	echo '<script type="text/javascript">window.location.href="../configuracion.php?msg=2";</script>';
 	exit();
