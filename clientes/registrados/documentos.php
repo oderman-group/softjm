@@ -9,9 +9,7 @@ mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hi
 if(mysql_errno()!=0){echo mysql_error(); exit();}
 ?>
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
+
 <!--[if IE 7]>
             <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
         <![endif]-->

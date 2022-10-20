@@ -1,27 +1,18 @@
 <?php 
 include("sesion.php");
-
 $idPagina = 11;
-
 include("verificar-paginas.php");
 include("head.php");
 
 $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
-
-$tituloPagina = strtoupper($resultadoD['cli_nombre']);
 ?>
 
-<!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
 <!--[if IE 7]>
 <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
 <![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-<link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-blue.css" rel="stylesheet">
+
 
 <!--[if IE 7]>
 <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
@@ -69,19 +60,19 @@ include("js-formularios.php");
 <div class="layout">
 	<?php include("encabezado.php");?>
     
-    <?php include("barra-izq.php");?>
+    
     
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>  
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>  
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
 						<li><a href="clientes.php">Clientes</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -97,7 +88,7 @@ include("js-formularios.php");
 				<div class="span12">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> <?=$tituloPagina;?></h3>
+							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 
 						<div class="widget-container">

@@ -71,3 +71,25 @@ function contarClientesPorDepto($depto){
 	return $totalClientes;
 }
 
+function validarVariableGet($get){
+	if(isset($get) and is_numeric($get)){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function validarReferencia($paginaDeReferencia){
+	if( !isset($_SERVER['HTTP_REFERER']) ){
+		echo "No hay pagina de referencia de origen.";
+		exit();
+	}
+	
+	if( !str_contains($_SERVER['HTTP_REFERER'], $paginaDeReferencia) || !isset($_SERVER['HTTP_REFERER']) ){
+		echo "No estás accediendo correctamente.";
+		exit();
+	}
+}
+
+
+

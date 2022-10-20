@@ -12,14 +12,11 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 $cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'",$conexion));
 ?>
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
+
 <!--[if IE 7]>
             <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
         <![endif]-->
-<link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-blue.css" rel="stylesheet">
+
 
 <!--[if IE 7]>
             <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />

@@ -1,6 +1,5 @@
 <?php   
 require_once("../sesion.php");
-require(RUTA_PROYECTO."/usuarios/funciones-para-el-sistema.php");
 
 $idPagina = 179;
 include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");

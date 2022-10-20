@@ -1,7 +1,7 @@
 <?php include("sesion.php");?>
 <?php
 $idPagina = 160;
-$tituloPagina = "Productos Soporte Op.";
+$paginaActual['pag_nombre'] = "Productos Soporte Op.";
 
 $tabla = 'productos_soptec';
 $pk = 'prod_id';
@@ -14,14 +14,11 @@ mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hi
 if(mysql_errno()!=0){echo mysql_error(); exit();}
 ?>
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
+
 <!--[if IE 7]>
             <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
         <![endif]-->
-<link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-blue.css" rel="stylesheet">
+
 
 <!--[if IE 7]>
             <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
@@ -208,7 +205,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <div class="layout">
 	<?php include("encabezado.php");?>
     
-    <?php include("barra-izq.php");?>
+    
 	<div class="main-wrapper">
 		<div class="container-fluid">
             <?php include("notificaciones.php");?>
@@ -226,7 +223,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 				<div class="span12">
 					<div class="content-widgets light-gray">
 						<div class="widget-head green">
-							<h3><?=$tituloPagina;?></h3>
+							<h3><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
 							<p></p>

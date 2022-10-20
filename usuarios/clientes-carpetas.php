@@ -1,7 +1,7 @@
 <?php include("sesion.php");?>
 <?php
 $idPagina = 29;
-$tituloPagina = "Carpeta";
+$paginaActual['pag_nombre'] = "Carpeta";
 ?>
 <?php include("verificar-paginas.php");?>
 <?php include("head.php");?>
@@ -22,8 +22,7 @@ $momento = mysql_fetch_array(mysql_query("SELECT * FROM momentos WHERE mom_id='"
 <!--[if IE 7]>
             <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
         <![endif]-->
-<link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-blue.css" rel="stylesheet">
+
 
 <!--[if IE 7]>
             <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
@@ -330,13 +329,13 @@ $momento = mysql_fetch_array(mysql_query("SELECT * FROM momentos WHERE mom_id='"
 <div class="layout">
 	<?php include("encabezado.php");?>
     
-    <?php include("barra-izq.php");?>
+    
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?> de <?=$cliente[1];?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?> de <?=$cliente[1];?></h3>
 						<ul class="top-right-toolbar">
 							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a></li>
 							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
@@ -347,7 +346,7 @@ $momento = mysql_fetch_array(mysql_query("SELECT * FROM momentos WHERE mom_id='"
 						<li><a href="#" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
 						<li><a href="clientes.php">Clientes</a><span class="divider"><i class="icon-angle-right"></i></span></li>
                         <li><a href="clientes-momentos.php?cte=<?=$_GET["cte"];?>&mto=<?=$_GET["mto"];?>">Momentos <b><?=$momento[2];?></b></a><span class="divider"><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?> de <?=$cliente[1];?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?> de <?=$cliente[1];?></li>
 					</ul>
 				</div>
 			</div>

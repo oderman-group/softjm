@@ -1,6 +1,8 @@
 <?php
 require_once("../sesion.php");
-require("../funciones-para-el-sistema.php");
+
+$idPagina = 16;
+include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
 
 $conexionBdPrincipal->query("UPDATE configuracion SET conf_emsj_cotizacion='" . $_POST["eCotizacion"] . "', conf_emsj_portafolios='" . $_POST["ePortafolio"] . "' WHERE conf_id=1");
 

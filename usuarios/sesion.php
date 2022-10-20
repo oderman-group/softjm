@@ -3,7 +3,7 @@ session_start();
 
 const RUTA_PROYECTO = "C:/xampp/htdocs/works-projects/softjm";
 
-if($_SESSION["id"]=="")
+if( $_SESSION["id"]=="" || !is_numeric($_SESSION["id"]) )
 	header("Location:../salir.php");
 else
 {
@@ -11,10 +11,17 @@ else
 	
 	require_once(RUTA_PROYECTO."/conexion.php");
 	require_once(RUTA_PROYECTO."/usuarios/config/config.php");
+	require(RUTA_PROYECTO."/usuarios/funciones-para-el-sistema.php");
 
 	//USUARIO ACTUAL
 	$consultaUsuarioActual = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$_SESSION["id"]."'");
 	$numUsuarioActual = $consultaUsuarioActual->num_rows;
+
+	if($numUsuarioActual == 0){
+		echo "<span style='font-family:Arial; color:red;'>El usuario con ID <b>".$_SESSION["id"]."</b> no existe.</samp>";
+		exit();
+	}
+
 	$datosUsuarioActual = mysqli_fetch_array($consultaUsuarioActual, MYSQLI_BOTH);
 
 	//SABER SI ESTA BLOQUEADO

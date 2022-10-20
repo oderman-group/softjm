@@ -1,7 +1,7 @@
 	<?php include("sesion.php"); ?>
 	<?php
 	$idPagina = 170;
-	$tituloPagina = "Ventas";
+	$paginaActual['pag_nombre'] = "Ventas";
 	?>
 	<?php include("verificar-paginas.php"); ?>
 	<?php include("head.php"); ?>
@@ -133,7 +133,7 @@
 			<div class="layout">
 				<?php include("encabezado.php"); ?>
 
-				<?php include("barra-izq.php"); ?>
+				
 				<div class="main-wrapper">
 					<div class="container-fluid">
 						<?php include("notificaciones.php"); ?>
@@ -304,7 +304,7 @@
 		<div class="span8">
 			<div class="content-widgets light-gray">
 				<div class="widget-head green">
-					<h3><?= $tituloPagina; ?></h3>
+					<h3><?= $paginaActual['pag_nombre']; ?></h3>
 				</div>
 				<div class="widget-container">
 					<p></p>

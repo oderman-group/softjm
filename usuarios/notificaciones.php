@@ -93,6 +93,13 @@ if(isset($_GET["msg"])){
 		</div>
 	<?php }?>
 
+	<?php if($_GET["msg"]==14){?>
+		<div class="alert alert-success">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-exclamation-sign"></i><strong>Exito!</strong> Las claves de los clientes fueron cambiadas correctamente.
+		</div>
+	<?php }?>
+
 
 <?php }?>
 

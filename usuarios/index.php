@@ -1,9 +1,6 @@
 <?php
 include("sesion.php"); 
-
 $idPagina = 1;
-$tituloPagina = "Inicio";
-
 include("verificar-paginas.php");
 include("head.php");
 ?>
@@ -17,8 +14,7 @@ include("head.php");
 <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
 <![endif]-->
 <link href="css/tablecloth.css" rel="stylesheet">
-<link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-blue.css" rel="stylesheet">
+
 
 <!--[if IE 7]>
 <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
@@ -148,7 +144,7 @@ while ($cte = mysql_fetch_array($clientes)) {
 	<div class="layout">
 		<?php include("encabezado.php"); ?>
 
-		<?php include("barra-izq.php"); ?>
+		
 
 		<div class="main-wrapper">
 

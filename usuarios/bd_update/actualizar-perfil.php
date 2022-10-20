@@ -1,19 +1,10 @@
 <?php   
 require_once("../sesion.php");
-require(RUTA_PROYECTO."/usuarios/funciones-para-el-sistema.php");
 
 $idPagina = 177;
 include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
 
-if( !isset($_SERVER['HTTP_REFERER']) ){
-    echo "No hay pagina de referencia de origen.";
-    exit();
-}
-
-if( !str_contains($_SERVER['HTTP_REFERER'], "perfil-editar.php") || !isset($_SERVER['HTTP_REFERER']) ){
-    echo "No estás accediendo correctamente.";
-    exit();
-}
+validarReferencia('perfil-editar.php');
 
 
 if ($_FILES['foto']['name'] != "") {

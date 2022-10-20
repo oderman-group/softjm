@@ -14,7 +14,6 @@ header("Content-Transfer-Encoding: binary ");
         
 include("../conexion.php");
 
-require("funciones-para-el-sistema.php");
 ?>
 <?php include("head.php");?>
 </head>

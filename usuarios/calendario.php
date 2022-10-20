@@ -1,7 +1,7 @@
 <?php include("sesion.php");?>
 <?php
 $idPagina = 104;
-$tituloPagina = "Calendario";
+$paginaActual['pag_nombre'] = "Calendario";
 ?>
 <?php include("verificar-paginas.php");?>
 <?php include("head.php");?>
@@ -124,9 +124,7 @@ $eventos .= '
 ?>
 
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
+
 <!--[if IE 7]>
             <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
         <![endif]-->
@@ -187,14 +185,14 @@ $eventos .= '
 <div class="layout">
 	<?php include("encabezado.php");?>
     
-    <?php include("barra-izq.php");?>
+    
 	
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?>: <?=$usuarioCalendario["usr_nombre"];?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?>: <?=$usuarioCalendario["usr_nombre"];?></h3>
 						<ul class="top-right-toolbar">
 							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
 							</li>
@@ -211,7 +209,7 @@ $eventos .= '
 					
 					<div class="content-widgets gray">
 						<div class="widget-head orange">
-							<h3><i class=" icon-calendar"></i><?=$tituloPagina;?></h3>
+							<h3><i class=" icon-calendar"></i><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="ribbon-wrapper-green">
 							<div class="ribbon-green">

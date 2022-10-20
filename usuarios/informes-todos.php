@@ -1,7 +1,7 @@
 <?php include("sesion.php");?>
 <?php 
 $idPagina = 120;
-$tituloPagina = "Todos los informes";
+$paginaActual['pag_nombre'] = "Todos los informes";
 ?>
 <?php include("verificar-paginas.php");?>
 <?php include("head.php");?>
@@ -18,8 +18,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
 <![endif]-->
 <link href="css/tablecloth.css" rel="stylesheet">
-<link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-blue.css" rel="stylesheet">
+
 
 <!--[if IE 7]>
 <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
@@ -70,7 +69,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <div class="layout">
 	<?php include("encabezado.php");?>
     
-    <?php include("barra-izq.php");?>
+    
 	
 	<div class="main-wrapper">
 		<div class="container-fluid">

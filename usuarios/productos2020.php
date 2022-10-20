@@ -1,7 +1,7 @@
 <?php include("sesion.php");?>
 <?php
 $idPagina = 39;
-$tituloPagina = "Categorías de Productos";
+$paginaActual['pag_nombre'] = "Categorías de Productos";
 ?>
 <?php include("verificar-paginas.php");?>
 <?php include("head.php");?>
@@ -126,7 +126,7 @@ $(function(){
 <div class="layout">
 	<?php include("encabezado.php");?>
     
-    <?php include("barra-izq.php");?>
+    
 	<div class="main-wrapper">
     <div class="container-fluid">
 		

@@ -1,6 +1,8 @@
 <?php
 require_once("../sesion.php");
-require("../funciones-para-el-sistema.php");
+
+$idPagina = 31;
+include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
 
 
 	if ($_FILES['logo']['name'] != "") {

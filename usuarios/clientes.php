@@ -1,23 +1,16 @@
 <?php 
 include("sesion.php");
-require("funciones-para-el-sistema.php");
-
 $idPagina = 9;
-$tituloPagina = "Clientes";
-
 include("verificar-paginas.php");
 include("head.php");
 ?>
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
+
 
 <!--[if IE 7]>
             <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
         <![endif]-->
-<link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-blue.css" rel="stylesheet">
+
 
 <!--[if IE 7]>
             <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
@@ -150,7 +143,7 @@ include("head.php");
 <div class="layout">
 	<?php include("encabezado.php");?>
     
-    <?php include("barra-izq.php");?>
+    
 
 	<div class="main-wrapper">
 		<div class="container-fluid">
@@ -281,7 +274,7 @@ include("head.php");
 					
 					<div class="content-widgets light-gray">
 						<div class="widget-head green">
-							<h3><?=$tituloPagina;?></h3>
+							<h3><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
                         <?php
 						$filtro = "";

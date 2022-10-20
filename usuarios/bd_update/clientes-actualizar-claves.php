@@ -1,6 +1,8 @@
 <?php   
 require_once("../sesion.php");
-require("../funciones-para-el-sistema.php");
+
+$idPagina = 17;
+include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
 
 $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes");
 while ($datos = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
@@ -10,5 +12,5 @@ while ($datos = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
 include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
 
-echo '<script type="text/javascript">window.location.href="../clientes.php?msg=passOk";</script>';
+echo '<script type="text/javascript">window.location.href="../clientes.php?msg=14";</script>';
 exit();

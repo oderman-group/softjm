@@ -11,9 +11,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 $producto = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_id='".$_GET["pdto"]."'",$conexion));
 ?>
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
+
 <!--[if IE 7]>
             <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
         <![endif]-->

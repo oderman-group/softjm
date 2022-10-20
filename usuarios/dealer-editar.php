@@ -1,7 +1,7 @@
 <?php include("sesion.php");?>
 <?php
 $idPagina = 35;
-$tituloPagina = "Editar grupos";
+$paginaActual['pag_nombre'] = "Editar grupos";
 ?>
 <?php include("verificar-paginas.php");?>
 <?php include("head.php");?>
@@ -13,15 +13,12 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM dealer WHERE deal_id='".$_GET["id"]."'",$conexion));
 ?>
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
+
 <!--[if IE 7]>
 <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
 <![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-<link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-blue.css" rel="stylesheet">
+
 
 <!--[if IE 7]>
 <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
@@ -158,14 +155,14 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM dealer WHERE deal_id=
 <div class="layout">
 	<?php include("encabezado.php");?>
     
-    <?php include("barra-izq.php");?>
+    
     
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
                         <ul class="top-right-toolbar">
 							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
@@ -178,7 +175,7 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM dealer WHERE deal_id=
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
 						<li><a href="dealer.php">Grupos</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -190,7 +187,7 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM dealer WHERE deal_id=
 				<div class="span12">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> <?=$tituloPagina;?></h3>
+							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="sql.php">

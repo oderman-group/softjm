@@ -1,7 +1,7 @@
 <?php include("sesion.php");?>
 <?php
 $idPagina = 67;
-$tituloPagina = "Estádisticas Anuales (".date("Y").")";
+$paginaActual['pag_nombre'] = "Estádisticas Anuales (".date("Y").")";
 
 if(is_numeric($_GET["a"])){$agnoConsulta = $_GET["a"];}else{$agnoConsulta = date("Y");}
 if(is_numeric($_GET["m"])){$mesConsulta = $_GET["m"];}else{$mesConsulta = date("m");}
@@ -105,14 +105,11 @@ while($i<=31){
 $epordia = substr($epordia,0,-1);
 ?>
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
+
 <!--[if IE 7]>
 <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
 <![endif]-->
-<link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-blue.css" rel="stylesheet">
+
 
 <!--[if IE 7]>
 <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
@@ -482,7 +479,7 @@ $epordia = substr($epordia,0,-1);
 <div class="layout">
 	<?php include("encabezado.php");?>
     
-    <?php include("barra-izq.php");?>
+    
     
 	<div class="main-wrapper">
 		<div class="container-fluid">
@@ -491,7 +488,7 @@ $epordia = substr($epordia,0,-1);
             <div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 					</div>
 				</div>
 			</div>

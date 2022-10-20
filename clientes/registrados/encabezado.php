@@ -4,7 +4,7 @@ INNER JOIN remisiones ON rem_id=remseg_id_remisiones AND rem_cliente='".$_SESSIO
 WHERE remseg_notificar_cliente=1 AND (remseg_visto_cliente=0 OR remseg_visto_cliente IS NULL)
 ",$conexion);
 $numNotf = mysql_num_rows($notificaciones);
-?>
+?>	
 <!-- Navbar
     ================================================== -->
 	<div class="navbar navbar-inverse top-nav">

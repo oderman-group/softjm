@@ -1,12 +1,12 @@
-<?php include("sesion.php");
-
+<?php 
+include("sesion.php");
 $idPagina = 157;
-$tituloPagina = "Editar Métricas";
-
 include("verificar-paginas.php");
-include("head.php"); 
+include("head.php");
 
-if(isset($_GET['id']) and is_numeric($_GET['id'])){
+$validarGet = validarVariableGet($_GET['id']);
+
+if($validarGet){
     $consulta = $conexionBdPrincipal->query("SELECT * FROM metricas WHERE met_id='".$_GET['id']."'");
     $numRegistros = $consulta->num_rows;
     if($numRegistros == 0){
@@ -18,18 +18,14 @@ if(isset($_GET['id']) and is_numeric($_GET['id'])){
     echo "Usted no está accediendo de manera correcta";
     exit();
 }
-
 ?>
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
+
 <!--[if IE 7]>
 <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
 <![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-<link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-blue.css" rel="stylesheet">
+
 
 <!--[if IE 7]>
 <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
@@ -74,7 +70,7 @@ include("js-formularios.php");
     <div class="layout">
         <?php include("encabezado.php"); ?>
 
-        <?php include("barra-izq.php"); ?>
+        
 
         <div class="main-wrapper">
             <div class="container-fluid">
@@ -83,7 +79,7 @@ include("js-formularios.php");
                     <div class="span12">
                         <div class="content-widgets gray">
                             <div class="widget-head bondi-blue">
-                                <h3> <?= $tituloPagina; ?></h3>
+                                <h3> <?= $paginaActual['pag_nombre']; ?></h3>
                             </div>
                             <div class="widget-container">
                                 <form class="form-horizontal" method="post" action="bd_update/metricas-actualizar.php" enctype="multipart/form-data">

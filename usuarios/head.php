@@ -23,6 +23,15 @@
 	}*/
 	</style>
 
+<!-- styles -->
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link rel="stylesheet" href="css/font-awesome.css">
+
+
+<link href="css/styles.css" rel="stylesheet">
+<link href="css/theme-blue.css" rel="stylesheet">
+
 
 
 	

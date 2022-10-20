@@ -54,7 +54,13 @@ switch($_SESSION["bd"]){
 
 <?php }?>
 
-	
+<!--
+<style type="text/css">
+	.navbar-inverse .navbar-inner {
+		background-color: #DA2201;
+		}	
+</style>
+	-->
 
 <div class="navbar navbar-inverse top-nav">
 		<div class="navbar-inner">

@@ -6,7 +6,7 @@ if(!isset($idPagina)){
 }
 
 //PAGINAS A LAS QUE TIENE PERMISO EL ROL DEL USUARIO
-$consultaPaginaUsuario = $conexionBdPrincipal->query("SELECT * FROM paginas_perfiles 
+$consultaPaginaUsuario = $conexionBdPrincipal->query("SELECT * FROM paginas_perfiles
 WHERE pper_tipo_usuario='".$datosUsuarioActual[3]."' AND pper_pagina='".$idPagina."'");
 $numPaginaUsuario = $consultaPaginaUsuario->num_rows;
 
@@ -27,3 +27,6 @@ if($numPaginaUsuario == 0 and $datosUsuarioActual[3]!=1)
 <?php
 	exit();	
 }
+
+$consultaPaginaActual = $conexionBdAdmin->query("SELECT * FROM paginas WHERE pag_id='".$idPagina."'");
+$paginaActual = mysqli_fetch_array($consultaPaginaActual, MYSQLI_BOTH);

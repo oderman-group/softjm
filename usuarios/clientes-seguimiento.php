@@ -1,7 +1,7 @@
 <?php include("sesion.php"); ?>
 <?php
 $idPagina = 12;
-$tituloPagina = "Seguimiento de clientes";
+$paginaActual['pag_nombre'] = "Seguimiento de clientes";
 ?>
 
 <?php include("verificar-paginas.php"); ?>
@@ -17,14 +17,11 @@ if (mysql_errno() != 0) {
 $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_id='" . $_GET["idTK"] . "'", $conexion));
 ?>
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
+
 <!--[if IE 7]>
             <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
         <![endif]-->
-<link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-blue.css" rel="stylesheet">
+
 
 <!--[if IE 7]>
             <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
@@ -132,7 +129,7 @@ $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_
 	<div class="layout">
 		<?php include("encabezado.php"); ?>
 
-		<?php include("barra-izq.php"); ?>
+		
 		<div class="main-wrapper">
 			<div class="container-fluid">
 
@@ -273,7 +270,7 @@ $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_
 
 						<div class="content-widgets light-gray">
 							<div class="widget-head green">
-								<h3><?= $tituloPagina; ?> : <b><?= $tiket['tik_asunto_principal']; ?></b></h3>
+								<h3><?= $paginaActual['pag_nombre']; ?> : <b><?= $tiket['tik_asunto_principal']; ?></b></h3>
 							</div>
 							<div class="widget-container">
 								<?php include("notificaciones.php"); ?>
