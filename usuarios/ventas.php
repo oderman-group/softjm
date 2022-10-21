@@ -18,9 +18,6 @@
 	$metricas = mysql_fetch_array(mysql_query("SELECT * FROM metricas WHERE met_id='".$suc."'", $conexion));
 	?>
 	<!-- styles -->
-	<link href="css/bootstrap.css" rel="stylesheet">
-	<link href="css/bootstrap-responsive.css" rel="stylesheet">
-	<link rel="stylesheet" href="css/font-awesome.css">
 	<link href="css/jquery.gritter.css" rel="stylesheet">
 	<!--[if IE 7]>
 	            <link rel="stylesheet" href="css/font-awesome-ie7.min.css">

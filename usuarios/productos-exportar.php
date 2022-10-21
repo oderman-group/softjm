@@ -1,7 +1,5 @@
 <?php include("sesion.php");?>
 <?php
-//header("Content-Type: application/vnd.ms-excel");
-//header("Expires: 0");
 header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 
 header("Content-Type: application/force-download");
@@ -10,9 +8,6 @@ header("Content-Type: application/download");
 
 header("content-disposition: attachment;filename=productos_".date("d/m/Y h:m:i").".xls");
 header("Content-Transfer-Encoding: binary ");
-
-        
-include("../conexion.php");
 
 ?>
 <?php include("head.php");?>

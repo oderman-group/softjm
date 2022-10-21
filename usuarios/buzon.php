@@ -1,7 +1,6 @@
 <?php include("sesion.php");?>
 <?php
 $idPagina = 167;
-$paginaActual['pag_nombre'] = "Categorías de Productos";
 ?>
 <?php include("verificar-paginas.php");?>
 <?php include("head.php");?>
@@ -10,10 +9,7 @@ mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hi
 if(mysql_errno()!=0){echo mysql_error(); exit();}
 ?>
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
 <link href="css/jquery.gritter.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
 <!--[if IE 7]>
 <link rel="stylesheet" href="css2020/font-awesome-ie7.min.css">
 <![endif]-->
@@ -29,13 +25,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <!--[if IE 9]>
 <link rel="stylesheet" type="text/css" href="css2020/ie/ie9.css" />
 <![endif]-->
-<link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
-<!--fav and touch icons -->
-<link rel="shortcut icon" href="ico/favicon.ico">
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png">
-<link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png">
-<link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png">
-<link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png">
+
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>

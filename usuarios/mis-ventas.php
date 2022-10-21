@@ -5,15 +5,12 @@ include("verificar-paginas.php");
 include("head.php");
 ?>
 	<!-- styles -->
-	<link href="css/bootstrap.css" rel="stylesheet">
-	<link href="css/bootstrap-responsive.css" rel="stylesheet">
 	<link rel="stylesheet" href="css/font-awesome.css">
 	<link href="css/jquery.gritter.css" rel="stylesheet">
 	<!--[if IE 7]>
 	            <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
 	        <![endif]-->
-	        	<link href="css/styles.css" rel="stylesheet">
-	        	<link href="css/theme-blue.css" rel="stylesheet">
+
 
 	<!--[if IE 7]>
 	            <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />

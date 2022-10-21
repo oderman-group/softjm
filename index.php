@@ -12,16 +12,16 @@ $configuracion = mysqli_fetch_array($consultaConfiguracion, MYSQLI_BOTH);
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>ORIÓN - <?= $configuracion['conf_empresa']; ?></title>
   <!-- plugins:css -->
-  <link rel="stylesheet" href="login2/vendors/iconfonts/font-awesome/css/all.min.css">
-  <link rel="stylesheet" href="login2/vendors/css/vendor.bundle.base.css">
-  <link rel="stylesheet" href="login2/vendors/css/vendor.bundle.addons.css">
+  <link rel="stylesheet" href="assets-login/vendors/iconfonts/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="assets-login/vendors/css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="assets-login/vendors/css/vendor.bundle.addons.css">
   <!-- endinject -->
   <!-- plugin css for this page -->
   <!-- End plugin css for this page -->
   <!-- inject:css -->
-  <link rel="stylesheet" href="login2/css/style.css">
+  <link rel="stylesheet" href="assets-login/css/style.css">
   <!-- endinject -->
-  <link rel="shortcut icon" href="login2/images/favicon.png" />
+  <link rel="shortcut icon" href="assets-login/images/favicon.png" />
 
 
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -167,15 +167,15 @@ $configuracion = mysqli_fetch_array($consultaConfiguracion, MYSQLI_BOTH);
   </div>
   <!-- container-scroller -->
   <!-- plugins:js -->
-  <script src="login2/vendors/js/vendor.bundle.base.js"></script>
-  <script src="login2/vendors/js/vendor.bundle.addons.js"></script>
+  <script src="assets-login/vendors/js/vendor.bundle.base.js"></script>
+  <script src="assets-login/vendors/js/vendor.bundle.addons.js"></script>
   <!-- endinject -->
   <!-- inject:js -->
-  <script src="login2/js/off-canvas.js"></script>
-  <script src="login2/js/hoverable-collapse.js"></script>
-  <script src="login2/js/misc.js"></script>
-  <script src="login2/js/settings.js"></script>
-  <script src="login2/js/todolist.js"></script>
+  <script src="assets-login/js/off-canvas.js"></script>
+  <script src="assets-login/js/hoverable-collapse.js"></script>
+  <script src="assets-login/js/misc.js"></script>
+  <script src="assets-login/js/settings.js"></script>
+  <script src="assets-login/js/todolist.js"></script>
   <!-- endinject -->
 </body>
 

@@ -6,10 +6,7 @@ include("head.php");
 ?>
 
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
 <link href="css/jquery.gritter.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
 <!--[if IE 7]>
 <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
 <![endif]-->
@@ -25,13 +22,7 @@ include("head.php");
 <!--[if IE 9]>
 <link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
 <![endif]-->
-<link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
-<!--fav and touch icons -->
-<link rel="shortcut icon" href="ico/favicon.ico">
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png">
-<link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png">
-<link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png">
-<link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png">
+
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -74,18 +65,6 @@ include("head.php");
 	}
 </style>
 
-<?php
-/*
-$clientes = mysql_query("SELECT fpp_producto, prod_nombre, COUNT(fpp_id) AS cant FROM facturacion_productos
-INNER JOIN productos ON prod_id=fpp_producto
-GROUP BY fpp_producto ORDER BY cant DESC LIMIT 0,10
-", $conexion);
-while ($cte = mysql_fetch_array($clientes)) {
-	//if($cte[3]==0) continue;
-	$cotizacionesResultados .= "['#" . $cte[0] . " - " . $cte[1] . "', '" . $cte[2] . "'],";
-}
-*/
-?>
 
 <script>
 	anychart.onDocumentReady(function() {
@@ -150,17 +129,6 @@ while ($cte = mysql_fetch_array($clientes)) {
 
 			<div class="container-fluid">
 
-				<!--
-            <div class="alert alert-error">
-				<button type="button" class="close" data-dismiss="alert">&times;</button>
-				<i class="icon-exclamation-sign"></i><strong>Warning!</strong> Best check yo self, you're not looking too good.
-			</div>
-
-            
-     <p>
-		 <a href="#" name="usuarios-agregar.php" onClick="axiosAjax(this)">Botón 1</a>
-		 <a href="#" name="usuarios-editar.php?id=16" onClick="axiosAjax(this)">Botón 2</a>
-			</p> -->
 
 				<div id="cargarAxios"></div>
 
