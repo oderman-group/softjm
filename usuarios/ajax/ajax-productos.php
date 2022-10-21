@@ -35,10 +35,8 @@ if($_POST["proceso"]==1){
 //PRODUCTOS DE LA COTIZACIÓN
 if($_POST["proceso"]==2){
 
-	$datosProducto = mysql_fetch_array(mysql_query("SELECT * FROM cotizacion_productos 
-	INNER JOIN productos ON prod_id=czpp_producto
-	WHERE czpp_id='".$_POST["producto"]."'
-	",$conexion));
+	$consultaProducto=$conexionBdPrincipal->query("SELECT * FROM cotizacion_productos INNER JOIN productos ON prod_id=czpp_producto WHERE czpp_id='".$_POST["producto"]."' ");
+	$datosProducto = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
 
 	if($_POST["campo"]=='czpp_descuento'){
 		
@@ -57,8 +55,7 @@ if($_POST["proceso"]==2){
 		}
 	}
 
-	mysql_query("UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysql_real_escape_string($_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'",$conexion);
-	if(mysql_errno()!=0){echo mysql_error(); exit();}
+	$conexionBdPrincipal->query("UPDATE cotizacion_productos SET ".$_POST["campo"]."='".$conexionBdPrincipal->real_escape_string( $_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
 	
 	//echo '<script type="text/javascript">location.reload();</script>';
 }
