@@ -1,33 +1,17 @@
-<?php include("sesion.php"); ?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 77;
-$paginaActual['pag_nombre'] = "Cotizaciones";
-?>
-<?php include("verificar-paginas.php"); ?>
-<?php include("head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
+
+include("verificar-paginas.php");
+include("head.php");
 ?>
 <!-- styles -->
-
-<!--[if IE 7]>
-            <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-        <![endif]-->
-
-
-<!--[if IE 7]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-        <![endif]-->
-<!--[if IE 8]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-        <![endif]-->
-<!--[if IE 9]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-        <![endif]-->
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link rel="stylesheet" href="css/font-awesome.css">
+<link href="css/styles.css" rel="stylesheet">
+<link href="css/theme-blue.css" rel="stylesheet">
 <link href="css/tablecloth.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
@@ -52,46 +36,9 @@ if (mysql_errno() != 0) {
 <script src="js/bootbox.js"></script>
 
 <script type="text/javascript">
-	/*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
 	$(function() {
 		$('#data-table').dataTable({
 			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-			/*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
 		});
 	});
 	$(function() {
@@ -135,15 +82,13 @@ if (mysql_errno() != 0) {
 <body>
 	<div class="layout">
 		<?php include("encabezado.php"); ?>
-
-		
 		<div class="main-wrapper">
 			<div class="container-fluid">
 				<?php include("notificaciones.php"); ?>
 
 				<p>
 					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-					<a href="cotizaciones-agregar.php?cte=<?= $_GET["cte"]; ?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+					<a href="cotizaciones-agregar.php?cte='<?php if(isset($_GET['cte'])) echo $_GET['cte'];?>'" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
 					<a href="cotizaciones.php?dctoEspecial=1" class="btn btn-warning"><i class="icon-ok-sign"></i> Cotizaciones con descuentos especiales</a>
 				</p>
 
@@ -158,12 +103,16 @@ if (mysql_errno() != 0) {
 
 								<?php
 								$filtro = '';
-								if ($_GET["q"] != "") {
-									$filtro .= " AND cotiz_id='" . $_GET["q"] . "'";
+								if(isset($_GET['q'])){
+									if ($_GET["q"] != "") {
+										$filtro .= " AND cotiz_id='" . $_GET["q"] . "'";
+									}
 								}
 
-								if ($_GET["dctoEspecial"] != "") {
-									$filtro .= " AND cotiz_descuentos_especiales=1";
+								if(isset($_GET['dctoEspecial'])){
+									if ($_GET["dctoEspecial"] != "") {
+										$filtro .= " AND cotiz_descuentos_especiales=1";
+									}
 								}
 
 								//Consulta de contar registros Solo para paginación
@@ -190,11 +139,11 @@ if (mysql_errno() != 0) {
 										<form class="form-horizontal" action="<?= $_SERVER['PHP_SELF']; ?>" method="get">
 											<div class="search-box">
 												<div class="input-append input-icon">
-													<input class="search-input" placeholder="ID..." type="text" name="q" value="<?= $_GET["q"]; ?>">
+													<input class="search-input" placeholder="ID..." type="text" name="q" value="<?php if(isset($_GET['q'])) echo $_GET['q'];?>">
 													<i class=" icon-search"></i>
 													<input class="btn" type="submit" name="buscar" value="Buscar">
 												</div>
-												<?php if ($_GET["q"] != "") { ?> <a href="<?= $_SERVER['PHP_SELF']; ?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
+												<?php if(isset($_GET['q'])){ if ($_GET["q"] != "") { ?> <a href="<?= $_SERVER['PHP_SELF']; ?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php }} ?>
 											</div>
 										</form>
 									</p>
@@ -216,14 +165,14 @@ if (mysql_errno() != 0) {
 									<tbody>
 										<?php
 										if (isset($_GET["cte"]) and $_GET["cte"] != "") {
-											$consulta = mysql_query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cli_id, cli_nombre, cli_zona
+											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cli_id, cli_nombre, cli_zona
 												FROM cotizacion
 								INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='" . $_GET["cte"] . "'
 								ORDER BY cotiz_id DESC
 								LIMIT $inicio, $limite
-								", $conexion);
+								");
 										} else {
-											$consulta = mysql_query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 
+											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 
 												cli_id, cli_nombre, cli_zona,
 												usr_id, usr_nombre 
 												FROM cotizacion
@@ -232,14 +181,15 @@ if (mysql_errno() != 0) {
 								WHERE cotiz_id=cotiz_id $filtro
 								ORDER BY cotiz_id DESC
 								LIMIT $inicio, $limite
-								", $conexion);
+								");
 										}
 										$no = 1;
-										while ($res = mysql_fetch_array($consulta)) {
+										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
 											if ($datosUsuarioActual[3] != 1) {
-												$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios 
-													WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'", $conexion));
+												$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
+												WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
+												$numZ = $consultaNumZ->num_rows;
 												if ($numZ == 0) continue;
 											}
 
@@ -247,19 +197,21 @@ if (mysql_errno() != 0) {
 												continue;
 											}
 
-											$vendedor = mysql_fetch_array(mysql_query("SELECT usr_id, usr_nombre FROM usuarios 
-												WHERE usr_id='" . $res['cotiz_vendedor'] . "'", $conexion));
+											$vendedor = mysqli_fetch_array($conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios 
+												WHERE usr_id='" . $res['cotiz_vendedor'] . "'"), MYSQLI_BOTH);
 
 											$fondoCotiz = '';
 											if ($res['cotiz_vendida'] == 1) {
 												$fondoCotiz = 'aquamarine';
 											}
 
-											$generoPedido = mysql_fetch_array(mysql_query("SELECT pedid_id, pedid_fecha_creacion FROM pedidos 
-												WHERE pedid_cotizacion='" . $res['cotiz_id'] . "'", $conexion));
+											$generoPedido = mysqli_fetch_array($conexionBdPrincipal->query("SELECT pedid_id, pedid_fecha_creacion FROM pedidos 
+												WHERE pedid_cotizacion='" . $res['cotiz_id'] . "'"), MYSQLI_BOTH);
 
 											$infoPedido = '';
-											if($generoPedido['pedid_id']!=""){$infoPedido = 'Esta cotización ya generó el pedido con ID: '.$generoPedido['pedid_id'].". En la fecha: ".$generoPedido['pedid_fecha_creacion'];}
+											if(isset($generoPedido['pedid_id'])){
+												if($generoPedido['pedid_id']!=""){$infoPedido = 'Esta cotización ya generó el pedido con ID: '.$generoPedido['pedid_id'].". En la fecha: ".$generoPedido['pedid_fecha_creacion'];}
+											}
 										?>
 											<tr>
 											<td><?= $no; ?></td>
@@ -269,12 +221,12 @@ if (mysql_errno() != 0) {
 												<td>
 													
 													<?php
-													$productos = mysql_query("SELECT prod_nombre FROM cotizacion_productos
+													$productos = $conexionBdPrincipal->query("SELECT prod_nombre FROM cotizacion_productos
 										INNER JOIN productos ON prod_id=czpp_producto
 										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "'
-										", $conexion);
+										");
 													$i = 1;
-													while ($prod = mysql_fetch_array($productos)) {
+													while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 														if($i==1){echo "<b>Productos:</b><br>";}
 														echo "<b>" . $i . ".</b> " . $prod['prod_nombre'] . ", ";
 														$i++;
@@ -282,25 +234,25 @@ if (mysql_errno() != 0) {
 													?>
 
 													<?php
-													$combos = mysql_query("SELECT combo_nombre FROM cotizacion_productos
+													$combos = $conexionBdPrincipal->query("SELECT combo_nombre FROM cotizacion_productos
 										INNER JOIN combos ON combo_id=czpp_combo
 										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "'
-										", $conexion);
+										");
 													$i = 1;
-													while ($comb = mysql_fetch_array($combos)) {
+													while ($comb = mysqli_fetch_array($combos, MYSQLI_BOTH)) {
 														if($i==1){echo "<br><b>Combos:</b><br>";}
 														echo "<b>" . $i . ".</b> " . $comb['combo_nombre'] . ", ";
 														$i++;
 													}
 													?>
 
-<?php
-													$servicios = mysql_query("SELECT serv_nombre FROM cotizacion_productos
+										<?php
+													$servicios =$conexionBdPrincipal->query("SELECT serv_nombre FROM cotizacion_productos
 										INNER JOIN servicios ON serv_id=czpp_servicio
 										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "'
-										", $conexion);
+										");
 													$i = 1;
-													while ($serv = mysql_fetch_array($servicios)) {
+													while ($serv = mysqli_fetch_array($servicios, MYSQLI_BOTH)) {
 														if($i==1){echo "<br><b>Servicios:</b><br>";}
 														echo "<b>" . $i . ".</b> " . $serv['serv_nombre'] . ", ";
 														$i++;
@@ -318,19 +270,16 @@ if (mysql_errno() != 0) {
 															<?php if ($_SESSION["id"] == $res['cotiz_creador'] or $_SESSION["id"] == $res['cotiz_vendedor'] or $datosUsuarioActual[3] == 1) { ?>
 																<li><a href="cotizaciones-editar.php?id=<?= $res['cotiz_id']; ?>#productos"> Editar</a></li>
 
-																<li><a href="sql.php?id=<?= $res['cotiz_id']; ?>&get=22" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
+																<li><a href="bd_delete/cotizaciones-eliminar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 															<?php } ?>
 
 															<li><a href="reportes/formato-cotizacion-1.php?id=<?= $res['cotiz_id']; ?>" target="_blank">Imprimir</a></li>
 
-															<li><a href="sql.php?get=46&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
+															<li><a href="bd_create/cotizaciones-replicar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
 
-																<?php if($generoPedido['pedid_id']==""){?>
-															<li><a href="sql.php?get=48&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
-															<?php }?>
-
-															<!--
-											<li><a href="#sql.php?get=56&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar factura de esta cotización?')){return false;}">Generar factura</a></li>-->
+																<?php if(isset($generoPedido['pedid_id'])){if($generoPedido['pedid_id']==""){?>
+															<li><a href="bd_create/cotizaciones-genera-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
+															<?php }}?>
 
 
 														</ul>
