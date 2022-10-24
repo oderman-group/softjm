@@ -7,8 +7,9 @@ include("verificar-paginas.php");
 include("head.php");
 ?>
 <!-- styles -->
-
-
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link rel="stylesheet" href="css/font-awesome.css">
 <link href="css/tablecloth.css" rel="stylesheet">
 
 <!--============j avascript===========-->
@@ -188,20 +189,26 @@ include("head.php");
 												continue;
 											}
 
-											$vendedor = mysqli_fetch_array($conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios 
-												WHERE usr_id='" . $res['cotiz_vendedor'] . "'"), MYSQLI_BOTH);
+											$consultaVendedor=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios 
+											WHERE usr_id='" . $res['cotiz_vendedor'] . "'");
+											$vendedor = mysqli_fetch_array($consultaVendedor, MYSQLI_BOTH);
 
 											$fondoCotiz = '';
 											if ($res['cotiz_vendida'] == 1) {
 												$fondoCotiz = 'aquamarine';
 											}
 
-											$generoPedido = mysqli_fetch_array($conexionBdPrincipal->query("SELECT pedid_id, pedid_fecha_creacion FROM pedidos 
-												WHERE pedid_cotizacion='" . $res['cotiz_id'] . "'"), MYSQLI_BOTH);
+											$consultaGpedido=$conexionBdPrincipal->query("SELECT pedid_id, pedid_fecha_creacion FROM pedidos 
+											WHERE pedid_cotizacion='" . $res['cotiz_id'] . "'");
+											$generoPedido = mysqli_fetch_array($consultaGpedido, MYSQLI_BOTH);
 
+											$IdGeneroPedido = '';
 											$infoPedido = '';
 											if(isset($generoPedido['pedid_id'])){
-												if($generoPedido['pedid_id']!=""){$infoPedido = 'Esta cotización ya generó el pedido con ID: '.$generoPedido['pedid_id'].". En la fecha: ".$generoPedido['pedid_fecha_creacion'];}
+												if($generoPedido['pedid_id']!=""){
+													$infoPedido = 'Esta cotización ya generó el pedido con ID: '.$generoPedido['pedid_id'].". En la fecha: ".$generoPedido['pedid_fecha_creacion'];
+													$IdGeneroPedido = $generoPedido['pedid_id'];
+												}
 											}
 										?>
 											<tr>
@@ -268,9 +275,9 @@ include("head.php");
 
 															<li><a href="bd_create/cotizaciones-replicar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
 
-																<?php if(isset($generoPedido['pedid_id'])){if($generoPedido['pedid_id']==""){?>
-															<li><a href="bd_create/cotizaciones-genera-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
-															<?php }}?>
+																<?php if($IdGeneroPedido == ''){?>
+															<li><a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
+															<?php }?>
 
 
 														</ul>
