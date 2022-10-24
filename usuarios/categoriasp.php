@@ -107,7 +107,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 		datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&nombreCat="+(nombreCat);
 			   $.ajax({
 				   type: "POST",
-				   url: "ajax-productos.php",
+				   url: "ajax/ajax-productos.php",
 				   data: datos,
 				   success: function(data){
 				   $('#resp').empty().hide().html(data).show(1);
@@ -125,7 +125,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 		datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&nombreCat="+(nombreCat)
 			   $.ajax({
 				   type: "POST",
-				   url: "ajax-productos.php",
+				   url: "ajax/ajax-productos.php",
 				   data: datos,
 				   success: function(data){
 				   $('#respG1').empty().hide().html(data).show(1);
@@ -143,7 +143,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 		datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&nombreCat="+(nombreCat)
 			   $.ajax({
 				   type: "POST",
-				   url: "ajax-productos.php",
+				   url: "ajax/ajax-productos.php",
 				   data: datos,
 				   success: function(data){
 				   $('#respG3').empty().hide().html(data).show(1);

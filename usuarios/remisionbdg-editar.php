@@ -172,7 +172,7 @@ if(is_numeric($_GET["cte"])){
 			datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&idRemision="+(idRemision);
 				   $.ajax({
 					   type: "POST",
-					   url: "ajax-productos.php",
+					   url: "ajax/ajax-productos.php",
 					   data: datos,
 					   success: function(data){
 					   $('#resp').empty().hide().html(data).show(1);
