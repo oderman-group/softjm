@@ -7,9 +7,6 @@ include("verificar-paginas.php");
 include("head.php");
 ?>
 <!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
 <link href="css/tablecloth.css" rel="stylesheet">
 
 <!--============j avascript===========-->
