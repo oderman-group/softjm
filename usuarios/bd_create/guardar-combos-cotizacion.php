@@ -5,15 +5,15 @@
         $contador = 0;
         while ($contador < $numero) {
 
-            $datosCombos = mysql_query("SELECT ROUND((SUM(copp_cantidad)*prod_precio),0), combo_descuento, combo_descuento_dealer FROM combos
+            $datosCombos = $conexionBdPrincipal->query("SELECT ROUND((SUM(copp_cantidad)*prod_precio),0), combo_descuento, combo_descuento_dealer FROM combos
             INNER JOIN combos_productos ON copp_combo=combo_id
             INNER JOIN productos ON prod_id=copp_producto
             WHERE combo_id='" . $_POST["combo"][$contador] . "'
             GROUP BY copp_producto
-            ", $conexion);
+            ");
             $precioCombo = 0;
             $dctoCombo = 0;
-            while ($dCombos = mysql_fetch_array($datosCombos)) {
+            while ($dCombos = mysqli_fetch_array($datosCombos, MYSQLI_BOTH)) {
                 $precioCombo += $dCombos[0];
                 $dctoCombo = $dCombos[1];
 
@@ -34,31 +34,20 @@
 
             
 
-
-            $productoNum = mysql_fetch_array(mysql_query("SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_combo='" . $_POST["combo"][$contador] . "'", $conexion));
-            if (mysql_errno() != 0) {
-                echo informarErrorAlUsuario(__LINE__, mysql_error());
-                exit();
-            }
+            $consultaProduto=$conexionBdPrincipal->query("SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_combo='" . $_POST["combo"][$contador] . "'");
+            $productoNum = mysqli_fetch_array($consultaProduto, MYSQLI_BOTH);
 
 
             if ($productoNum['czpp_id'] == '') {
-                $productoDatos = mysql_fetch_array(mysql_query("SELECT * FROM combos WHERE combo_id='" . $_POST["combo"][$contador] . "'", $conexion));
-                if (mysql_errno() != 0) {
-                    echo informarErrorAlUsuario(__LINE__, mysql_error());
-                    exit();
-                }
+                $consultaCombo= $conexionBdPrincipal->query("SELECT * FROM combos WHERE combo_id='" . $_POST["combo"][$contador] . "'");
+                $productoDatos = mysqli_fetch_array($consultaCombo, MYSQLI_BOTH);
 
                 $valorProducto = $precioCombo;
                 if ($_POST["moneda"] == 2) {
                     $valorProducto = round(($precioCombo / $configu['conf_trm_compra']), 0);
                 }
 
-                mysql_query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["combo"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 1)", $conexion);
-                if (mysql_errno() != 0) {
-                    echo informarErrorAlUsuario(__LINE__, mysql_error());
-                    exit();
-                }
+                $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["combo"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 1)");
             }
 
             $contador++;
