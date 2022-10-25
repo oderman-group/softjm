@@ -1,5 +1,6 @@
 <?php
 //COMBOS
+if($_POST["combo"]!=''){
     $numero = (count($_POST["combo"]));
     if ($numero > 0) {
         $contador = 0;
@@ -53,3 +54,4 @@
             $contador++;
         }
     }
+}

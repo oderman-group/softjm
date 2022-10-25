@@ -1,5 +1,6 @@
 <?php
 //Servicios
+if($_POST["servicio"]!=''){
     $numero = (count($_POST["servicio"]));
     if ($numero > 0) {
         $contador = 0;
@@ -16,3 +17,4 @@
             $contador++;
         }
     }
+}
