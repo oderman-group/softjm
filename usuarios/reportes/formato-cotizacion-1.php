@@ -1,4 +1,8 @@
 <?php
+include("../sesion.php");
+
+$idPagina = 50;
+
 require_once("logica-cotizacion.php");
 ?>
 
@@ -115,18 +119,18 @@ require_once("logica-cotizacion.php");
 						<?php
 						$no = 1;
 
-						$productos = mysql_query("SELECT * FROM combos
+						$productos = $conexionBdPrincipal->query("SELECT * FROM combos
 							INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "'
-							ORDER BY czpp_orden", $conexion);
+							ORDER BY czpp_orden");
 
 
-						while ($prod = mysql_fetch_array($productos)) {
+						while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 
 							require("logica-cotizacion-items.php");
 
-							$precioNormalCombo = mysql_fetch_array(mysql_query("SELECT SUM(copp_cantidad*prod_precio) FROM combos_productos
+							$precioNormalCombo = mysqli_fetch_array($conexionBdPrincipal->query("SELECT SUM(copp_cantidad*prod_precio) FROM combos_productos
 								INNER JOIN productos ON prod_id=copp_producto
-								WHERE copp_combo='".$prod['combo_id']."'",$conexion));
+								WHERE copp_combo='".$prod['combo_id']."'"), MYSQLI_BOTH);
 								?>
 								<tr style="height: 30px; background-color: <?= $fondo; ?>;">
 									<td align="center"><?= $no; ?></td>
@@ -148,11 +152,11 @@ require_once("logica-cotizacion.php");
 										<span style="font-size: 9px; color: darkblue;"><?= $prod['combo_descripcion']; ?></span><br>
 										<span style="font-size: 9px; color: teal;">
 											<?php
-											$productosCombo = mysql_query("SELECT prod_id, prod_nombre, copp_cantidad FROM productos 
+											$productosCombo = $conexionBdPrincipal->query("SELECT prod_id, prod_nombre, copp_cantidad FROM productos 
 												INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='" . $prod['combo_id'] . "'
-												ORDER BY copp_id", $conexion);
+												ORDER BY copp_id");
 											$c = 1;
-											while ($prodCombo = mysql_fetch_array($productosCombo)) {
+											while ($prodCombo = mysqli_fetch_array($productosCombo, MYSQLI_BOTH)) {
 												if ($c == 1) {
 													echo "<br><b>INCLUYE:</b><br>";
 												}
@@ -185,13 +189,13 @@ require_once("logica-cotizacion.php");
 
 							<!-- PRODUCTOS -->
 							<?php
-							$productos = mysql_query("SELECT * FROM productos 
+							$productos = $conexionBdPrincipal->query("SELECT * FROM productos 
 								INNER JOIN productos_categorias ON catp_id=prod_categoria
 								INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "'
-								ORDER BY czpp_orden", $conexion);
+								ORDER BY czpp_orden");
 
 
-							while ($prod = mysql_fetch_array($productos)) {
+							while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 								require("logica-cotizacion-items.php");
 								?>
 								<tr style="height: 30px; background-color: <?= $fondo; ?>;">
@@ -226,12 +230,16 @@ require_once("logica-cotizacion.php");
 
 							<!-- SERVICIOS -->
 							<?php
-							$productos = mysql_query("SELECT * FROM servicios
+							$productos = $conexionBdPrincipal->query("SELECT * FROM servicios
 								INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='" . $_GET["id"] . "'
-								ORDER BY czpp_orden", $conexion);
+								ORDER BY czpp_orden");
 
 
-							while ($prod = mysql_fetch_array($productos)) {
+								
+							$totalIva = 0;
+							$subtotal=0;
+							$totalDescuento=0;
+							while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 								require("logica-cotizacion-items.php");
 							?>
 								<tr style="height: 30px; background-color: <?= $fondo; ?>;">
@@ -250,14 +258,10 @@ require_once("logica-cotizacion.php");
 								<?php
 								$no++;
 							}
+							if($resultado['cotiz_envio']==''){$envio=0;}else{$envio=$resultado['cotiz_envio'];}
+							$total = $subtotal- $totalDescuento + $totalIva + $envio;
 							?>
 						</tbody>
-
-						<?php
-						$total = $subtotal - $totalDescuento;
-						$total += $resultado['cotiz_envio'] + $totalIva;
-
-						?>
 						<tfoot>
 							<tr style="font-weight: bold; font-size: 13px; height: 20px;">
 
@@ -274,19 +278,19 @@ require_once("logica-cotizacion.php");
 			</td>
 
 			<td style="text-align: right;" colspan="3">SUBTOTAL <?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?></td>
-			<td align="right" colspan="2"><?= number_format($subtotal, 0, ",", "."); ?></td>
+			<td align="right" colspan="2"><?php if(isset($subtotal)) echo number_format($subtotal, 0, ",", "."); ?></td>
 		</tr>
 		<tr style="font-weight: bold; font-size: 13px; height: 20px;">
 			<td style="text-align: right;" colspan="3">DESCUENTO <?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?></td>
-			<td align="right" colspan="2"><?= number_format($totalDescuento, 0, ",", "."); ?></td>
+			<td align="right" colspan="2"><?php if(isset($totalDescuento)) echo number_format($totalDescuento, 0, ",", "."); ?></td>
 		</tr>
 		<tr style="font-weight: bold; font-size: 13px; height: 20px;">
 			<td style="text-align: right;" colspan="3">IVA <?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?></td>
-			<td align="right" colspan="2"><?= number_format($totalIva, 0, ",", "."); ?></td>
+			<td align="right" colspan="2"><?php if(isset($totalIva)) echo number_format($totalIva, 0, ",", "."); ?></td>
 		</tr>
 		<tr style="font-weight: bold; font-size: 13px; height: 20px;">
 			<td style="text-align: right;" colspan="3">ENVÍO <?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?></td>
-			<td align="right" colspan="2"><?= number_format($resultado['cotiz_envio'], 0, ",", "."); ?></td>
+			<td align="right" colspan="2"><?php if(isset($resultado)) echo number_format(floatval($resultado['cotiz_envio']), 0, ",", "."); ?></td>
 		</tr>
 		<tr style="font-weight: bold; font-size: 13px; height: 20px;">
 			<td style="text-align: right; background-color: #0033a0; color:white;" colspan="3">TOTAL NETO <?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?></td>
