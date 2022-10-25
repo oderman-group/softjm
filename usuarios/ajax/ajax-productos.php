@@ -1,5 +1,5 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("../sesion.php");
 //EDITAR PRODUCTOS
 if($_POST["proceso"]==1){
 	mysql_query("UPDATE ".$_POST["tabla"]." SET ".$_POST["campo"]."='".$_POST["valor"]."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE ".$_POST["pk"]."='".$_POST["producto"]."'",$conexion);
@@ -34,7 +34,6 @@ if($_POST["proceso"]==1){
 
 //PRODUCTOS DE LA COTIZACIÓN
 if($_POST["proceso"]==2){
-
 	$consultaProducto=$conexionBdPrincipal->query("SELECT * FROM cotizacion_productos INNER JOIN productos ON prod_id=czpp_producto WHERE czpp_id='".$_POST["producto"]."' ");
 	$datosProducto = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
 
