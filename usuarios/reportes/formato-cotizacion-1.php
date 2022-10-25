@@ -122,8 +122,9 @@ require_once("logica-cotizacion.php");
 						$productos = $conexionBdPrincipal->query("SELECT * FROM combos
 							INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "'
 							ORDER BY czpp_orden");
-
-
+							$totalIva = 0;
+							$subtotal=0;
+							$totalDescuento=0;
 						while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 
 							require("logica-cotizacion-items.php");
@@ -193,8 +194,6 @@ require_once("logica-cotizacion.php");
 								INNER JOIN productos_categorias ON catp_id=prod_categoria
 								INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "'
 								ORDER BY czpp_orden");
-
-
 							while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 								require("logica-cotizacion-items.php");
 								?>
@@ -233,12 +232,6 @@ require_once("logica-cotizacion.php");
 							$productos = $conexionBdPrincipal->query("SELECT * FROM servicios
 								INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='" . $_GET["id"] . "'
 								ORDER BY czpp_orden");
-
-
-								
-							$totalIva = 0;
-							$subtotal=0;
-							$totalDescuento=0;
 							while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 								require("logica-cotizacion-items.php");
 							?>
