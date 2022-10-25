@@ -4,7 +4,7 @@ if(isset($_GET['cte'])){
 		$_GET["id"] = base64_decode($_GET["id"]);
 	} else {
 		if ($_SESSION["id"] == "")
-			header("Location:../../salir.php");
+			header("Location:".RUTA_PROYECTO.."/salir.php");
 	}
 }
 
