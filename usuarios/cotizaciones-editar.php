@@ -1,48 +1,27 @@
-<?php include("sesion.php");?>
 <?php
-//$idPagina = 79;
-$paginaActual['pag_nombre'] = "COTIZACIÓN #".$_GET["id"];
-?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
+include("sesion.php");
 
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM cotizacion 
+$idPagina = 79;
+
+include("verificar-paginas.php");
+include("head.php");
+
+$consultaCliente=$conexionBdPrincipal->query("SELECT * FROM cotizacion 
 INNER JOIN clientes ON cli_id=cotiz_cliente
 INNER JOIN contactos ON cont_id=cotiz_contacto
-WHERE cotiz_id='".$_GET["id"]."'",$conexion));
-?>
+WHERE cotiz_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 
-<?php
-if(is_numeric($_GET["cte"])){
-	$cliente = $_GET["cte"]; 
+if(isset($_GET["cte"])){
+	if(is_numeric($_GET["cte"])){
+		$cliente = $_GET["cte"]; 
+	}
 }else{
 	$cliente = $resultadoD['cotiz_cliente'];
 }
 ?>
 
-
-<!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -176,7 +155,7 @@ if(is_numeric($_GET["cte"])){
 			datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&tipoCliente="+(tipoCliente);
 				   $.ajax({
 					   type: "POST",
-					   url: "ajax-productos.php",
+					   url: "ajax/ajax-productos.php",
 					   data: datos,
 					   success: function(data){
 					   $('#resp').empty().hide().html(data).show(1);
@@ -194,7 +173,7 @@ if(is_numeric($_GET["cte"])){
 			datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo);
 				   $.ajax({
 					   type: "POST",
-					   url: "ajax-productos.php",
+					   url: "ajax/ajax-productos.php",
 					   data: datos,
 					   success: function(data){
 					   $('#resp').empty().hide().html(data).show(1);
@@ -216,15 +195,7 @@ if(is_numeric($_GET["cte"])){
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-                        
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>                        
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -242,8 +213,7 @@ if(is_numeric($_GET["cte"])){
 							<h3> Enviar cotización por correo</h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="58">
+							<form class="form-horizontal" method="post" action="enviar_correos/cotizaciones-enviar-correo.php">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
 								
 								<div class="control-group">
@@ -280,14 +250,10 @@ if(is_numeric($_GET["cte"])){
 				<?php
 				if($resultadoD['cotiz_vendida']!=1){
 				?>
-					<a href="sql.php?get=48&id=<?= $resultadoD['cotiz_id']; ?>" class="btn btn-info" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}"><i class="icon-money"></i> Generar pedido</a>
+					<a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $resultadoD['cotiz_id']; ?>" class="btn btn-info" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}"><i class="icon-money"></i> Generar pedido</a>
 				<?php
 				}
 				?>
-				
-				<!--
-				<a href="sql.php?get=44&id=<?=$_GET["id"];?>" class="btn btn-warning" onClick="if(!confirm('Desea Enviar este mensaje al correo del contacto?')){return false;}"><i class="icon-envelope"></i> Enviar por correo</a>
-				-->
 			</p>
 			
 			<?php
@@ -308,7 +274,6 @@ if(is_numeric($_GET["cte"])){
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="bd_update/cotizaciones-actualizar.php">
-                            <input type="hidden" name="idSql" value="36">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
 							<input type="hidden" name="monedaActual" value="<?=$resultadoD['cotiz_moneda'];?>">
                             	   
@@ -337,8 +302,8 @@ if(is_numeric($_GET["cte"])){
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" onChange="provee(this)" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysql_query("SELECT prov_id, prov_nombre FROM proveedores",$conexion);
-											 while($resOp = mysql_fetch_array($conOp)){
+											 $conOp = $conexionBdPrincipal->query("SELECT prov_id, prov_nombre FROM proveedores");
+											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_proveedor']==$resOp[0]) echo "selected";?>><?=$resOp['prov_nombre'];?></option>
 											 <?php
@@ -365,13 +330,13 @@ if(is_numeric($_GET["cte"])){
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" required onChange="clientes(this)">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT cli_id, cli_nombre, cli_categoria, 
+											$conOp = $conexionBdPrincipal->query("SELECT cli_id, cli_nombre, cli_categoria, 
 												CASE 
 													WHEN cli_categoria = 3 THEN '(DEALER)'
 													ELSE ''
 												END AS 'categoria'	
-												FROM clientes",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+												FROM clientes");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
 												$disabled = '';
 												
@@ -396,20 +361,20 @@ if(is_numeric($_GET["cte"])){
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="sucursal" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT sucu_id, sucu_nombre FROM sucursales 
-											WHERE sucu_cliente_principal='".$cliente."'",$conexion);
-											$numOp = mysql_num_rows($conOp);
+											$conOp = $conexionBdPrincipal->query("SELECT sucu_id, sucu_nombre FROM sucursales WHERE sucu_cliente_principal='".$cliente."'");
+											$numOp = $conOp->num_rows;
 											if($numOp==0){
 												//Crear automáticamente la sucursal
-												mysql_query("INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$cliente."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')",$conexion);
+												$conexionBdPrincipal->query("INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$cliente."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')");
 												
 												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
 												exit();
 											}
-											while($resOp = mysql_fetch_array($conOp)){
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+												
 											?>
-                                            	<option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_sucursal']==$resOp[0]){echo "selected";}?>><?=$resOp['sucu_nombre'];?></option>
-                                            <?php
+                                            	<option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_sucursal']==$resOp[0]){echo "selected";} echo $disabled; ?>><?=$resOp['sucu_nombre'];?></option>
+                                            <?php 
 											}
 											?>
                                     	</select>
@@ -423,17 +388,17 @@ if(is_numeric($_GET["cte"])){
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT cont_id, cont_nombre, cont_email FROM contactos 
-											WHERE cont_cliente_principal='".$cliente."'",$conexion);
-											$numOp = mysql_num_rows($conOp);
+											$conOp = $conexionBdPrincipal->query("SELECT cont_id, cont_nombre, cont_email FROM contactos 
+											WHERE cont_cliente_principal='".$cliente."'");
+											$numOp = $conOp->num_rows;
 											if($numOp==0){
 												//Crear automáticamente el contacto
-												mysql_query("INSERT INTO contactos(cont_nombre, cont_cliente_principal)VALUES('Contacto principal (Automático)', '".$cliente."')",$conexion);
+												$conexionBdPrincipal->query("INSERT INTO contactos(cont_nombre, cont_cliente_principal)VALUES('Contacto principal (Automático)', '".$cliente."')");
 												
 												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
 												exit();
 											}
-											while($resOp = mysql_fetch_array($conOp)){
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_contacto']==$resOp[0]){echo "selected";}?>><?=strtoupper($resOp['cont_nombre'])." (".$resOp['cont_email'].")";?></option>
                                             <?php
@@ -452,8 +417,8 @@ if(is_numeric($_GET["cte"])){
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['usr_id'];?>" <?php if($resultadoD['cotiz_vendedor']==$resOp['usr_id']){echo "selected";}?>><?=strtoupper($resOp['usr_nombre'])." (".$resOp['usr_email'].")";?></option>
                                             <?php
@@ -478,9 +443,11 @@ if(is_numeric($_GET["cte"])){
 								</div>
 								
 								<?php
-								if($clienteInfo['cli_credito']==1){
-									$msjCredito = "Este cliente tiene crédito con la compañía.";
-									$colorCredito = 'aquamarine';
+								if(isset($clienteInfo['cli_credito'])){
+									if($clienteInfo['cli_credito']==1){
+										$msjCredito = "Este cliente tiene crédito con la compañía.";
+										$colorCredito = 'aquamarine';
+									}
 								}else{
 									$msjCredito = "Este cliente aún NO tiene crédito con la compañía.";
 									$colorCredito = 'gold';
@@ -531,11 +498,12 @@ if(is_numeric($_GET["cte"])){
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="combo[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT combo_id, combo_nombre FROM combos 
-												ORDER BY combo_nombre",$conexion);
-												while($resOp = mysql_fetch_array($conOp)){
+												$conOp = $conexionBdPrincipal->query("SELECT combo_id, combo_nombre FROM combos 
+												ORDER BY combo_nombre");
+												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
-													$productoN = mysql_num_rows(mysql_query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo  FROM cotizacion_productos WHERE czpp_combo='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo=1",$conexion));
+													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo  FROM cotizacion_productos WHERE czpp_combo='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo=1");
+													$productoN = $consultaCotizacionP->num_rows;
 												?>
 													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>
 												<?php
@@ -554,18 +522,18 @@ if(is_numeric($_GET["cte"])){
 												$filtroProd = '';
 												if(is_numeric($resultadoD['cotiz_proveedor']) and $resultadoD['cotiz_proveedor']!='0' and $resultadoD['cotiz_proveedor']!=''){ $filtroProd .=" AND prod_proveedor='".$resultadoD['cotiz_proveedor']."'";}
 
-												$conOp = mysql_query("SELECT prod_id, prod_referencia, prod_nombre, prod_existencias, prod_categoria FROM v_productos_categorias 
+												$conOp = $conexionBdPrincipal->query("SELECT prod_id, prod_referencia, prod_nombre, prod_existencias, prod_categoria FROM productos 
 												WHERE prod_id=prod_id $filtroProd
-												ORDER BY prod_nombre",$conexion);
-												while($resOp = mysql_fetch_array($conOp)){
+												ORDER BY prod_nombre");
+												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
 													if($resOp['prod_categoria'] == 28 and ($datosUsuarioActual[3]!=1 and $datosUsuarioActual[3]!=9) ){
 														continue;
 													}
-													
-													$productoN = mysql_num_rows(mysql_query("SELECT czpp_producto, czpp_cotizacion 
+													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_producto, czpp_cotizacion 
 														FROM cotizacion_productos 
-														WHERE czpp_producto='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."'",$conexion));
+														WHERE czpp_producto='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."'");
+													$productoN = $consultaCotizacionP->num_rows;
 
 												?>
 													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_id'].". ".$resOp['prod_referencia']." ".strtoupper($resOp['prod_nombre'])." - [HAY ".$resOp['prod_existencias']."]";?></option>
@@ -583,11 +551,12 @@ if(is_numeric($_GET["cte"])){
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="servicio[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT serv_id, serv_nombre FROM servicios 
-												ORDER BY serv_nombre",$conexion);
-												while($resOp = mysql_fetch_array($conOp)){
+												$conOp = $conexionBdPrincipal->query("SELECT serv_id, serv_nombre FROM servicios 
+												ORDER BY serv_nombre");
+												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 													
-													$productoN = mysql_num_rows(mysql_query("SELECT czpp_servicio, czpp_cotizacion FROM cotizacion_productos WHERE czpp_servicio='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."'",$conexion));
+													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_servicio, czpp_cotizacion FROM cotizacion_productos WHERE czpp_servicio='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."'");
+													$productoN = $consultaCotizacionP->num_rows;
 												?>
 													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['serv_id'];?>"><?=$resOp['serv_id'].". ".$resOp['serv_nombre'];?></option>
 												<?php
@@ -690,11 +659,16 @@ if(is_numeric($_GET["cte"])){
 								
 							<!-- COMBOS -->
 							<?php
-							$productos = mysql_query("SELECT * FROM combos
+							$no = 1;
+							$productos = $conexionBdPrincipal->query("SELECT * FROM combos
 							INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='".$_GET["id"]."'
-							ORDER BY czpp_orden",$conexion);
+							ORDER BY czpp_orden");
 							$sumaUtilidad = 0;
-							while($prod = mysql_fetch_array($productos)){
+							$totalIva = 0;
+							$subtotal=0;
+							$totalDescuento=0;
+							$totalCantidad=0;
+							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 								$dcto = 0;
 								$valorTotal = 0;
 
@@ -714,17 +688,18 @@ if(is_numeric($_GET["cte"])){
 								
 								$totalCantidad += $prod['czpp_cantidad'];
 
-								$precioNormalCombo = mysql_fetch_array(mysql_query("SELECT SUM(copp_cantidad*prod_precio) FROM combos_productos
+								$consultaPreciosCombos=$conexionBdPrincipal->query("SELECT SUM(copp_cantidad*prod_precio) FROM combos_productos
 								INNER JOIN productos ON prod_id=copp_producto
-								WHERE copp_combo='".$prod['combo_id']."'",$conexion));
+								WHERE copp_combo='".$prod['combo_id']."'");
+								$precioNormalCombo = mysqli_fetch_array($consultaPreciosCombos, MYSQLI_BOTH);
 
-								$productosDelCombo = mysql_query("SELECT * FROM combos_productos
+								$productosDelCombo = $conexionBdPrincipal->query("SELECT * FROM combos_productos
 								INNER JOIN productos ON prod_id=copp_producto
 								WHERE copp_combo='".$prod['combo_id']."'
-								",$conexion);
+								");
 
 								$sumaCostosProductosCombos = 0;
-								while($pdCombo = mysql_fetch_array($productosDelCombo)){
+								while($pdCombo = mysqli_fetch_array($productosDelCombo, MYSQLI_BOTH)){
 
 									$sumaCostosProductosCombos += $pdCombo['prod_costo'];
 
@@ -747,12 +722,12 @@ if(is_numeric($_GET["cte"])){
 									<span style="font-size: 9px; color: darkblue;"><?=$prod['combo_descripcion'];?></span><br>
 									<span style="font-size: 9px; color: teal;">
 									<?php
-									$productosCombo = mysql_query("SELECT copp_id, copp_combo, copp_producto, copp_cantidad,
+									$productosCombo = $conexionBdPrincipal->query("SELECT copp_id, copp_combo, copp_producto, copp_cantidad,
 										prod_id, prod_nombre
 									   FROM productos
 									INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='".$prod['combo_id']."'
-									ORDER BY copp_id",$conexion);
-									while($prodCombo = mysql_fetch_array($productosCombo)){
+									ORDER BY copp_id");
+									while($prodCombo = mysqli_fetch_array($productosCombo, MYSQLI_BOTH)){
 										echo $prodCombo['prod_nombre']." (".$prodCombo['copp_cantidad']." Unds.).<br>";
 									}
 									?>
@@ -788,7 +763,8 @@ if(is_numeric($_GET["cte"])){
 
 
 									<?php }
-									$usuarioDctoEspecialAprobar = mysql_fetch_array(mysql_query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']."'",$conexion));
+									$consultaDctoEspecial=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']."'");
+									$usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
 									?>
 
 									<br><span style="font-size:10px; color:gray;">
@@ -810,15 +786,12 @@ if(is_numeric($_GET["cte"])){
 								
 							<!-- PRODUCTOS -->	
                             <?php
-							$no = 1;
-							$productos = mysql_query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,
+							$productos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,
 								prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad
 								FROM productos
 							INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='".$_GET["id"]."'
-							ORDER BY czpp_orden",$conexion);
-
-							
-							while($prod = mysql_fetch_array($productos)){
+							ORDER BY czpp_orden");
+							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 								$dcto = 0;
 								$valorTotal = 0;
 
@@ -896,7 +869,8 @@ if(is_numeric($_GET["cte"])){
 
 
 									<?php }
-									$usuarioDctoEspecialAprobar = mysql_fetch_array(mysql_query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']."'",$conexion));
+									$consultaDctoEspecial=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']."'");
+									$usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
 									?>
 
 									<br><span style="font-size:10px; color:gray;">
@@ -919,10 +893,10 @@ if(is_numeric($_GET["cte"])){
 								
 								<!-- SERVICIOS -->
 							<?php
-							$productos = mysql_query("SELECT * FROM servicios
+							$productos = $conexionBdPrincipal->query("SELECT * FROM servicios
 							INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='".$_GET["id"]."'
-							ORDER BY czpp_orden",$conexion);
-							while($prod = mysql_fetch_array($productos)){
+							ORDER BY czpp_orden");
+							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 								$dcto = 0;
 								$valorTotal = 0;
 
@@ -966,8 +940,8 @@ if(is_numeric($_GET["cte"])){
 							?>
 							
 							<?php
-							$total = $subtotal - $totalDescuento;
-							$total +=$resultado['cotiz_envio'] + $totalIva;
+							if($resultadoD['cotiz_envio']==''){$envio=0;}else{$envio=$resultadoD['cotiz_envio'];}
+							$total = $subtotal- $totalDescuento + $totalIva + $envio;
 							?>	
 							</tbody>
 							<tfoot>
@@ -985,7 +959,7 @@ if(is_numeric($_GET["cte"])){
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">ENVÍO</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($resultadoD['cotiz_envio'],0,",",".");?></td>
+									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($envio,0,",",".");?></td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">TOTAL NETO</td>
