@@ -48,7 +48,9 @@ include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
     cli_tipo_documento='" . $_POST["tipoDocumento"] . "' 
     WHERE cli_id='" . $_POST["id"] . "'");
 
-if(isset($_POST["grupos"])){    
+if(isset($_POST["grupos"])){
+    $conexionBdPrincipal->query("DELETE FROM clientes_categorias WHERE cpcat_cliente='" . $_POST["id"] . "'");
+    
 	$numero = (count($_POST["grupos"]));
 	$contador = 0;
 	

@@ -1,30 +1,14 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
 $idPagina = 167;
+include("verificar-paginas.php");
+include("head.php");
 ?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
+
 <!-- styles -->
 <link href="css/jquery.gritter.css" rel="stylesheet">
-<!--[if IE 7]>
-<link rel="stylesheet" href="css2020/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/tablecloth.css" rel="stylesheet">
-<link href="css/responsive-tables.css" rel="stylesheet">
-<link href="css2020/styles.css" rel="stylesheet">
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css2020/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css2020/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css2020/ie/ie9.css" />
-<![endif]-->
+
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
