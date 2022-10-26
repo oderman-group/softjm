@@ -87,7 +87,7 @@ include("head.php");
 												<td><?=$res['utipo_nombre'];?></td>
 												<td><h4>
 													<a href="roles-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-													<?php if($res['utipo_id']!=1){?><a href="sql.php?id=<?=$res[0];?>&get=2" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a><?php }?>
+													<?php if($res['utipo_id']!=1){?><a href="bd_delete/roles-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a><?php }?>
 												</h4></td>
 											</tr>
 											<?php $no++;}?>
