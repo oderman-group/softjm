@@ -20,31 +20,7 @@ if (mysql_errno() != 0) {
 ?>
 <?php
 //AGREGAR USUARIOS
-if ($_POST["idSql"] == 1) {
-	mysql_query("INSERT INTO usuarios(usr_login, usr_clave, usr_tipo, usr_nombre, usr_email, usr_bloqueado, usr_ciudad, usr_area, usr_sucursal)VALUES('" . $_POST["usuario"] . "',SHA1('" . $_POST["clave"] . "'),'" . $_POST["tipoU"] . "','" . $_POST["nombre"] . "','" . $_POST["email"] . "',0,'" . $_POST["ciudad"] . "','" . $_POST["area"] . "', '" . $_POST["sucursal"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsertU = mysql_insert_id();
-	$numero = (count($_POST["zona"]));
-	$contador = 0;
-	mysql_query("DELETE FROM zonas_usuarios WHERE zpu_usuario='" . $idInsertU . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	while ($contador < $numero) {
-		mysql_query("INSERT INTO zonas_usuarios(zpu_usuario, zpu_zona)VALUES('" . $idInsertU . "'," . $_POST["zona"][$contador] . ")", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-		$contador++;
-	}
-	echo '<script type="text/javascript">window.location.href="usuarios-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
+
 //EDITAR USUARIOS
 if ($_POST["idSql"] == 2) {
 
