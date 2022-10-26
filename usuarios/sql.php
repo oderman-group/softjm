@@ -2915,19 +2915,6 @@ if ($_POST["idSql"] == 92) {
 //ELIMINAR USUARIO
 
 //ELIMINAR ROLES
-if ($_GET["get"] == 2) {
-	$idPagina = 54;
-	include("verificar-paginas.php");
-	mysql_query("DELETE FROM paginas_perfiles WHERE pper_tipo_usuario='" . $_GET["id"] . "'", $conexion);
-	mysql_query("DELETE FROM usuarios WHERE usr_tipo='" . $_GET["id"] . "'", $conexion);
-	mysql_query("DELETE FROM usuarios_tipos WHERE utipo_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="roles.php?msg=3";</script>';
-	exit();
-}
 
 //ELIMINAR SEGUIMIENTO CLIENTES
 if ($_GET["get"] == 4) {
