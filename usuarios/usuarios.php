@@ -157,7 +157,7 @@ include("head.php");
 													<h4>
 														<a href="usuarios-editar.php?id=<?=$res['usr_id'];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
 														
-														<a href="sql.php?id=<?=$res['usr_id'];?>&get=1" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+														<a href="bd_delete/usuarios-eliminar.php?id=<?=$res['usr_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 														
 														<a href="calendario.php?id=<?=$res['usr_id'];?>" data-toggle="tooltip" title="Calendario"><i class="icon-calendar"></i></a>
 														
