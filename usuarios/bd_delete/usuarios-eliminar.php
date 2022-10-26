@@ -8,5 +8,5 @@
 
     include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
 
-    echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
+	echo '<script type="text/javascript">window.location.href="../usuarios.php?msg=3";</script>';
 	exit();
