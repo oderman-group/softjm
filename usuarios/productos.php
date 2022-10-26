@@ -143,7 +143,7 @@ if (mysql_errno() != 0) {
 		datos = "producto=" + (producto) + "&proceso=" + (proceso) + "&valor=" + (valor) + "&campo=" + (campo) + "&tabla=" + $("#tabla").val() + "&pk=" + $("#pk").val();
 		$.ajax({
 			type: "POST",
-			url: "ajax-productos.php",
+			url: "ajax/ajax-productos.php",
 			data: datos,
 			success: function(data) {
 				$('#resp').empty().hide().html(data).show(1);
@@ -170,7 +170,7 @@ if (mysql_errno() != 0) {
 		datos = "producto=" + (producto) + "&proceso=" + (proceso) + "&valorActual=" + (valorActual);
 		$.ajax({
 			type: "POST",
-			url: "ajax-productos.php",
+			url: "ajax/ajax-productos.php",
 			data: datos,
 			success: function(data) {
 				$('#resp').empty().hide().html(data).show(1);
@@ -197,7 +197,7 @@ if (mysql_errno() != 0) {
 		datos = "producto=" + (producto) + "&proceso=" + (proceso) + "&valorActual=" + (valorActual);
 		$.ajax({
 			type: "POST",
-			url: "ajax-productos.php",
+			url: "ajax/ajax-productos.php",
 			data: datos,
 			success: function(data) {
 				$('#resp').empty().hide().html(data).show(1);

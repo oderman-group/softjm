@@ -2,20 +2,25 @@
 $dcto = 0;
 $valorTotal = 0;
 
-$valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
+if($prod['czpp_valor']!=''){
+	$valorTotal = $prod['czpp_valor'] * $prod['czpp_cantidad'];
+}else{
+	$valorTotal = 0 * $prod['czpp_cantidad'];
+}
 
-if ($prod['czpp_cantidad'] > 0 and $prod['czpp_descuento'] > 0) {
-	$dcto = ($valorTotal * ($prod['czpp_descuento'] / 100));
-	$totalDescuento += $dcto;
+
+if($prod['czpp_cantidad']>0 and $prod['czpp_descuento']>0){
+	$dcto = ($valorTotal * ($prod['czpp_descuento']/100));
+	$totalDescuento = $totalDescuento+$dcto;	
 }
 
 $valorConDcto = $valorTotal - $dcto;
+$totalIva =$totalIva + ($valorConDcto * ($prod['czpp_impuesto']/100));
 
-$totalIva += ($valorConDcto * ($prod['czpp_impuesto'] / 100));
+$subtotal =$subtotal+$valorTotal;
 
-$subtotal += $valorTotal;
 
-$totalCantidad += $prod['czpp_cantidad'];
+$totalCantidad = $prod['czpp_cantidad'];
 
 $fondo = 'white';
 if ($no % 2 == 0) {

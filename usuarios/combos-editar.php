@@ -157,7 +157,7 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM combos WHERE combo_id
 		datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo);
 			   $.ajax({
 				   type: "POST",
-				   url: "ajax-productos.php",
+				   url: "ajax/ajax-productos.php",
 				   data: datos,
 				   success: function(data){
 				   $('#resp').empty().hide().html(data).show(1);

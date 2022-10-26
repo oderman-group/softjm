@@ -1,6 +1,5 @@
 <?php   
 require_once("../sesion.php");
-require("../funciones-para-el-sistema.php");
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;

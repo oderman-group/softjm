@@ -20,58 +20,9 @@ if (mysql_errno() != 0) {
 ?>
 <?php
 //AGREGAR USUARIOS
-if ($_POST["idSql"] == 1) {
-	mysql_query("INSERT INTO usuarios(usr_login, usr_clave, usr_tipo, usr_nombre, usr_email, usr_bloqueado, usr_ciudad, usr_area, usr_sucursal)VALUES('" . $_POST["usuario"] . "',SHA1('" . $_POST["clave"] . "'),'" . $_POST["tipoU"] . "','" . $_POST["nombre"] . "','" . $_POST["email"] . "',0,'" . $_POST["ciudad"] . "','" . $_POST["area"] . "', '" . $_POST["sucursal"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsertU = mysql_insert_id();
-	$numero = (count($_POST["zona"]));
-	$contador = 0;
-	mysql_query("DELETE FROM zonas_usuarios WHERE zpu_usuario='" . $idInsertU . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	while ($contador < $numero) {
-		mysql_query("INSERT INTO zonas_usuarios(zpu_usuario, zpu_zona)VALUES('" . $idInsertU . "'," . $_POST["zona"][$contador] . ")", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-		$contador++;
-	}
-	echo '<script type="text/javascript">window.location.href="usuarios-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
+
 //EDITAR USUARIOS
-if ($_POST["idSql"] == 2) {
 
-	if ($_FILES['foto']['name'] != "") {
-		
-		$destino = "files/fotos";
-		$foto = subirArchivosAlServidor($_FILES['foto'], 'fp', $destino);
-
-		mysql_query("UPDATE usuarios SET usr_foto='" . $foto . "' WHERE usr_id='" . $_POST["id"] . "'", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-	}
-	
-	mysql_query("UPDATE usuarios SET usr_login='" . $_POST["usuario"] . "', usr_nombre='" . $_POST["nombre"] . "', usr_email='" . $_POST["email"] . "', usr_tipo='" . $_POST["tipoU"] . "', usr_ciudad='" . $_POST["ciudad"] . "', usr_area='" . $_POST["area"] . "', usr_bloqueado='" . $_POST["bloqueado"] . "', usr_intentos_fallidos='" . $_POST["fallidos"] . "', usr_sucursal='" . $_POST["sucursal"] . "', usr_meta_ventas='" . $_POST["metaVentas"] . "'
-	WHERE usr_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	
-
-	echo '<script type="text/javascript">window.location.href="usuarios-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 //AGREGAR ROLES
 if ($_POST["idSql"] == 3) {
 	mysql_query("INSERT INTO usuarios_tipos(utipo_nombre)VALUES('" . $_POST["nombre"] . "')", $conexion);
@@ -1875,77 +1826,7 @@ if ($_POST["idSql"] == 57) {
 	exit();
 }
 //ENVIAR COTIZACIÓN AL CORREO ELABORADO
-if ($_POST["idSql"] == 58) {
 
-	$resultado = mysql_fetch_array(mysql_query("SELECT * FROM cotizacion
-	INNER JOIN clientes ON cli_id=cotiz_cliente
-	INNER JOIN sucursales ON sucu_id=cotiz_sucursal
-	INNER JOIN contactos ON cont_id=cotiz_contacto
-	INNER JOIN usuarios ON usr_id=cotiz_vendedor
-	WHERE cotiz_id='" . $_POST["id"] . "'", $conexion));
-
-	$fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
-	$fin .= '
-				<center>
-					<p align="center"><img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="350"></p>
-					<div style="font-family:arial; background:' . $configuracion["conf_fondo_mensaje"] . '; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
-						
-						<p style="color:' . $configuracion["conf_color_letra"] . ';">' . $_POST['mensaje'] . '<br>
-						Haga click en el siguiente enlace para revisar la cotización.</p>
-						
-						<p align="center"><a href="' . $configuracion["conf_url_encuestas"] . '/usuarios/reportes/formato-cotizacion-1.php?cte=1&id=' . base64_encode($_POST["id"]) . '" target="_blank" style="color:' . $configuracion["conf_color_link"] . ';">REVISAR COTIZACIÓN</a></p>
-						
-						<p align="center" style="color:' . $configuracion["conf_color_letra"] . ';">
-							<img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="80"><br>
-							' . $configuracion["conf_mensaje_pie"] . '<br>
-							<a href="' . $configuracion["conf_web"] . '" style="color:' . $configuracion["conf_color_link"] . ';">' . $configuracion["conf_web"] . '</a>
-						</p>
-						
-					</div>
-				</center>
-				<p>&nbsp;</p>
-			';
-	$fin .= '';
-	$fin .=  '<html><body>';
-
-
-	// Instantiation and passing `true` enables exceptions
-	$mail = new PHPMailer(true);
-
-	try {
-		//Server settings
-		$mail->SMTPDebug = 2;                                       // Enable verbose debug output
-		$mail->isSMTP();                                            // Set mailer to use SMTP
-		$mail->Host       = 'mail.orioncrm.com.co';  // Specify main and backup SMTP servers
-		$mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-		$mail->Username   = $configuracion['conf_email'];                     // SMTP username
-		$mail->Password   = $configuracion['conf_clave_correo'];                              // SMTP password
-		$mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
-		$mail->Port       = 465;                                    // TCP port to connect to
-
-		//Recipients
-		$mail->setFrom($configuracion['conf_email'], '');
-		$mail->addAddress($resultado['cont_email'], $contacto['cont_nombre']);     // Add a recipient
-		$mail->addAddress($resultado['cli_email'], $contacto['cli_nombre']);     // Add a recipient
-		$mail->addAddress($resultado['usr_email'], $contacto['usr_nombre']);     // Add a recipient
-
-
-		// Content
-		$mail->isHTML(true);                                  // Set email format to HTML
-		$mail->Subject = $_POST['asunto'];
-		$mail->Body = $fin;
-		$mail->CharSet = 'UTF-8';
-
-		$mail->send();
-		echo 'Enviada cotización al cliente.';
-	} catch (Exception $e) {
-		echo "Error: {$mail->ErrorInfo}";
-	}
-
-
-	echo '<script type="text/javascript">window.location.href="cotizaciones-editar.php?msg=6&id=' . $_POST["id"] . '";</script>';
-	exit();
-}
 //AGREGAR SERVICIOS
 if ($_POST["idSql"] == 59) {
 	mysql_query("INSERT INTO servicios(serv_nombre, serv_precio)VALUES('" . $_POST["nombre"] . "','" . $_POST["precio"] . "')", $conexion);
@@ -2282,16 +2163,7 @@ if ($_POST["idSql"] == 73) {
 //aqui estaba la actualización de estructura de mensajes.
 
 //EDITAR CLAVE DE USUARIOS
-if ($_POST["idSql"] == 75) {
-	mysql_query("UPDATE usuarios SET  usr_clave=SHA1('" . $_POST["clave"] . "') WHERE usr_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
 
-	echo '<script type="text/javascript">window.location.href="usuarios-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 //EDITAR CONTRASEÑA
 /*
 if ($_POST["idSql"] == 76) {
@@ -3407,18 +3279,6 @@ if ($_GET["get"] == 21) {
 	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
 	exit();
 }
-//ELIMINAR COTIZACIONES
-if ($_GET["get"] == 22) {
-	$idPagina = 80;
-	include("verificar-paginas.php");
-	mysql_query("DELETE FROM cotizacion WHERE cotiz_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 //ELIMINAR SUCURSALES
 if ($_GET["get"] == 23) {
 	$idPagina = 86;
@@ -3774,36 +3634,6 @@ if ($_GET["get"] == 44) {
 	echo '<script type="text/javascript">window.location.href="cotizaciones.php?msg=6";</script>';
 	exit();
 }
-
-//REPLICAR COTIZACIÓN
-if ($_GET["get"] == 46) {
-	//$idPagina = 72; include("verificar-paginas.php");
-	mysql_query("INSERT INTO cotizacion (cotiz_fecha_propuesta, cotiz_descripcion, cotiz_valor, cotiz_observaciones, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, cotiz_creador, cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, cotiz_fecha_creacion, cotiz_moneda) SELECT cotiz_fecha_propuesta, cotiz_descripcion, cotiz_valor, cotiz_observaciones, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, '" . $_SESSION["id"] . "', cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, now(), cotiz_moneda FROM cotizacion WHERE cotiz_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsert = mysql_insert_id();
-
-
-	$productos = mysql_query("SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	while ($prod = mysql_fetch_array($productos)) {
-		mysql_query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_observacion, czpp_servicio, czpp_combo)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '" . $prod['czpp_cantidad'] . "', '" . $prod['czpp_impuesto'] . "', '" . $prod['czpp_tipo'] . "', '" . $prod['czpp_observacion'] . "', '" . $prod['czpp_servicio'] . "', '" . $prod['czpp_combo'] . "')", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-		$contador++;
-	}
-
-	echo '<script type="text/javascript">window.location.href="cotizaciones-editar.php?id=' . $idInsert . '";</script>';
-	exit();
-}
 //Eliminar marcas
 if ($_GET["get"] == 47) {
 	//$idPagina = 118; include("verificar-paginas.php");
@@ -3815,52 +3645,7 @@ if ($_GET["get"] == 47) {
 	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
 	exit();
 }
-//GENERAR PEDIDO A PARTIR DE COTIZACIÓN
-if ($_GET["get"] == 48) {
-	//$idPagina = 72; include("verificar-paginas.php");
 
-	$generoPedido = mysql_fetch_array(mysql_query("SELECT * FROM pedidos WHERE pedid_cotizacion='" . $_GET["id"] . "'", $conexion));
-	if($generoPedido[0]!=""){
-		echo "<span style='font-family:arial; text-align:center; color:red;'>Esta cotización ya generó el pedido con ID: ".$generoPedido[0].". En la fecha: ".$generoPedido['pedid_fecha_creacion']."</div>";
-		exit();
-	}
-
-	mysql_query("INSERT INTO pedidos (pedid_fecha_propuesta, pedid_observaciones, pedid_cliente, pedid_fecha_vencimiento, pedid_vendedor, pedid_creador, pedid_sucursal, pedid_contacto, pedid_forma_pago, pedid_fecha_creacion, pedid_moneda, pedid_cotizacion, pedid_estado) SELECT now(), cotiz_observaciones, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, '" . $_SESSION["id"] . "', cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, now(), cotiz_moneda, '" . $_GET["id"] . "', 1 FROM cotizacion WHERE cotiz_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsert = mysql_insert_id();
-
-
-	$productos = mysql_query("SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=1", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	while ($prod = mysql_fetch_array($productos)) {
-		if ($prod['czpp_orden'] == "") $prod['czpp_orden'] = 1;
-		if ($prod['czpp_cantidad'] == "") $prod['czpp_cantidad'] = 1;
-
-		mysql_query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_servicio, czpp_combo, czpp_descuento)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '" . $prod['czpp_cantidad'] . "', '" . $prod['czpp_impuesto'] . "', 2, '" . $prod['czpp_servicio'] . "', '" . $prod['czpp_combo'] . "', '" . $prod['czpp_descuento'] . "')", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-
-		$contador++;
-	}
-
-	mysql_query("UPDATE cotizacion SET cotiz_vendida=1, cotiz_fecha_vendida=now() WHERE cotiz_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	echo '<script type="text/javascript">window.location.href="pedidos.php?q=' . $idInsert . '";</script>';
-	exit();
-}
 //ELIMINAR SERVICIOS
 if ($_GET["get"] == 49) {
 	//$idPagina = 118; include("verificar-paginas.php");
