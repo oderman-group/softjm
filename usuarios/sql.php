@@ -3002,17 +3002,7 @@ if ($_POST["idSql"] == 92) {
 
 //GET GET GET GET GET GETGET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET
 //ELIMINAR USUARIO
-if ($_GET["get"] == 1) {
-	$idPagina = 53;
-	include("verificar-paginas.php");
-	echo mysql_query("DELETE FROM usuarios WHERE usr_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="usuarios.php?msg=3";</script>';
-	exit();
-}
+
 //ELIMINAR ROLES
 if ($_GET["get"] == 2) {
 	$idPagina = 54;
