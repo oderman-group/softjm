@@ -22,32 +22,7 @@ if (mysql_errno() != 0) {
 //AGREGAR USUARIOS
 
 //EDITAR USUARIOS
-if ($_POST["idSql"] == 2) {
 
-	if ($_FILES['foto']['name'] != "") {
-		
-		$destino = "files/fotos";
-		$foto = subirArchivosAlServidor($_FILES['foto'], 'fp', $destino);
-
-		mysql_query("UPDATE usuarios SET usr_foto='" . $foto . "' WHERE usr_id='" . $_POST["id"] . "'", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-	}
-	
-	mysql_query("UPDATE usuarios SET usr_login='" . $_POST["usuario"] . "', usr_nombre='" . $_POST["nombre"] . "', usr_email='" . $_POST["email"] . "', usr_tipo='" . $_POST["tipoU"] . "', usr_ciudad='" . $_POST["ciudad"] . "', usr_area='" . $_POST["area"] . "', usr_bloqueado='" . $_POST["bloqueado"] . "', usr_intentos_fallidos='" . $_POST["fallidos"] . "', usr_sucursal='" . $_POST["sucursal"] . "', usr_meta_ventas='" . $_POST["metaVentas"] . "'
-	WHERE usr_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	
-
-	echo '<script type="text/javascript">window.location.href="usuarios-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 //AGREGAR ROLES
 if ($_POST["idSql"] == 3) {
 	mysql_query("INSERT INTO usuarios_tipos(utipo_nombre)VALUES('" . $_POST["nombre"] . "')", $conexion);
@@ -2188,16 +2163,7 @@ if ($_POST["idSql"] == 73) {
 //aqui estaba la actualización de estructura de mensajes.
 
 //EDITAR CLAVE DE USUARIOS
-if ($_POST["idSql"] == 75) {
-	mysql_query("UPDATE usuarios SET  usr_clave=SHA1('" . $_POST["clave"] . "') WHERE usr_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
 
-	echo '<script type="text/javascript">window.location.href="usuarios-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 //EDITAR CONTRASEÑA
 /*
 if ($_POST["idSql"] == 76) {
