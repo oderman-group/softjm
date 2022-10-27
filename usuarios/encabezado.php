@@ -86,8 +86,8 @@ switch($_SESSION["bd"]){
 									</ul>
 								</div>
 								</li>
-								<li><a href="#"><i class=" icon-unlock"></i>Módulos</a></li>
-                                <li><a href="#"><i class="icon-file"></i> Páginas</a></li>
+								<li><a href="modulos.php"><i class=" icon-unlock"></i>Módulos</a></li>
+                                <li><a href="paginas.php"><i class="icon-file"></i> Páginas</a></li>
 								<li><a href="buzon.php"><i class="icon-envelope"></i> Buzón de salida </a></li>
 
 								<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Documentación</a>
