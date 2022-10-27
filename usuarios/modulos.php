@@ -69,7 +69,7 @@ include("head.php");
 									<table class="table table-striped table-bordered" id="data-table">
 										<thead>
 											<tr>
-												<th>#</th>
+												<th>No</th>
 												<th>Nombre</th>
 												<th></th>
 											</tr>
