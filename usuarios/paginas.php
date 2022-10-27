@@ -81,12 +81,11 @@ include("head.php");
 											$consulta = $conexionBdAdmin->query("SELECT * FROM paginas");
 											$no = 1;
 											while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){    
-                                                if($res['pag_id_modulo']!=0){                                            
+                                                $nombreModulo='[SIN MODULO]';
+												if($res['pag_id_modulo']!=0){                                            
                                                     $consultaNombreMod = $conexionBdAdmin->query("SELECT * FROM modulos WHERE mod_id='".$res['pag_id_modulo']."'");
                                                     $resNombreModulo = mysqli_fetch_array($consultaNombreMod, MYSQLI_BOTH);                                                    
                                                     $nombreModulo=$resNombreModulo['mod_nombre'];
-                                                }else{
-                                                    $nombreModulo='Modificar';
                                                 }
 											?>
 											<tr>
