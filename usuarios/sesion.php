@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-const RUTA_PROYECTO = "C:/xampp/htdocs/works-projects/softjm";
+const RUTA_PROYECTO = "C:/xampp/htdocs/softjm";
 
 if( $_SESSION["id"]=="" || !is_numeric($_SESSION["id"]) )
 	header("Location:../salir.php");
@@ -53,6 +53,10 @@ $negociosGanados = array("", "Precio", "Calidad", "Atención");
 $estadoRegistros = array("Inactivo", "Activo");
 $opcionSINO = array("NO", "SI");
 $tipoDocumento = array("Desc.", "Desc.", "NIT", "Cédula");
+
+$tipoCrud= array("", "Create", "Read", "Update", "Delete");
+
+$formaPago = array("", "CONTADO", "CRÉDITO");
 
 $tipoBuzon = array("Desc.", "Portafolios", "Cotización");
 $estadoBuzon = array("Desc.", "OK", "ERROR");
