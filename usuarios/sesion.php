@@ -54,7 +54,7 @@ $estadoRegistros = array("Inactivo", "Activo");
 $opcionSINO = array("NO", "SI");
 $tipoDocumento = array("Desc.", "Desc.", "NIT", "Cédula");
 
-$tipoCrud= array("", "Create", "Read", "Update", "Delete");
+$tipoCrud= array("", "Read", "Create", "Update", "Delete");
 
 $formaPago = array("", "CONTADO", "CRÉDITO");
 
