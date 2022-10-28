@@ -142,7 +142,7 @@ include("includes/head.php");
 								<li><a href="clientes-filtro.php">Imprimir informe</a></li>
 								
 								<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15 or $_SESSION["id"]==17){?>
-								<li><a href="excel-exportar/clientes-exportar.php?dpto=<?php if(isset($_GET["dpto"])) echo $_GET["dpto"];?>" target="_blank">Exportar a Excel</a></li>
+								<li><a href="excel_exportar/clientes-exportar.php?dpto=<?php if(isset($_GET["dpto"])) echo $_GET["dpto"];?>" target="_blank">Exportar a Excel</a></li>
 								<li><a href="bd_update/clientes-actualizar-claves.php" onClick="if(!confirm('Desea ejecutar esta accion?')){return false;}">Cambiar todas las claves</a></li>
 								<li><a href="clientes.php?pap=1">Ver clientes en papelera</a></li>
 								<?php }?>
