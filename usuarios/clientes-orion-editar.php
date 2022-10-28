@@ -1,38 +1,16 @@
-<?php include("sesion.php"); ?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM clientes_orion WHERE clio_id='" . $_GET["id"] . "'", $conexion));
+<?php 
+include("sesion.php");
 
 $idPagina = 171;
-$paginaActual['pag_nombre'] = "Editar clientes ORION";
-?>
-<?php include("includes/verificar-paginas.php"); ?>
-<?php include("includes/head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consulta= $conexionBdAdmin->query("SELECT * FROM clientes_orion WHERE clio_id='" . $_GET["id"] . "'");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 
 <!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
-
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -48,104 +26,11 @@ if (mysql_errno() != 0) {
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
-<script type="text/javascript">
-	/*====TAGS INPUT====*/
-	$(function() {
-		$('#tags_1').tagsInput({
-			width: 'auto'
-		});
-		$('#tags_2').tagsInput({
-			width: 'auto',
-			onChange: function(elem, elem_tags) {
-				var languages = ['php', 'ruby', 'javascript'];
-				$('.tag', elem_tags).each(function() {
-					if ($(this).text().search(new RegExp('\\b(' + languages.join('|') + ')\\b')) >= 0) $(this).css('background-color', 'yellow');
-				});
-			}
-		});
-	});
-	/*====Select Box====*/
-	$(function() {
-		$(".chzn-select").chosen();
-		$(".chzn-select-deselect").chosen({
-			allow_single_deselect: true
-		});
-	});
-	/*====Color Picker====*/
-	$(function() {
-		$('.colorpicker').colorpicker({
-			format: 'hex'
-		});
-		$('.pick-color').colorpicker();
-	});
-	/*====DATE Time Picker====*/
-	$(function() {
-		$('#datetimepicker1').datetimepicker({
-			language: 'pt-BR'
-		});
-	});
-	$(function() {
-		$('#datetimepicker3').datetimepicker({
-			pickDate: false
-		});
-	});
-	$(function() {
-		$('#datetimepicker4').datetimepicker({
-			pickTime: false
-		});
-	});
-	/*DATE RANGE PICKER*/
-	$(function() {
-		$('#reportrange').daterangepicker({
-				ranges: {
-					'Today': ['today', 'today'],
-					'Yesterday': ['yesterday', 'yesterday'],
-					'Last 7 Days': [Date.today().add({
-						days: -6
-					}), 'today'],
-					'Last 30 Days': [Date.today().add({
-						days: -29
-					}), 'today'],
-					'This Month': [Date.today().moveToFirstDayOfMonth(), Date.today().moveToLastDayOfMonth()],
-					'Last Month': [Date.today().moveToFirstDayOfMonth().add({
-						months: -1
-					}), Date.today().moveToFirstDayOfMonth().add({
-						days: -1
-					})]
-				},
-				opens: 'left',
-				format: 'MM/dd/yyyy',
-				separator: ' to ',
-				startDate: Date.today().add({
-					days: -29
-				}),
-				endDate: Date.today(),
-				minDate: '01/01/2012',
-				maxDate: '12/31/2013',
-				locale: {
-					applyLabel: 'Submit',
-					fromLabel: 'From',
-					toLabel: 'To',
-					customRangeLabel: 'Custom Range',
-					daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-					monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-					firstDay: 1
-				},
-				showWeekNumbers: true,
-				buttonClasses: ['btn-danger']
-			},
-			function(start, end) {
-				$('#reportrange span').html(start.toString('MMMM d, yyyy') + ' - ' + end.toString('MMMM d, yyyy'));
-			});
-		//Set the initial state of the picker label
-		$('#reportrange span').html(Date.today().add({
-			days: -29
-		}).toString('MMMM d, yyyy') + ' - ' + Date.today().toString('MMMM d, yyyy'));
-	});
-	$(function() {
-		$('#reservation').daterangepicker();
-	});
-</script>
+
+<?php 
+//Son todas las funciones javascript para que los campos del formulario funcionen bien.
+include("includes/js-formularios.php");
+?>
 
 <script type="text/javascript">
 	function clientesVerificar(enviada) {
@@ -156,7 +41,7 @@ if (mysql_errno() != 0) {
 			"&opcion=" + (opcion);
 		$.ajax({
 			type: "POST",
-			url: "ajax-clientes-verificar.php",
+			url: "ajax/ajax-clientes-verificar.php",
 			data: datos,
 			success: function(data) {
 				$('#resp').empty().hide().html(data).show(1);
@@ -182,14 +67,6 @@ if (mysql_errno() != 0) {
 					<div class="span12">
 						<div class="primary-head">
 							<h3 class="page-header"><?= $paginaActual['pag_nombre']; ?></h3>
-
-							<ul class="top-right-toolbar">
-								<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-								</li>
-								<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-								<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-							</ul>
-
 						</div>
 						<ul class="breadcrumb">
 							<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -205,8 +82,7 @@ if (mysql_errno() != 0) {
 								<h3> <?= $paginaActual['pag_nombre']; ?></h3>
 							</div>
 							<div class="widget-container">
-								<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-									<input type="hidden" name="idSql" value="90">
+								<form class="form-horizontal" method="post" action="bd_update/actualizar-cliente-orion.php" enctype="multipart/form-data">
 									<input type="hidden" name="id" value="<?= $_GET["id"]; ?>">
 
 									<fieldset class="default">
@@ -248,7 +124,25 @@ if (mysql_errno() != 0) {
 											</div>
 										</div>
 
-
+                                
+										<div class="control-group">
+											<label class="control-label">Modulos</label>
+											<div class="controls">
+												<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="modulo[]" multiple>
+													<option value=""></option>
+													<?php
+													$conOp = $conexionBdAdmin->query("SELECT * FROM modulos");
+													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+														$consultaModulos=$conexionBdAdmin->query("SELECT * FROM modulos_empresa WHERE mxe_id_empresa='".$resultadoD['clio_id']."' AND mxe_id_modulo='".$resOp['mod_id']."'");
+														$numZ = $consultaModulos->num_rows;
+													?>
+														<option value="<?=$resOp[0];?>"<?php if($numZ>0){echo "selected";}?> ><?=$resOp['mod_nombre'];?></option>
+													<?php
+													}
+													?>
+												</select>
+											</div>
+										</div>
 
 										<div class="control-group">
 											<label class="control-label">Contacto principal</label>
