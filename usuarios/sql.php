@@ -2792,50 +2792,8 @@ if ($_POST["idSql"] == 89) {
 	exit();
 }
 //EDITAR CLIENTES ORION
-if ($_POST["idSql"] == 90) {
 
-	if ($_FILES['contrato']['name'] != "") {
-		$extension = end(explode(".", $_FILES['contrato']['name']));
-		$contrato = uniqid('cont_') . "." . $extension;
-		$destino = "files/contratos";
-		move_uploaded_file($_FILES['contrato']['tmp_name'], $destino . "/" . $contrato);
-
-		mysql_query("UPDATE clientes_orion SET clio_contrato='" . $contrato . "' WHERE clio_id='" . $_POST["id"] . "'", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-	}
-
-	mysql_query("UPDATE clientes_orion SET  clio_empresa='" . $_POST["nombre"] . "', clio_email='" . $_POST["email"] . "', clio_telefono='" . $_POST["telefono"] . "', clio_contacto_principal='" . $_POST["contacto"] . "', clio_fecha_inicio='" . $_POST["inicio"] . "', clio_fecha_fin='" . $_POST["fin"] . "' WHERE clio_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	echo '<script type="text/javascript">window.location.href="clientes-orion-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 //AGREGAR CLIENTES ORION
-if ($_POST["idSql"] == 91) {
-
-
-		$extension = end(explode(".", $_FILES['contrato']['name']));
-		$contrato = uniqid('cont_') . "." . $extension;
-		$destino = "files/contratos";
-		move_uploaded_file($_FILES['contrato']['tmp_name'], $destino . "/" . $contrato);
-
-
-
-	mysql_query("INSERT INTO clientes_orion (clio_empresa, clio_email, clio_telefono, clio_contacto_principal, clio_fecha_inicio, clio_fecha_fin, clio_contrato)VALUES('" . $_POST["nombre"] . "', '" . $_POST["email"] . "', '" . $_POST["telefono"] . "', '" . $_POST["contacto"] . "', '" . $_POST["inicio"] . "', '" . $_POST["fin"] . "', '" . $contrato . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	echo '<script type="text/javascript">window.location.href="clientes-orion.php?msg=1";</script>';
-	exit();
-}
 
 //EDITAR ZONAS USUARIOS
 if ($_POST["idSql"] == 92) {
