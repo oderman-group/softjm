@@ -3,8 +3,8 @@ include("sesion.php");
 
 $idPagina = 77;
 
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 <link href="css/tablecloth.css" rel="stylesheet">
@@ -70,10 +70,10 @@ include("head.php");
 
 <body>
 	<div class="layout">
-		<?php include("encabezado.php"); ?>
+		<?php include("includes/encabezado.php"); ?>
 		<div class="main-wrapper">
 			<div class="container-fluid">
-				<?php include("notificaciones.php"); ?>
+				<?php include("includes/notificaciones.php"); ?>
 
 				<p>
 					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
@@ -120,7 +120,7 @@ include("head.php");
 								}
 								?>
 
-								<p style="margin: 10px;"><?php include("paginacion.php"); ?></p>
+								<p style="margin: 10px;"><?php include("includes/paginacion.php"); ?></p>
 
 								<div style="border:thin; border-style:solid; height:150px; margin:10px;">
 									<h4 align="center">-Búsqueda por ID-</h4>
@@ -294,7 +294,7 @@ include("head.php");
 			</div>
 		</div>
 	</div>
-	<?php include("pie.php"); ?>
+	<?php include("includes/pie.php"); ?>
 	</div>
 </body>
 

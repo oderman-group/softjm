@@ -1,8 +1,8 @@
 <?php 
 include("sesion.php");
 $idPagina = 11;
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 
 $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
@@ -42,17 +42,17 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
-include("js-formularios.php");
+include("includes/js-formularios.php");
 ?>
 
-<?php include("funciones-js.php");?>
+<?php include("includes/funciones-js.php");?>
 
-<?php include("texto-editor.php");?>
+<?php include("includes/texto-editor.php");?>
 
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
     
@@ -76,7 +76,7 @@ include("js-formularios.php");
 				<a href="enviar_correos/clientes-enviar-credenciales.php?id=<?=$_GET["id"];?>" class="btn btn-info" onClick="if(!confirm('Desea ejecutar esta accion?')){return false;}"><i class="icon-envelope"></i> Enviar credenciales</a>
 			</p>
 
-            <?php include("notificaciones.php");?>
+            <?php include("includes/notificaciones.php");?>
 			
 			<div class="row-fluid">
 				<div class="span12">
@@ -872,7 +872,7 @@ include("js-formularios.php");
 
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

@@ -1,8 +1,8 @@
 <?php 
 include("sesion.php");
 $idPagina = 158;
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 	<!-- styles -->
 	<link rel="stylesheet" href="css/font-awesome.css">
@@ -115,12 +115,12 @@ include("head.php");
 
 		<body>
 			<div class="layout">
-				<?php include("encabezado.php"); ?>
+				<?php include("includes/encabezado.php"); ?>
 
 				
 				<div class="main-wrapper">
 					<div class="container-fluid">
-						<?php include("notificaciones.php"); ?>
+						<?php include("includes/notificaciones.php"); ?>
 
 
 
@@ -393,7 +393,7 @@ include("head.php");
 </script>
 
 
-				<?php include("pie.php"); ?>
+				<?php include("includes/pie.php"); ?>
 			</div>
 		</body>
 

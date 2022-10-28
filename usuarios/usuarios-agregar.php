@@ -2,8 +2,8 @@
 
 $idPagina = 3;
 
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -122,11 +122,11 @@ include("head.php");
         $('#reservation').daterangepicker();
     });
 </script>
-<?php include("funciones-js.php");?>
+<?php include("includes/funciones-js.php");?>
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
     
@@ -279,7 +279,7 @@ include("head.php");
 			
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

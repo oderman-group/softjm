@@ -1,8 +1,8 @@
 <?php
 include("sesion.php"); 
 $idPagina = 1;
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 
 <!-- styles -->
@@ -115,13 +115,13 @@ include("head.php");
 </script>
 
 
-<?php include("funciones-js.php"); ?>
+<?php include("includes/funciones-js.php"); ?>
 
 </head>
 
 <body>
 	<div class="layout">
-		<?php include("encabezado.php"); ?>
+		<?php include("includes/encabezado.php"); ?>
 
 		
 
@@ -263,7 +263,7 @@ include("head.php");
 
 						</div>
 
-						<?php include("cuadros-dialogos.php"); ?>
+						<?php include("includes/cuadros-dialogos.php"); ?>
 
 						<script>
 							function modalFiltro(datos) {
@@ -375,7 +375,7 @@ chart.draw();
 
 
 
-		<?php include("pie.php"); ?>
+		<?php include("includes/pie.php"); ?>
 	</div>
 </body>
 

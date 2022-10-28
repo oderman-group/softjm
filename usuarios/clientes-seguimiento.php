@@ -4,8 +4,8 @@ $idPagina = 12;
 $paginaActual['pag_nombre'] = "Seguimiento de clientes";
 ?>
 
-<?php include("verificar-paginas.php"); ?>
-<?php include("head.php"); ?>
+<?php include("includes/verificar-paginas.php"); ?>
+<?php include("includes/head.php"); ?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
 if (mysql_errno() != 0) {
@@ -103,12 +103,12 @@ $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_
 	});
 </script>
 
-<?php include("funciones-js.php"); ?>
+<?php include("includes/funciones-js.php"); ?>
 </head>
 
 <body>
 	<div class="layout">
-		<?php include("encabezado.php"); ?>
+		<?php include("includes/encabezado.php"); ?>
 
 		
 		<div class="main-wrapper">
@@ -247,14 +247,14 @@ $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_
 							DT = Consiguió datos | CZ = Hubo cotización | VT = Hubo venta
 						</p>
 
-						<p style="margin: 10px;"><?php include("paginacion.php"); ?></p>
+						<p style="margin: 10px;"><?php include("includes/paginacion.php"); ?></p>
 
 						<div class="content-widgets light-gray">
 							<div class="widget-head green">
 								<h3><?= $paginaActual['pag_nombre']; ?> : <b><?= $tiket['tik_asunto_principal']; ?></b></h3>
 							</div>
 							<div class="widget-container">
-								<?php include("notificaciones.php"); ?>
+								<?php include("includes/notificaciones.php"); ?>
 								<p></p>
 								<table class="table table-striped table-bordered" id="data-table">
 									<thead>
@@ -393,7 +393,7 @@ $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_
 
 		</div>
 	</div>
-	<?php include("pie.php"); ?>
+	<?php include("includes/pie.php"); ?>
 	</div>
 </body>
 

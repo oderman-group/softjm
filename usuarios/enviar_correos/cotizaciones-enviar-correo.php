@@ -9,7 +9,7 @@ require RUTA_PROYECTO.'/librerias/phpmailer/PHPMailer.php';
 require RUTA_PROYECTO.'/librerias/phpmailer/SMTP.php';
 
 $idPagina = 24;
-include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
+include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 $consulta= $conexionBdPrincipal->query("SELECT * FROM cotizacion INNER JOIN clientes ON cli_id=cotiz_cliente INNER JOIN sucursales ON sucu_id=cotiz_sucursal INNER JOIN contactos ON cont_id=cotiz_contacto INNER JOIN usuarios ON usr_id=cotiz_vendedor WHERE cotiz_id='" . $_POST["id"] . "'");
 $resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH);
@@ -72,7 +72,7 @@ try {
     echo "Error: {$mail->ErrorInfo}";
 }
 
-include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 
 echo '<script type="text/javascript">window.location.href="../cotizaciones-editar.php?msg=6&id=' . $_POST["id"] . '";</script>';

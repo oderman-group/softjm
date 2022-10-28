@@ -2,7 +2,7 @@
 require_once("../sesion.php");
 
 $idPagina = 64;
-include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
+include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 	$conexionBdPrincipal->query("UPDATE usuarios_tipos SET utipo_nombre='" . $_POST["nombre"] . "' WHERE utipo_id='" . $_POST["id"] . "'");
 
@@ -34,7 +34,7 @@ include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
 		}
 	}
 
-    include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+    include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 	echo '<script type="text/javascript">window.location.href="../roles-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
 	exit();

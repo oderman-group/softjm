@@ -2,7 +2,7 @@
 require_once("../sesion.php");
 
 $idPagina = 17;
-include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
+include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes");
 while ($datos = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
@@ -10,7 +10,7 @@ while ($datos = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 	$conexionBdPrincipal->query("UPDATE clientes SET cli_clave='" . $clave1 . "' WHERE cli_id='" . $datos['cli_id'] . "'");
 }
 
-include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 echo '<script type="text/javascript">window.location.href="../clientes.php?msg=14";</script>';
 exit();

@@ -3,8 +3,8 @@
 $idPagina = 138;
 $paginaActual['pag_nombre'] = "Editar Sucursales";
 ?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
 if(mysql_errno()!=0){echo mysql_error(); exit();}
@@ -148,11 +148,11 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM sucursales_propias WH
 							document.getElementById("solo").innerHTML='hola';
                         </script>
 
-<?php include("funciones-js.php");?>
+<?php include("includes/funciones-js.php");?>
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
     
@@ -180,7 +180,7 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM sucursales_propias WH
 			</div>
             <p><a href="sucursales-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a> <div id="solo"></div></p>
             
-            <?php include("notificaciones.php");?>                  
+            <?php include("includes/notificaciones.php");?>                  
 						
 
 
@@ -223,7 +223,7 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM sucursales_propias WH
 			
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

@@ -2,7 +2,7 @@
 require_once("../sesion.php");
 
 $idPagina = 179;
-include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
+include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 	if ($_POST["fechaIngreso"] == "") $_POST["fechaIngreso"] = '0000-00-00';
 	if ($_POST["retiroFecha"] == "") $_POST["retiroFecha"] = '0000-00-00';
@@ -50,7 +50,7 @@ include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
 
 if(isset($_POST["grupos"])){
     $conexionBdPrincipal->query("DELETE FROM clientes_categorias WHERE cpcat_cliente='" . $_POST["id"] . "'");
-    
+
 	$numero = (count($_POST["grupos"]));
 	$contador = 0;
 	
@@ -70,7 +70,7 @@ if(isset($_POST["grupos"])){
 		$conexionBdPrincipal->query("INSERT INTO clientes_usuarios(cliu_usuario, cliu_cliente, cliu_fecha)VALUES('" . $_POST["asesor"] . "'," . $_POST["id"] . ", now())");
 	}
 
-    include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+    include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 	echo '<script type="text/javascript">window.location.href="../clientes-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
 	exit();

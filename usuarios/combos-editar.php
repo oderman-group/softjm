@@ -3,8 +3,8 @@
 $idPagina = 175;
 $paginaActual['pag_nombre'] = "Editar combos";
 ?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
 if(mysql_errno()!=0){echo mysql_error(); exit();}
@@ -143,9 +143,9 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM combos WHERE combo_id
         $('#reservation').daterangepicker();
     });
 </script>
-<?php include("funciones-js.php");?>
+<?php include("includes/funciones-js.php");?>
 
-<?php include("texto-editor.php");?>
+<?php include("includes/texto-editor.php");?>
 
 <script type="text/javascript">
   function productos(enviada){
@@ -168,7 +168,7 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM combos WHERE combo_id
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
     
@@ -437,7 +437,7 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM combos WHERE combo_id
 
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

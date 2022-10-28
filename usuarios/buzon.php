@@ -1,8 +1,8 @@
 <?php 
 include("sesion.php");
 $idPagina = 167;
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 
 <!-- styles -->
@@ -98,7 +98,7 @@ $(function(){
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
 	<div class="main-wrapper">
@@ -195,7 +195,7 @@ $(function(){
 	
 	
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

@@ -2,8 +2,8 @@
 
 $idPagina = 76;
 
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 
 $consuluta= $conexionBdAdmin->query("SELECT * FROM paginas WHERE pag_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consuluta, MYSQLI_BOTH);
@@ -125,11 +125,11 @@ $resultadoD = mysqli_fetch_array($consuluta, MYSQLI_BOTH);
     });
 </script>
 
-<?php include("funciones-js.php");?>
+<?php include("includes/funciones-js.php");?>
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
@@ -210,7 +210,7 @@ $resultadoD = mysqli_fetch_array($consuluta, MYSQLI_BOTH);
 
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

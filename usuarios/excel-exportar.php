@@ -6,7 +6,7 @@ header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 header("content-disposition: attachment;filename=INFORMES_ORION_CRM_" . date("d/m/Y") . ".xls");
 include("../conexion.php");
 ?>
-<?php include("head.php"); ?>
+<?php include("includes/head.php"); ?>
 <?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1",$conexion));?>
 </head>
 

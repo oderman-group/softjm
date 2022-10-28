@@ -3,8 +3,8 @@
 $idPagina = 111;
 $paginaActual['pag_nombre'] = "Editar proyecto";
 ?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
 if(mysql_errno()!=0){echo mysql_error(); exit();}
@@ -144,11 +144,11 @@ WHERE proy_id='".$_GET["id"]."'",$conexion));
         $('#reservation').daterangepicker();
     });
 </script>
-<?php include("texto-editor.php");?>
+<?php include("includes/texto-editor.php");?>
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
     
@@ -178,7 +178,7 @@ WHERE proy_id='".$_GET["id"]."'",$conexion));
 				<a href="proyectos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
 				<a href="proyectos-tareas.php?proy=<?=$_GET["id"];?>" class="btn btn-info"><i class="icon-list"></i> Ver tareas</a>
 			</p>
-            <?php include("notificaciones.php");?>
+            <?php include("includes/notificaciones.php");?>
 			<div class="row-fluid">
 				<div class="span12">
 					<div class="content-widgets gray">
@@ -265,7 +265,7 @@ WHERE proy_id='".$_GET["id"]."'",$conexion));
 
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

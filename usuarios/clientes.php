@@ -1,8 +1,8 @@
 <?php 
 include("sesion.php");
 $idPagina = 9;
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -115,20 +115,20 @@ include("head.php");
   } );
   </script>
   
-<?php include("funciones-js.php");?>
+<?php include("includes/funciones-js.php");?>
 </head>
 <body>
 
 
 
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
 
 	<div class="main-wrapper">
 		<div class="container-fluid">
-            <?php include("notificaciones.php");?>
+            <?php include("includes/notificaciones.php");?>
             <p>
                 <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
                 <a href="clientes-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
@@ -296,7 +296,7 @@ include("head.php");
                                             <?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
                                         </div>
                                     </form>
-								<p style="margin: 10px;"><?php include("paginacion.php");?></p> 
+								<p style="margin: 10px;"><?php include("includes/paginacion.php");?></p> 
                                 </p>
                             </div>
 							<table class="table table-striped table-bordered" id="data-table">
@@ -447,7 +447,7 @@ include("head.php");
 			</div>
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 
 </body>

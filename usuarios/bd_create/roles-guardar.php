@@ -1,7 +1,7 @@
 <?php
     require_once("../sesion.php");
     $idPagina = 59;
-    include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
+    include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 	$conexionBdPrincipal->query("INSERT INTO usuarios_tipos(utipo_nombre)VALUES('" . $_POST["nombre"] . "')");
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
@@ -30,7 +30,7 @@
 		}
 	}
 
-    include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+    include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 	echo '<script type="text/javascript">window.location.href="../roles-editar.php?id=' . $idInsertU . '&msg=1";</script>';
 	exit();

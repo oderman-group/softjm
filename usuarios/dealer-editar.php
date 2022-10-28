@@ -3,8 +3,8 @@
 $idPagina = 35;
 $paginaActual['pag_nombre'] = "Editar grupos";
 ?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
 if(mysql_errno()!=0){echo mysql_error(); exit();}
@@ -143,11 +143,11 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM dealer WHERE deal_id=
         $('#reservation').daterangepicker();
     });
 </script>
-<?php include("texto-editor.php");?>
+<?php include("includes/texto-editor.php");?>
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
     
@@ -176,7 +176,7 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM dealer WHERE deal_id=
             
             <p><a href="dealer-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
             
-            <?php include("notificaciones.php");?>
+            <?php include("includes/notificaciones.php");?>
 			<div class="row-fluid">
 				<div class="span12">
 					<div class="content-widgets gray">
@@ -260,7 +260,7 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM dealer WHERE deal_id=
 
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

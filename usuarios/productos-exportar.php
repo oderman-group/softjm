@@ -10,7 +10,7 @@ header("content-disposition: attachment;filename=productos_".date("d/m/Y h:m:i")
 header("Content-Transfer-Encoding: binary ");
 
 ?>
-<?php include("head.php");?>
+<?php include("includes/head.php");?>
 </head>
 
 <body>

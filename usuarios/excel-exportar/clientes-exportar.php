@@ -1,6 +1,5 @@
 <?php   
 require_once("../sesion.php");
-require("../funciones-para-el-sistema.php");
 
 header("Content-Type: application/vnd.ms-excel");
 header("Expires: 0");
@@ -8,7 +7,7 @@ header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 header("content-disposition: attachment;filename=clientes_" . date("d/m/Y") . ".xls");
 
 $idPagina = 30;
-include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
+include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -91,4 +90,4 @@ include(RUTA_PROYECTO."/usuarios/head.php");
 </html>
 
 <?php
-include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");

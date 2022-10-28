@@ -5,8 +5,8 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM proveedores WHERE pro
 $idPagina = 125;
 $paginaActual['pag_nombre'] = "Editar proveedores";
 ?>
-<?php include("verificar-paginas.php"); ?>
-<?php include("head.php"); ?>
+<?php include("includes/verificar-paginas.php"); ?>
+<?php include("includes/head.php"); ?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
 if (mysql_errno() != 0) {
@@ -165,14 +165,14 @@ if (mysql_errno() != 0) {
 
 	}
 </script>
-<?php include("funciones-js.php"); ?>
+<?php include("includes/funciones-js.php"); ?>
 
-<?php include("texto-editor.php"); ?>
+<?php include("includes/texto-editor.php"); ?>
 </head>
 
 <body>
 	<div class="layout">
-		<?php include("encabezado.php"); ?>
+		<?php include("includes/encabezado.php"); ?>
 
 		
 
@@ -387,7 +387,7 @@ if (mysql_errno() != 0) {
 
 			</div>
 		</div>
-		<?php include("pie.php"); ?>
+		<?php include("includes/pie.php"); ?>
 	</div>
 </body>
 

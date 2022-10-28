@@ -3,8 +3,8 @@ include("sesion.php");
 
 $idPagina = 79;
 
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 
 $consultaCliente=$conexionBdPrincipal->query("SELECT * FROM cotizacion 
 INNER JOIN clientes ON cli_id=cotiz_cliente
@@ -136,7 +136,7 @@ if(isset($_GET["cte"])){
         $('#reservation').daterangepicker();
     });
 </script>
-<?php include("texto-editor.php");?>
+<?php include("includes/texto-editor.php");?>
 
 
 <?php if($resultadoD['cotiz_vendida']!=1){?>
@@ -186,7 +186,7 @@ if(isset($_GET["cte"])){
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
     
@@ -205,7 +205,7 @@ if(isset($_GET["cte"])){
 				</div>
 			</div>
             
-            <?php include("notificaciones.php");?>
+            <?php include("includes/notificaciones.php");?>
 			<div class="row-fluid">
 				<div class="span12">
 					<div class="content-widgets gray">
@@ -997,7 +997,7 @@ if(isset($_GET["cte"])){
 
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

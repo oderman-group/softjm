@@ -2,7 +2,7 @@
 require_once("../sesion.php");
 
 $idPagina = 25;
-include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
+include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 $consultaCli=$conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_POST["cliente"]."'");
 $datosCliente = mysqli_fetch_array($consultaCli, MYSQLI_BOTH);
@@ -30,7 +30,7 @@ WHERE cotiz_id='" . $_POST["id"] . "' ");
 
     require('actualizar-servicios-cotizacion.php');
 
-include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 echo '<script type="text/javascript">window.location.href="../cotizaciones-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
 exit();

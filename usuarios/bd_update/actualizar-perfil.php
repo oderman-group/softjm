@@ -2,7 +2,7 @@
 require_once("../sesion.php");
 
 $idPagina = 177;
-include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
+include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 validarReferencia('perfil-editar.php');
 
@@ -23,7 +23,7 @@ usr_nombre='" . htmlspecialchars ($_POST["nombre"]) . "',
 usr_email='" . $_POST["email"] . "' 
 WHERE usr_id='" . $_SESSION["id"] . "'");
 
-include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 echo '<script type="text/javascript">window.location.href="../perfil-editar.php?msg=2";</script>';
 exit();

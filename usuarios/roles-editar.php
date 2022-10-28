@@ -1,8 +1,8 @@
 <?php include("sesion.php");
 
 $idPagina = 7;
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 
 $consulta=$conexionBdPrincipal->query("SELECT * FROM usuarios_tipos WHERE utipo_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
@@ -127,11 +127,11 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 							document.getElementById("solo").innerHTML='hola';
                         </script>
 
-<?php include("funciones-js.php");?>
+<?php include("includes/funciones-js.php");?>
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
     
@@ -151,7 +151,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 			</div>
             <p><a href="roles-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a> <div id="solo"></div></p>
             
-            <?php include("notificaciones.php");?>
+            <?php include("includes/notificaciones.php");?>
             <div class="row-fluid">
 				<div class="span12">
 					<div class="content-widgets gray">
@@ -202,7 +202,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 			
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

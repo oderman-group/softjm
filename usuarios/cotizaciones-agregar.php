@@ -3,8 +3,8 @@ include("sesion.php");
 
 $idPagina = 78;
 
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 
@@ -125,11 +125,11 @@ include("head.php");
 
 
 
-<?php include("texto-editor.php");?>
+<?php include("includes/texto-editor.php");?>
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
     
@@ -461,7 +461,7 @@ include("head.php");
 
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

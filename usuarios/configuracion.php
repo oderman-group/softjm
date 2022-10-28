@@ -3,8 +3,8 @@ include("sesion.php");
 $idPagina = 42;
 $paginaActual['pag_nombre'] = "Editar Configuración";
 
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 
 $consulta = $conexionBdPrincipal->query("SELECT * FROM configuracion WHERE conf_id=1");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
@@ -45,20 +45,20 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
-include("js-formularios.php");
+include("includes/js-formularios.php");
 ?>
 
 </head>
 
 <body>
     <div class="layout">
-        <?php include("encabezado.php"); ?>
+        <?php include("includes/encabezado.php"); ?>
 
         
 
         <div class="main-wrapper">
             <div class="container-fluid">
-                <?php include("notificaciones.php"); ?>
+                <?php include("includes/notificaciones.php"); ?>
                 <div class="row-fluid">
                     <div class="span12">
                         <div class="content-widgets gray">
@@ -446,7 +446,7 @@ include("js-formularios.php");
 
             </div>
         </div>
-        <?php include("pie.php"); ?>
+        <?php include("includes/pie.php"); ?>
     </div>
 </body>
 

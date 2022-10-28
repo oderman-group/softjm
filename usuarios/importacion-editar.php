@@ -3,8 +3,8 @@
 $idPagina = 135;
 $paginaActual['pag_nombre'] = "IMPORTACIÓN #" . $_GET["id"];
 ?>
-<?php include("verificar-paginas.php"); ?>
-<?php include("head.php"); ?>
+<?php include("includes/verificar-paginas.php"); ?>
+<?php include("includes/head.php"); ?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
 if (mysql_errno() != 0) {
@@ -183,7 +183,7 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 		$('#reservation').daterangepicker();
 	});
 </script>
-<?php include("texto-editor.php"); ?>
+<?php include("includes/texto-editor.php"); ?>
 
 
 
@@ -214,7 +214,7 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 
 <body>
 	<div class="layout">
-		<?php include("encabezado.php"); ?>
+		<?php include("includes/encabezado.php"); ?>
 
 		
 
@@ -241,7 +241,7 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 					</div>
 				</div>
 
-				<?php include("notificaciones.php"); ?>
+				<?php include("includes/notificaciones.php"); ?>
 
 
 				<p>
@@ -666,7 +666,7 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 
 			</div>
 		</div>
-		<?php include("pie.php"); ?>
+		<?php include("includes/pie.php"); ?>
 	</div>
 </body>
 

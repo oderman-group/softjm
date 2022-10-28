@@ -3,8 +3,8 @@
 $idPagina = 82;
 $paginaActual['pag_nombre'] = "Galería de productos";
 ?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
 if(mysql_errno()!=0){echo mysql_error(); exit();}
@@ -149,7 +149,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
 	<div class="main-wrapper">
@@ -232,7 +232,7 @@ function closeForm() {
 </script>
 	
 	
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

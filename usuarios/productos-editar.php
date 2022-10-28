@@ -3,8 +3,8 @@
 $idPagina = 38;
 $paginaActual['pag_nombre'] = "Editar productos";
 ?>
-<?php include("verificar-paginas.php"); ?>
-<?php include("head.php"); ?>
+<?php include("includes/verificar-paginas.php"); ?>
+<?php include("includes/head.php"); ?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
 if (mysql_errno() != 0) {
@@ -167,14 +167,14 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 
 	}
 </script>
-<?php include("funciones-js.php"); ?>
+<?php include("includes/funciones-js.php"); ?>
 
-<?php include("texto-editor.php"); ?>
+<?php include("includes/texto-editor.php"); ?>
 </head>
 
 <body>
 	<div class="layout">
-		<?php include("encabezado.php"); ?>
+		<?php include("includes/encabezado.php"); ?>
 
 		
 
@@ -206,7 +206,7 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 				</p>
 
 
-				<?php include("notificaciones.php"); ?>
+				<?php include("includes/notificaciones.php"); ?>
 				<div class="row-fluid">
 
 					<div class="span3">
@@ -442,7 +442,7 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 
 			</div>
 		</div>
-		<?php include("pie.php"); ?>
+		<?php include("includes/pie.php"); ?>
 	</div>
 </body>
 

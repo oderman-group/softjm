@@ -1,8 +1,8 @@
 <?php
 include("sesion.php"); 
 $idPagina = 19;
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 
 $consulta = $conexionBdPrincipal->query("SELECT * FROM usuarios 
 INNER JOIN usuarios_tipos ON utipo_id=usr_tipo
@@ -46,20 +46,20 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
-include("js-formularios.php");
+include("includes/js-formularios.php");
 ?>
 
 </head>
 
 <body>
     <div class="layout">
-        <?php include("encabezado.php"); ?>
+        <?php include("includes/encabezado.php"); ?>
 
         
 
         <div class="main-wrapper">
             <div class="container-fluid">
-                <?php include("notificaciones.php"); ?>
+                <?php include("includes/notificaciones.php"); ?>
                 <div class="row-fluid">
                     <div class="span8">
                         <div class="content-widgets gray">
@@ -171,7 +171,7 @@ include("js-formularios.php");
 
             </div>
         </div>
-        <?php include("pie.php"); ?>
+        <?php include("includes/pie.php"); ?>
     </div>
 </body>
 

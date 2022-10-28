@@ -8,8 +8,8 @@ if(is_numeric($_GET["m"])){$mesConsulta = $_GET["m"];}else{$mesConsulta = date("
 
 if(is_numeric($_GET["u"])){$userConsulta = $_GET["u"];}else{$userConsulta = 9;}
 ?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
 if(mysql_errno()!=0){echo mysql_error(); exit();}
@@ -467,11 +467,11 @@ $epordia = substr($epordia,0,-1);
 .widget-container{ padding-bottom:20px;}
 </style>
 
-<?php include("funciones-js.php");?>
+<?php include("includes/funciones-js.php");?>
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
     
@@ -635,7 +635,7 @@ $epordia = substr($epordia,0,-1);
 			
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

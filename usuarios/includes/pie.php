@@ -48,7 +48,7 @@ function axiosAjax(datos){
 </script>
 
 <?php
-include("guardar-historial-acciones.php");
+include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 echo "se cargo el sitio web en ".$tiempoMostrar;
 ?>

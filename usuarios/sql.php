@@ -2919,7 +2919,7 @@ if ($_POST["idSql"] == 92) {
 //ELIMINAR SEGUIMIENTO CLIENTES
 if ($_GET["get"] == 4) {
 	$idPagina = 56;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM cliente_seguimiento WHERE cseg_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -2931,7 +2931,7 @@ if ($_GET["get"] == 4) {
 //ELIMINAR AUDITORES
 if ($_GET["get"] == 5) {
 	$idPagina = 57;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM auditores WHERE aud_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -2943,7 +2943,7 @@ if ($_GET["get"] == 5) {
 //ELIMINAR FACTURAS
 if ($_GET["get"] == 6) {
 	$idPagina = 58;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM facturacion_abonos WHERE fpab_factura='" . $_GET["id"] . "'", $conexion);
 	mysql_query("DELETE FROM facturacion_productos WHERE fpp_factura='" . $_GET["id"] . "'", $conexion);
 	mysql_query("DELETE FROM facturacion WHERE fact_id='" . $_GET["id"] . "'", $conexion);
@@ -2957,7 +2957,7 @@ if ($_GET["get"] == 6) {
 //ELIMINAR DOCUMENTOS
 if ($_GET["get"] == 7) {
 	$idPagina = 59;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM documentos WHERE doc_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -2999,7 +2999,7 @@ if ($_GET["get"] == 10) {
 //ELIMINAR DEALER
 if ($_GET["get"] == 11) {
 	$idPagina = 60;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM dealer WHERE deal_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3011,7 +3011,7 @@ if ($_GET["get"] == 11) {
 //ELIMINAR PRODUCTOS
 if ($_GET["get"] == 12) {
 	$idPagina = 61;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM productos_materiales WHERE ppmt_producto='" . $_GET["id"] . "'", $conexion);
 	mysql_query("DELETE FROM productos WHERE prod_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
@@ -3024,7 +3024,7 @@ if ($_GET["get"] == 12) {
 //ELIMINAR CATEGORÍA DE PRODUCTOS
 if ($_GET["get"] == 13) {
 	$idPagina = 62;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM productos WHERE prod_categoria='" . $_GET["id"] . "'", $conexion);
 	mysql_query("DELETE FROM productos_categorias WHERE catp_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
@@ -3037,7 +3037,7 @@ if ($_GET["get"] == 13) {
 //ELIMINAR ZONAS
 if ($_GET["get"] == 14) {
 	$idPagina = 63;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM zonas WHERE zon_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3049,7 +3049,7 @@ if ($_GET["get"] == 14) {
 //ELIMINAR ENCUESTAS
 if ($_GET["get"] == 15) {
 	$idPagina = 64;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM encuesta_satisfaccion WHERE encs_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3060,7 +3060,7 @@ if ($_GET["get"] == 15) {
 }
 //ELIMINAR NOTIFICACIONES
 if ($_GET["get"] == 16) {
-	//$idPagina = 65; include("verificar-paginas.php");
+	//$idPagina = 65; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM notificaciones WHERE not_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3072,7 +3072,7 @@ if ($_GET["get"] == 16) {
 //ELIMINAR MATERIALES DE PRODUCTOS
 if ($_GET["get"] == 17) {
 	$idPagina = 71;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM productos_materiales WHERE ppmt_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3127,7 +3127,7 @@ if ($_GET["get"] == 18) {
 //REPLICAR FACTURA
 if ($_GET["get"] == 19) {
 	$idPagina = 72;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	//$factura = mysql_fetch_array(mysql_query("SELECT * FROM facturacion",$conexion));
 	mysql_query("INSERT INTO facturacion (fact_cliente, fact_fecha, fact_valor, fact_estado, fact_usuario_responsable, fact_descripcion, fact_observacion, fact_descuento, fact_producto, fact_numero_fisica, fact_usuario_influyente, fact_fecha_real, fact_fecha_vencimiento) SELECT fact_cliente, now(), fact_valor, fact_estado, fact_usuario_responsable, fact_descripcion, fact_observacion, fact_descuento, fact_producto, fact_numero_fisica, fact_usuario_influyente, now(), fact_fecha_vencimiento FROM facturacion WHERE fact_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
@@ -3158,7 +3158,7 @@ if ($_GET["get"] == 20) {
 //ELIMINAR ORDENES DE SERVICIO
 if ($_GET["get"] == 21) {
 	$idPagina = 76;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM ordenes_servicio WHERE ord_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3170,7 +3170,7 @@ if ($_GET["get"] == 21) {
 //ELIMINAR SUCURSALES
 if ($_GET["get"] == 23) {
 	$idPagina = 86;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM sucursales WHERE sucu_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3181,7 +3181,7 @@ if ($_GET["get"] == 23) {
 }
 if ($_GET["get"] == 24) {
 	$idPagina = 91;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM cliente_seguimiento WHERE cseg_tiket='" . $_GET["id"] . "'", $conexion);
 	mysql_query("DELETE FROM clientes_tikets WHERE tik_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
@@ -3193,7 +3193,7 @@ if ($_GET["get"] == 24) {
 }
 if ($_GET["get"] == 25) {
 	$idPagina = 95;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM facturacion_abonos WHERE fpab_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3233,7 +3233,7 @@ if ($_GET["get"] == 26) {
 }
 if ($_GET["get"] == 27) {
 	$idPagina = 100;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM soporte_productos WHERE sop_padre='" . $_GET["id"] . "'", $conexion);
 	mysql_query("DELETE FROM soporte_productos WHERE sop_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
@@ -3244,7 +3244,7 @@ if ($_GET["get"] == 27) {
 	exit();
 }
 if ($_GET["get"] == 28) {
-	//$idPagina = 100; include("verificar-paginas.php");
+	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysql_query("UPDATE cliente_seguimiento SET cseg_realizado=1 WHERE cseg_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3254,7 +3254,7 @@ if ($_GET["get"] == 28) {
 	exit();
 }
 if ($_GET["get"] == 29) {
-	//$idPagina = 100; include("verificar-paginas.php");
+	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysql_query("UPDATE clientes_tikets SET tik_estado=2 WHERE tik_id='" . $_GET["id"] . "'", $conexion);
 	mysql_query("UPDATE cliente_seguimiento SET cseg_realizado=1 WHERE cseg_tiket='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
@@ -3265,7 +3265,7 @@ if ($_GET["get"] == 29) {
 	exit();
 }
 if ($_GET["get"] == 30) {
-	//$idPagina = 100; include("verificar-paginas.php");
+	//$idPagina = 100; include("includes/verificar-paginas.php");
 	$producto = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_id='" . $_GET["id"] . "'", $conexion));
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3294,7 +3294,7 @@ if ($_GET["get"] == 30) {
 }
 //Cambiar de estado a los productos
 if ($_GET["get"] == 31) {
-	//$idPagina = 100; include("verificar-paginas.php");
+	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysql_query("UPDATE productos SET prod_visible='" . $_GET["estado"] . "' WHERE prod_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3304,7 +3304,7 @@ if ($_GET["get"] == 31) {
 	exit();
 }
 if ($_GET["get"] == 32) {
-	//$idPagina = 100; include("verificar-paginas.php");
+	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysql_query("UPDATE cliente_seguimiento SET cseg_archivo='' WHERE cseg_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3314,7 +3314,7 @@ if ($_GET["get"] == 32) {
 	exit();
 }
 if ($_GET["get"] == 33) {
-	//$idPagina = 100; include("verificar-paginas.php");
+	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysql_query("UPDATE clientes SET cli_papelera=1, cli_papelera_por='" . $_SESSION["id"] . "', cli_papelera_fecha=now() WHERE cli_id='" . $_GET["idR"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3331,7 +3331,7 @@ if ($_GET["get"] == 33) {
 	exit();
 }
 if ($_GET["get"] == 34) {
-	//$idPagina = 100; include("verificar-paginas.php");
+	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysql_query("UPDATE clientes SET cli_terminado=1, cli_terminado_por='" . $_SESSION["id"] . "', cli_terminado_fecha=now() WHERE cli_id='" . $_GET["idR"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3357,7 +3357,7 @@ if ($_GET["get"] == 34) {
 }
 if ($_GET["get"] == 35) {
 	$idPagina = 114;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM proyectos_tareas WHERE ptar_id_proyecto='" . $_GET["id"] . "'", $conexion);
 	mysql_query("DELETE FROM proyectos WHERE proy_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
@@ -3369,7 +3369,7 @@ if ($_GET["get"] == 35) {
 }
 if ($_GET["get"] == 36) {
 	$idPagina = 115;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM proyectos_tareas WHERE ptar_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3380,7 +3380,7 @@ if ($_GET["get"] == 36) {
 }
 if ($_GET["get"] == 37) {
 	$idPagina = 118;
-	include("verificar-paginas.php");
+	include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM agenda WHERE age_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3390,7 +3390,7 @@ if ($_GET["get"] == 37) {
 	exit();
 }
 if ($_GET["get"] == 38) {
-	//$idPagina = 100; include("verificar-paginas.php");
+	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysql_query("UPDATE configuracion SET conf_banner_top='' WHERE conf_id=1", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3400,7 +3400,7 @@ if ($_GET["get"] == 38) {
 	exit();
 }
 if ($_GET["get"] == 39) {
-	//$idPagina = 100; include("verificar-paginas.php");
+	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysql_query("UPDATE configuracion SET conf_banner_lateral='' WHERE conf_id=1", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3410,7 +3410,7 @@ if ($_GET["get"] == 39) {
 	exit();
 }
 if ($_GET["get"] == 40) {
-	//$idPagina = 118; include("verificar-paginas.php");
+	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM cupones WHERE cupo_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3420,7 +3420,7 @@ if ($_GET["get"] == 40) {
 	exit();
 }
 if ($_GET["get"] == 41) {
-	//$idPagina = 100; include("verificar-paginas.php");
+	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysql_query("UPDATE clientes_tikets SET tik_etapa='" . $_GET["etapa"] . "' WHERE tik_id='" . $_GET["idtk"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3430,7 +3430,7 @@ if ($_GET["get"] == 41) {
 	exit();
 }
 if ($_GET["get"] == 42) {
-	//$idPagina = 100; include("verificar-paginas.php");
+	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysql_query("UPDATE clientes SET cli_estado_mercadeo='" . $_GET["em"] . "', cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='" . $_SESSION["id"] . "' WHERE cli_id='" . $_GET["idR"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3440,7 +3440,7 @@ if ($_GET["get"] == 42) {
 	exit();
 }
 if ($_GET["get"] == 43) {
-	//$idPagina = 118; include("verificar-paginas.php");
+	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM cotizacion_productos WHERE czpp_id='" . $_GET["idItem"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3524,7 +3524,7 @@ if ($_GET["get"] == 44) {
 }
 //Eliminar marcas
 if ($_GET["get"] == 47) {
-	//$idPagina = 118; include("verificar-paginas.php");
+	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM marcas WHERE mar_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3536,7 +3536,7 @@ if ($_GET["get"] == 47) {
 
 //ELIMINAR SERVICIOS
 if ($_GET["get"] == 49) {
-	//$idPagina = 118; include("verificar-paginas.php");
+	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM servicios WHERE serv_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3547,7 +3547,7 @@ if ($_GET["get"] == 49) {
 }
 //ELIMINAR PEDIDO
 if ($_GET["get"] == 50) {
-	//$idPagina = 118; include("verificar-paginas.php");
+	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM pedidos WHERE pedid_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3558,7 +3558,7 @@ if ($_GET["get"] == 50) {
 }
 //ANULAR PEDIDO
 if ($_GET["get"] == 51) {
-	//$idPagina = 118; include("verificar-paginas.php");
+	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("UPDATE pedidos SET pedid_estado=2 WHERE pedid_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3569,7 +3569,7 @@ if ($_GET["get"] == 51) {
 }
 //GENERAR REMISIÓN A PARTIR DE PEDIDOS
 if ($_GET["get"] == 52) {
-	//$idPagina = 72; include("verificar-paginas.php");
+	//$idPagina = 72; include("includes/verificar-paginas.php");
 
 	$generoRemision = mysql_fetch_array(mysql_query("SELECT * FROM remisionbdg WHERE remi_pedido='" . $_GET["id"] . "'", $conexion));
 	if($generoRemision[0]!=""){
@@ -3644,7 +3644,7 @@ if ($_GET["get"] == 52) {
 }
 //ELIMINAR COMBO
 if ($_GET["get"] == 53) {
-	//$idPagina = 118; include("verificar-paginas.php");
+	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM combos WHERE combo_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3655,7 +3655,7 @@ if ($_GET["get"] == 53) {
 }
 
 if ($_GET["get"] == 55) {
-	//$idPagina = 118; include("verificar-paginas.php");
+	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM combos_productos WHERE copp_id='" . $_GET["idItem"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3666,7 +3666,7 @@ if ($_GET["get"] == 55) {
 }
 //GENERAR FACTURA A PARTIR DE COTIZACIÓN (VIEJA)
 if ($_GET["get"] == 56) {
-	//$idPagina = 72; include("verificar-paginas.php");
+	//$idPagina = 72; include("includes/verificar-paginas.php");
 	$generoFactura = mysql_fetch_array(mysql_query("SELECT * FROM facturas WHERE factura_remision='" . $_GET["id"] . "'", $conexion));
 	if($generoFactura[0]!=""){
 		echo "<span style='font-family:arial; text-align:center; color:red;'>Esta Remisión ya generó la factura con ID: ".$generoFactura[0].". En la fecha: ".$generoFactura['factura_fecha_creacion']."</div>";
@@ -3710,7 +3710,7 @@ if ($_GET["get"] == 56) {
 	exit();
 }
 if ($_GET["get"] == 57) {
-	//$idPagina = 118; include("verificar-paginas.php");
+	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM productos_galeria WHERE pgal_id='" . $_GET["idItem"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3720,7 +3720,7 @@ if ($_GET["get"] == 57) {
 	exit();
 }
 if ($_GET["get"] == 58) {
-	//$idPagina = 118; include("verificar-paginas.php");
+	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM areas WHERE ar_id='" . $_GET["id"] . "'", $conexion);
 	if (mysql_errno() != 0) {
 		echo informarErrorAlUsuario(__LINE__, mysql_error());
@@ -3803,7 +3803,7 @@ if ($_GET["get"] == 64) {
 }
 //GENERAR FACTURA DE VENTA A PARTIR DE REMISIÓN
 if ($_GET["get"] == 65) {
-	//$idPagina = 72; include("verificar-paginas.php");
+	//$idPagina = 72; include("includes/verificar-paginas.php");
 
 	$generoFactura = mysql_fetch_array(mysql_query("SELECT * FROM facturas WHERE factura_remision='" . $_GET["id"] . "'", $conexion));
 	if($generoFactura[0]!=""){

@@ -3,8 +3,8 @@
 $idPagina = 33;
 $paginaActual['pag_nombre'] = "Marcas";
 ?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
 if(mysql_errno()!=0){echo mysql_error(); exit();}
@@ -98,12 +98,12 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
 	<div class="main-wrapper">
 		<div class="container-fluid">
-            <?php include("notificaciones.php");?>
+            <?php include("includes/notificaciones.php");?>
    
             
             <p>
@@ -153,7 +153,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 			</div>
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

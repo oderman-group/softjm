@@ -2,7 +2,7 @@
 require_once("../sesion.php");
 
 $idPagina = 23;
-include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
+include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 $generoPedido = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM pedidos WHERE pedid_cotizacion='" . $_GET["id"] . "'"), MYSQLI_BOTH);
 
@@ -23,7 +23,7 @@ while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 
 $conexionBdPrincipal->query("UPDATE cotizacion SET cotiz_vendida=1, cotiz_fecha_vendida=now() WHERE cotiz_id='" . $_GET["id"] . "'");
 
-include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 echo '<script type="text/javascript">window.location.href="../pedidos.php?q=' . $idInsert . '";</script>';
 exit();

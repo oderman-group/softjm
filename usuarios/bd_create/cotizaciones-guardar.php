@@ -21,7 +21,7 @@ $datosCliente = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
     require("guardar-servicios-cotizacion.php");
 
-    include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+    include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
     echo '<script type="text/javascript">window.location.href="../cotizaciones-editar.php?id=' . $idInsert . '&msg=1";</script>';
     exit();

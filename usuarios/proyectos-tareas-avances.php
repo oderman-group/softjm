@@ -3,8 +3,8 @@
 $idPagina = 119;
 $paginaActual['pag_nombre'] = "Avances";
 ?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
 if(mysql_errno()!=0){echo mysql_error(); exit();}
@@ -124,14 +124,14 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
   } );
   </script>
   
-<?php include("funciones-js.php");?>
+<?php include("includes/funciones-js.php");?>
 </head>
 <body>
 
 
 
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
 	<div class="main-wrapper">
@@ -154,7 +154,7 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
 					</ul>
 				</div>
 			</div>
-            <?php include("notificaciones.php");?>
+            <?php include("includes/notificaciones.php");?>
 			
             <p>
                 <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
@@ -200,7 +200,7 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
                                             <?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="proyectos-tareas.php?proy=<?=$_GET["proy"];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
                                         </div>
                                     </form>
-                                    <?php include("paginacion.php");?> 
+                                    <?php include("includes/paginacion.php");?> 
                                 </p>
                             </div>
 							<table class="table table-striped table-bordered" id="data-table">
@@ -270,7 +270,7 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
 			</div>
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

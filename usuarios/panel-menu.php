@@ -2,8 +2,8 @@
 <?php 
 $idPagina = "";
 ?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
 if(mysql_errno()!=0){echo mysql_error(); exit();}
@@ -281,12 +281,12 @@ FLOT PIE CHART
     });
 </script>
 
-<?php include("funciones-js.php");?>
+<?php include("includes/funciones-js.php");?>
 
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
 	
@@ -761,7 +761,7 @@ FLOT PIE CHART
 			</div>
 		</div>
 
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 
 </body>
 </html>

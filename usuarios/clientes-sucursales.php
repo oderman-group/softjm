@@ -3,8 +3,8 @@
 $idPagina = 83;
 $paginaActual['pag_nombre'] = "Sucursales";
 ?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
 if(mysql_errno()!=0){echo mysql_error(); exit();}
@@ -101,7 +101,7 @@ $cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='"
 </head>
 <body>
 <div class="layout">
-	<?php include("encabezado.php");?>
+	<?php include("includes/encabezado.php");?>
     
     
 	<div class="main-wrapper">
@@ -124,7 +124,7 @@ $cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='"
 					</ul>
 				</div>
 			</div>
-            <?php include("notificaciones.php");?>
+            <?php include("includes/notificaciones.php");?>
             <p>
             	<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
                 <a href="clientes-sucursales-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
@@ -184,7 +184,7 @@ $cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='"
 			</div>
 		</div>
 	</div>
-	<?php include("pie.php");?>
+	<?php include("includes/pie.php");?>
 </div>
 </body>
 </html>

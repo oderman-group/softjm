@@ -3,8 +3,8 @@ include("sesion.php");
 
 $idPagina = 5;
 
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 <link href="css/tablecloth.css" rel="stylesheet">
@@ -49,11 +49,11 @@ include("head.php");
 		});
 	});
 </script>
-<?php include("funciones-js.php");?>
+<?php include("includes/funciones-js.php");?>
 </head>
 <body>
 	<div class="layout">
-		<?php include("encabezado.php");?>		
+		<?php include("includes/encabezado.php");?>		
 		<div class="main-wrapper">
 			<div class="container-fluid">
 				<div class="row-fluid ">
@@ -100,7 +100,7 @@ include("head.php");
 				</div>
 			</div>
 		</div>
-		<?php include("pie.php");?>
+		<?php include("includes/pie.php");?>
 	</div>
 </body>
 </html>

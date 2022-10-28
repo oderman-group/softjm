@@ -7,8 +7,8 @@ $tabla = 'productos';
 $pk = 'prod_id';
 ?>
 
-<?php include("verificar-paginas.php"); ?>
-<?php include("head.php"); ?>
+<?php include("includes/verificar-paginas.php"); ?>
+<?php include("includes/head.php"); ?>
 <?php
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
 if (mysql_errno() != 0) {
@@ -206,7 +206,7 @@ if (mysql_errno() != 0) {
 	}
 </script>
 
-<?php include("funciones-js.php"); ?>
+<?php include("includes/funciones-js.php"); ?>
 
 <?php
 $columna = '';
@@ -246,13 +246,13 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 	<input type="hidden" value="<?= $pk; ?>" name="pk" id="pk">
 
 	<div class="layout">
-		<?php include("encabezado.php"); ?>
+		<?php include("includes/encabezado.php"); ?>
 
 		
 
 		<div class="main-wrapper">
 			<div class="container-fluid">
-				<?php include("notificaciones.php"); ?>
+				<?php include("includes/notificaciones.php"); ?>
 				<span id="resp"></span>
 
 
@@ -632,7 +632,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 			</div>
 		</div>
 	</div>
-	<?php include("pie.php"); ?>
+	<?php include("includes/pie.php"); ?>
 
 	</div>
 </body>

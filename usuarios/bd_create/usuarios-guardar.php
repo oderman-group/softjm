@@ -1,7 +1,7 @@
 <?php
     require_once("../sesion.php");
     $idPagina = 51;
-    include(RUTA_PROYECTO."/usuarios/verificar-paginas.php");
+    include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
     $conexionBdPrincipal->query("INSERT INTO usuarios(usr_login, usr_clave, usr_tipo, usr_nombre, usr_email, usr_bloqueado, usr_ciudad, usr_area, usr_sucursal)VALUES('" . $_POST["usuario"] . "',SHA1('" . $_POST["clave"] . "'),'" . $_POST["tipoU"] . "','" . $_POST["nombre"] . "','" . $_POST["email"] . "',0,'" . $_POST["ciudad"] . "','" . $_POST["area"] . "', '" . $_POST["sucursal"] . "')");
 
@@ -15,7 +15,7 @@
         $contador++;
     }
 
-    include(RUTA_PROYECTO."/usuarios/guardar-historial-acciones.php");
+    include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
     echo '<script type="text/javascript">window.location.href="../usuarios-editar.php?id=' . $idInsertU . '&msg=1";</script>';
     exit();
