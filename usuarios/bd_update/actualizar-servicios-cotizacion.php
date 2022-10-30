@@ -15,7 +15,7 @@ if($_POST["servicio"]!=''){
 
             $valorProducto = $productoDatos['serv_precio'];
             if ($_POST["moneda"] == 2) {
-                $valorProducto = round(($productoDatos['serv_precio'] / $configu['conf_trm_compra']), 0);
+                $valorProducto = round(($productoDatos['serv_precio'] / $configuracion['conf_trm_compra']), 0);
             }
 
             $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_servicio, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo)VALUES('" . $_POST["id"] . "','" . $_POST["servicio"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 1)");
@@ -23,11 +23,11 @@ if($_POST["servicio"]!=''){
             if ($_POST["monedaActual"] != $_POST["moneda"]) {
                 //Si cambió a pesos colombianos
                 if ($_POST["moneda"] == 1) {
-                    $valorProducto = round(($productoNum['czpp_valor'] * $configu['conf_trm_venta']), 0);
+                    $valorProducto = round(($productoNum['czpp_valor'] * $configuracion['conf_trm_venta']), 0);
                 }
                 //Si cambió a Dolares
                 else {
-                    $valorProducto = round(($productoNum['czpp_valor'] / $configu['conf_trm_compra']), 0);
+                    $valorProducto = round(($productoNum['czpp_valor'] / $configuracion['conf_trm_compra']), 0);
                 }
 
                 $conexionBdPrincipal->query("UPDATE cotizacion_productos SET czpp_valor='" . $valorProducto . "' WHERE czpp_id='" . $productoNum['czpp_id'] . "'");

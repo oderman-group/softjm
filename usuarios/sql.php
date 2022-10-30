@@ -2196,7 +2196,7 @@ if ($_POST["idSql"] == 81) {
 
 			$valorProducto = $productoDatos['prod_precio'];
 			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['prod_precio'] / $configu['conf_trm_compra']), 0);
+				$valorProducto = round(($productoDatos['prod_precio'] / $configuracion['conf_trm_compra']), 0);
 			}
 
 			mysql_query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["producto"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 1)", $conexion);
@@ -2247,7 +2247,7 @@ if ($_POST["idSql"] == 81) {
 
 				$valorProducto = $precioCombo;
 				if ($_POST["moneda"] == 2) {
-					$valorProducto = round(($precioCombo / $configu['conf_trm_compra']), 0);
+					$valorProducto = round(($precioCombo / $configuracion['conf_trm_compra']), 0);
 				}
 
 				mysql_query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["combo"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 1)", $conexion);
@@ -2274,7 +2274,7 @@ if ($_POST["idSql"] == 81) {
 
 			$valorProducto = $productoDatos['serv_precio'];
 			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['serv_precio'] / $configu['conf_trm_compra']), 0);
+				$valorProducto = round(($productoDatos['serv_precio'] / $configuracion['conf_trm_compra']), 0);
 			}
 
 			mysql_query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_servicio, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["servicio"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 1)", $conexion);
@@ -2322,7 +2322,7 @@ if ($_POST["idSql"] == 83) {
 
 			$valorProducto = $productoDatos['prod_precio'];
 			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['prod_precio'] / $configu['conf_trm_compra']), 0);
+				$valorProducto = round(($productoDatos['prod_precio'] / $configuracion['conf_trm_compra']), 0);
 			}
 
 			mysql_query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["producto"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 4)", $conexion);
@@ -2373,7 +2373,7 @@ if ($_POST["idSql"] == 83) {
 
 				$valorProducto = $precioCombo;
 				if ($_POST["moneda"] == 2) {
-					$valorProducto = round(($precioCombo / $configu['conf_trm_compra']), 0);
+					$valorProducto = round(($precioCombo / $configuracion['conf_trm_compra']), 0);
 				}
 
 				mysql_query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["combo"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 4)", $conexion);
@@ -2400,7 +2400,7 @@ if ($_POST["idSql"] == 83) {
 
 			$valorProducto = $productoDatos['serv_precio'];
 			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['serv_precio'] / $configu['conf_trm_compra']), 0);
+				$valorProducto = round(($productoDatos['serv_precio'] / $configuracion['conf_trm_compra']), 0);
 			}
 
 			mysql_query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_servicio, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["servicio"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 4)", $conexion);
@@ -2439,7 +2439,7 @@ if ($_POST["idSql"] == 84) {
 
 			$valorProducto = $productoDatos['prod_precio'];
 			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['prod_precio'] / $configu['conf_trm_compra']), 0);
+				$valorProducto = round(($productoDatos['prod_precio'] / $configuracion['conf_trm_compra']), 0);
 			}
 
 			mysql_query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega)VALUES('" . $idInsert . "','" . $_POST["producto"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 4, 1)", $conexion);
@@ -2572,7 +2572,7 @@ if ($_POST["idSql"] == 85) {
 
 					$valorProducto = $productoDatos['prod_precio'];
 					if ($_POST["moneda"] == 2) {
-						$valorProducto = round(($productoDatos['prod_precio'] / $configu['conf_trm_compra']), 0);
+						$valorProducto = round(($productoDatos['prod_precio'] / $configuracion['conf_trm_compra']), 0);
 					}
 
 					mysql_query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo, czpp_bodega)VALUES('" . $_POST["id"] . "','" . $_POST["producto"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 4, 1)", $conexion);
@@ -2584,11 +2584,11 @@ if ($_POST["idSql"] == 85) {
 					if ($_POST["monedaActual"] != $_POST["moneda"]) {
 						//Si cambió a pesos colombianos
 						if ($_POST["moneda"] == 1) {
-							$valorProducto = round(($productoNum['czpp_valor'] * $configu['conf_trm_venta']), 0);
+							$valorProducto = round(($productoNum['czpp_valor'] * $configuracion['conf_trm_venta']), 0);
 						}
 						//Si cambió a Dolares
 						else {
-							$valorProducto = round(($productoNum['czpp_valor'] / $configu['conf_trm_compra']), 0);
+							$valorProducto = round(($productoNum['czpp_valor'] / $configuracion['conf_trm_compra']), 0);
 						}
 
 						mysql_query("UPDATE cotizacion_productos SET czpp_valor='" . $valorProducto . "' WHERE czpp_id='" . $productoNum['czpp_id'] . "'", $conexion);

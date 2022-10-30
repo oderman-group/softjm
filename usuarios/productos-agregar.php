@@ -216,7 +216,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 									</div>
                                 </div>  
                                 
-                                <?php if ($configu['conf_proveedor_cotizacion'] == 1) { ?>
+                                <?php if ($configuracion['conf_proveedor_cotizacion'] == 1) { ?>
 
 <div class="control-group">
     <label class="control-label">Proveedor</label>

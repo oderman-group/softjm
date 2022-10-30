@@ -75,7 +75,7 @@ require_once("logica-cotizacion.php");
 								</p>
 
 								<?php
-								if ($configu['conf_proveedor_cotizacion'] == 1) {
+								if ($configuracion['conf_proveedor_cotizacion'] == 1) {
 									?>
 									<p class="border border-warning p-2">
 										<span style="font-size: 12px; font-weight: bold;">NEGOCIO EN REPRESENTACIÓN<br>COMERCIAL DE</span><br>

@@ -220,7 +220,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 
 							   <?php if(is_numeric($_GET['cte'])){?>
 
-							   <?php if($configu['conf_proveedor_cotizacion'] == 1){?>
+							   <?php if($configuracion['conf_proveedor_cotizacion'] == 1){?>
 
 								<script type="application/javascript">
 

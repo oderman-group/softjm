@@ -82,7 +82,7 @@ $total = number_format($resultado['cotiz_valor'] + ($resultado['cotiz_valor'] * 
 						</td>
 						<td width="40%">
 							<?php
-							if ($configu['conf_proveedor_cotizacion'] == 1) {
+							if ($configuracion['conf_proveedor_cotizacion'] == 1) {
 								$proveedor = mysql_fetch_array(mysql_query("SELECT * FROM proveedores WHERE prov_id='" . $resultado['cotiz_proveedor'] . "'", $conexion));
 							?>
 								<p class="border border-warning p-2">

@@ -1,7 +1,7 @@
 <?php
 $consultaTotal = $conexionBdPrincipal->query($SQL);
 $numTotal = $consultaTotal->num_rows;
-$limite = $configu['conf_paginacion'];
+$limite = $configuracion['conf_paginacion'];
 
 $dpto =  "";
 if(isset($_GET["dpto"])){

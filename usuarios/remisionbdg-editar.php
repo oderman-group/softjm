@@ -254,7 +254,7 @@ if(is_numeric($_GET["cte"])){
 								</div>
 								
 
-								<?php if($configu['conf_proveedor_cotizacion'] == 1){?>
+								<?php if($configuracion['conf_proveedor_cotizacion'] == 1){?>
 								
 								<div class="control-group">
 									 <label class="control-label">Escoja un proveedor</label>

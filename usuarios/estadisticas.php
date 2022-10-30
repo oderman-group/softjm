@@ -490,7 +490,7 @@ $epordia = substr($epordia,0,-1);
             
             <div align="center" style="margin:10px; font-size:20px;">
             <?php
-			$a = $configu['conf_agno_inicio'];
+			$a = $configuracion['conf_agno_inicio'];
 			while($a<=date("Y")){
 				if($a==$agnoConsulta)
 					echo '<a style="font-weight:bold;">'.$a.'</a>&nbsp;&nbsp;&nbsp;';

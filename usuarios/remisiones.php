@@ -142,7 +142,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 
             <div align="center" style="margin:10px; font-size:20px;">
 								<?php
-								$a = $configu['conf_agno_inicio'];
+								$a = $configuracion['conf_agno_inicio'];
 								while($a<=date("Y")){
 									if($a==$_GET["a"])
 										echo '<a style="font-weight:bold;">'.$a.'</a>&nbsp;&nbsp;&nbsp;';

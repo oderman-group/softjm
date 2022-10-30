@@ -35,7 +35,7 @@ if(isset($_POST["producto"])){
                     
                     //Si cambió a pesos colombianos
                     if ($_POST["moneda"] == 1) {
-                        $valorProducto = round(($productoDatos['czpp_valor'] * $configu['conf_trm_venta']), 0);
+                        $valorProducto = round(($productoDatos['czpp_valor'] * $configuracion['conf_trm_venta']), 0);
                     }
                     //Si cambió a Dolares
                     else {

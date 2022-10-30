@@ -45,7 +45,7 @@ if($_POST["combo"]!=''){
 
                 $valorProducto = $precioCombo;
                 if ($_POST["moneda"] == 2) {
-                    $valorProducto = round(($precioCombo / $configu['conf_trm_compra']), 0);
+                    $valorProducto = round(($precioCombo / $configuracion['conf_trm_compra']), 0);
                 }
 
                 $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["combo"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 1)");

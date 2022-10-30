@@ -169,8 +169,8 @@ if (mysql_errno() != 0) {
 											<th>Rem.</th>
 											<th>Valor con Dcto sin IVA </th>
 											<th>Valor con IVA</th>
-											<th>Comisión<br>Vendedor<br><?=$configu['conf_comision_vendedores'];?>% </th>
-											<th>Acumulado<br>Cliente<br><?=$configu['conf_porcentaje_clientes'];?>%</th>
+											<th>Comisión<br>Vendedor<br><?=$configuracion['conf_comision_vendedores'];?>% </th>
+											<th>Acumulado<br>Cliente<br><?=$configuracion['conf_porcentaje_clientes'];?>%</th>
 											<th></th>
 										</tr>
 									</thead>
@@ -266,11 +266,11 @@ if (mysql_errno() != 0) {
 												
 
 
-											$pCom = $configu['conf_comision_vendedores'] / 100;
+											$pCom = $configuracion['conf_comision_vendedores'] / 100;
 
 											$comision = ($sumaTotalConDcto * $pCom);
 
-											$pCliente = $configu['conf_porcentaje_clientes'] / 100;
+											$pCliente = $configuracion['conf_porcentaje_clientes'] / 100;
 
 											$aCliente = ($sumaTotalConDcto * $pCliente);
 

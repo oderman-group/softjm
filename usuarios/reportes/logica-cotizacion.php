@@ -17,6 +17,6 @@ WHERE cotiz_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
 
 $total = number_format($resultado['cotiz_valor'] + ($resultado['cotiz_valor'] * ($resultado['cotiz_impuestos'] / 100)), 0, ",", ".");
 
-if ($configu['conf_proveedor_cotizacion'] == 1) {
+if ($configuracion['conf_proveedor_cotizacion'] == 1) {
 	$proveedor = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM proveedores WHERE prov_id='" . $resultado['cotiz_proveedor'] . "'"), MYSQLI_BOTH);
 }

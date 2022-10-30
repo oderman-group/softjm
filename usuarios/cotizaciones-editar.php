@@ -229,7 +229,7 @@ if(isset($_GET["cte"])){
 										<textarea rows="7" cols="80" style="width: 80%" class="tinymce-simple" name="mensaje"><?=strtoupper($resultadoD['cli_nombre']);?><br>
 											<?=strtoupper($resultadoD['cont_nombre']);?><br><br>
 											<br>
-											<?=$configu['conf_emsj_cotizacion'];?>
+											<?=$configuracion['conf_emsj_cotizacion'];?>
 										</textarea>
 									</div>
 								</div>	
@@ -294,7 +294,7 @@ if(isset($_GET["cte"])){
 								</div>
 								
 
-								<?php if($configu['conf_proveedor_cotizacion'] == 1){?>
+								<?php if($configuracion['conf_proveedor_cotizacion'] == 1){?>
 								
 								<div class="control-group">
 									 <label class="control-label">Escoja un proveedor</label>
