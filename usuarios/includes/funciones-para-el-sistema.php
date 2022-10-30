@@ -91,5 +91,24 @@ function validarReferencia($paginaDeReferencia){
 	}
 }
 
+function validarAccesoModulo($empresa, $modulo){
+
+	global $conexionBdAdmin, $datosUsuarioActual;
+
+	if($datosUsuarioActual[3]==1){
+		return true;
+	}
+
+	$consulta = $conexionBdAdmin->query("SELECT * FROM modulos_empresa
+	WHERE mxe_id_empresa='".$empresa."' AND mxe_id_modulo='".$modulo."'");
+	$numRegistros = $consulta->num_rows;
+	
+	if($numRegistros>0){
+		return true;
+	}
+
+	return false;
+}
+
 
 
