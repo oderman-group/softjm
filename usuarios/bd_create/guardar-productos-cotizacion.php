@@ -14,8 +14,6 @@ if($_POST["producto"]!=''){
             $valorProducto = $productoDatos['prod_precio'];
 
             if ($_POST["moneda"] == 2) {
-                    //$valorProducto = round(($productoDatos['prod_precio'] / $configu['conf_trm_compra']), 0);
-
                 $valorProducto = productosPrecioListaUSD($productoDatos['prod_utilidad'], $productoDatos['prod_costo_dolar']);
             }
 
