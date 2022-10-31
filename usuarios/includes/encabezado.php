@@ -40,11 +40,13 @@ switch($_SESSION["bd"]){
 
 	<div style="height:50px; width:100%; background-color:black; padding:2px; color:#42FF00; display:flex; justify-content: center; align-items: center;">
 		<b>Sesion DB:&nbsp;</b> <?=$_SESSION["bd"]; ?>&nbsp;|&nbsp;
-		<b>ID Company:&nbsp;</b> <?=$configu['conf_id_empresa']; ?>&nbsp;|&nbsp;
+		<b>ID Company:&nbsp;</b> <?=$configuracion['conf_id_empresa']; ?>&nbsp;|&nbsp;
 		<b>Current User ID:&nbsp;</b> <?=$_SESSION["id"]; ?>&nbsp;|&nbsp;
 		<b>ID Page:&nbsp;</b> <?=$idPagina; ?>&nbsp;|&nbsp;
+		<b>ID Module:&nbsp;</b> <?=$paginaActual['pag_id_modulo']; ?>&nbsp;|&nbsp;
 		<b>Versión PHP:&nbsp;</b> <?=phpversion(); ?>&nbsp;|&nbsp; 
 		<b>Server:&nbsp;</b> <?=$_SERVER['SERVER_NAME']; ?>&nbsp;|&nbsp;
+		<b>BD:&nbsp;</b> <?=SERVER." - ".MAINBD; ?>&nbsp;|&nbsp;
 		<?php if( isset($_SESSION['admin']) ){?>
 			<b>User Admin:&nbsp;</b> <?=$_SESSION['admin']; ?>&nbsp;|&nbsp;
 			<a href="return-admin-panel.php" style="color:white; text-decoration:underline;">RETURN TO ADMIN PANEL</a>
@@ -52,15 +54,12 @@ switch($_SESSION["bd"]){
 		
 	</div>
 
-<?php }?>
+<?php }
 
-<!--
-<style type="text/css">
-	.navbar-inverse .navbar-inner {
-		background-color: #DA2201;
-		}	
-</style>
-	-->
+require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
+?>
+
+
 
 <div class="navbar navbar-inverse top-nav">
 		<div class="navbar-inner">
@@ -68,39 +67,44 @@ switch($_SESSION["bd"]){
 				<span class="home-link"><a href="index.php" class="icon-home"></a></span>
 				<div class="nav-collapse">
 					<ul class="nav">
+
 						<li><a style="font-weight: bold; color: yellow; font-size: 14px;"><?=$bdEmpresa;?></a></li>
 
-						<li class="dropdown"><a href="index.php"><i class="icon-dashboard"></i> Escritorio</a></li>
+						<?php if(validarAccesoModulo($configuracion['conf_id_empresa'], 1)){?>
+							<li class="dropdown"><a href="index.php"><i class="icon-dashboard"></i> Escritorio</a></li>
+						<?php }?>
 
-						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Sistema <b class="icon-angle-down"></b></a>
-						<div class="dropdown-menu">
-							<ul>
-								<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Parametrización</a>
-								<div class="dropdown-menu">
-									<ul>
-										<li><a href="configuracion.php"><i class=" icon-file-alt"></i> Configuración</a></li>
-										<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
-											<li><a href="metricas.php?id=1"><i class="icon-cogs"></i> Métricas </a></li>
-										<?php }?>
-										<li><a href="estructura-mensajes.php"><i class=" icon-file-alt"></i> Estructura de mensajes</a></li>
-									</ul>
-								</div>
-								</li>
-								<li><a href="modulos.php"><i class=" icon-unlock"></i>Módulos</a></li>
-                                <li><a href="paginas.php"><i class="icon-file"></i> Páginas</a></li>
-								<li><a href="buzon.php"><i class="icon-envelope"></i> Buzón de salida </a></li>
+						<?php if(validarAccesoModulo($configuracion['conf_id_empresa'], 2)){?>
+							<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Sistema <b class="icon-angle-down"></b></a>
+							<div class="dropdown-menu">
+								<ul>
+									<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Parametrización</a>
+									<div class="dropdown-menu">
+										<ul>
+											<li><a href="configuracion.php"><i class=" icon-file-alt"></i> Configuración</a></li>
+											<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
+												<li><a href="metricas.php?id=1"><i class="icon-cogs"></i> Métricas </a></li>
+											<?php }?>
+											<li><a href="estructura-mensajes.php"><i class=" icon-file-alt"></i> Estructura de mensajes</a></li>
+										</ul>
+									</div>
+									</li>
+									<li><a href="modulos.php"><i class=" icon-unlock"></i>Módulos</a></li>
+									<li><a href="paginas.php"><i class="icon-file"></i> Páginas</a></li>
+									<li><a href="buzon.php"><i class="icon-envelope"></i> Buzón de salida </a></li>
 
-								<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Documentación</a>
-								<div class="dropdown-menu">
-									<ul>
-                        				<li><a href="tutoriales.php"><i class="icon-facetime-video"></i> Tutoriales</a></li>
-										<li><a href="https://www.loom.com/share/308bdd148ddc4bffb2af76e27e3d5139" target="_blank"><i class="icon-facetime-video"></i> Tutorial Completo</a></li>
-									</ul>
-								</div>
-								</li>
-							</ul>
-						</div>
-						</li>
+									<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Documentación</a>
+									<div class="dropdown-menu">
+										<ul>
+											<li><a href="tutoriales.php"><i class="icon-facetime-video"></i> Tutoriales</a></li>
+											<li><a href="https://www.loom.com/share/308bdd148ddc4bffb2af76e27e3d5139" target="_blank"><i class="icon-facetime-video"></i> Tutorial Completo</a></li>
+										</ul>
+									</div>
+									</li>
+								</ul>
+							</div>
+							</li>
+						<?php }?>
 
 						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Administración <b class="icon-angle-down"></b></a>
 						<div class="dropdown-menu">
