@@ -1,7 +1,6 @@
 <?php 
 include("sesion.php");
 $idPagina = 42;
-$paginaActual['pag_nombre'] = "Editar Configuración";
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
@@ -11,21 +10,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -61,6 +46,9 @@ include("includes/js-formularios.php");
                 <?php include("includes/notificaciones.php"); ?>
                 <div class="row-fluid">
                     <div class="span12">
+                        <p>
+                            <a href="configuracion-color-encabezado.php?id=<?=$configuracion['conf_id_empresa'];?>" class="btn btn-danger"></i>Cambiar Color para Encabezado</a>
+                        </p>
                         <div class="content-widgets gray">
                             <div class="widget-head bondi-blue">
                                 <h3> <?= $paginaActual['pag_nombre']; ?></h3>
