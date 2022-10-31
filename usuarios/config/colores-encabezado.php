@@ -1,35 +1,36 @@
 
-<?php 
-//Consulta para traer los colores de BD.
+<?php
+	$consultaColorEncabezado = $conexionBdPrincipal->query("SELECT * FROM encabezado_color_empresa WHERE cxe_id_empresa='".$configuracion['conf_id_empresa']."'");
+	$colorEncabezado = mysqli_fetch_array($consultaColorEncabezado, MYSQLI_BOTH);
 ?>
 
 <style type="text/css">
 .navbar-inverse .navbar-inner {
-	background-color: #2C3E50;
+	background-color: <?=$colorEncabezado[1];?>;
 }
 
 .navbar-inverse .brand, .navbar-inverse .nav > li > a {
-	color: #FFF;
+	color: <?=$colorEncabezado[2];?>;
 }
 
 .navbar-inverse .brand, .navbar-inverse .nav > li > a:hover {
-	color: #B3B6B7;
+	color: <?=$colorEncabezado[3];?>;
 }
 
 .navbar-inverse .nav li.dropdown.open > .dropdown-toggle, .navbar-inverse .nav li.dropdown.active > .dropdown-toggle, .navbar-inverse .nav li.dropdown.open.active > .dropdown-toggle {
-	background-color: #5D6D7E;
-	color: #FFF;
+	background-color: <?=$colorEncabezado[4];?>;
+	color: <?=$colorEncabezado[5];?>;
 }
 
 .dropdown-menu {
-	background-color: gray;
+	background-color: <?=$colorEncabezado[6];?>;
 }
 
 .top-nav .nav .dropdown-menu ul {
-	background-color: #2C3E50;
+	background-color: <?=$colorEncabezado[7];?>;
 }
 
 .dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a {
-	background-color: orange;
+	background-color: <?=$colorEncabezado[8];?>;
 }
 </style>
