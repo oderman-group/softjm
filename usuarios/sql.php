@@ -536,26 +536,9 @@ if ($_POST["idSql"] == 8) {
 	exit();
 }
 //AGREGAR MARCAS
-if ($_POST["idSql"] == 9) {
-	mysql_query("INSERT INTO marcas(mar_nombre)VALUES('" . $_POST["nombre"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsertU = mysql_insert_id();
-	echo '<script type="text/javascript">window.location.href="marcas-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
+
 //EDITAR MARCAS
-if ($_POST["idSql"] == 10) {
-	mysql_query("UPDATE marcas SET mar_nombre='" . $_POST["nombre"] . "' WHERE mar_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="marcas-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
+
 //AGREGAR FACTURAS
 if ($_POST["idSql"] == 11) {
 
@@ -3481,16 +3464,6 @@ if ($_GET["get"] == 44) {
 	exit();
 }
 //Eliminar marcas
-if ($_GET["get"] == 47) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysql_query("DELETE FROM marcas WHERE mar_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 
 //ELIMINAR SERVICIOS
 if ($_GET["get"] == 49) {
