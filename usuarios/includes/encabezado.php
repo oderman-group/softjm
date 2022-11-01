@@ -160,7 +160,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 									<ul>
 										<li><a href="productos.php"><i class=" icon-file-alt"></i> Productos</a></li>
 										<li><a href="combos.php"><i class=" icon-file-alt"></i> Combos</a></li>
-										<li><a href="categorias.php"><i class=" icon-file-alt"></i>Categorías</a></li>
+										<li><a href="categoriasp.php"><i class=" icon-file-alt"></i>Categorías</a></li>
 										<li><a href="marcas.php"><i class=" icon-file-alt"></i>Marcas</a></li>
 									</ul>
 								</div>
