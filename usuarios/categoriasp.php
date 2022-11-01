@@ -315,8 +315,8 @@ include("includes/head.php");
 								//if($numProductos==0) continue;
 								
 								$totalP += $numProductos;
-								$consultaUsuarios=$conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['catp_usuario']."'");
-								$usuario = mysqli_fetch_array($consultaUsuarios, MYSQLI_BOTH);
+								$consultaUsuarios2=$conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['catp_usuario']."'");
+								$usuario = mysqli_fetch_array($consultaUsuarios2, MYSQLI_BOTH);
 							?>
 							<tr>
 								<td><?=$no;?></td>
