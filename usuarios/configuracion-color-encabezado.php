@@ -54,56 +54,56 @@ include("includes/js-formularios.php");
                                 <form class="form-horizontal" method="post" action="bd_update/actualizar-color-encabezado.php" enctype="multipart/form-data">
                                 <input type="hidden" name="id" value="<?=$_GET["id"];?>">
 
-                                    <div class="control-group">
+                                    <div class="control-group" title="Este campo cambia el color del fondo de todo el menu.">
                                         <label class="control-label">Color Fondo</label>
                                         <div class="controls">
                                             <input type="color" class="span4" name="colFondo" value="<?= $resultadoD['cxe_fondo'];?>">
                                         </div>
                                     </div>
 
-                                    <div class="control-group">
+                                    <div class="control-group" title="Este campo cambia el color de los titulo de todo el menu.">
                                         <label class="control-label">Color Texto Items</label>
                                         <div class="controls">
                                             <input type="color" class="span4" name="colText" value="<?= $resultadoD['cxe_text_items'];?>">
                                         </div>
                                     </div>
 
-                                    <div class="control-group">
+                                    <div class="control-group" title="Este campo cambia el color del titulo del menu cuando se pasa el mause por encima.">
                                         <label class="control-label">Color Texto Items Hover</label>
                                         <div class="controls">
                                             <input type="color" class="span4" name="colTextHover" value="<?= $resultadoD['cxe_text_items_hover'];?>">
                                         </div>
                                     </div>
 
-                                    <div class="control-group">
+                                    <div class="control-group" title="Este campo cambia el fondo del item seleccionado en el menu.">
                                         <label class="control-label">Color Fondo Items Activo</label>
                                         <div class="controls">
                                             <input type="color" class="span4" name="colFonActivo" value="<?= $resultadoD['cxe_fondo_items_activo'];?>">
                                         </div>
                                     </div>
 
-                                    <div class="control-group">
+                                    <div class="control-group" title="Este campo cambia el color del titulo del item seleccionado en el menu.">
                                         <label class="control-label">Color Texto Items Activo</label>
                                         <div class="controls">
                                             <input type="color" class="span4" name="colTextActivo" value="<?= $resultadoD['cxe_text_items_activo'];?>">
                                         </div>
                                     </div>
 
-                                    <div class="control-group">
-                                        <label class="control-label">Color Borde Fondo Sub-Menu</label>
+                                    <div class="control-group" title="Este campo cambia el color del borde del sub-menu.">
+                                        <label class="control-label">Color Borde del Sub-Menu</label>
                                         <div class="controls">
                                             <input type="color" class="span4" name="colBorSubmenu" value="<?= $resultadoD['cxe_border_submenu'];?>">
                                         </div>
                                     </div>
 
-                                    <div class="control-group">
+                                    <div class="control-group" title="Este campo cambia el color del fondo del sub-menu.">
                                         <label class="control-label">Color Fondo Sub-Menu</label>
                                         <div class="controls">
                                             <input type="color" class="span4" name="colFonSubmenu" value="<?= $resultadoD['cxe_fondo_submenu'];?>">
                                         </div>
                                     </div>
 
-                                    <div class="control-group">
+                                    <div class="control-group" title="Este campo cambia el color de fondo del item del sub-menu cuando se pasa el mause por encima.">
                                         <label class="control-label">Color Fondo Sub-Menu Hover</label>
                                         <div class="controls">
                                             <input type="color" class="span4" name="colFonSubmenuHover" value="<?= $resultadoD['cxe_fondo_submenu_hover'];?>">
