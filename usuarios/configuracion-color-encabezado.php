@@ -5,7 +5,7 @@ $idPagina = 190;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consulta = $conexionBdPrincipal->query("SELECT * FROM encabezado_color_empresa WHERE cxe_id_empresa='".$_GET['id']."'");
+$consulta = $conexionBdAdmin->query("SELECT * FROM encabezado_color_empresa WHERE cxe_id_empresa='".$_GET['id']."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
@@ -57,56 +57,56 @@ include("includes/js-formularios.php");
                                     <div class="control-group">
                                         <label class="control-label">Color Fondo</label>
                                         <div class="controls">
-                                            <input type="color" class="span4" name="colFondo" value="<?= $resultadoD[1];?>">
+                                            <input type="color" class="span4" name="colFondo" value="<?= $resultadoD['cxe_fondo'];?>">
                                         </div>
                                     </div>
 
                                     <div class="control-group">
                                         <label class="control-label">Color Texto Items</label>
                                         <div class="controls">
-                                            <input type="color" class="span4" name="colText" value="<?= $resultadoD[2];?>">
+                                            <input type="color" class="span4" name="colText" value="<?= $resultadoD['cxe_text_items'];?>">
                                         </div>
                                     </div>
 
                                     <div class="control-group">
                                         <label class="control-label">Color Texto Items Hover</label>
                                         <div class="controls">
-                                            <input type="color" class="span4" name="colTextHover" value="<?= $resultadoD[3];?>">
+                                            <input type="color" class="span4" name="colTextHover" value="<?= $resultadoD['cxe_text_items_hover'];?>">
                                         </div>
                                     </div>
 
                                     <div class="control-group">
                                         <label class="control-label">Color Fondo Items Activo</label>
                                         <div class="controls">
-                                            <input type="color" class="span4" name="colFonActivo" value="<?= $resultadoD[4];?>">
+                                            <input type="color" class="span4" name="colFonActivo" value="<?= $resultadoD['cxe_fondo_items_activo'];?>">
                                         </div>
                                     </div>
 
                                     <div class="control-group">
                                         <label class="control-label">Color Texto Items Activo</label>
                                         <div class="controls">
-                                            <input type="color" class="span4" name="colTextActivo" value="<?= $resultadoD[5];?>">
+                                            <input type="color" class="span4" name="colTextActivo" value="<?= $resultadoD['cxe_text_items_activo'];?>">
                                         </div>
                                     </div>
 
                                     <div class="control-group">
                                         <label class="control-label">Color Borde Fondo Sub-Menu</label>
                                         <div class="controls">
-                                            <input type="color" class="span4" name="colBorSubmenu" value="<?= $resultadoD[6];?>">
+                                            <input type="color" class="span4" name="colBorSubmenu" value="<?= $resultadoD['cxe_border_submenu'];?>">
                                         </div>
                                     </div>
 
                                     <div class="control-group">
                                         <label class="control-label">Color Fondo Sub-Menu</label>
                                         <div class="controls">
-                                            <input type="color" class="span4" name="colFonSubmenu" value="<?= $resultadoD[7];?>">
+                                            <input type="color" class="span4" name="colFonSubmenu" value="<?= $resultadoD['cxe_fondo_submenu'];?>">
                                         </div>
                                     </div>
 
                                     <div class="control-group">
                                         <label class="control-label">Color Fondo Sub-Menu Hover</label>
                                         <div class="controls">
-                                            <input type="color" class="span4" name="colFonSubmenuHover" value="<?= $resultadoD[8];?>">
+                                            <input type="color" class="span4" name="colFonSubmenuHover" value="<?= $resultadoD['cxe_fondo_submenu_hover'];?>">
                                         </div>
                                     </div>
 

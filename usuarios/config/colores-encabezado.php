@@ -1,6 +1,6 @@
 
 <?php
-	$consultaColorEncabezado = $conexionBdPrincipal->query("SELECT * FROM encabezado_color_empresa WHERE cxe_id_empresa='".$configuracion['conf_id_empresa']."'");
+	$consultaColorEncabezado = $conexionBdAdmin->query("SELECT * FROM encabezado_color_empresa WHERE cxe_id_empresa='".$configuracion['conf_id_empresa']."'");
 	$colorEncabezado = mysqli_fetch_array($consultaColorEncabezado, MYSQLI_BOTH);
 ?>
 
