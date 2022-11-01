@@ -1,13 +1,10 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 33;
-$paginaActual['pag_nombre'] = "Marcas";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -28,73 +25,36 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script type="text/javascript">
-            /*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
-            $(function () {
-                $('#data-table').dataTable({
-                    "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                    /*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
-                });
-            });
-            $(function () {
-                $('.tbl-simple').dataTable({
-                    "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                });
-            });
-			
-			$(function () {
-			$(".tbl-paper-theme").tablecloth({
-          theme: "paper"
-		   });
-			});
-			
-		$(function () {
-			$(".tbl-dark-theme").tablecloth({
-          theme: "dark"
-		   });
+	$(function () {
+		$('#data-table').dataTable({
+			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
 		});
-			$(function () {
-                $('.tbl-paper-theme,.tbl-dark-theme').dataTable({
-                    "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                });
+	});
+	$(function () {
+		$('.tbl-simple').dataTable({
+			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
+		});
+	});
 	
+	$(function () {
+	$(".tbl-paper-theme").tablecloth({
+	theme: "paper"
+	});
+	});
+		
+	$(function () {
+		$(".tbl-dark-theme").tablecloth({
+		theme: "dark"
+		});
+	});
+	$(function () {
+		$('.tbl-paper-theme,.tbl-dark-theme').dataTable({
+			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
+		});
 
-            });
-        </script>
+
+	});
+</script>
 </head>
 <body>
 <div class="layout">
@@ -103,11 +63,9 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
     
 	<div class="main-wrapper">
 		<div class="container-fluid">
-            <?php include("includes/notificaciones.php");?>
-   
-            
+            <?php include("includes/notificaciones.php");?>            
             <p>
-            	<a href="marcas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+            	<a href="marcas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i>Agregar Nuevo</a>
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -128,9 +86,9 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							</thead>
 							<tbody>
                             <?php
-							$consulta = mysql_query("SELECT * FROM marcas",$conexion);
+							$consulta = $conexionBdPrincipal->query("SELECT * FROM marcas");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 							?>
 							<tr>
 								<td><?=$no;?></td>
@@ -138,7 +96,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
                                 <td><?=$res['mar_nombre'];?></td>
                                 <td><h4>
                                     <a href="marcas-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-                                    <a href="sql.php?id=<?=$res[0];?>&get=47" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                    <a href="bd_delete/marcas-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>
