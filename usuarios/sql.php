@@ -791,26 +791,8 @@ if ($_POST["idSql"] == 20) {
 	exit();
 }
 //AGREGAR CATEGORIA PRODUCTOS
-if ($_POST["idSql"] == 21) {
-	mysql_query("INSERT INTO productos_categorias(catp_nombre, catp_grupo)VALUES('" . $_POST["nombre"] . "', '" . $_POST["grupo"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsertU = mysql_insert_id();
-	echo '<script type="text/javascript">window.location.href="categoriasp-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
+
 //EDITAR CATEGORIA PRODUCTOS
-if ($_POST["idSql"] == 22) {
-	mysql_query("UPDATE productos_categorias SET catp_nombre='" . $_POST["nombre"] . "' WHERE catp_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="categoriasp-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 
 //aqui estaba configuración
 
@@ -2897,18 +2879,7 @@ if ($_GET["get"] == 12) {
 	exit();
 }
 //ELIMINAR CATEGORÍA DE PRODUCTOS
-if ($_GET["get"] == 13) {
-	$idPagina = 62;
-	include("includes/verificar-paginas.php");
-	mysql_query("DELETE FROM productos WHERE prod_categoria='" . $_GET["id"] . "'", $conexion);
-	mysql_query("DELETE FROM productos_categorias WHERE catp_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //ELIMINAR ZONAS
 if ($_GET["get"] == 14) {
 	$idPagina = 63;
