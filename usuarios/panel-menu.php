@@ -1,30 +1,14 @@
-<?php include("sesion.php");?>
 <?php 
-$idPagina = "";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+include("sesion.php");
+
+$idPagina = "195";
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 <link href="css/jquery.gritter.css" rel="stylesheet">
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/tablecloth.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -293,7 +277,7 @@ FLOT PIE CHART
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			
-			<?php if($_GET["p"]==1){?>
+			<?php if(isset($_GET["p"])){if($_GET["p"]==1){?>
 			<h2>CRM</h2>
 			<div class="row-fluid">
 				<div class="span3">
@@ -375,12 +359,12 @@ FLOT PIE CHART
 			
 			
 			<?php
-			$tikets = mysql_query("SELECT * FROM cliente_seguimiento
+			$tikets = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
 			INNER JOIN clientes ON cli_id=cseg_cliente
 			INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 			WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND cseg_fecha_proximo_contacto!='0000-00-00'
 			ORDER BY cseg_fecha_proximo_contacto DESC
-			",$conexion);
+			");
 			?>
 			
 			<p>&nbsp;</p>
@@ -396,16 +380,17 @@ FLOT PIE CHART
 						<div class="widget-container">
 							<ul class="sample-noty">
 								<?php
-								$llamadas = mysql_query("SELECT * FROM cliente_seguimiento 
+								$llamadas = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento 
 								INNER JOIN clientes ON cli_id=cseg_cliente
-								WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND (cseg_canal_proximo_contacto=2 OR cseg_canal_proximo_contacto=3) AND cseg_realizado IS NULL",$conexion);
+								WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND (cseg_canal_proximo_contacto=2 OR cseg_canal_proximo_contacto=3) AND cseg_realizado IS NULL");
 								
-								while($llamada = mysql_fetch_array($llamadas)){
-								$pahoy = mysql_fetch_array(mysql_query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()) FROM cliente_seguimiento 
-								WHERE cseg_id='".$llamada['cseg_id']."'",$conexion));
+								while($llamada = mysqli_fetch_array($llamadas)){
+								$consultaClienteSeguimiento=$conexionBdPrincipal->query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()) FROM cliente_seguimiento 
+								WHERE cseg_id='".$llamada['cseg_id']."'");
+								$pahoy = mysqli_fetch_array($consultaClienteSeguimiento, MYSQLI_BOTH);
 								
-								$contacto = mysql_fetch_array(mysql_query("SELECT * FROM contactos
-								WHERE cont_id='".$llamada['cseg_contacto']."'",$conexion));
+								$consultaContactos=$conexionBdPrincipal->query("SELECT * FROM contactos WHERE cont_id='".$llamada['cseg_contacto']."'");
+								$contacto = mysqli_fetch_array($consultaContactos, MYSQLI_BOTH);
 								$addContacto = '';
 								if($contacto[0]!=""){$addContacto = '. El contacto de esta empresa es <a href="clientes-contactos-editar.php?id='.$contacto['cont_id'].'&cte='.$llamada['cli_id'].'">'.$contacto['cont_nombre'].' ('.$contacto['cont_telefono'].' - '.$contacto['cont_celular'].')</a>';}	
 									
@@ -431,16 +416,18 @@ FLOT PIE CHART
 						<div class="widget-container">
 							<ul class="sample-noty">
 								<?php
-								$llamadas = mysql_query("SELECT * FROM cliente_seguimiento 
+								$llamadas = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento 
 								INNER JOIN clientes ON cli_id=cseg_cliente
-								WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND (cseg_canal_proximo_contacto=4 OR cseg_canal_proximo_contacto=5) AND cseg_realizado IS NULL",$conexion);
+								WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND (cseg_canal_proximo_contacto=4 OR cseg_canal_proximo_contacto=5) AND cseg_realizado IS NULL");
 								
-								while($llamada = mysql_fetch_array($llamadas)){
-								$pahoy = mysql_fetch_array(mysql_query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()) FROM cliente_seguimiento 
-								WHERE cseg_id='".$llamada['cseg_id']."'",$conexion));
+								while($llamada = mysqli_fetch_array($llamadas)){
+								$consultaClienteSeguimiento=$conexionBdPrincipal->query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()) FROM cliente_seguimiento 
+								WHERE cseg_id='".$llamada['cseg_id']."'");
+								$pahoy = mysqli_fetch_array($consultaClienteSeguimiento, MYSQLI_BOTH);
 								
-								$contacto = mysql_fetch_array(mysql_query("SELECT * FROM contactos
-								WHERE cont_id='".$llamada['cseg_contacto']."'",$conexion));
+								$consultaContactos=$conexionBdPrincipal->query("SELECT * FROM contactos
+								WHERE cont_id='".$llamada['cseg_contacto']."'");
+								$contacto = mysqli_fetch_array($consultaContactos, MYSQLI_BOTH);
 								$addContacto = '';
 								if($contacto[0]!=""){$addContacto = '. El contacto de esta empresa es <a href="clientes-contactos-editar.php?id='.$contacto['cont_id'].'&cte='.$llamada['cli_id'].'">'.$contacto['cont_nombre'].' ('.$contacto['cont_telefono'].' - '.$contacto['cont_celular'].')</a>';}	
 									
@@ -471,24 +458,25 @@ FLOT PIE CHART
 					</div>
 					
 					<?php
-					$NumtiketsI = mysql_num_rows(mysql_query("SELECT * FROM clientes_tikets
+					$ConsultaNumTikets=$conexionBdPrincipal->query("SELECT * FROM clientes_tikets
 					INNER JOIN clientes ON cli_id=tik_cliente
 					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado=1 
 					ORDER BY tik_tipo_tiket DESC
-					",$conexion));
+					");
+					$NumtiketsI = $ConsultaNumTikets->num_rows;
 
-					$tiketsI = mysql_query("SELECT * FROM clientes_tikets
+					$tiketsI = $conexionBdPrincipal->query("SELECT * FROM clientes_tikets
 					INNER JOIN clientes ON cli_id=tik_cliente
 					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado=1 
 					ORDER BY tik_tipo_tiket DESC
 					LIMIT 0,5
-					",$conexion);
+					");
 					?>
 					<div class="content-widgets gray">
 						<div class="widget-head" style="background-color: #eb4132;">
 							<h3><i class="icon-list"></i> Tickets Abiertos (<?=$NumtiketsI;?>)</h3>
 						</div>
-							<?php $i=1; while($tkResI = mysql_fetch_array($tiketsI)){?>
+							<?php $i=1; while($tkResI = mysqli_fetch_array($tiketsI, MYSQLI_BOTH)){?>
                             <ul class="sample-noty">
 								<li><a href="clientes-tikets-editar.php?id=<?=$tkResI['tik_id'];?>" style="color:#000;" target="_blank">
 								<?="<b>".$i.")</b> ".$tkResI['tik_asunto_principal']." (<b>".$tkResI['cli_nombre']."</b>)</a><br>
@@ -522,13 +510,14 @@ FLOT PIE CHART
 								<div class="user_list">
 									
 									<?php
-									while($tkRes = mysql_fetch_array($tikets)){
+									while($tkRes = mysqli_fetch_array($tikets, MYSQLI_BOTH)){
 										switch($tkRes['cseg_tipo']){
 											case 1: $tipoS = 'Comercial'; $etiquetaT='success'; break;
 											case 2: $tipoS = 'Soporte'; $etiquetaT='info'; break;
 										}
-										$segHoy = mysql_fetch_array(mysql_query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()), cseg_usuario_encargado FROM cliente_seguimiento 
-										WHERE cseg_id='".$tkRes['cseg_id']."'",$conexion));
+										$consultaClienteSeguimiento=$conexionBdPrincipal->query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()), cseg_usuario_encargado FROM cliente_seguimiento 
+										WHERE cseg_id='".$tkRes['cseg_id']."'");
+										$segHoy = mysqli_fetch_array($consultaClienteSeguimiento, MYSQLI_BOTH);
 										if(($segHoy[0]<0 and $tkRes['cseg_realizado']==1) or $segHoy[0]>0) continue;
 									?>
                                     <div class="user_block">
@@ -565,18 +554,19 @@ FLOT PIE CHART
 								<div class="user_list">
 									
 									<?php
-									$tikets2 = mysql_query("SELECT * FROM cliente_seguimiento
+									$tikets2 = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
 									INNER JOIN clientes ON cli_id=cseg_cliente
 									INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 									WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND cseg_fecha_proximo_contacto!='0000-00-00'
-									",$conexion);
-									while($tkRes2 = mysql_fetch_array($tikets2)){
+									");
+									while($tkRes2 = mysqli_fetch_array($tikets2, MYSQLI_BOTH)){
 										switch($tkRes2['cseg_tipo']){
 											case 1: $tipoS = 'Comercial'; $etiquetaT='success'; break;
 											case 2: $tipoS = 'Soporte'; $etiquetaT='info'; break;
 										}
-										$segHoy2 = mysql_fetch_array(mysql_query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()), cseg_usuario_encargado FROM cliente_seguimiento 
-										WHERE cseg_id='".$tkRes2['cseg_id']."'",$conexion));
+										$consultaClienteSeguimiento=$conexionBdPrincipal->query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()), cseg_usuario_encargado FROM cliente_seguimiento 
+										WHERE cseg_id='".$tkRes2['cseg_id']."'");
+										$segHoy2 = mysqli_fetch_array($consultaClienteSeguimiento, MYSQLI_BOTH);
 										if($segHoy2[0]!=1) continue;
 									?>
                                     <div class="user_block">
@@ -615,9 +605,9 @@ FLOT PIE CHART
               </div>
 			
 			
-			<?php }?>
+			<?php }}?>
 			
-			<?php if($_GET["p"]==1.1){?>
+			<?php if(isset($_GET["p"])){if($_GET["p"]==1.1){?>
 			<h2>SUBMÓDULO DE PRODUCTOS</h2>
 			<div class="row-fluid">
 				<div class="span3">
@@ -645,10 +635,10 @@ FLOT PIE CHART
 				</div>
 				
 			</div>
-			<?php }?>
+			<?php }}?>
 			
 			
-			<?php if($_GET["p"]==2){?>
+			<?php if(isset($_GET["p"])){if($_GET["p"]==2){?>
 			<h2>ADMINISTRATIVO</h2>
 			<div class="row-fluid">
 				<div class="span3">
@@ -701,10 +691,10 @@ FLOT PIE CHART
 					</div>
 				</div>
 			</div>
-			<?php }?>
+			<?php }}?>
 
 			
-			<?php if($_GET["p"]==3){?>
+			<?php if(isset($_GET["p"])){if($_GET["p"]==3){?>
 			<h2>MÓDULO DE SOPORTE OPERATIVO</h2>
 			<div class="row-fluid">
 				<div class="span3">
@@ -720,10 +710,10 @@ FLOT PIE CHART
 				</div>
 				
 			</div>
-			<?php }?>
+			<?php }}?>
 			
 			
-			<?php if($_GET["p"]==4){?>
+			<?php if(isset($_GET["p"])){if($_GET["p"]==4){?>
 			<h2>CONFIGURACIÓN/PERSONALIZACIÓN</h2>
 			<div class="row-fluid">
 				<div class="span3">
@@ -751,7 +741,7 @@ FLOT PIE CHART
 				</div>
 				
 			</div>
-			<?php }?>
+			<?php }}?>
 			
 			
 
