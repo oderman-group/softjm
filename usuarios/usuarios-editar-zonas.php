@@ -67,7 +67,7 @@ include("includes/js-formularios.php");
 							
 							
 
-							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
+							<form class="form-horizontal" method="post" action="bd_update/zonas-usuarios-actualizar.php" enctype="multipart/form-data">
                             <input type="hidden" name="idSql" value="92">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
 
