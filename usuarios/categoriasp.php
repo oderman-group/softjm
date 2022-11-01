@@ -418,6 +418,8 @@ include("includes/head.php");
 								//if($numProductos3==0) continue;
 								
 								$totalP3 += $numProductos3;
+								/*$consultaUsuarios3=$conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res3['catp_usuario']."'");
+								$usuario3 = mysqli_fetch_array($consultaUsuarios3, MYSQLI_BOTH);*/
 							?>
 							<tr>
 								<td><?=$no;?></td>
@@ -429,8 +431,8 @@ include("includes/head.php");
 								</td>
 								<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
 								<td>
-										<span style="font-size: 9px;">NN</span>
-										<br><span style="font-size: 9px;">NN</span>
+										<span style="font-size: 9px;"><!--<?=strtoupper($usuario3['usr_nombre']);?>--></span>
+										<br><span style="font-size: 9px;"><!--<?=$res3['catp_fecha'];?>--></span>
 								</td>
 								
 								<td>
