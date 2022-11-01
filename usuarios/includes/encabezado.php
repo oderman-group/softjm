@@ -158,9 +158,10 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 							<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Productos</a>
 								<div class="dropdown-menu">
 									<ul>
-										<li><a href="#"><i class=" icon-file-alt"></i> Productos</a></li>
-										<li><a href="#"><i class=" icon-file-alt"></i> Combos</a></li>
-										<li><a href="#"><i class=" icon-file-alt"></i>Categorías</a></li>
+										<li><a href="productos.php"><i class=" icon-file-alt"></i> Productos</a></li>
+										<li><a href="combos.php"><i class=" icon-file-alt"></i> Combos</a></li>
+										<li><a href="categorias.php"><i class=" icon-file-alt"></i>Categorías</a></li>
+										<li><a href="marcas.php"><i class=" icon-file-alt"></i>Marcas</a></li>
 									</ul>
 								</div>
 							</li>
