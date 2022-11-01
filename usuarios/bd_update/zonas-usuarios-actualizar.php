@@ -5,6 +5,7 @@ $idPagina = 196;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
+
 if($_POST['zonasTodas'] == 1){
 
     $conexionBdPrincipal->query("DELETE FROM zonas_usuarios WHERE zpu_usuario='" . $_POST["id"] . "'");
@@ -19,15 +20,20 @@ if($_POST['zonasTodas'] == 1){
 
 
 }else{
+    if(isset($_POST["zona"])){
 
-    $numero = (count($_POST["zona"]));
-    $contador = 0;
-    $conexionBdPrincipal->query("DELETE FROM zonas_usuarios WHERE zpu_usuario='" . $_POST["id"] . "'");
-    while ($contador < $numero) {
-        $conexionBdPrincipal->query("INSERT INTO zonas_usuarios(zpu_usuario, zpu_zona)VALUES('" . $_POST["id"] . "'," . $_POST["zona"][$contador] . ")");
-        $contador++;
+        $numero = (count($_POST["zona"]));
+        $contador = 0;
+        $conexionBdPrincipal->query("DELETE FROM zonas_usuarios WHERE zpu_usuario='" . $_POST["id"] . "'");
+        while ($contador < $numero) {
+            $conexionBdPrincipal->query("INSERT INTO zonas_usuarios(zpu_usuario, zpu_zona)VALUES('" . $_POST["id"] . "'," . $_POST["zona"][$contador] . ")");
+            $contador++;
+        }
+    }else{
+        $conexionBdPrincipal->query("DELETE FROM zonas_usuarios WHERE zpu_usuario='" . $_POST["id"] . "'");
     }
 }
+
 
 
 //asignar clientes
