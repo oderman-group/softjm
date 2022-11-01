@@ -328,7 +328,7 @@ include("includes/head.php");
 								</td>
 								<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
 								<td>
-										<span style="font-size: 9px;"><?=strtoupper($usuario['usr_nombre']);?></span>
+										<span style="font-size: 9px;"><?php if(isset($usuario['usr_nombre'])){strtoupper($usuario['usr_nombre']);}?></span>
 										<br><span style="font-size: 9px;"><?=$res['catp_fecha'];?></span>
 								</td>
 								
