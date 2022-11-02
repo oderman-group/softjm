@@ -2,33 +2,31 @@
 include("../sesion.php");
 //EDITAR PRODUCTOS
 if($_POST["proceso"]==1){
-	mysql_query("UPDATE ".$_POST["tabla"]." SET ".$_POST["campo"]."='".$_POST["valor"]."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE ".$_POST["pk"]."='".$_POST["producto"]."'",$conexion);
-	if(mysql_errno()!=0){echo mysql_error(); exit();}
+	$conexionBdPrincipal->query("UPDATE ".$_POST["tabla"]." SET ".$_POST["campo"]."='".$_POST["valor"]."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE ".$_POST["pk"]."='".$_POST["producto"]."'");
 	
 	if($_POST["campo"]=='prod_utilidad'){
-		$datos = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'",$conexion));
+		$consulta=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'");
+		$datos = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 		$utilidad = $_POST["valor"]/100;
 		$precio1 = $datos['prod_costo'] + ($datos['prod_costo']*$utilidad);
 
-		mysql_query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$_POST["producto"]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', 2)");
-		if(mysql_errno()!=0){echo mysql_error(); exit();}
+		$conexionBdPrincipal->query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$_POST["producto"]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', 2)");
 
-		mysql_query("UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$_POST["producto"]."'",$conexion);
-		if(mysql_errno()!=0){echo mysql_error(); exit();}
+		$conexionBdPrincipal->query("UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$_POST["producto"]."'");
 
 	}
 	
 	if($_POST["campo"]=='prod_costo'){
-		$datos = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'",$conexion));
+		$consulta=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'");
+		$datos = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+		
 		$utilidad = $datos['prod_utilidad']/100;
 		$precio1 = $_POST["valor"] + ($_POST["valor"]*$utilidad);
 
-		mysql_query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$_POST["producto"]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', 1)");
-		if(mysql_errno()!=0){echo mysql_error(); exit();}
+		$conexionBdPrincipal->query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$_POST["producto"]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', 1)");
 
-		mysql_query("UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$_POST["producto"]."'",$conexion);
-		if(mysql_errno()!=0){echo mysql_error(); exit();}
+		$conexionBdPrincipal->query("UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$_POST["producto"]."'");
 	}
 }
 
