@@ -1,40 +1,17 @@
-<?php include("sesion.php"); ?>
 <?php
-$idPagina = 38;
-$paginaActual['pag_nombre'] = "Editar productos";
-?>
-<?php include("includes/verificar-paginas.php"); ?>
-<?php include("includes/head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_id='" . $_GET["id"] . "'", $conexion));
+include("sesion.php");
 
+$idPagina = 38;
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consulta=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='" . $_GET["id"] . "'");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resultadoD['prod_costo_dolar']);
 ?>
 <!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
-
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -158,13 +135,12 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 				"&opcion="+(opcion);
 			   $.ajax({
 				   type: "POST",
-				   url: "ajax-clientes-verificar.php",
+				   url: "ajax/ajax-clientes-verificar.php",
 				   data: datos,
 				   success: function(data){
 				   $('#resp').empty().hide().html(data).show(1);
 				   }
 			   });
-
 	}
 </script>
 <?php include("includes/funciones-js.php"); ?>
@@ -184,14 +160,6 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 					<div class="span12">
 						<div class="primary-head">
 							<h3 class="page-header"><?= $paginaActual['pag_nombre']; ?></h3>
-
-							<ul class="top-right-toolbar">
-								<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-								</li>
-								<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-								<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-							</ul>
-
 						</div>
 						<ul class="breadcrumb">
 							<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -226,8 +194,7 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 								<h3> <?= $paginaActual['pag_nombre']; ?></h3>
 							</div>
 							<div class="widget-container">
-								<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-									<input type="hidden" name="idSql" value="20">
+								<form class="form-horizontal" method="post" action="bd_update/productos-actualizar.php" enctype="multipart/form-data">
 									<input type="hidden" name="id" value="<?= $_GET["id"]; ?>">
 
 									<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10 or $datosUsuarioActual['usr_tipo'] == 13) { ?>
@@ -291,8 +258,8 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 												<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 													<option value=""></option>
 													<?php
-													$conOp = mysql_query("SELECT * FROM proveedores", $conexion);
-													while ($resOp = mysql_fetch_array($conOp)) {
+													$conOp = $conexionBdPrincipal->query("SELECT * FROM proveedores");
+													while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 													?>
 														<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['prod_proveedor'] == $resOp[0]) echo "selected"; ?>><?= $resOp['prov_nombre']; ?></option>
 													<?php
@@ -317,8 +284,8 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="grupo1" required>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT * FROM productos_categorias WHERE catp_grupo=1", $conexion);
-												while ($resOp = mysql_fetch_array($conOp)) {
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1");
+												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['prod_grupo1'] == $resOp[0]) {
 																						echo "selected";
@@ -337,8 +304,8 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="categoria" required>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT * FROM productos_categorias WHERE catp_grupo=2", $conexion);
-												while ($resOp = mysql_fetch_array($conOp)) {
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2");
+												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['prod_categoria'] == $resOp[0]) {
 																						echo "selected";
@@ -357,8 +324,8 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="marca" required>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT * FROM marcas", $conexion);
-												while ($resOp = mysql_fetch_array($conOp)) {
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM marcas");
+												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['prod_marca'] == $resOp[0]) {
 																						echo "selected";
