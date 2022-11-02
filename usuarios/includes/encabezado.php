@@ -82,7 +82,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 									<div class="dropdown-menu">
 										<ul>
 											<li><a href="configuracion.php"><i class=" icon-file-alt"></i> Configuración</a></li>
-											<li><a href="configuracion-color-encabezado.php?id=<?=$configuracion['conf_id_empresa'];?>"><i class=" icon-file-alt"></i> Configuración Encabezado</a></li>
+											<li><a href="configuracion-color-encabezado.php"><i class=" icon-file-alt"></i> Configuración Encabezado</a></li>
 											<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
 												<li><a href="metricas.php?id=1"><i class="icon-cogs"></i> Métricas </a></li>
 											<?php }?>
