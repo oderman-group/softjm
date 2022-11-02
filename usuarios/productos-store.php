@@ -1,35 +1,13 @@
-<?php include("sesion.php");?>
 <?php
+include("sesion.php");
+
 $idPagina = 152;
-$paginaActual['pag_nombre'] = "Productos Store JM";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM dealer WHERE deal_id='".$_GET["id"]."'",$conexion));
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
-
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -63,14 +41,6 @@ include("includes/js-formularios.php");
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-                        
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -92,10 +62,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="63">
-                            <input type="hidden" name="id" value="<?=$_GET["id"];?>">
-                            	   
+							<form class="form-horizontal" method="post" action="bd_update/gestionar-productos-store-actualizar.php">
                                 
                                 <div class="control-group">
 									<label class="control-label">Productos</label>
@@ -103,9 +70,10 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span12" multiple tabindex="2" name="producto[]">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM productos ORDER BY prod_nombre",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
-												$numD = mysql_num_rows(mysql_query("SELECT * FROM productos WHERE prod_visible_web=1 AND prod_id='".$resOp[0]."'",$conexion));
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos ORDER BY prod_nombre");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+												$consultaNumPro=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_visible_web=1 AND prod_id='".$resOp[0]."'");
+												$numD = $consultaNumPro->num_rows;
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($numD>0){echo "selected";}?>><?=$resOp[1];?></option>
                                             <?php
@@ -114,7 +82,6 @@ include("includes/js-formularios.php");
                                     	</select>
                                     </div>
                                </div>
-                                
                                
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
