@@ -1595,28 +1595,8 @@ if ($_POST["idSql"] == 55) {
 	echo '<script type="text/javascript">window.location.href="cupones.php";</script>';
 	exit();
 }
-//CONDICIONAR PRODUCTOS PARA DESCUENTO
-if ($_POST["idSql"] == 56) {
-	mysql_query("UPDATE productos SET prod_descuento1='" . $_POST["dcto"] . "' 
-	WHERE " . $_POST["campo"] . " " . $_POST["es"] . " '" . $_POST["valor"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="productos.php?msg=2";</script>';
-	exit();
-}
-//CONDICIONAR PRODUCTOS PARA COMISIÓN
-if ($_POST["idSql"] == 57) {
-	mysql_query("UPDATE productos SET prod_comision='" . $_POST["comision"] . "' 
-	WHERE " . $_POST["campo"] . " " . $_POST["es"] . " '" . $_POST["valor"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="productos.php?msg=2";</script>';
-	exit();
-}
+//CONDICIONAR PRODUCTOS
+
 //ENVIAR COTIZACIÓN AL CORREO ELABORADO
 
 //AGREGAR SERVICIOS
