@@ -1,26 +1,16 @@
-<?php include("sesion.php"); ?>
 <?php
+include("sesion.php");
+
 $idPagina = 36;
-$paginaActual['pag_nombre'] = "Productos";
 
 $tabla = 'productos';
 $pk = 'prod_id';
-?>
 
-<?php include("includes/verificar-paginas.php"); ?>
-<?php include("includes/head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
-
-
 <link href="css/tablecloth.css" rel="stylesheet">
-
 <!--============j avascript===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -294,8 +284,8 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 						</button>
 						<ul class="dropdown-menu">
 							<?php
-							$grupos1 = mysql_query("SELECT * FROM productos_categorias WHERE catp_grupo=1", $conexion);
-							while ($grupo1 = mysql_fetch_array($grupos1)) {
+							$grupos1 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1");
+							while ($grupo1 = mysqli_fetch_array($grupos1, MYSQLI_BOTH)) {
 							?>
 								<li><a href="productos.php?grupo1=<?= $grupo1[0]; ?>" style="color:<?= $color; ?>"><?= $grupo1['catp_nombre']; ?></a></li>
 							<?php } ?>
@@ -308,8 +298,8 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 						</button>
 						<ul class="dropdown-menu">
 							<?php
-							$grupos2 = mysql_query("SELECT * FROM productos_categorias WHERE catp_grupo=2", $conexion);
-							while ($grupo2 = mysql_fetch_array($grupos2)) {
+							$grupos2 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2");
+							while ($grupo2 = mysqli_fetch_array($grupos2, MYSQLI_BOTH)) {
 							?>
 								<li><a href="productos.php?grupo2=<?= $grupo2[0]; ?>" style="color:<?= $color; ?>"><?= $grupo2['catp_nombre']; ?></a></li>
 							<?php } ?>
@@ -322,22 +312,19 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 						</button>
 						<ul class="dropdown-menu">
 							<?php
-							$marcas = mysql_query("SELECT * FROM marcas", $conexion);
-							while ($marca = mysql_fetch_array($marcas)) {
+							$marcas = $conexionBdPrincipal->query("SELECT * FROM marcas");
+							while ($marca = mysqli_fetch_array($marcas, MYSQLI_BOTH)) {
 							?>
 								<li><a href="productos.php?marca=<?= $marca[0]; ?>" style="color:<?= $color; ?>"><?= $marca[1]; ?></a></li>
 							<?php } ?>
 						</ul>
 					</div>
-
 				</p>
-
-
 				<p>
 					<form method="get" action="productos.php" style="text-align: center; margin-top: 10px;">
 						<div class="control-group">
 							<div class="controls">
-								<input type="text" class="span8" name="busqueda" placeholder="Búsqueda en todos los registros..." value="<?= $_GET["busqueda"]; ?>" required><br>
+								<input type="text" class="span8" name="busqueda" placeholder="Búsqueda en todos los registros..." value="<?php if(isset($_GET['busqueda'])){$_GET['busqueda'];}?>" required><br>
 								<button type="submit" class="btn btn-info"> Buscar</button>
 								<a href="productos.php" type="submit" class="btn btn-danger"> Quitar filtro</a>
 							</div>
@@ -345,10 +332,6 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 
 					</form>
 				</p>
-
-
-
-
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="content-widgets light-gray">
@@ -404,84 +387,107 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 												<th>Aduana<br>USD</th>
 											<?php } ?>
 											<th>Existencia</th>
-
 											<!--<th>Precio Min.</th>
-								<th>Comisión estimada</th>-->
+											<th>Comisión estimada</th>-->
 										</tr>
 									</thead>
 									<tbody>
 										<?php
 										$limite = 100;
-										if ($_GET["todo"] == 1) {
-											$limite = 10000;
+										if(isset($_GET["todo"])){
+											if ($_GET["todo"] == 1) {
+												$limite = 10000;
+											}
 										}
 
 										$filtro = '';
-										if (is_numeric($_GET["grupo1"])) {
-											$filtro .= " AND prod_grupo1='" . $_GET["grupo1"] . "'";
+										if(isset($_GET["grupo1"])){
+											if (is_numeric($_GET["grupo1"])) {
+												$filtro .= " AND prod_grupo1='" . $_GET["grupo1"] . "'";
+											}
 										}
-										if (is_numeric($_GET["grupo2"])) {
-											$filtro .= " AND prod_categoria='" . $_GET["grupo2"] . "'";
+										if(isset($_GET["grupo2"])){
+											if (is_numeric($_GET["grupo2"])) {
+												$filtro .= " AND prod_categoria='" . $_GET["grupo2"] . "'";
+											}
 										}
-										if (is_numeric($_GET["marca"])) {
-											$filtro .= " AND prod_marca='" . $_GET["marca"] . "'";
+										if(isset($_GET["marca"])){
+											if (is_numeric($_GET["marca"])) {
+												$filtro .= " AND prod_marca='" . $_GET["marca"] . "'";
+											}
 										}
-										if (is_numeric($_GET["web"])) {
-											$filtro .= " AND prod_visible_web=1";
+										if(isset($_GET["web"])){
+											if (is_numeric($_GET["web"])) {
+												$filtro .= " AND prod_visible_web=1";
+											}
 										}
-										if (is_numeric($_GET["pdt"])) {
-											$filtro .= " AND prod_precio_predeterminado=1";
+										if(isset($_GET["pdt"])){
+											if (is_numeric($_GET["pdt"])) {
+												$filtro .= " AND prod_precio_predeterminado=1";
+											}
 										}
-										if ($_GET["utilidad"] == 1) {
-											$filtro .= " AND prod_utilidad=0 OR prod_utilidad=''";
+										if(isset($_GET["utilidad"])){
+											if ($_GET["utilidad"] == 1) {
+												$filtro .= " AND prod_utilidad=0 OR prod_utilidad=''";
+											}
 										}
-										if (is_numeric($_GET["nopdt"])) {
-											$filtro .= " AND prod_precio_predeterminado=0";
+										if(isset($_GET["nopdt"])){
+											if (is_numeric($_GET["nopdt"])) {
+												$filtro .= " AND prod_precio_predeterminado=0";
+											}
 										}
-										if (is_numeric($_GET["stock"])) {
-											$filtro .= " AND prod_existencias<=0";
+										if(isset($_GET["stock"])){
+											if (is_numeric($_GET["stock"])) {
+												$filtro .= " AND prod_existencias<=0";
+											}
 										}
-										if (is_numeric($_GET["nodctomax"])) {
-											$filtro .= " AND prod_descuento1<=0";
+										if(isset($_GET["nodctomax"])){
+											if (is_numeric($_GET["nodctomax"])) {
+												$filtro .= " AND prod_descuento1<=0";
+											}
+										}
+										if(isset($_GET["busqueda"])){
+											if ($_GET["busqueda"] != "") {
+												$filtro .= " AND (prod_referencia LIKE '%" . $_GET["busqueda"] . "%' OR prod_nombre LIKE '%" . $_GET["busqueda"] . "%')";
+											}
 										}
 
-										if ($_GET["busqueda"] != "") {
-											$filtro .= " AND (
-							prod_referencia LIKE '%" . $_GET["busqueda"] . "%'
-							OR prod_nombre LIKE '%" . $_GET["busqueda"] . "%'
-							) ";
-										}
-
-										$consulta = mysql_query("SELECT * FROM productos 
-							LEFT JOIN productos_categorias ON catp_id=prod_categoria
-							WHERE prod_id=prod_id $filtro
-							LIMIT 0, $limite
-							", $conexion);
+										$consulta = $conexionBdPrincipal->query("SELECT * FROM productos LEFT JOIN productos_categorias ON catp_id=prod_categoria WHERE prod_id=prod_id $filtro LIMIT 0, $limite");
 										$no = 1;
 										$visible = array("SI", "SI", "NO");
 										$estadoVisible = array(2, 2, 1);
-										while ($res = mysql_fetch_array($consulta)) {
+										$comision=0;
+										$precioListaUSD=0;
+										$precioWeb=0;
+										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
-											$grupo1 = mysql_fetch_array(mysql_query("SELECT * FROM productos_categorias WHERE catp_id='" . $res['prod_grupo1'] . "'
-								", $conexion));
+											$consultaGrupo1=$conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_id='" . $res['prod_grupo1'] . "'");
+											$grupo1 = mysqli_fetch_array($consultaGrupo1, MYSQLI_BOTH);
 
-											$marca = mysql_fetch_array(mysql_query("SELECT * FROM marcas WHERE mar_id='" . $res['prod_marca'] . "'
-								", $conexion));
+											$consultaMarca=$conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id='" . $res['prod_marca'] . "'");
+											$marca = mysqli_fetch_array($consultaMarca, MYSQLI_BOTH);
 
-											/*
-								$dcto1 = $res['prod_descuento1']/100;
-								$precioMinimo = $res['prod_precio'] - ($res['prod_precio']*$dcto1);
-								*/
+											/*$dcto1 = $res['prod_descuento1']/100;
+											$precioMinimo = $res['prod_precio'] - ($res['prod_precio']*$dcto1);*/
 
 											$utilidadDealer = $res['prod_descuento2'] / 100;
+
+											if($res['prod_costo']!=''){
 											$precioDealer = $res['prod_costo'] + ($res['prod_costo'] * $utilidadDealer);
+											}
 
 											$utilidadWeb = $res['prod_descuento_web'] / 100;
+											if($res['prod_costo']!=''){
 											$precioWeb = $res['prod_costo'] + ($res['prod_costo'] * $utilidadWeb);
+											}
 
+											if($res['prod_utilidad']!='' AND $res['prod_costo_dolar']!=''){
 											$precioListaUSD = productosPrecioListaUSD($res['prod_utilidad'], $res['prod_costo_dolar']);
+											}
 
+											if($res['prod_comision']!=''){
 											$comision = $res['prod_comision'] / 100;
+											}
 											$valorComision = ($res['prod_precio'] * $comision);
 
 											$precioConIva = $res['prod_precio'] + ($res['prod_precio'] * 0.19);
@@ -490,15 +496,13 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 												<td><?= $no; ?></td>
 
 												<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
-													<td><a href="#" onClick="pred(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_precio_predeterminado']; ?>" id="p<?= $res[$pk]; ?>"><?= $opcionSINO[$res['prod_precio_predeterminado']]; ?></a></td>
+													<td><a href="#" onClick="pred(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_precio_predeterminado']; ?>" id="p<?= $res[$pk]; ?>"><?php if($res['prod_precio_predeterminado']!=''){$opcionSINO[$res['prod_precio_predeterminado']];}?></a></td>
 
-													<td><a href="#" onClick="visweb(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_visible_web']; ?>" id="vw<?= $res[$pk]; ?>"><?= $opcionSINO[$res['prod_visible_web']]; ?></a></td>
+													<td><a href="#" onClick="visweb(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_visible_web']; ?>" id="vw<?= $res[$pk];?>"><?= $opcionSINO[$res['prod_visible_web']]; ?></a></td>
 												<?php } ?>
 
 												<td align="center" style="font-weight: bold;">
-													<input type="text" title="prod_referencia" name="<?= $res[$pk]; ?>" value="<?= $res['prod_referencia']; ?>" style="width: 60px; text-align: center" onChange="productos(this)" <?php if (!$datosUsuarioActual['usr_tipo'] == 1) {
-																																																									echo "disabled";
-																																																								} ?>>
+													<input type="text" title="prod_referencia" name="<?= $res[$pk]; ?>" value="<?= $res['prod_referencia']; ?>" style="width: 60px; text-align: center" onChange="productos(this)" <?php if (!$datosUsuarioActual['usr_tipo'] == 1) {echo "disabled";} ?>>
 													<span style="visibility: hidden;"><?= $res['prod_referencia']; ?></span>
 												</td>
 
@@ -535,9 +539,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 
 
 												<td>
-													<input type="text" title="prod_descuento1" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento1']; ?>" style="width: 40px; text-align: center" onChange="productos(this)" <?php if ($_SESSION["id"] != 7 and $_SESSION["id"] != 15) {
-																																																									echo "disabled";
-																																																								} ?>>
+													<input type="text" title="prod_descuento1" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento1']; ?>" style="width: 40px; text-align: center" onChange="productos(this)" <?php if ($_SESSION["id"] != 7 and $_SESSION["id"] != 15) {echo "disabled";} ?>>
 													<span style="visibility: hidden;"><?= $res['prod_descuento1']; ?></span>
 												</td>
 
@@ -605,19 +607,13 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 														<input type="text" title="prod_aduana" name="<?= $res[$pk]; ?>" value="<?= $res['prod_aduana']; ?>" style="width: 80px; text-align: center" onChange="productos(this)">
 														<span style="visibility: hidden;"><?= $res['prod_aduana']; ?></span>
 													</td>
-
-
 												<?php } ?>
-
 												<td align="center" style="font-weight: bold;">
 													<input type="text" title="prod_existencias" name="<?= $res[$pk]; ?>" value="<?= $res['prod_existencias']; ?>" style="width: 60px; text-align: center" onChange="productos(this)" disabled>
 													<span style="visibility: hidden;"><?= $res['prod_existencias']; ?></span>
 												</td>
-
-
 												<!--<td>$<?= number_format($precioMinimo, 0, ",", "."); ?></td>
-								
-								<td>$<?= number_format($valorComision, 0, ",", "."); ?></td>-->
+												<td>$<?= number_format($valorComision, 0, ",", "."); ?></td>-->
 											</tr>
 										<?php $no++;
 										} ?>
