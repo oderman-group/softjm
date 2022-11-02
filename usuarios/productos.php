@@ -496,7 +496,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 												<td><?= $no; ?></td>
 
 												<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
-													<td><a href="#" onClick="pred(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_precio_predeterminado']; ?>" id="p<?= $res[$pk]; ?>"><?php if($res['prod_precio_predeterminado']!=''){$opcionSINO[$res['prod_precio_predeterminado']];}?></a></td>
+													<td><a href="#" onClick="pred(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_precio_predeterminado']; ?>" id="p<?= $res[$pk]; ?>"><?=$opcionSINO[$res['prod_precio_predeterminado']];?></a></td>
 
 													<td><a href="#" onClick="visweb(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_visible_web']; ?>" id="vw<?= $res[$pk];?>"><?= $opcionSINO[$res['prod_visible_web']]; ?></a></td>
 												<?php } ?>
