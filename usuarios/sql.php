@@ -1701,62 +1701,6 @@ if ($_POST["idSql"] == 62) {
 	exit();
 }
 //GESTIONAR PRODUCTOS WEB - STORE JM
-if ($_POST["idSql"] == 63) {
-
-	//Agregar productos
-	$numero = (count($_POST["producto"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-			$productoN = mysql_num_rows(mysql_query("SELECT * FROM productos WHERE prod_id='" . $_POST["producto"][$contador] . "' AND prod_visible_web=1", $conexion));
-			if ($productoN == 0) {
-				mysql_query("UPDATE productos SET prod_descuento_web=1 WHERE prod_id='" . $_POST["producto"][$contador] . "'", $conexion);
-				if (mysql_errno() != 0) {
-					echo informarErrorAlUsuario(__LINE__, mysql_error());
-					exit();
-				}
-			}
-			$contador++;
-		}
-	}
-
-	//ELIMINAR LOS QUE YA NO.
-	$numero = (count($_POST["producto"]));
-	if ($numero > 0) {
-		$productosWeb = mysql_query("SELECT * FROM productos WHERE prod_descuento_web>=1", $conexion);
-		while ($pWeb = mysql_fetch_array($productosWeb)) {
-
-			$encontrado = 0;
-			$contador = 0;
-			while ($contador < $numero) {
-
-				if ($pWeb['prod_id'] == $_POST["producto"][$contador]) {
-					$encontrado = 1;
-					break;
-				}
-
-				$contador++;
-			}
-
-			if ($encontrado == 0) {
-				mysql_query("UPDATE productos SET prod_descuento_web=0 WHERE prod_id='" . $pWeb['prod_id'] . "'", $conexion);
-				if (mysql_errno() != 0) {
-					echo informarErrorAlUsuario(__LINE__, mysql_error());
-					exit();
-				}
-			}
-		}
-	} else {
-		mysql_query("UPDATE productos SET prod_descuento_web=0", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-	}
-
-	echo '<script type="text/javascript">window.location.href="productos-store.php?msg=1";</script>';
-	exit();
-}
 
 //SUBIR FOTOS A LOS PRODUCTOS
 if ($_POST["idSql"] == 64) {
