@@ -703,93 +703,9 @@ if ($_POST["idSql"] == 18) {
 	exit();
 }
 //AGREGAR PRODUCTOS
-if ($_POST["idSql"] == 19) {
-	$datos = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_referencia='".trim($_POST["referencia"])."'",$conexion));
-	if($datos[0]!=""){
-		echo "<span style='font-family:arial; text-align:center; color:red;'>Ya existe un registro con esta Referencia: <b><a href='productos-editar.php?id=".$datos[0]."'>".$datos['prod_nombre']."</a></b></div>";
-		exit();
-	}
 
-	mysql_query("INSERT INTO productos(prod_nombre, prod_categoria, prod_grupo1, prod_marca, prod_referencia, prod_proveedor)VALUES('" . htmlspecialchars($_POST["nombre"], ENT_QUOTES) . "','" . $_POST["categoria"] . "','" . $_POST["grupo1"] . "','" . $_POST["marca"] . "','" . $_POST["referencia"] . "','" . $_POST["proveedor"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsertU = mysql_insert_id();
-
-	mysql_query("INSERT INTO productos_bodegas(prodb_producto, prodb_bodega, prodb_fecha_actualizacion, prodb_usuario_actualizacion)VALUES('" . $idInsertU . "', 1, now(), '" . $_SESSION["id"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	if ($_POST["replicar"] == 1) {
-		mysql_query("INSERT INTO productos_soptec(prod_nombre, prod_categoria, prod_grupo1, prod_marca)VALUES('" . $_POST["nombre"] . "','" . $_POST["categoria"] . "','" . $_POST["grupo1"] . "','" . $_POST["marca"] . "')", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-	}
-
-	echo '<script type="text/javascript">window.location.href="productos-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
 //EDITAR PRODUCTOS
-if ($_POST["idSql"] == 20) {
 
-	$datos = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_id='".$_POST["id"]."'",$conexion));
-
-	$origen = 0;
-	if($datos['prod_utilidad'] != $_POST["utilidad"]){
-		$origen = 2;
-	}
-
-	if($datos['prod_costo'] != $_POST["costo"]){
-		$origen = 1;
-	}
-
-	if($datos['prod_costo'] != $_POST["costo"] and $datos['prod_utilidad'] != $_POST["utilidad"]){
-		$origen = 3;
-	}
-
-
-	if ($_FILES['foto']['name'] != "") {
-		$extension = end(explode(".", $_FILES['foto']['name']));
-		$foto = uniqid('prod_') . "." . $extension;
-		$destino = "files/productos";
-		move_uploaded_file($_FILES['foto']['tmp_name'], $destino . "/" . $foto);
-
-		mysql_query("UPDATE productos SET prod_foto='" . $foto . "' WHERE prod_id='" . $_POST["id"] . "'", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-	}
-
-	$utilidad = $_POST["utilidad"] / 100;
-	$precio1 = $_POST["costo"] + ($_POST["costo"] * $utilidad);
-	
-	
-	if($origen > 0){
-
-		mysql_query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$_POST["id"]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', '".$origen."')");
-		if(mysql_errno()!=0){echo informarErrorAlUsuario(__LINE__, mysql_error()); exit();}
-
-	}
-	
-
-	
-
-	
-
-	mysql_query("UPDATE productos SET prod_nombre='" . htmlspecialchars($_POST["nombre"], ENT_QUOTES) . "', prod_categoria='" . $_POST["categoria"] . "', prod_grupo1='" . $_POST["grupo1"] . "', prod_costo='" . $_POST["costo"] . "', prod_utilidad='" . $_POST["utilidad"] . "', prod_precio='" . $precio1 . "', prod_descuento1='" . $_POST["dcto1"] . "', prod_comision='" . $_POST["comision"] . "', prod_marca='" . $_POST["marca"] . "', prod_descripcion_corta='" . mysql_real_escape_string($_POST["descripcion"]) . "', prod_costo_dolar='" . $_POST["costoDolar"] . "', prod_referencia='" . $_POST["referencia"] . "', prod_existencias='" . $_POST["cant"] . "', prod_proveedor='" . $_POST["proveedor"] . "', prod_descripcion_larga='" . mysql_real_escape_string($_POST["descripcionLarga"]) . "' WHERE prod_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="productos-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 //AGREGAR CATEGORIA PRODUCTOS
 
 //EDITAR CATEGORIA PRODUCTOS
