@@ -1743,65 +1743,8 @@ if ($_POST["idSql"] == 66) {
 }
 //ESTABA AQUI EDITAR PERFIL
 
-
-
 //GESTIONAR PRODUCTOS CON PRECIO PREDETERMINADO
-if ($_POST["idSql"] == 68) {
 
-	//Agregar productos
-	$numero = (count($_POST["producto"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-			$productoN = mysql_num_rows(mysql_query("SELECT * FROM productos WHERE prod_id='" . $_POST["producto"][$contador] . "' AND prod_precio_predeterminado=1", $conexion));
-			if ($productoN == 0) {
-				mysql_query("UPDATE productos SET prod_precio_predeterminado=1 WHERE prod_id='" . $_POST["producto"][$contador] . "'", $conexion);
-				if (mysql_errno() != 0) {
-					echo informarErrorAlUsuario(__LINE__, mysql_error());
-					exit();
-				}
-			}
-			$contador++;
-		}
-	}
-
-	//ELIMINAR LOS QUE YA NO.
-	$numero = (count($_POST["producto"]));
-	if ($numero > 0) {
-		$productosWeb = mysql_query("SELECT * FROM productos WHERE prod_precio_predeterminado=1", $conexion);
-		while ($pWeb = mysql_fetch_array($productosWeb)) {
-
-			$encontrado = 0;
-			$contador = 0;
-			while ($contador < $numero) {
-
-				if ($pWeb['prod_id'] == $_POST["producto"][$contador]) {
-					$encontrado = 1;
-					break;
-				}
-
-				$contador++;
-			}
-
-			if ($encontrado == 0) {
-				mysql_query("UPDATE productos SET prod_precio_predeterminado=0 WHERE prod_id='" . $pWeb['prod_id'] . "'", $conexion);
-				if (mysql_errno() != 0) {
-					echo informarErrorAlUsuario(__LINE__, mysql_error());
-					exit();
-				}
-			}
-		}
-	} else {
-		mysql_query("UPDATE productos SET prod_precio_predeterminado=0", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-	}
-
-	echo '<script type="text/javascript">window.location.href="productos-predeterminados.php?msg=1";</script>';
-	exit();
-}
 //REGISTRAR GASTOS
 if ($_POST["idSql"] == 69) {
 	mysql_query("INSERT INTO gastos(gasv_fecha, gasv_registro, gasv_concepto, gasv_valor, gasv_responsable)
