@@ -5,7 +5,7 @@ $idPagina = 190;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consulta = $conexionBdAdmin->query("SELECT * FROM encabezado_color_empresa WHERE cxe_id_empresa='".$_GET['id']."'");
+$consulta = $conexionBdAdmin->query("SELECT * FROM encabezado_color_empresa WHERE cxe_id_empresa='".$configuracion['conf_id_empresa']."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
@@ -52,7 +52,7 @@ include("includes/js-formularios.php");
                             </div>
                             <div class="widget-container">
                                 <form class="form-horizontal" method="post" action="bd_update/actualizar-color-encabezado.php" enctype="multipart/form-data">
-                                    <input type="hidden" name="id" value="<?=$_GET["id"];?>">
+                                    <input type="hidden" name="id" value="<?=$configuracion['conf_id_empresa'];?>">
 
                                     <div class="control-group">
                                         <label class="control-label">Color Fondo</label>
