@@ -46,9 +46,6 @@ include("includes/js-formularios.php");
                 <?php include("includes/notificaciones.php"); ?>
                 <div class="row-fluid">
                     <div class="span12">
-                        <p>
-                            <a href="configuracion-color-encabezado.php?id=<?=$configuracion['conf_id_empresa'];?>" class="btn btn-danger"></i>Cambiar Color para Encabezado</a>
-                        </p>
                         <div class="content-widgets gray">
                             <div class="widget-head bondi-blue">
                                 <h3> <?= $paginaActual['pag_nombre']; ?></h3>
