@@ -2782,18 +2782,7 @@ if ($_GET["get"] == 11) {
 	exit();
 }
 //ELIMINAR PRODUCTOS
-if ($_GET["get"] == 12) {
-	$idPagina = 61;
-	include("includes/verificar-paginas.php");
-	mysql_query("DELETE FROM productos_materiales WHERE ppmt_producto='" . $_GET["id"] . "'", $conexion);
-	mysql_query("DELETE FROM productos WHERE prod_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //ELIMINAR CATEGORÍA DE PRODUCTOS
 
 //ELIMINAR ZONAS
