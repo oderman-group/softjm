@@ -1,31 +1,13 @@
-<?php include("sesion.php");?>
-<?php
-$idPagina = 82;
-$paginaActual['pag_nombre'] = "Galería de productos";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+<?php 
+include("sesion.php");
+
+$idPagina = 209;
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 
 <!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 <link href="css/aristo-ui.css" rel="stylesheet">
 <link href="css/elfinder.css" rel="stylesheet">
 
@@ -150,14 +132,9 @@ body {font-family: Arial, Helvetica, sans-serif;}
 <body>
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
-    
-    
 	<div class="main-wrapper">
 		<div class="container-fluid">
-			
-			
-			
-			<div class="row-fluid ">
+		  <div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
@@ -169,8 +146,6 @@ body {font-family: Arial, Helvetica, sans-serif;}
 					</ul>
 				</div>
 			</div>
-			
-			
 			<p>
 				<a href="#" class="btn btn-danger open-button" onclick="openForm()"><i class="icon-plus"></i> Agregar foto</a>
 			</p>
@@ -179,12 +154,9 @@ body {font-family: Arial, Helvetica, sans-serif;}
 				<div class="span12">
 					<div id="container">
 						<?php
-						$consulta = mysql_query("SELECT * FROM productos_galeria 
-						INNER JOIN productos ON prod_id=pgal_producto
-						WHERE pgal_producto='".$_GET["id"]."' $filtro
-						",$conexion);
+						$consulta = $conexionBdPrincipal->query("SELECT * FROM productos_galeria INNER JOIN productos ON prod_id=pgal_producto WHERE pgal_producto='".$_GET["id"]."'");
 						$no = 1;
-						while($res = mysql_fetch_array($consulta)){
+						while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 						?>
 						<div class="item">
 							<div class="thumbnail">
@@ -193,7 +165,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 									<h4><?=$res['pgal_foto'];?></h4>
 									<p>
 										<a class="btn btn-primary" href="#">Reemplazar</a>
-										<a class="btn btn-primary" href="sql.php?get=57&idItem=<?=$res['pgal_id'];?>" onClick="if(!confirm('Seguro desea eliminar esta foto?')){return false;}">Eliminar</a>
+										<a class="btn btn-primary" href="bd_delete/productos-galeria-eliminar.php?idItem=<?=$res['pgal_id'];?>" onClick="if(!confirm('Seguro desea eliminar esta foto?')){return false;}">Eliminar</a>
 									</p>
 								</div>
 							</div>
@@ -207,8 +179,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 	</div>
 	
 	<div class="form-popup" id="myForm">
-  <form action="sql.php" method="post" enctype="multipart/form-data" class="form-container">
-	  <input type="hidden" value="64" name="idSql">
+  <form action="bd_create/productos-fotos-guardar.php" method="post" enctype="multipart/form-data" class="form-container">
 	  <input type="hidden" value="<?=$_GET["id"];?>" name="id">
     <h1>Nueva foto</h1>
 
