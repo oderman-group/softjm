@@ -1,20 +1,12 @@
-<?php include("sesion.php"); ?>
 <?php
+include("sesion.php");
+
 $idPagina = 145;
-$paginaActual['pag_nombre'] = "Productos en Bodegas";
-?>
-<?php include("includes/verificar-paginas.php"); ?>
-<?php include("includes/head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
-
-
 <link href="css/tablecloth.css" rel="stylesheet">
 
 <!--============j avascript===========-->
@@ -115,20 +107,6 @@ if (mysql_errno() != 0) {
 
 					<a href="bodegas-productos-agregar.php?prod=<?=$_GET["prod"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
 					<a href="reportes/bodegasprod.php" target="_blank" class="btn btn-success"><i class="icon-file"></i> Sacar informe</a>
-
-					<div class="btn-group">
-						<button class="btn btn-primary">Transferir productos a</button>
-						<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<?php
-							$grupos1 = mysql_query("SELECT * FROM bodegas WHERE bod_id!=1", $conexion);
-							while ($grupo1 = mysql_fetch_array($grupos1)) {
-							?>
-								<li><a href="#"><?= $grupo1['bod_nombre']; ?></a></li>
-							<?php } ?>
-						</ul>
-					</div>
 				</p>
 
 				<div class="row-fluid">
@@ -156,22 +134,21 @@ if (mysql_errno() != 0) {
 									<tbody>
 										<?php
 										$filtro = '';
-										if ($_GET["bod"] != "") {
-											$filtro .= " AND prodb_bodega='" . $_GET["bod"] . "'";
+										if(isset($_GET["bod"])){
+											if ($_GET["bod"] != "") {
+												$filtro .= " AND prodb_bodega='" . $_GET["bod"] . "'";
+											}
 										}
-										if ($_GET["prod"] != "") {
-											$filtro .= " AND prodb_producto='" . $_GET["prod"] . "'";
+										if(isset($_GET["prod"])){
+											if ($_GET["prod"] != "") {
+												$filtro .= " AND prodb_producto='" . $_GET["prod"] . "'";
+											}
 										}
 
 
-										$consulta = mysql_query("SELECT * FROM productos_bodegas
-										INNER JOIN productos ON prod_id=prodb_producto
-										INNER JOIN bodegas ON bod_id=prodb_bodega
-										LEFT JOIN usuarios ON usr_id=prodb_usuario_actualizacion
-										WHERE prodb_id=prodb_id $filtro
-										", $conexion);
+										$consulta = $conexionBdPrincipal->query("SELECT * FROM productos_bodegas INNER JOIN productos ON prod_id=prodb_producto INNER JOIN bodegas ON bod_id=prodb_bodega LEFT JOIN usuarios ON usr_id=prodb_usuario_actualizacion WHERE prodb_id=prodb_id $filtro");
 										$no = 1;
-										while ($res = mysql_fetch_array($consulta)) {
+										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 										?>
 											<tr>
 											<td><input type="checkbox"></td>
@@ -186,7 +163,7 @@ if (mysql_errno() != 0) {
 													<h4>
 
 														<a href="bodegas-productos-agregar.php?id=<?= $res[0]; ?>&prod=<?= $res['prod_id']; ?>&bod=<?= $res['bod_id']; ?>&ex=<?= $res['prodb_existencias']; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-														<a href="sql.php?id=<?= $res[0]; ?>&get=63" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+														<a href="bd_delete/productos-bodegas-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 
 													</h4>
 												</td>
