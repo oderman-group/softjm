@@ -1,13 +1,19 @@
-<?php include("sesion.php");?>
 <?php
-$consulta = mysql_query("SELECT * FROM productos", $conexion);
+    require_once("sesion.php");
 
-while($datos = mysql_fetch_array($consulta)){
+    $idPagina = 208;
 
-	mysql_query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$datos["prod_id"]."', '".$datos['prod_precio']."', '".$datos['prod_precio']."', '".$_SESSION["id"]."', 4)");
-	if(mysql_errno()!=0){echo mysql_error(); exit();}
+    include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
+		
+	$consulta = $conexionBdPrincipal->query("SELECT * FROM productos");
 
-}
+	while($datos = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 
-echo '<script type="text/javascript">window.location.href="productos.php?msg=12";</script>';
-exit();
+		$conexionBdPrincipal->query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$datos["prod_id"]."', '".$datos['prod_precio']."', '".$datos['prod_precio']."', '".$_SESSION["id"]."', 4)");
+
+	}
+
+    include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
+
+	echo '<script type="text/javascript">window.location.href="productos.php?msg=12";</script>';
+	exit();
