@@ -1,16 +1,10 @@
-<?php include("sesion.php"); ?>
 <?php
-$idPagina = 33;
-$paginaActual['pag_nombre'] = "Historial de precios";
-?>
-<?php include("includes/verificar-paginas.php"); ?>
-<?php include("includes/head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
+include("sesion.php");
+
+$idPagina = 214;
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -103,17 +97,10 @@ if (mysql_errno() != 0) {
 <body>
 	<div class="layout">
 		<?php include("includes/encabezado.php"); ?>
-
-		
 		<div class="main-wrapper">
 			<div class="container-fluid">
 				<?php include("includes/notificaciones.php"); ?>
-
-
-				<p>
-					
-				</p>
-
+				<p></p>
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="content-widgets light-gray">
@@ -137,19 +124,20 @@ if (mysql_errno() != 0) {
 									<tbody>
 										<?php
 										$filtro = '';
-										if ($_GET["prod"] != "") {
-											$filtro .= " AND php_producto='" . $_GET["prod"] . "'";
+										if(isset($_GET["prod"])){
+											if ($_GET["prod"] != "") {
+												$filtro .= " AND php_producto='" . $_GET["prod"] . "'";
+											}
 										}
 
-
-										$consulta = mysql_query("SELECT * FROM productos_historial_precios
+										$consulta = $conexionBdPrincipal->query("SELECT * FROM productos_historial_precios
 										INNER JOIN productos ON prod_id=php_producto
 										LEFT JOIN usuarios ON usr_id=php_usuario
 										WHERE php_id=php_id $filtro
 										ORDER BY php_id DESC
-										", $conexion);
+										");
 										$no = 1;
-										while ($res = mysql_fetch_array($consulta)) {
+										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 										?>
 											<tr>
 												<td><?= $no; ?></td>
@@ -168,8 +156,6 @@ if (mysql_errno() != 0) {
 						</div>
 					</div>
 				</div>
-
-
 			</div>
 		</div>
 	</div>
