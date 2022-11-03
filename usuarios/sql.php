@@ -3120,16 +3120,6 @@ if ($_GET["get"] == 52) {
 	exit();
 }
 //ELIMINAR COMBO
-if ($_GET["get"] == 53) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysql_query("DELETE FROM combos WHERE combo_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 
 if ($_GET["get"] == 55) {
 	//$idPagina = 118; include("includes/verificar-paginas.php");
