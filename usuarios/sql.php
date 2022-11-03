@@ -3302,16 +3302,6 @@ if ($_GET["get"] == 56) {
 	exit();
 }
 
-if ($_GET["get"] == 57) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysql_query("DELETE FROM productos_galeria WHERE pgal_id='" . $_GET["idItem"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 if ($_GET["get"] == 58) {
 	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM areas WHERE ar_id='" . $_GET["id"] . "'", $conexion);
