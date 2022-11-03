@@ -1,35 +1,17 @@
-<?php include("sesion.php");?>
 <?php
-$idPagina = 174;
-$paginaActual['pag_nombre'] = "Agregar combos";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+include("sesion.php");
 
-$numPaquetes = mysql_num_rows(mysql_query("SELECT * FROM combos",$conexion));
+$idPagina = 174;
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consultaCombos=$conexionBdPrincipal->query("SELECT * FROM combos");
+$numPaquetes = $consultaCombos->num_rows;
 $numPaquetes++;
 ?>
 <!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
-
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -56,9 +38,6 @@ include("includes/js-formularios.php");
 <body>
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
-    
-    
-    
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
@@ -77,8 +56,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-                            <input type="hidden" name="idSql" value="61">
+							<form class="form-horizontal" method="post" action="bd_create/combos-guardar.php" enctype="multipart/form-data">
                                 
                                 <div class="control-group">
 									<label class="control-label">Nombre</label>
@@ -107,10 +85,10 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="producto[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT * FROM productos 
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria 
-												ORDER BY prod_nombre",$conexion);
-												while($resOp = mysql_fetch_array($conOp)){
+												ORDER BY prod_nombre");
+												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												?>
 													<option value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_nombre']." - [HAY ".$resOp['prod_existencias']."]";?></option>
 												<?php
