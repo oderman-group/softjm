@@ -1623,48 +1623,7 @@ if ($_POST["idSql"] == 60) {
 //AGREGAR COMBOS
 
 //EDITAR COMBOS
-if ($_POST["idSql"] == 62) {
-	if ($_FILES['foto']['name'] != "") {
-		$extension = end(explode(".", $_FILES['foto']['name']));
-		$foto = uniqid('file_') . "." . $extension;
 
-		$destino = "files/combos";
-		move_uploaded_file($_FILES['foto']['tmp_name'], $destino . "/" . $foto);
-
-		mysql_query("UPDATE combos SET combo_imagen='" . $foto . "' WHERE combo_id='" . $_POST["id"] . "'", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-	}
-
-	mysql_query("UPDATE combos SET combo_nombre='" . $_POST["nombre"] . "', combo_descripcion='" . $_POST["descripcion"] . "', combo_descuento='" . $_POST["dcto"] . "', combo_actualizaciones=combo_actualizaciones+1, combo_ultima_actualizacion=now(), combo_estado='" . $_POST["estado"] . "', combo_descuento_maximo='" . $_POST["descuentoMax"] . "', combo_descuento_dealer='" . $_POST["dctoDealer"] . "' WHERE combo_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	$numero = (count($_POST["producto"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-			$productoDatos = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_id='" . $_POST["producto"][$contador] . "'", $conexion));
-
-			$productoN = mysql_num_rows(mysql_query("SELECT * FROM combos_productos WHERE copp_producto='" . $_POST["producto"][$contador] . "' AND copp_combo='" . $_POST["id"] . "'", $conexion));
-			if ($productoN == 0) {
-				mysql_query("INSERT INTO combos_productos(copp_combo, copp_producto, copp_cantidad, copp_precio)VALUES('" . $_POST["id"] . "', '" . $_POST["producto"][$contador] . "', 1, '".$productoDatos['prod_precio']."')", $conexion);
-				if (mysql_errno() != 0) {
-					echo informarErrorAlUsuario(__LINE__, mysql_error());
-					exit();
-				}
-			}
-			$contador++;
-		}
-	}
-
-	echo '<script type="text/javascript">window.location.href="combos-editar.php?id=' . $_POST["id"] . '&msg=1";</script>';
-	exit();
-}
 //GESTIONAR PRODUCTOS WEB - STORE JM
 
 //SUBIR FOTOS A LOS PRODUCTOS
