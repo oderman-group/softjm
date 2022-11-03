@@ -3417,21 +3417,6 @@ if ($_GET["get"] == 68) {
 }
 
 //AGREGAR PRODUCTOS
-if ($_GET["get"] == 69) {
-
-	$datos = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_id='".trim($_GET["prod"])."'",$conexion));
-
-	mysql_query("INSERT INTO productos_soptec(prod_nombre, prod_categoria, prod_grupo1, prod_marca)VALUES('" . $datos['prod_nombre'] . "','" . $datos['prod_categoria'] . "','" . $datos['prod_grupo1'] . "','" . $datos['prod_marca'] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	$idInsertU = mysql_insert_id();
-
-	echo '<script type="text/javascript">window.location.href="productos.php?id=' . $idInsertU . '&msg=11";</script>';
-	exit();
-}
 
 //APROBAR DESCUENTOS ESPECIALES EN COTIZACIONES
 if ($_GET["get"] == 70) {
