@@ -3317,16 +3317,8 @@ if ($_GET["get"] == 62) {
 	exit();
 }
 //ELIMINAR BODEGAS POR PRODUCTOS
-if ($_GET["get"] == 63) {
-	mysql_query("DELETE FROM productos_bodegas WHERE prodb_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
 
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+//OTRO
 if ($_GET["get"] == 64) {
 	$prod = mysql_fetch_array(mysql_query("SELECT * FROM cotizacion_productos 
 	WHERE czpp_id='" . $_GET["idItem"] . "'", $conexion));
