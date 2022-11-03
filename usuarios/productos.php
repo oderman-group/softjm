@@ -516,7 +516,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 															<a href="productos-galeria.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Galería"><i class="icon-picture"></i></a>
 															<a href="bodegas-productos.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Bodegas por productos"><i class="icon-pushpin"></i></a>
 															<a href="productos-historial-precios.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Historial de precios"><i class="icon-time"></i></a>
-															<a href="sql.php?get=69&prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Replicar a productos de soporte" onClick="if(!confirm('Desea replicar este producto a soporte operativo?')){return false;}"><i class="icon-repeat"></i></a>
+															<a href="bd_create/productos-replicar-guardar.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Replicar a productos de soporte" onClick="if(!confirm('Desea replicar este producto a soporte operativo?')){return false;}"><i class="icon-repeat"></i></a>
 														</h4>
 													</div>
 												</td>
