@@ -1,19 +1,12 @@
-<?php include("sesion.php");?>
 <?php
+include("sesion.php");
 $idPagina = 172;
-$paginaActual['pag_nombre'] = "Combos";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
-
-
 <link href="css/tablecloth.css" rel="stylesheet">
-
 <!--============j avascript===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -104,8 +97,6 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 	<div class="main-wrapper">
 		<div class="container-fluid">
             <?php include("includes/notificaciones.php");?>
-   
-            
             <p>
             	<a href="combos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
             </p>
@@ -138,19 +129,19 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							</thead>
 							<tbody>
                             <?php
-							$consulta = mysql_query("SELECT * FROM combos",$conexion);
+							$consulta = $conexionBdPrincipal->query("SELECT * FROM combos");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
-								$datosCombos = mysql_query("SELECT ROUND((SUM(copp_cantidad)*prod_precio),0) FROM combos
+								$datosCombos = $conexionBdPrincipal->query("SELECT ROUND((SUM(copp_cantidad)*prod_precio),0) FROM combos
 								INNER JOIN combos_productos ON copp_combo=combo_id
 								INNER JOIN productos ON prod_id=copp_producto
 								WHERE combo_id='".$res['combo_id']."'
 								GROUP BY copp_producto
-								",$conexion);
+								");
 								
 								$precioCombo = 0;
-								while($dCombos = mysql_fetch_array($datosCombos)){
+								while($dCombos = mysqli_fetch_array($datosCombos, MYSQLI_BOTH)){
 									$precioCombo += $dCombos[0];
 								}
 								
@@ -183,7 +174,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 										<a href="combos-ver.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Ver"><i class="icon-eye-open"></i></a>
 										<a href="combos-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
 									
-									<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15 or $_SESSION["id"]==17){?>
+									<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15 or $_SESSION["id"]==17 or $_SESSION["id"]==57){?>
 										<a href="sql.php?id=<?=$res[0];?>&get=53" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 									<?php }?>
                                 </h4>
