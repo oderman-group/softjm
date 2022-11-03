@@ -1703,22 +1703,6 @@ if ($_POST["idSql"] == 62) {
 //GESTIONAR PRODUCTOS WEB - STORE JM
 
 //SUBIR FOTOS A LOS PRODUCTOS
-if ($_POST["idSql"] == 64) {
-	if ($_FILES['archivo']['name'] != "") {
-		$archivo = $_FILES['archivo']['name'];
-		$destino = "files/productos/galeria";
-		move_uploaded_file($_FILES['archivo']['tmp_name'], $destino . "/" . $archivo);
-
-		mysql_query("INSERT INTO productos_galeria(pgal_producto, pgal_foto)VALUES('" . $_POST["id"] . "', '" . $archivo . "')", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-	}
-
-	echo '<script type="text/javascript">window.location.href="productos-galeria.php?id=' . $_POST["id"] . '";</script>';
-	exit();
-}
 
 //AGREGAR AREAS
 if ($_POST["idSql"] == 65) {
@@ -3317,6 +3301,7 @@ if ($_GET["get"] == 56) {
 	echo '<script type="text/javascript">window.location.href="facturacion-editar.php?id=' . $idInsert . '";</script>';
 	exit();
 }
+
 if ($_GET["get"] == 57) {
 	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysql_query("DELETE FROM productos_galeria WHERE pgal_id='" . $_GET["idItem"] . "'", $conexion);
