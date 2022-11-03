@@ -1621,41 +1621,6 @@ if ($_POST["idSql"] == 60) {
 	exit();
 }
 //AGREGAR COMBOS
-if ($_POST["idSql"] == 61) {
-
-	if ($_FILES['foto']['name'] != "") {
-		$extension = end(explode(".", $_FILES['foto']['name']));
-		$foto = uniqid('file_') . "." . $extension;
-
-		$destino = "files/combos";
-		move_uploaded_file($_FILES['foto']['tmp_name'], $destino . "/" . $foto);
-	}
-
-	mysql_query("INSERT INTO combos(combo_nombre, combo_descripcion, combo_imagen, combo_descuento, combo_estado, combo_fecha_registro, combo_actualizaciones, combo_descuento_maximo, combo_descuento_dealer)VALUES('" . $_POST["nombre"] . "', '" . $_POST["descripcion"] . "', '" . $foto . "', '" . $_POST["dcto"] . "', '" . $_POST["estado"] . "', now(), 0, '" . $_POST["descuentoMax"] . "', '" . $_POST["dctoDealer"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsert = mysql_insert_id();
-
-	$numero = (count($_POST["producto"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-			$productoDatos = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_id='" . $_POST["producto"][$contador] . "'", $conexion));
-
-			mysql_query("INSERT INTO combos_productos(copp_combo, copp_producto, copp_cantidad, copp_precio)VALUES('" . $idInsert . "', '" . $_POST["producto"][$contador] . "', 1, '".$productoDatos['prod_precio']."')", $conexion);
-			if (mysql_errno() != 0) {
-				echo informarErrorAlUsuario(__LINE__, mysql_error());
-				exit();
-			}
-			$contador++;
-		}
-	}
-
-	echo '<script type="text/javascript">window.location.href="combos.php?id=' . $idInsert . '&msg=1";</script>';
-	exit();
-}
 
 //EDITAR COMBOS
 if ($_POST["idSql"] == 62) {
