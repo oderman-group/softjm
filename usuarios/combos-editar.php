@@ -1,35 +1,15 @@
-<?php include("sesion.php");?>
-<?php
+<?php include("sesion.php");
+
 $idPagina = 175;
-$paginaActual['pag_nombre'] = "Editar combos";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM combos WHERE combo_id='".$_GET["id"]."'",$conexion));
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consultaCombos=$conexionBdPrincipal->query("SELECT * FROM combos WHERE combo_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consultaCombos, MYSQLI_BOTH);
 ?>
 <!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
-
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -91,7 +71,8 @@ include("includes/js-formularios.php");
 			</div>
 			
 			<?php
-			$combosCotizacion = mysql_num_rows(mysql_query("SELECT * FROM cotizacion_productos WHERE czpp_combo='".$_GET["id"]."'",$conexion));
+			$consultaCotizProducto=$conexionBdPrincipal->query("SELECT * FROM cotizacion_productos WHERE czpp_combo='".$_GET["id"]."'");
+			$combosCotizacion = $consultaCotizProducto->num_rows;
 			if($combosCotizacion>0){
 				$msjCombo = "";
 				$msjCombo = "Este combo se encuentra incluído en <b>".$combosCotizacion."</b> cotizaciones.";
@@ -118,8 +99,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-                            <input type="hidden" name="idSql" value="62">
+							<form class="form-horizontal" method="post" action="bd_update/combos-actualizar.php" enctype="multipart/form-data">
 								<input type="hidden" name="id" value="<?=$_GET["id"];?>">
                                 
                                 <div class="control-group">
@@ -149,11 +129,12 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="producto[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT * FROM productos 
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria 
-												ORDER BY prod_nombre",$conexion);
-												while($resOp = mysql_fetch_array($conOp)){
-													$productoN = mysql_num_rows(mysql_query("SELECT * FROM combos_productos WHERE copp_producto='".$resOp[0]."' AND copp_combo='".$resultadoD['combo_id']."'",$conexion));
+												ORDER BY prod_nombre");
+												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+													$consultaNumCombosProductos=$conexionBdPrincipal->query("SELECT * FROM combos_productos WHERE copp_producto='".$resOp[0]."' AND copp_combo='".$resultadoD['combo_id']."'");
+													$productoN = $consultaNumCombosProductos->num_rows;
 												?>
 													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_id'].". ".$resOp['prod_nombre']." - [HAY ".$resOp['prod_existencias']."]";?></option>
 												<?php
@@ -202,7 +183,7 @@ include("includes/js-formularios.php");
  
 								<div class="form-actions">
 									
-									<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15 or $_SESSION["id"]==17 or $_SESSION["id"]==13){?>
+									<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15 or $_SESSION["id"]==17 or $_SESSION["id"]==13 or $_SESSION["id"]==57){?>
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									<?php }?>
 									
@@ -249,11 +230,14 @@ include("includes/js-formularios.php");
 							}
 
 							$no = 1;
-							$productos = mysql_query("SELECT * FROM productos 
+							$totalDealer=0;
+							$total=0;
+							$totalCantidad=0;
+							$productos = $conexionBdPrincipal->query("SELECT * FROM productos 
 							INNER JOIN productos_categorias ON catp_id=prod_categoria
 							INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='".$_GET["id"]."'
-							ORDER BY copp_id",$conexion);
-							while($prod = mysql_fetch_array($productos)){
+							ORDER BY copp_id");
+							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 
 								$utilidadDealer = $prod['prod_descuento2'] / 100;
 								$precioDealer = $prod['prod_costo'] + ($prod['prod_costo'] * $utilidadDealer);
