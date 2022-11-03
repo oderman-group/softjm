@@ -1863,46 +1863,7 @@ if ($_POST["idSql"] == 79) {
 	exit();
 }
 //AGREGAR O ACTUALIZAR PRODUCTOS EN BODEGAS
-if ($_POST["idSql"] == 80) {
 
-	$bpp = mysql_num_rows(mysql_query("SELECT * FROM productos_bodegas WHERE prodb_producto='" . $_POST["producto"] . "' AND prodb_bodega='" . $_POST["bodega"] . "'", $conexion));
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	if ($bpp == 0) {
-		mysql_query("INSERT INTO productos_bodegas(prodb_producto, prodb_bodega, prodb_existencias, prodb_fecha_actualizacion, prodb_usuario_actualizacion)VALUES('" . $_POST["producto"] . "', '" . $_POST["bodega"] . "', '" . $_POST["existencia"] . "', now(), '" . $_SESSION["id"] . "')", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-		$idInsertU = mysql_insert_id();
-	} else {
-		mysql_query("UPDATE productos_bodegas SET prodb_existencias='" . $_POST["existencia"] . "', prodb_fecha_actualizacion=now(), prodb_usuario_actualizacion='" . $_SESSION["id"] . "' WHERE prodb_producto='" . $_POST["producto"] . "' AND prodb_bodega='" . $_POST["bodega"] . "'", $conexion);
-		if (mysql_errno() != 0) {
-			echo informarErrorAlUsuario(__LINE__, mysql_error());
-			exit();
-		}
-	}
-
-	
-	$exis = mysql_fetch_array(mysql_query("SELECT SUM(prodb_existencias) FROM productos_bodegas WHERE prodb_producto='".$_POST["producto"]."'",$conexion));
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	mysql_query("UPDATE productos SET prod_existencias='".$exis[0]."' WHERE prod_id='".$_POST["producto"]."'",$conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	echo '<script type="text/javascript">window.location.href="bodegas-productos.php?prod=' . $_POST["producto"] . '";</script>';
-
-	exit();
-}
 //AGREGAR REMISIONES
 if ($_POST["idSql"] == 81) {
 
