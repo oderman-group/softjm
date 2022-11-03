@@ -1,5 +1,10 @@
-<?php include("sesion.php");?>
 <?php
+include("sesion.php");
+
+$idPagina = 206;
+
+include("includes/verificar-paginas.php");
+
 header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 
 header("Content-Type: application/force-download");
@@ -9,24 +14,10 @@ header("Content-Type: application/download");
 header("content-disposition: attachment;filename=productos_".date("d/m/Y h:m:i").".xls");
 header("Content-Transfer-Encoding: binary ");
 
+include("includes/head.php");
 ?>
-<?php include("includes/head.php");?>
 </head>
-
 <body>
-<?php
-$filtro = "";
-if($_GET["grupo1"]){$filtro .=" AND prod_grupo1='".$_GET["grupo1"]."'";}
-if($_GET["grupo2"]){$filtro .=" AND prod_categoria='".$_GET["grupo2"]."'";}
-if($_GET["marca"]){$filtro .=" AND prod_marca='".$_GET["marca"]."'";}
-if($_GET["tipoProductos"]==2){$filtro .=" AND prod_descuento_web>0";}
-if($_GET["tipoProductos"]==3){$filtro .=" AND prod_precio_predeterminado=1";}
-	
-$consulta = mysql_query("SELECT * FROM productos 
-INNER JOIN productos_categorias ON catp_id=prod_categoria
-WHERE prod_id=prod_id $filtro
-",$conexion);
-?>
 <div align="center">  
 <table  width="100%" border="1" rules="all">
     <thead>
@@ -77,25 +68,31 @@ WHERE prod_id=prod_id $filtro
     <tbody>
 <?php
 $no = 1;
-$pdt = array("NO","SI");		
-while($res=mysql_fetch_array($consulta))
-{
-	$grupo1 = mysql_fetch_array(mysql_query("SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'
-	",$conexion));
+$pdt = array("NO","SI");	
+
+$filtro = "";
+if($_GET["grupo1"]){$filtro .=" AND prod_grupo1='".$_GET["grupo1"]."'";}
+if($_GET["grupo2"]){$filtro .=" AND prod_categoria='".$_GET["grupo2"]."'";}
+if($_GET["marca"]){$filtro .=" AND prod_marca='".$_GET["marca"]."'";}
+if($_GET["tipoProductos"]==2){$filtro .=" AND prod_descuento_web>0";}
+if($_GET["tipoProductos"]==3){$filtro .=" AND prod_precio_predeterminado=1";}
 	
-	$marca = mysql_fetch_array(mysql_query("SELECT * FROM marcas WHERE mar_id='".$res['prod_marca']."'
-	",$conexion));
+$consulta = $conexionBdPrincipal->query("SELECT * FROM productos INNER JOIN productos_categorias ON catp_id=prod_categoria WHERE prod_id=prod_id $filtro ");	
+while($res=mysqli_fetch_array($consulta, MYSQLI_BOTH)){
+
+	$consultaGrupo1=$conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'");
+	$grupo1 = mysqli_fetch_array($consultaGrupo1, MYSQLI_BOTH);
+	
+	$consultaMarca=$conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id='".$res['prod_marca']."'");
+	$marca = mysqli_fetch_array($consultaMarca, MYSQLI_BOTH);
 	
 	$dctoWeb = $res['prod_descuento_web']/100;
 	$precioWeb = $res['prod_costo'] + ($res['prod_costo']*$dctoWeb);
 
 	$precioListaUSD = productosPrecioListaUSD($res['prod_utilidad'], $res['prod_costo_dolar']);
 	
-	$datosReg = mysql_fetch_array(mysql_query("
-	SELECT
-	(SELECT count(ppmt_id) FROM productos_materiales WHERE ppmt_producto='".$res['prod_id']."'),
-	(SELECT count(fpp_id) FROM facturacion_productos WHERE fpp_producto='".$res['prod_id']."')
-	",$conexion));
+	$consultaDatos=$conexionBdPrincipal->query("SELECT (SELECT count(ppmt_id) FROM productos_materiales WHERE ppmt_producto='".$res['prod_id']."'), (SELECT count(fpp_id) FROM facturacion_productos WHERE fpp_producto='".$res['prod_id']."')");
+	$datosReg = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 ?>    
     	<tr>	
             <td align="center"><?=$no;?></td>
@@ -143,6 +140,7 @@ while($res=mysql_fetch_array($consulta))
 <?php
  $no ++;
 }
+include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 ?>        
     </tbody>
 </table>

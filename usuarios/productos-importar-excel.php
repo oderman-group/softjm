@@ -1,11 +1,15 @@
-<?php include("sesion.php");?>
 <?php
+include("sesion.php");
+
+$idPagina = 207;
+
+include("includes/verificar-paginas.php");
+
 if($_FILES['planilla']['name']!=""){
-	$archivo = $_FILES['planilla']['name']; $destino = "files/excel";
+	$archivo = $_FILES['planilla']['name'];
+	$destino = "files/excel";
 	move_uploaded_file($_FILES['planilla']['tmp_name'], $destino ."/".$archivo);
 }
-?>
-<?php
 //set_time_limit (0);
 
 // Test CVS
@@ -38,22 +42,22 @@ for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 		//ELIMINAR REPETIDOS POR REFERENCIA
 		/*
 		if($data->sheets[0]['cells'][$i][2]<=52){
-			$numRpt = mysql_num_rows(mysql_query("SELECT * FROM productos WHERE prod_referencia='".$data->sheets[0]['cells'][$i][3]."'",$conexion));
-			if(mysql_errno()!=0){echo mysql_error(); exit();}
+			$numRpt = mysql_num_rows($conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_referencia='".$data->sheets[0]['cells'][$i][3]."'"));
+			
 				
 			if($numRpt>1){
-				mysql_query("DELETE FROM productos WHERE prod_referencia='".$data->sheets[0]['cells'][$i][3]."' AND prod_id>52",$conexion);
-				if(mysql_errno()!=0){echo mysql_error(); exit();}
+				$conexionBdPrincipal->query("DELETE FROM productos WHERE prod_referencia='".$data->sheets[0]['cells'][$i][3]."' AND prod_id>52");
+				
 				$eliminados++; 
 			}
 		}
 		*/
-		
-		$numProducto = mysql_num_rows(mysql_query("SELECT * FROM productos 
-			WHERE prod_id='".$data->sheets[0]['cells'][$i][2]."'",$conexion));
+		$consultaProducto=$conexionBdPrincipal->query("SELECT * FROM productos 
+		WHERE prod_id='".$data->sheets[0]['cells'][$i][2]."'");
+		$numProducto = $consultaProducto->num_rows;
 
-		$datos = mysql_fetch_array(mysql_query("SELECT * FROM productos 
-			WHERE prod_id='".$_POST["id"]."'",$conexion));
+		$datos = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM productos 
+			WHERE prod_id='".$_POST["id"]."'"), MYSQLI_BOTH);
 
 		$origen = 0;
 
@@ -65,7 +69,7 @@ for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 		if($_SESSION["id"]==7 /*or $_SESSION["id"]==15*/){
 			if($numProducto==0){
 				
-				mysql_query("INSERT INTO productos(
+				$conexionBdPrincipal->query("INSERT INTO productos(
 				prod_id,
 				prod_referencia,
 				prod_nombre,
@@ -107,25 +111,23 @@ for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 				now(),
 				'".$_SESSION["id"]."'
 				)
-				",$conexion);
-				if(mysql_errno()!=0){echo mysql_error(); exit();}
+				");
 				
 			}else{
 
-				mysql_query("UPDATE productos SET
+				$conexionBdPrincipal->query("UPDATE productos SET
 				prod_costo_dolar='".round($data->sheets[0]['cells'][$i][19],2)."',
 
 				prod_ultima_actualizacion=now(),
 				prod_ultima_actualizacion_usuario='".$_SESSION["id"]."'
 				WHERE prod_id='".$data->sheets[0]['cells'][$i][2]."'
-				",$conexion);
-				if(mysql_errno()!=0){echo mysql_error(); exit();}
+				");
 				
 				
 				
 				
 				/*
-				mysql_query("UPDATE productos SET 
+				$conexionBdPrincipal->query("UPDATE productos SET 
 				prod_referencia='".$data->sheets[0]['cells'][$i][3]."',
 				prod_nombre='".$data->sheets[0]['cells'][$i][4]."', 
 				prod_categoria='".$data->sheets[0]['cells'][$i][7]."', 
@@ -144,22 +146,22 @@ for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 				prod_ultima_actualizacion=now(),
 				prod_ultima_actualizacion_usuario='".$_SESSION["id"]."'
 				WHERE prod_id='".$data->sheets[0]['cells'][$i][2]."'
-				",$conexion);
-				if(mysql_errno()!=0){echo mysql_error(); exit();}
+				");
+				
 				
 				
 				$utilidad = $data->sheets[0]['cells'][$i][15]/100;
 				$precio1 = $data->sheets[0]['cells'][$i][12] + ($data->sheets[0]['cells'][$i][12]*$utilidad);
 				
-				mysql_query("UPDATE productos SET prod_utilidad='".$data->sheets[0]['cells'][$i][15]."', prod_precio='".$precio1."' 
-				WHERE prod_id='".$data->sheets[0]['cells'][$i][2]."'",$conexion);
-				if(mysql_errno()!=0){echo mysql_error(); exit();}*/
+				$conexionBdPrincipal->query("UPDATE productos SET prod_utilidad='".$data->sheets[0]['cells'][$i][15]."', prod_precio='".$precio1."' 
+				WHERE prod_id='".$data->sheets[0]['cells'][$i][2]."'");
+				*/
 			}
 		}
 		//OTROS USUARIOS
 		else{
 			if($numProducto==0){
-				mysql_query("INSERT INTO productos(
+				$conexionBdPrincipal->query("INSERT INTO productos(
 				prod_id,
 				prod_referencia,
 				prod_nombre,
@@ -185,10 +187,9 @@ for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 				now(),
 				'".$_SESSION["id"]."'
 				)
-				",$conexion);
-				if(mysql_errno()!=0){echo mysql_error(); exit();}
+				");
 			}else{
-				mysql_query("UPDATE productos SET 
+				$conexionBdPrincipal->query("UPDATE productos SET 
 				prod_referencia='".$data->sheets[0]['cells'][$i][3]."',
 				prod_nombre='".$data->sheets[0]['cells'][$i][4]."', 
 				prod_grupo1='".$data->sheets[0]['cells'][$i][5]."',
@@ -199,8 +200,8 @@ for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 				prod_ultima_actualizacion=now(),
 				prod_ultima_actualizacion_usuario='".$_SESSION["id"]."'
 				WHERE prod_id='".$data->sheets[0]['cells'][$i][2]."'
-				",$conexion);
-				if(mysql_errno()!=0){echo mysql_error(); exit();}
+				");
+				
 
 
 				if($origen > 0){
@@ -208,8 +209,8 @@ for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 					$utilidad = $datos['prod_utilidad']/100;
 					$precio1 = $data->sheets[0]['cells'][$i][12] + ($data->sheets[0]['cells'][$i][12] * $utilidad);
 
-					mysql_query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$data->sheets[0]['cells'][$i][2]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', '".$origen."')");
-					if(mysql_errno()!=0){echo mysql_error(); exit();}
+					$conexionBdPrincipal->query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$data->sheets[0]['cells'][$i][2]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', '".$origen."')");
+					
 
 				}
 				
@@ -222,6 +223,7 @@ for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 }
 //exit();
 
+include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 echo '<script type="text/javascript">window.location.href="productos.php";</script>';
 exit();

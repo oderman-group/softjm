@@ -1,32 +1,13 @@
-<?php include("sesion.php");?>
 <?php
+include("sesion.php");
+
 $idPagina = 21;
-$paginaActual['pag_nombre'] = "Importar productos";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
-
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -45,31 +26,21 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
-?>
-<?php include("includes/funciones-js.php");?>
 
-<?php include("includes/texto-editor.php");?>
+include("includes/funciones-js.php");
+
+include("includes/texto-editor.php");
+?>
 </head>
 <body>
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
-    
-    
-    
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-                        
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -86,19 +57,17 @@ include("includes/js-formularios.php");
 							<h3> Exportar productos</h3>
 						</div>
 						<div class="widget-container">
-							
-							<form class="form-horizontal" method="get" action="productos-exportar.php"> 
-                                   
+							<form class="form-horizontal" method="get" action="productos-exportar.php">
                                <div class="control-group">
 									<label class="control-label">Grupo 1</label>
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="grupo1">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM productos_categorias WHERE catp_grupo=1",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
-                                            	<option value="<?=$resOp[0];?>" <?php if($resultadoD['prod_grupo1']==$resOp[0]){echo "selected";}?>><?=$resOp[1];?></option>
+												<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
                                             <?php
 											}
 											?>
@@ -112,8 +81,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="grupo2">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM productos_categorias",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
                                             <?php
@@ -129,8 +98,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="marca">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM marcas",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM marcas");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
                                             <?php
@@ -154,23 +123,17 @@ include("includes/js-formularios.php");
 								<?php }else{?>
 									<input type="hidden" name="tipoProductos" value="1">
 								<?php }?>
-								
- 
 								<div class="form-actions">
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Exportar</button>
 								</div>
-                              
-							</form>  
-
+							</form>
 						</div>
 					</div>
 				</div>
 			</div>
 			
 			<div class="row-fluid">
-				
 				<div class="span12">
-					
 					<!--
 					<div style="background-color: antiquewhite; padding: 5px; margin: 10px;">
 					<h2>Información importante</h2>
@@ -186,41 +149,35 @@ include("includes/js-formularios.php");
 						</div>
 
 						<div class="row-fluid">
-				<div class="span12">
-					<div class="hero-unit">
-						<h2>Existencias</h2>
-						<p>
-							Las existencias ya no serán tomadas en cuenta desde este archivo. Todas las existencias se manejan por bodegas.
-						</p>
-					</div>
-				</div>
-			</div>
+							<div class="span12">
+								<div class="hero-unit">
+									<h2>Existencias</h2>
+									<p>
+										Las existencias ya no serán tomadas en cuenta desde este archivo. Todas las existencias se manejan por bodegas.
+									</p>
+								</div>
+							</div>
+						</div>
 
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="productos-importar-excel.php" enctype="multipart/form-data">
-                            	
                                 <fieldset class="default" style="background:#FFC;">
                                    	<legend>Información básica</legend>
-                                <div class="control-group">
-									<div class="controls">
-										<div class="fileupload fileupload-new" data-provides="fileupload">
-											<div class="input-append">
-												<div class="uneditable-input span3">
-													<i class="icon-file fileupload-exists"></i><span class="fileupload-preview"></span>
+									<div class="control-group">
+										<div class="controls">
+											<div class="fileupload fileupload-new" data-provides="fileupload">
+												<div class="input-append">
+													<div class="uneditable-input span3">
+														<i class="icon-file fileupload-exists"></i><span class="fileupload-preview"></span>
+													</div>
+													<span class="btn btn-file"><span class="fileupload-new">Seleccionar plantilla</span><span class="fileupload-exists">Cambiar</span>
+													<input type="file" name="planilla"/>
+													</span><a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remover</a>
 												</div>
-												<span class="btn btn-file"><span class="fileupload-new">Seleccionar plantilla</span><span class="fileupload-exists">Cambiar</span>
-												<input type="file" name="planilla"/>
-												</span><a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remover</a>
 											</div>
 										</div>
 									</div>
-								</div>
-                                
-                                </fieldset>
-                                
-                                
-                                
-
+                                </fieldset>   
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
                                     <button type="submit" class="btn btn-info"><i class="icon-save"></i> Iniciar importación</button>
@@ -230,7 +187,6 @@ include("includes/js-formularios.php");
 					</div>
 				</div>
 			</div>
-
 		</div>
 	</div>
 	<?php include("includes/pie.php");?>
