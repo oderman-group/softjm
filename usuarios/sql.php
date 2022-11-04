@@ -1765,17 +1765,7 @@ if ($_POST["idSql"] == 77) {
 	exit();
 }
 //AGREGAR BODEGAS
-if ($_POST["idSql"] == 78) {
 
-	mysql_query("INSERT INTO bodegas(bod_nombre, bod_ciudad)VALUES('" . $_POST["nombre"] . "', '" . $_POST["ciudad"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-
-	echo '<script type="text/javascript">window.location.href="bodegas.php?msg=1";</script>';
-	exit();
-}
 //EDITAR BODEGAS
 if ($_POST["idSql"] == 79) {
 	mysql_query("UPDATE bodegas SET bod_nombre='" . $_POST["nombre"] . "', bod_ciudad='" . $_POST["ciudad"] . "' WHERE bod_id='" . $_POST["id"] . "'", $conexion);
