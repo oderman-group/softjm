@@ -1,22 +1,13 @@
-<?php include("sesion.php"); ?>
 <?php
+include("sesion.php");
+
 $idPagina = 142;
-$paginaActual['pag_nombre'] = "Bodegas";
-?>
-<?php include("includes/verificar-paginas.php"); ?>
-<?php include("includes/head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
-
-
 <link href="css/tablecloth.css" rel="stylesheet">
-
 <!--============j avascript===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -103,18 +94,13 @@ if (mysql_errno() != 0) {
 <body>
 	<div class="layout">
 		<?php include("includes/encabezado.php"); ?>
-
-		
 		<div class="main-wrapper">
 			<div class="container-fluid">
 				<?php include("includes/notificaciones.php"); ?>
-
-
 				<p>
 					<a href="bodegas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
 					<a href="bodegas-transferir.php" class="btn btn-success"><i class="icon-random"></i> Transferir productos</a>
 				</p>
-
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="content-widgets light-gray">
@@ -136,12 +122,11 @@ if (mysql_errno() != 0) {
 									</thead>
 									<tbody>
 										<?php
-										$consulta = mysql_query("SELECT * FROM bodegas
-										LEFT JOIN localidad_ciudades ON ciu_id=bod_ciudad
-										", $conexion);
+										$consulta = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".bodegas, ".BDADMIN.".localidad_ciudades WHERE ciu_id=bod_ciudad");
 										$no = 1;
-										while ($res = mysql_fetch_array($consulta)) {
-											$cantProd = mysql_num_rows(mysql_query("SELECT * FROM productos_bodegas WHERE prodb_bodega='".$res[0]."'",$conexion));
+										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
+											$consultaProductosBodegas=$conexionBdPrincipal->query("SELECT * FROM productos_bodegas WHERE prodb_bodega='".$res[0]."'");
+											$cantProd = $consultaProductosBodegas->num_rows;
 										?>
 											<tr>
 												<td><?= $no; ?></td>
@@ -153,7 +138,6 @@ if (mysql_errno() != 0) {
 													<h4>
 													<?php if($res[0] != 1){?>	
 														<a href="bodegas-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-														
 														<a href="sql.php?id=<?= $res[0]; ?>&get=62" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 													<?php }?>
 													</h4>
