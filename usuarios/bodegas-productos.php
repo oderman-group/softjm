@@ -104,8 +104,9 @@ include("includes/head.php");
 
 				<p>
 					<a href="productos.php" class="btn btn-primary"><i class="icon-arrow"></i> Ir a productos</a>
-
+					<?php if(isset($_GET["prod"])){?>
 					<a href="bodegas-productos-agregar.php?prod=<?=$_GET["prod"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+					<?php }?>
 					<a href="reportes/bodegasprod.php" target="_blank" class="btn btn-success"><i class="icon-file"></i> Sacar informe</a>
 				</p>
 
