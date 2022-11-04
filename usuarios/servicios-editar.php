@@ -1,35 +1,16 @@
-<?php include("sesion.php");?>
 <?php
+include("sesion.php");
+
 $idPagina = 156;
-$paginaActual['pag_nombre'] = "Editar servicios";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM servicios WHERE serv_id='".$_GET["id"]."'",$conexion));
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consultasServicios=$conexionBdPrincipal->query("SELECT * FROM servicios WHERE serv_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consultasServicios, MYSQLI_BOTH);
 ?>
 <!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
-
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -54,23 +35,12 @@ include("includes/js-formularios.php");
 <body>
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
-    
-    
-    
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-                        
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -79,7 +49,6 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
-            <p><a href="servicios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
             <?php include("includes/notificaciones.php");?>
 			<div class="row-fluid">
 				<div class="span12">
@@ -88,8 +57,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="60">
+							<form class="form-horizontal" method="post" action="bd_update/servicios-actualizar.php">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
                             	   
                                 <div class="control-group">
