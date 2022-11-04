@@ -50,25 +50,22 @@ function productosPrecioListaUSD($porcentajeUtilidad, $costoEnDolares){
 }
 
 function contarClientesPorDepto($depto){
-	
-	require(RUTA_PROYECTO."/conexion.php");
+
+	global $conexionBdAdmin, $conexionBdPrincipal;
 
 	$consultaDeptos = $conexionBdAdmin->query("SELECT ciu_id FROM localidad_ciudades
 	WHERE ciu_departamento='".$depto."'");
-	
-	$totalClientes = 0;
-	while($deptos = mysqli_fetch_array($consultaDeptos, MYSQLI_BOTH)){
-		$clientesParaContar = $conexionBdPrincipal->query("SELECT count(*) FROM clientes 
-		WHERE (cli_papelera IS NULL OR cli_papelera=0) AND cli_ciudad='".$deptos['ciu_id']."'");
-		$cantidad = mysqli_fetch_array($clientesParaContar, MYSQLI_BOTH);
-		
-		$totalClientes += $cantidad[0];
-		//$totalClientes += $clientesParaContar->num_rows;
-	}
 
-	
-	
-	return $totalClientes;
+	while($deptos = mysqli_fetch_array($consultaDeptos, MYSQLI_BOTH)){
+		
+		$consultaContarClientes = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".clientes 
+		INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad AND ciu_departamento='".$depto."'
+		WHERE (cli_papelera IS NULL OR cli_papelera=0)
+		");
+		
+		return $contarClientes = $consultaContarClientes->num_rows;
+	}	
+
 }
 
 function validarVariableGet($get){
