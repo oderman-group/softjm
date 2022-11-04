@@ -1602,15 +1602,7 @@ if ($_POST["idSql"] == 55) {
 //AGREGAR SERVICIOS
 
 //EDITAR SERVICIOS
-if ($_POST["idSql"] == 60) {
-	mysql_query("UPDATE servicios SET serv_nombre='" . $_POST["nombre"] . "', serv_precio='" . $_POST["precio"] . "' WHERE serv_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="servicios-editar.php?id=' . $_POST["id"] . '";</script>';
-	exit();
-}
+
 //AGREGAR COMBOS
 
 //EDITAR COMBOS
