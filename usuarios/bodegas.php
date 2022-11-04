@@ -122,7 +122,10 @@ include("includes/head.php");
 									</thead>
 									<tbody>
 										<?php
-										$consulta = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".bodegas, ".BDADMIN.".localidad_ciudades WHERE ciu_id=bod_ciudad");
+										$consulta = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".bodegas 
+										INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=bod_ciudad
+										INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
+										");
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 											$consultaProductosBodegas=$conexionBdPrincipal->query("SELECT * FROM productos_bodegas WHERE prodb_bodega='".$res[0]."'");
@@ -132,7 +135,7 @@ include("includes/head.php");
 												<td><?= $no; ?></td>
 												<td><?= $res['bod_fecha_creacion']; ?></td>
 												<td><?= $res['bod_nombre']; ?></td>
-												<td><?= $res['ciu_nombre']; ?></td>
+												<td><?= $res['ciu_nombre'].", ".$res['dep_nombre']; ?></td>
 												<td><a href="bodegas-productos.php?bod=<?=$res[0];?>"><?= $cantProd; ?></a></td>
 												<td>
 													<h4>
