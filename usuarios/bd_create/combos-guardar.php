@@ -6,10 +6,8 @@
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 	if ($_FILES['foto']['name'] != "") {
-        $destino = "../files/combos/";
-        $fileName='comb_'.basename($_FILES['foto']['name']);
-        $archivo=$destino.$fileName;
-        move_uploaded_file($_FILES['foto']['tmp_name'],$archivo);
+		$destino = RUTA_PROYECTO."/usuarios/files/combos";
+		$fileName = subirArchivosAlServidor($_FILES['foto'], 'comb', $destino);
 	}
 
 	$conexionBdPrincipal->query("INSERT INTO combos(combo_nombre, combo_descripcion, combo_imagen, combo_descuento, combo_estado, combo_fecha_registro, combo_actualizaciones, combo_descuento_maximo, combo_descuento_dealer)VALUES('" . $_POST["nombre"] . "', '" . $_POST["descripcion"] . "', '" . $fileName . "', '" . $_POST["dcto"] . "', '" . $_POST["estado"] . "', now(), 0, '" . $_POST["descuentoMax"] . "', '" . $_POST["dctoDealer"] . "')");

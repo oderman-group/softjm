@@ -5,10 +5,8 @@
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     
     if ($_FILES['contrato']['name'] != "") {
-        $destino = "../files/contratos/";
-        $contrato='cont_'.basename($_FILES['contrato']['name']);
-        $archivo=$destino.$contrato;
-        move_uploaded_file($_FILES['contrato']['tmp_name'],$archivo);
+		$destino = RUTA_PROYECTO."/usuarios/files/contratos";
+		$fileName = subirArchivosAlServidor($_FILES['contrato'], 'cont', $destino);
 
 		mysql_query("UPDATE clientes_orion SET clio_contrato='" . $contrato . "' WHERE clio_id='" . $_POST["id"] . "'");
     }

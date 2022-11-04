@@ -6,10 +6,8 @@
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 	if ($_FILES['archivo']['name'] != "") {
-        $destino = "../files/productos/galeria/";
-        $fileName='gp_'.basename($_FILES['archivo']['name']);
-        $archivo=$destino.$fileName;
-        move_uploaded_file($_FILES['archivo']['tmp_name'],$archivo);
+		$destino = RUTA_PROYECTO."/usuarios/files/productos/galeria";
+		$fileName = subirArchivosAlServidor($_FILES['archivo'], 'gp', $destino);
 
 		$conexionBdPrincipal->query("INSERT INTO productos_galeria(pgal_producto, pgal_foto)VALUES('" . $_POST["id"] . "', '" . $fileName . "')");
 	}

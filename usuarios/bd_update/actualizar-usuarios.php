@@ -5,10 +5,8 @@ $idPagina = 52;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 if ($_FILES['foto']['name'] != "") {
-    $destino = "../files/fotos/";
-    $fileName='fp_'.basename($_FILES['foto']['name']);
-    $archivo=$destino.$fileName;
-    move_uploaded_file($_FILES['foto']['tmp_name'],$archivo);
+    $destino = RUTA_PROYECTO."/usuarios/files/fotos";
+    $fileName = subirArchivosAlServidor($_FILES['foto'], 'fp', $destino);
 
     $conexionBdPrincipal->query("UPDATE usuarios SET usr_foto='" . $fileName . "' WHERE usr_id='" . $_POST["id"] . "'");
 }

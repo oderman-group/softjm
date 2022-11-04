@@ -21,10 +21,8 @@
 	}
 
 	if ($_FILES['foto']['name'] != "") {
-        $destino = "../files/productos/";
-        $fileName='prod_'.basename($_FILES['foto']['name']);
-        $archivo=$destino.$fileName;
-        move_uploaded_file($_FILES['foto']['tmp_name'],$archivo);
+		$destino = RUTA_PROYECTO."/usuarios/files/productos";
+		$fileName = subirArchivosAlServidor($_FILES['foto'], 'prod', $destino);
 
 		$conexionBdPrincipal->query("UPDATE productos SET prod_foto='" . $fileName . "' WHERE prod_id='" . $_POST["id"] . "'");
 	}
