@@ -3194,16 +3194,7 @@ if ($_GET["get"] == 61) {
 	exit();
 }
 //ELIMINAR BODEGAS
-if ($_GET["get"] == 62) {
-	mysql_query("DELETE FROM bodegas WHERE bod_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
 
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 //ELIMINAR BODEGAS POR PRODUCTOS
 
 //OTRO
