@@ -1897,15 +1897,7 @@ if ($_POST["idSql"] == 81) {
 	exit();
 }
 //TRASNFERIR PRODUCTOS ENTRE BODEGAS
-if ($_POST["idSql"] == 82) {
-	mysql_query("UPDATE productos_bodegas SET prodb_bodega='" . $_POST["hasta"] . "' WHERE prodb_bodega='" . $_POST["desde"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="bodegas.php?msg=2";</script>';
-	exit();
-}
+
 //AGREGAR FACTURAS DE VENTA
 if ($_POST["idSql"] == 83) {
 
