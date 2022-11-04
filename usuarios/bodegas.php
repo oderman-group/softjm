@@ -138,7 +138,7 @@ include("includes/head.php");
 													<h4>
 													<?php if($res[0] != 1){?>	
 														<a href="bodegas-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-														<a href="sql.php?id=<?= $res[0]; ?>&get=62" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+														<a href="bd_delete/bodegas-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 													<?php }?>
 													</h4>
 												</td>
