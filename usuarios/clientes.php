@@ -1,6 +1,6 @@
 <?php 
 include("sesion.php");
-$idPagina = 9;
+$idPagina = 9; 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -150,25 +150,7 @@ include("includes/head.php");
 							</ul>
 						</div>
             </p>
-            <!--
-            <p>
-                <a href="clientes.php" style="margin-bottom:10px;">TODOS</a>
-                <?php
-                if($datosUsuarioActual[3]==1){
-					$departamentos = $conexionBdPrincipal->query("SELECT * FROM localidad_departamentos ORDER BY dep_nombre");
-				}else{
-					$departamentos = $conexionBdPrincipal->query("SELECT * FROM localidad_departamentos
-					INNER JOIN zonas_usuarios ON zpu_usuario='".$_SESSION["id"]."' AND zpu_zona=dep_id
-					ORDER BY dep_nombre
-					");
-				}
-                while($deptos = mysqli_fetch_array($departamentos, MYSQLI_BOTH)){
-                    if($deptos[0]==$_GET["dpto"]) $color = 'green'; else $color = 'blue';
-                ?>
-                    <a href="clientes.php?dpto=<?=$deptos[0];?>" style="margin-bottom:10px; color:<?=$color;?>"><?=$deptos[1];?></a>&nbsp;&nbsp;
-                <?php }?>
-            </p>
--->
+        
             
             
 			<div class="row-fluid">
@@ -182,10 +164,10 @@ include("includes/head.php");
                 <a href="clientes.php" style="margin-bottom:10px;">TODOS</a><br>
                 <?php
                 if($datosUsuarioActual[3]==1){
-					$departamentos = $conexionBdPrincipal->query("SELECT * FROM localidad_departamentos ORDER BY dep_nombre");
+					$departamentos = $conexionBdAdmin->query("SELECT * FROM localidad_departamentos ORDER BY dep_nombre");
 				}else{
-					$departamentos = $conexionBdPrincipal->query("SELECT * FROM localidad_departamentos
-					INNER JOIN zonas_usuarios ON zpu_usuario='".$_SESSION["id"]."' AND zpu_zona=dep_id
+					$departamentos = $conexionBdAdmin->query("SELECT * FROM ".BDADMIN.".localidad_departamentos
+					INNER JOIN ".MAINBD.".zonas_usuarios ON zpu_usuario='".$_SESSION["id"]."' AND zpu_zona=dep_id
 					ORDER BY dep_nombre");
 				}
                 while($deptos = mysqli_fetch_array($departamentos, MYSQLI_BOTH)){
@@ -195,14 +177,11 @@ include("includes/head.php");
 						if($deptos[0]==$_GET["dpto"]) $color = 'green' ;
 					}
 
-					//$contarClientes = contarClientesPorDepto($deptos[0]);
+					$contarClientes = contarClientesPorDepto($deptos[0]);
                 ?>
-                    <a href="clientes.php?dpto=<?=$deptos[0];?>" style="margin-bottom:10px; color:<?=$color;?>"><?=$deptos[1];?></a><br>
-
-					<!--
-					Esta linea se comenta mientras se aprueba la propuesta de contar clientes	
+                    	
 					<a href="clientes.php?dpto=<?=$deptos[0];?>" style="margin-bottom:10px; color:<?=$color;?>"><?=$deptos[1]." (".$contarClientes.")";?></a><br>
-					-->
+					
 
                 <?php }?>
 					</div>
@@ -268,15 +247,15 @@ include("includes/head.php");
                         
 						<?php
 						if(isset($_GET["dpto"]) and $_GET["dpto"]!=""){
-								$SQL = "SELECT * FROM clientes
-								LEFT JOIN localidad_ciudades ON ciu_id=cli_ciudad
-								INNER JOIN localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$_GET["dpto"]."'
+								$SQL = "SELECT * FROM ".MAINBD.".clientes
+								LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$_GET["dpto"]."'
 								WHERE cli_id=cli_id ".$filtro."
 								";
 							}else{
-								$SQL = "SELECT * FROM clientes
-								LEFT JOIN localidad_ciudades ON ciu_id=cli_ciudad
-								INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
+								$SQL = "SELECT * FROM ".MAINBD.".clientes
+								LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 								WHERE cli_id=cli_id ".$filtro."
 								";
 							}
@@ -320,16 +299,16 @@ include("includes/head.php");
 							if(isset($_GET["grupo"]) and is_numeric($_GET["grupo"])){ $filtroGrupos .="LEFT JOIN clientes_categorias ON cpcat_cliente=cli_id AND cpcat_categoria='".$_GET["grupo"]."'";}
 								
 							if(isset($_GET["dpto"]) and $_GET["dpto"]!=""){
-								$consulta = $conexionBdPrincipal->query("SELECT * FROM clientes
-								INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-								INNER JOIN localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$_GET["dpto"]."'
+								$consulta = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".clientes
+								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$_GET["dpto"]."'
 								WHERE cli_id=cli_id ".$filtro."
 								LIMIT $inicio, $limite
 								");
 							}else{
-								$consulta = $conexionBdPrincipal->query("SELECT * FROM clientes
-								INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-								INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
+								$consulta = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".clientes
+								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 								$filtroGrupos
 								WHERE cli_id=cli_id ".$filtro."
 								LIMIT $inicio, $limite
