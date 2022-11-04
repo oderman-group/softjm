@@ -1,22 +1,13 @@
-<?php include("sesion.php"); ?>
 <?php
+include("sesion.php");
+
 $idPagina = 154;
-$paginaActual['pag_nombre'] = "Servicios";
-?>
-<?php include("includes/verificar-paginas.php"); ?>
-<?php include("includes/head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
-
-
 <link href="css/tablecloth.css" rel="stylesheet">
-
 <!--============j avascript===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -103,62 +94,10 @@ if (mysql_errno() != 0) {
 <body>
 	<div class="layout">
 		<?php include("includes/encabezado.php"); ?>
-
-		
 		<div class="main-wrapper">
 			<div class="container-fluid">
 				<?php include("includes/notificaciones.php"); ?>
-
-
-				<p>
-					<a href="servicios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-				</p>
-
-
-				<div class="navbar">
-					<div class="navbar-inner">
-						<div class="container">
-							<a href="#" class="brand"><img src="images/logo-small.png" width="99" height="40" alt="Falgun"></a>
-							<div class="nav-collapse collapse navbar-responsive-collapse">
-								<ul class="nav">
-									<li class="active"><a href="#">Home</a></li>
-									<li><a href="#">Link</a></li>
-									<li><a href="#">Link</a></li>
-									<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Dropdown <b class="caret"></b></a>
-										<ul class="dropdown-menu">
-											<li><a href="#">Action</a></li>
-											<li><a href="#">Another action</a></li>
-											<li><a href="#">Something else here</a></li>
-											<li class="divider"></li>
-											<li class="nav-header">Nav header</li>
-											<li><a href="#">Separated link</a></li>
-											<li><a href="#">One more separated link</a></li>
-										</ul>
-									</li>
-								</ul>
-								<form action="#" class="navbar-search pull-left">
-									<input type="text" placeholder="Search" class="search-query span4">
-								</form>
-								<ul class="nav pull-right">
-									<li><a href="#">Link</a></li>
-									<li class="divider-vertical"></li>
-									<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Dropdown <b class="caret"></b></a>
-										<ul class="dropdown-menu">
-											<li><a href="#">Action</a></li>
-											<li><a href="#">Another action</a></li>
-											<li><a href="#">Something else here</a></li>
-											<li class="divider"></li>
-											<li><a href="#">Separated link</a></li>
-										</ul>
-									</li>
-								</ul>
-							</div>
-							<!-- /.nav-collapse -->
-						</div>
-					</div>
-					<!-- /navbar-inner -->
-				</div>
-
+				<p><a href="servicios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="content-widgets light-gray">
@@ -178,9 +117,9 @@ if (mysql_errno() != 0) {
 									</thead>
 									<tbody>
 										<?php
-										$consulta = mysql_query("SELECT * FROM servicios", $conexion);
+										$consulta = $conexionBdPrincipal->query("SELECT * FROM servicios");
 										$no = 1;
-										while ($res = mysql_fetch_array($consulta)) {
+										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 										?>
 											<tr>
 												<td><?= $no; ?></td>
@@ -201,8 +140,6 @@ if (mysql_errno() != 0) {
 						</div>
 					</div>
 				</div>
-
-
 			</div>
 		</div>
 	</div>
