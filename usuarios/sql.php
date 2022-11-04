@@ -1767,15 +1767,7 @@ if ($_POST["idSql"] == 77) {
 //AGREGAR BODEGAS
 
 //EDITAR BODEGAS
-if ($_POST["idSql"] == 79) {
-	mysql_query("UPDATE bodegas SET bod_nombre='" . $_POST["nombre"] . "', bod_ciudad='" . $_POST["ciudad"] . "' WHERE bod_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="bodegas-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
+
 //AGREGAR O ACTUALIZAR PRODUCTOS EN BODEGAS
 
 //AGREGAR REMISIONES
