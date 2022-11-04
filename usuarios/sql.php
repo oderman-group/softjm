@@ -2969,16 +2969,7 @@ if ($_GET["get"] == 44) {
 //Eliminar marcas
 
 //ELIMINAR SERVICIOS
-if ($_GET["get"] == 49) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysql_query("DELETE FROM servicios WHERE serv_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //ELIMINAR PEDIDO
 if ($_GET["get"] == 50) {
 	//$idPagina = 118; include("includes/verificar-paginas.php");
