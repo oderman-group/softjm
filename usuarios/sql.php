@@ -1600,16 +1600,7 @@ if ($_POST["idSql"] == 55) {
 //ENVIAR COTIZACIÓN AL CORREO ELABORADO
 
 //AGREGAR SERVICIOS
-if ($_POST["idSql"] == 59) {
-	mysql_query("INSERT INTO servicios(serv_nombre, serv_precio)VALUES('" . $_POST["nombre"] . "','" . $_POST["precio"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsertU = mysql_insert_id();
-	echo '<script type="text/javascript">window.location.href="servicios-editar.php?id=' . $idInsertU . '";</script>';
-	exit();
-}
+
 //EDITAR SERVICIOS
 if ($_POST["idSql"] == 60) {
 	mysql_query("UPDATE servicios SET serv_nombre='" . $_POST["nombre"] . "', serv_precio='" . $_POST["precio"] . "' WHERE serv_id='" . $_POST["id"] . "'", $conexion);
