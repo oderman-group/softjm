@@ -66,14 +66,13 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Precio</label>
 									<div class="controls">
-										<input type="text" class="span4" name="precio">
+										<input type="number" class="span4" name="precio">
 									</div>
 								</div>
 
                                
 								<div class="form-actions">
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-									<button type="button" class="btn btn-danger">Cancelar</button>
 								</div>
                                 
 
