@@ -14,3 +14,4 @@ require_once(RUTA_PROYECTO."/conexion.php");
 require_once(RUTA_PROYECTO."/usuarios/config/config.php");
 require_once(RUTA_PROYECTO."/usuarios/includes/funciones-para-el-sistema.php");
 require_once(RUTA_PROYECTO."/usuarios/includes/sesion-usuario-actual.php");
+require_once(RUTA_PROYECTO."/usuarios/class/BaseDatos.php");
