@@ -1,12 +1,9 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
 $idPagina = 162;
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 
 <!-- styles -->
@@ -60,14 +57,6 @@ include("includes/js-formularios.php");
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-                        
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -76,7 +65,7 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
-            <p><a href="servicios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+
             <?php include("includes/notificaciones.php");?>
 			<div class="row-fluid">
 				<div class="span12">
@@ -85,8 +74,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="65">
+							<form class="form-horizontal" method="post" action="bd_create/areas-guardar.php">
                             	   
                                 <div class="control-group">
 									<label class="control-label">Nombre</label>
