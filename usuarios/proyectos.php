@@ -1,17 +1,10 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
 $idPagina = 108;
-$paginaActual['pag_nombre'] = "Proyectos";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<!-- styles -->
 
-
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+?>
 
 <link href="css/tablecloth.css" rel="stylesheet">
 
@@ -136,12 +129,6 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						<ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -185,7 +172,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
                                     <form class="form-horizontal" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
                                         <div class="search-box">
                                             <div class="input-append input-icon">
-                                                <input class="search-input" placeholder="Buscar..." type="text" name="busqueda" value="<?=$_GET["busqueda"];?>">
+                                                <input class="search-input" placeholder="Buscar..." type="text" name="busqueda" value="<?php if(isset($_GET["busqueda"])) echo $_GET["busqueda"];?>">
                                                 <i class=" icon-search"></i>
                                                 <input class="btn" type="submit" name="buscar" value="Buscar">
                                             </div>
@@ -211,21 +198,22 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							<tbody>
                             <?php
 							
-								$consulta = mysql_query("SELECT * FROM proyectos
+								$consulta = $conexionBdPrincipal->query("SELECT * FROM proyectos
 								INNER JOIN usuarios ON usr_id=proy_responsable_principal
 								LIMIT $inicio, $limite
-								",$conexion);
+								");
 							
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
+								$creadaConsulta = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res["proy_creada_usuario"]."'");
+								$creada = mysqli_fetch_array($creadaConsulta, MYSQLI_BOTH);
 								
-								$creada = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res["proy_creada_usuario"]."'",$conexion));
-								
-								$numeros = mysql_fetch_array(mysql_query("
+								$numerosConsulta = $conexionBdPrincipal->query("
 								SELECT
 								(SELECT count(ptar_id) FROM proyectos_tareas WHERE ptar_id_proyecto='".$res['proy_id']."'),
 								(SELECT ROUND(AVG(ptar_avance),2) FROM proyectos_tareas WHERE ptar_id_proyecto='".$res['proy_id']."')
-								",$conexion));
+								");
+								$numeros = mysqli_fetch_array($numerosConsulta, MYSQLI_BOTH);
 								
 								$color1='#FFF';
 								if($numeros[0]==0){$color1='#FFF090';}
@@ -245,7 +233,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 										
 										<a href="proyectos-editar.php?id=<?=$res['proy_id'];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
 										
-                                        <a href="sql.php?get=35&id=<?=$res['proy_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                        <a href="bd_delete/proyectos-eliminar.php?id=<?=$res['proy_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 										
 										<?php }?>
 										

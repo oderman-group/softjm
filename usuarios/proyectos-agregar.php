@@ -1,31 +1,12 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
 $idPagina = 109;
-$paginaActual['pag_nombre'] = "Agregar proyecto";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<!-- styles -->
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+?>
+
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -83,31 +64,32 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="48">  
+							<form class="form-horizontal" method="post" action="bd_create/proyectos-guardar.php">
+
+							<input type="hidden" name="proy_creada_usuario" value="<?=$_SESSION["id"];?>"> 
 								
 								<div class="control-group">
 									<label class="control-label">Titulo del proyecto</label>
 									<div class="controls">
-										<input type="text" class="span12" name="titulo" required>
+										<input type="text" class="span12" name="proy_titulo" required>
 									</div>
 								</div>
 								
 								<div class="control-group">
 									<label class="control-label">Descripción</label>
 									<div class="controls">
-										<textarea rows="10" cols="80" style="width: 80%" class="tinymce-simple" name="descripcion"></textarea>
+										<textarea rows="10" cols="80" style="width: 80%" class="tinymce-simple" name="proy_descripcion"></textarea>
 									</div>
 								</div>
 								
                                <div class="control-group">
 									<label class="control-label">Responsable principal</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="responsable" onChange="clientes(this)">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="proy_responsable_principal">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM usuarios WHERE usr_bloqueado=0",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado=0");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['usr_nombre'];?></option>
                                             <?php
@@ -117,20 +99,17 @@ include("includes/js-formularios.php");
                                     </div>
                                </div>
                                
-                               
-                               
-                               
                                <div class="control-group">
 									<label class="control-label">Fecha inicio</label>
 									<div class="controls">
-										<input type="date" class="span3" name="inicio" required>
+										<input type="date" class="span3" name="proy_inicio" required>
 									</div>
 								</div>
                                 
                                 <div class="control-group">
 									<label class="control-label">Fecha de entrega (Ideal)</label>
 									<div class="controls">
-										<input type="date" class="span3" name="fin" required>
+										<input type="date" class="span3" name="proy_fin" required>
 									</div>
 								</div>
                                 
@@ -138,7 +117,7 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Estado</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span3" tabindex="2" name="estado">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span3" tabindex="2" name="proy_estado">
 											<option value=""></option>
                                             <option value="1">En espera</option>
                                             <option value="2">En proceso</option>

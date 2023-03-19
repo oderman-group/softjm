@@ -1,35 +1,15 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
 $idPagina = 111;
-$paginaActual['pag_nombre'] = "Editar proyecto";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM proyectos 
-WHERE proy_id='".$_GET["id"]."'",$conexion));
-?>
-<!-- styles -->
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consulta = $conexionBdPrincipal->query("SELECT * FROM proyectos WHERE proy_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+?>
+
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -92,34 +72,31 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="49">
-                            <input type="hidden" name="id" value="<?=$_GET["id"];?>">
-                            	   
-                                
+							<form class="form-horizontal" method="post" action="bd_update/proyectos-actualizar.php">
+                            <input type="hidden" name="id" value="<?=$_GET["id"];?>"
 
                                <div class="control-group">
 									<label class="control-label">Titulo del proyecto</label>
 									<div class="controls">
-										<input type="text" class="span12" name="titulo" value="<?=$resultadoD["proy_titulo"];?>" required>
+										<input type="text" class="span12" name="proy_titulo" value="<?=$resultadoD["proy_titulo"];?>" required>
 									</div>
 								</div>
 								
 								<div class="control-group">
 									<label class="control-label">Descripción</label>
 									<div class="controls">
-										<textarea rows="10" cols="80" style="width: 80%" class="tinymce-simple" name="descripcion"><?=$resultadoD["proy_descripcion"];?></textarea>
+										<textarea rows="10" cols="80" style="width: 80%" class="tinymce-simple" name="proy_descripcion"><?=$resultadoD["proy_descripcion"];?></textarea>
 									</div>
 								</div>
 								
                                <div class="control-group">
 									<label class="control-label">Responsable principal</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="responsable" onChange="clientes(this)">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="proy_responsable_principal">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM usuarios WHERE usr_bloqueado=0",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado=0");
+											while($resOp = mysqlI_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD["proy_responsable_principal"]==$resOp[0]){echo "selected";}?> ><?=$resOp['usr_nombre'];?></option>
                                             <?php
@@ -128,21 +105,18 @@ include("includes/js-formularios.php");
                                     	</select>
                                     </div>
                                </div>
-                               
-                               
-                               
-                               
+
                                <div class="control-group">
 									<label class="control-label">Fecha inicio</label>
 									<div class="controls">
-										<input type="date" class="span3" name="inicio" value="<?=$resultadoD["proy_inicio"];?>" required>
+										<input type="date" class="span3" name="proy_inicio" value="<?=$resultadoD["proy_inicio"];?>" required>
 									</div>
 								</div>
                                 
                                 <div class="control-group">
 									<label class="control-label">Fecha de entrega (Ideal)</label>
 									<div class="controls">
-										<input type="date" class="span3" name="fin" value="<?=$resultadoD["proy_fin"];?>" required>
+										<input type="date" class="span3" name="proy_fin" value="<?=$resultadoD["proy_fin"];?>" required>
 									</div>
 								</div>
                                 
@@ -150,7 +124,7 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Estado</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span3" tabindex="2" name="estado">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span3" tabindex="2" name="proy_estado">
 											<option value=""></option>
                                             <option value="1" <?php if($resultadoD["proy_estado"]==1){echo "selected";}?> >En espera</option>
                                             <option value="2" <?php if($resultadoD["proy_estado"]==2){echo "selected";}?>>En proceso</option>
