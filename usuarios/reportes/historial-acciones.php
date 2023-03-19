@@ -1,5 +1,4 @@
 <?php include("../sesion.php");?>
-<?php include("../../conexion.php");?>
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
@@ -10,9 +9,13 @@
 
 							<h1 style="text-align:center;">INFORMES</h1>
                             <h2 style="text-align:center;">HISTORIAL DE ACCIONES</h2>
-                            <table width="90%" border="1" rules="all" align="center">
+							<div align="center">
+								<img src="../files/<?= $configuracion['conf_logo']; ?>" alt="<?= $configuracion['conf_empresa']; ?>" width="120">
+							</div>
+
+                            <table width="100%" border="1" rules="all" align="center">
 							<thead>
-							<tr>
+							<tr style="height: 30px; background-color:darkblue; color:white;">
 								<th>No</th>
                                 <th>Fecha</th>
                                 <th>Usuario</th>
@@ -31,14 +34,13 @@
 							if(isset($_POST["hasta"]) and $_POST["hasta"]!=""){
 								$filtro .= " AND (hil_fecha<='".$_POST["hasta"]."')";
 							}
-							$consulta = mysql_query("SELECT * FROM historial_acciones
-							INNER JOIN usuarios ON usr_id=hil_usuario
-							INNER JOIN paginas ON pag_id=hil_titulo
+							$consulta = $conexionBdPrincipal->query("SELECT * FROM ".BDADMIN.".historial_acciones
+							INNER JOIN ".MAINBD.".usuarios ON usr_id=hil_usuario
+							INNER JOIN ".BDADMIN.".paginas ON pag_id=hil_id_pagina
 							WHERE hil_id=hil_id ".$filtro."
-							ORDER BY ".$_POST["orden"]." ".$_POST["formaOrden"]."",$conexion);
+							ORDER BY ".$_POST["orden"]." ".$_POST["formaOrden"]."");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
-								$encargado = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['cseg_usuario_encargado']."'",$conexion));
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 							?>
 							<tr>
 								<td align="center"><?=$no;?></td>
