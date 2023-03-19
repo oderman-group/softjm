@@ -1,0 +1,1 @@
+ALTER TABLE orioncrmcom_dev_jm_crm.proyectos MODIFY COLUMN proy_creada_fecha TIMESTAMP NOT NULL;
