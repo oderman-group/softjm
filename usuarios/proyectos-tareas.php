@@ -1,21 +1,13 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
 $idPagina = 108;
-$paginaActual['pag_nombre'] = "Tareas";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$proyecto = mysql_fetch_array(mysql_query("SELECT * FROM proyectos 
-WHERE proy_id='".$_GET["proy"]."'",$conexion));
-?>
-<!-- styles -->
 
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 
+$consulta = $conexionBdPrincipal->query("SELECT * FROM proyectos WHERE proy_id='".$_GET["proy"]."'");
+$proyecto = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+?>
 
 <link href="css/tablecloth.css" rel="stylesheet">
 
@@ -140,12 +132,6 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?>:  <strong><?=$proyecto['proy_titulo'];?></strong></h3>
-						<ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -193,7 +179,7 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
 										<input type="hidden" name="proy" value="<?=$_GET["proy"];?>">
                                         <div class="search-box">
                                             <div class="input-append input-icon">
-                                                <input class="search-input" placeholder="Buscar..." type="text" name="busqueda" value="<?=$_GET["busqueda"];?>">
+                                                <input class="search-input" placeholder="Buscar..." type="text" name="busqueda" value="<?php if(isset($_GET["busqueda"])) echo $_GET["busqueda"];?>">
                                                 <i class=" icon-search"></i>
                                                 <input class="btn" type="submit" name="buscar" value="Buscar">
                                             </div>
@@ -218,21 +204,24 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
 							<tbody>
                             <?php
 							
-								$consulta = mysql_query("SELECT * FROM proyectos_tareas
+								$consulta = $conexionBdPrincipal->query("SELECT * FROM proyectos_tareas
 								INNER JOIN usuarios ON usr_id=ptar_responsable
 								WHERE ptar_id_proyecto='".$_GET["proy"]."'
 								LIMIT $inicio, $limite
-								",$conexion);
+								");
 							
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqlI_fetch_array($consulta, MYSQLI_BOTH)){
+
+								$creadaConsulta = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res["ptar_creada_usuario"]."'");
+								$creada = mysqli_fetch_array($creadaConsulta, MYSQLI_BOTH);
 								
-								$creada = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res["ptar_creada_usuario"]."'",$conexion));
-								
-								$numeros = mysql_fetch_array(mysql_query("
+								$numerosConsulta = $conexionBdPrincipal->query("
 								SELECT
-								(SELECT count(ptar_id) FROM proyectos_tareas WHERE ptar_id_proyecto='".$res['proy_id']."')
-								",$conexion));
+								(SELECT count(ptar_id) FROM proyectos_tareas WHERE ptar_id_proyecto='".$_GET["proy"]."'),
+								(SELECT ROUND(AVG(ptar_avance),2) FROM proyectos_tareas WHERE ptar_id_proyecto='".$_GET["proy"]."')
+								");
+								$numeros = mysqli_fetch_array($numerosConsulta, MYSQLI_BOTH);
 								
 								$color1='#FFF';
 								if($numeros[0]==0){$color1='#FFF090';}
@@ -249,7 +238,7 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
 										<?php if($res['ptar_creada_usuario']==$_SESSION["id"]){?>
                                         <a href="proyectos-tareas-editar.php?id=<?=$res['ptar_id'];?>&proy=<?=$_GET["proy"];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
 										
-                                        <a href="sql.php?get=36&id=<?=$res['ptar_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                        <a href="bd_delete/proyectos-tareas-eliminar.php?id=<?=$res['ptar_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 										<?php }?>
                                 	</h4>
                                 </td>

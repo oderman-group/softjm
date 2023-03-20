@@ -78,18 +78,20 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 							<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Sistema <b class="icon-angle-down"></b></a>
 							<div class="dropdown-menu">
 								<ul>
+								<?php if(validarAccesoModulo($configuracion['conf_id_empresa'], 8)){?>
 									<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Parametrización</a>
-									<div class="dropdown-menu">
-										<ul>
-											<li><a href="configuracion.php"><i class=" icon-file-alt"></i> Configuración</a></li>
-											<li><a href="configuracion-color-encabezado.php"><i class=" icon-file-alt"></i> Configuración Encabezado</a></li>
-											<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
-												<li><a href="metricas.php?id=1"><i class="icon-cogs"></i> Métricas </a></li>
-											<?php }?>
-											<li><a href="estructura-mensajes.php"><i class=" icon-file-alt"></i> Estructura de mensajes</a></li>
-										</ul>
-									</div>
+										<div class="dropdown-menu">
+											<ul>
+												<li><a href="configuracion.php"><i class=" icon-file-alt"></i> Configuración</a></li>
+												<li><a href="configuracion-color-encabezado.php"><i class=" icon-file-alt"></i> Configuración Encabezado</a></li>
+												<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
+													<li><a href="metricas.php?id=1"><i class="icon-cogs"></i> Métricas </a></li>
+												<?php }?>
+												<li><a href="estructura-mensajes.php"><i class=" icon-file-alt"></i> Estructura de mensajes</a></li>
+											</ul>
+										</div>
 									</li>
+								<?php }?>
 									<li><a href="modulos.php"><i class=" icon-unlock"></i>Módulos</a></li>
 									<li><a href="paginas.php"><i class="icon-file"></i> Páginas</a></li>
 									<li><a href="buzon.php"><i class="icon-envelope"></i> Buzón de salida </a></li>

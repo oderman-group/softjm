@@ -1,17 +1,12 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
 $idPagina = 112;
-$paginaActual['pag_nombre'] = "Agregar tarea";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$proyecto = mysql_fetch_array(mysql_query("SELECT * FROM proyectos 
-WHERE proy_id='".$_GET["proy"]."'",$conexion));
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consulta = $conexionBdPrincipal->query("SELECT * FROM proyectos WHERE proy_id='".$_GET["proy"]."'");
+$proyecto = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
@@ -55,9 +50,7 @@ include("includes/js-formularios.php");
 <body>
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
-    
-    
-    
+
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
@@ -69,13 +62,6 @@ include("includes/js-formularios.php");
 						<strong>Proyecto:</strong> <?=$proyecto['proy_titulo'];?><br>
 						<strong>Fechas:</strong> De <?=$proyecto['proy_inicio']." a ".$proyecto['proy_fin'];?>
 						</p>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -93,32 +79,32 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="50">
-							<input type="hidden" name="proyecto" value="<?=$_GET["proy"];?>">
+							<form class="form-horizontal" method="post" action="bd_create/proyectos-tareas-guardar.php">
+
+							<input type="hidden" name="ptar_id_proyecto" value="<?=$_GET["proy"];?>">
 								
 								<div class="control-group">
 									<label class="control-label">Titulo de la tarea</label>
 									<div class="controls">
-										<input type="text" class="span10" name="titulo" required>
+										<input type="text" class="span10" name="ptar_titulo" required>
 									</div>
 								</div>
 								
 								<div class="control-group">
 									<label class="control-label">Descripción</label>
 									<div class="controls">
-										<textarea rows="8" cols="80" style="width: 80%" class="tinymce-simple" name="descripcion"></textarea>
+										<textarea rows="8" cols="80" style="width: 80%" class="tinymce-simple" name="ptar_descripcion"></textarea>
 									</div>
 								</div>
 								
                                <div class="control-group">
 									<label class="control-label">Responsable principal</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="responsable" onChange="clientes(this)">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ptar_responsable">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM usuarios WHERE usr_bloqueado=0",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado=0");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($proyecto["proy_responsable_principal"]==$resOp[0]){echo "selected";}?>><?=$resOp['usr_nombre'];?></option>
                                             <?php
@@ -132,14 +118,14 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Fecha inicio</label>
 									<div class="controls">
-										<input type="date" class="span3" name="inicio" value="<?=date("Y-m-d");?>" required>
+										<input type="date" class="span3" name="ptar_inicio" value="<?=date("Y-m-d");?>" required>
 									</div>
 								</div>
                                 
                                 <div class="control-group">
 									<label class="control-label">Fecha de entrega (Ideal)</label>
 									<div class="controls">
-										<input type="date" class="span3" name="fin" required>
+										<input type="date" class="span3" name="ptar_fin" required>
 									</div>
 								</div>
                                 
@@ -147,7 +133,7 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Avance</label>
 									<div class="controls">
-										<input type="text" class="span3" name="avance">
+										<input type="text" class="span3" name="ptar_avance">
 									</div>
 								</div>
                                

@@ -1374,47 +1374,13 @@ if ($_POST["idSql"] == 47) {
 	exit();
 }
 //AGREGAR PROYECTOS
-if ($_POST["idSql"] == 48) {
-	mysql_query("INSERT INTO proyectos(proy_titulo, proy_descripcion, proy_inicio, proy_fin, proy_creada_usuario, proy_creada_fecha, proy_responsable_principal, proy_estado)VALUES('" . $_POST["titulo"] . "','" . $_POST["descripcion"] . "','" . $_POST["inicio"] . "','" . $_POST["fin"] . "','" . $_SESSION["id"] . "',now(),'" . $_POST["responsable"] . "','" . $_POST["estado"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsertU = mysql_insert_id();
-	echo '<script type="text/javascript">window.location.href="proyectos-tareas-agregar.php?proy=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
+
 //EDITAR PROYECTOS
-if ($_POST["idSql"] == 49) {
-	mysql_query("UPDATE proyectos SET proy_titulo='" . $_POST["titulo"] . "', proy_descripcion='" . $_POST["descripcion"] . "', proy_inicio='" . $_POST["inicio"] . "', proy_fin='" . $_POST["fin"] . "', proy_responsable_principal='" . $_POST["responsable"] . "', proy_estado='" . $_POST["estado"] . "', proy_ultima_modificacion=now(), proy_usuario_modificacion='" . $_SESSION["id"] . "' WHERE proy_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="proyectos-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
+
 //AGREGAR TAREAS-PROYECTOS
-if ($_POST["idSql"] == 50) {
-	mysql_query("INSERT INTO proyectos_tareas(ptar_titulo, ptar_descripcion, ptar_inicio, ptar_fin, ptar_creada_usuario, ptar_creada_fecha, ptar_id_proyecto, ptar_responsable, ptar_avance)VALUES('" . $_POST["titulo"] . "','" . $_POST["descripcion"] . "','" . $_POST["inicio"] . "','" . $_POST["fin"] . "','" . $_SESSION["id"] . "',now(),'" . $_POST["proyecto"] . "','" . $_POST["responsable"] . "','" . $_POST["avance"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsertU = mysql_insert_id();
-	echo '<script type="text/javascript">window.location.href="proyectos-tareas.php?proy=' . $_POST["proyecto"] . '&msg=1";</script>';
-	exit();
-}
+
 //EDITAR TAREAS-PROYECTOS
-if ($_POST["idSql"] == 51) {
-	mysql_query("UPDATE proyectos_tareas SET ptar_titulo='" . $_POST["titulo"] . "', ptar_descripcion='" . $_POST["descripcion"] . "', ptar_inicio='" . $_POST["inicio"] . "', ptar_fin='" . $_POST["fin"] . "', ptar_responsable='" . $_POST["responsable"] . "', ptar_avance='" . $_POST["avance"] . "', ptar_ultima_modificacion=now(), ptar_usuario_modificacion='" . $_SESSION["id"] . "' WHERE ptar_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="proyectos-tareas-editar.php?id=' . $_POST["id"] . '&proy=' . $_POST["proy"] . '&msg=2";</script>';
-	exit();
-}
+
 //AGREGAR EVENTOS AL CALENDARIO
 if ($_POST["idSql"] == 52) {
 	mysql_query("INSERT INTO agenda(age_evento, age_fecha, age_usuario, age_inicio, age_fin, age_lugar, age_notas, age_cliente)VALUES('" . $_POST["evento"] . "','" . $_POST["fecha"] . "','" . $_SESSION["id"] . "','" . $_POST["inicio"] . "','" . $_POST["fin"] . "','" . $_POST["lugar"] . "','" . $_POST["notas"] . "','" . $_POST["cliente"] . "')", $conexion);
@@ -1612,26 +1578,9 @@ if ($_POST["idSql"] == 55) {
 //SUBIR FOTOS A LOS PRODUCTOS
 
 //AGREGAR AREAS
-if ($_POST["idSql"] == 65) {
-	mysql_query("INSERT INTO areas(ar_nombre)VALUES('" . $_POST["nombre"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsertU = mysql_insert_id();
-	echo '<script type="text/javascript">window.location.href="areas-editar.php?id=' . $idInsertU . '";</script>';
-	exit();
-}
+
 //EDITAR AREAS
-if ($_POST["idSql"] == 66) {
-	mysql_query("UPDATE areas SET ar_nombre='" . $_POST["nombre"] . "' WHERE ar_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="areas-editar.php?id=' . $_POST["id"] . '";</script>';
-	exit();
-}
+
 //ESTABA AQUI EDITAR PERFIL
 
 //GESTIONAR PRODUCTOS CON PRECIO PREDETERMINADO
@@ -2345,26 +2294,9 @@ if ($_POST["idSql"] == 86) {
 //aquí iba la parte de actualizar las métricas.
 
 //AGREGAR SUCURSALES
-if ($_POST["idSql"] == 88) {
-	mysql_query("INSERT INTO sucursales_propias(sucp_nombre)VALUES('" . $_POST["nombre"] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	$idInsertU = mysql_insert_id();
-	echo '<script type="text/javascript">window.location.href="sucursales-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
+
 //EDITAR SUCURSALES
-if ($_POST["idSql"] == 89) {
-	mysql_query("UPDATE sucursales_propias SET sucp_nombre='" . $_POST["nombre"] . "' WHERE sucp_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="sucursales-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
+
 //EDITAR CLIENTES ORION
 
 //AGREGAR CLIENTES ORION
@@ -3125,16 +3057,7 @@ if ($_GET["get"] == 56) {
 	exit();
 }
 
-if ($_GET["get"] == 58) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysql_query("DELETE FROM areas WHERE ar_id='" . $_GET["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo informarErrorAlUsuario(__LINE__, mysql_error());
-		exit();
-	}
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //COTIZACIÓN VENDIDA
 if ($_GET["get"] == 59) {
 	mysql_query("UPDATE cotizacion SET cotiz_vendida=1, cotiz_fecha_vendida=now() WHERE cotiz_id='" . $_GET["id"] . "'", $conexion);

@@ -1,17 +1,12 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
 $idPagina = 112;
-$paginaActual['pag_nombre'] = "Editar tarea";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM proyectos_tareas 
-WHERE ptar_id='".$_GET["id"]."'",$conexion));
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consulta = $conexionBdPrincipal->query("SELECT * FROM proyectos_tareas WHERE ptar_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
@@ -88,33 +83,33 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="51">
-							<input type="hidden" name="proy" value="<?=$_GET["proy"];?>">
+							<form class="form-horizontal" method="post" action="bd_update/proyectos-tareas-actualizar.php">
+
+							<input type="hidden" name="ptar_id_proyecto" value="<?=$_GET["proy"];?>">
 								<input type="hidden" name="id" value="<?=$_GET["id"];?>">
 								
 								<div class="control-group">
 									<label class="control-label">Titulo de la tarea</label>
 									<div class="controls">
-										<input type="text" class="span10" name="titulo" value="<?=$resultadoD["ptar_titulo"];?>" required>
+										<input type="text" class="span10" name="ptar_titulo" value="<?=$resultadoD["ptar_titulo"];?>" required>
 									</div>
 								</div>
 								
 								<div class="control-group">
 									<label class="control-label">Descripción</label>
 									<div class="controls">
-										<textarea rows="8" cols="80" style="width: 80%" class="tinymce-simple" name="descripcion"><?=$resultadoD["ptar_descripcion"];?></textarea>
+										<textarea rows="8" cols="80" style="width: 80%" class="tinymce-simple" name="ptar_descripcion"><?=$resultadoD["ptar_descripcion"];?></textarea>
 									</div>
 								</div>
 								
                                <div class="control-group">
 									<label class="control-label">Responsable principal</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="responsable">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ptar_responsable">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM usuarios WHERE usr_bloqueado=0",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado=0");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD["ptar_responsable"]==$resOp[0]){echo "selected";}?>><?=$resOp['usr_nombre'];?></option>
                                             <?php
@@ -128,14 +123,14 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Fecha inicio</label>
 									<div class="controls">
-										<input type="date" class="span3" name="inicio" value="<?=$resultadoD["ptar_inicio"];?>" required>
+										<input type="date" class="span3" name="ptar_inicio" value="<?=$resultadoD["ptar_inicio"];?>" required>
 									</div>
 								</div>
                                 
                                 <div class="control-group">
 									<label class="control-label">Fecha de entrega (Ideal)</label>
 									<div class="controls">
-										<input type="date" class="span3" name="fin" value="<?=$resultadoD["ptar_fin"];?>" required>
+										<input type="date" class="span3" name="ptar_fin" value="<?=$resultadoD["ptar_fin"];?>" required>
 									</div>
 								</div>
                                 
@@ -143,7 +138,7 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Avance</label>
 									<div class="controls">
-										<input type="text" class="span3" value="<?=$resultadoD["ptar_avance"];?>" name="avance">
+										<input type="text" class="span3" value="<?=$resultadoD["ptar_avance"];?>" name="ptar_avance">
 									</div>
 								</div>
                                

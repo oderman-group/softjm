@@ -1,34 +1,15 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
 $idPagina = 138;
-$paginaActual['pag_nombre'] = "Editar Sucursales";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM sucursales_propias WHERE sucp_id='".$_GET["id"]."'",$conexion));
-?>
-<!-- styles -->
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consulta = $conexionBdPrincipal->query("SELECT * FROM sucursales_propias WHERE sucp_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+?>
+
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -50,18 +31,12 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM sucursales_propias WH
 include("includes/js-formularios.php");
 ?>
 
-<script type="text/javascript">
-							document.getElementById("solo").innerHTML='hola';
-                        </script>
-
 <?php include("includes/funciones-js.php");?>
 </head>
 <body>
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
-    
-    
-    
+
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
@@ -84,12 +59,10 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
-            <p><a href="sucursales-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a> <div id="solo"></div></p>
+            <p><a href="sucursales-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
             
             <?php include("includes/notificaciones.php");?>                  
 						
-
-
 
             <div class="row-fluid">
 				<div class="span12">
@@ -98,24 +71,17 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?> </h3>
 						</div>
                         
-						
-                        
-                        
-                        
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="89">
+							<form class="form-horizontal" method="post" action="bd_update/sucursales-actualizar.php">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
                                 
                                 <div class="control-group">
 									<label class="control-label">Nombre</label>
 									<div class="controls">
-										<input type="text" class="span4" name="nombre" id="nombre" value="<?=$resultadoD['sucp_nombre'];?>">
+										<input type="text" class="span4" name="sucp_nombre" value="<?=$resultadoD['sucp_nombre'];?>">
 									</div>
 								</div>
                                 
-                                
-                               
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
                                     <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
