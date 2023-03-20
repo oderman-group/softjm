@@ -4,11 +4,6 @@ include("conexion.php");
 
 if(isset($_SESSION["id"])){
 	$query = $conexionBdPrincipal->query("UPDATE usuarios SET usr_sesion=0, usr_ultima_salida=now() WHERE usr_id='".$_SESSION["id"]."'");
-	
-	if (!$query) {
-		printf("Error message: %s\n", $conexionBdPrincipal->error);
-		exit();
-	}
 }
 
 session_destroy();

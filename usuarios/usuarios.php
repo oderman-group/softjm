@@ -26,7 +26,7 @@ include("includes/head.php");
 <script type="text/javascript">
 	$(function () {
 		$('#data-table').dataTable({
-			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
+			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
 			"oTableTools": {
 			"aButtons": [
 				"copy",
@@ -132,11 +132,11 @@ include("includes/head.php");
 												$bloq = array("NO","SI");	
 												while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 													$estadoSesion = 'gris.jpg';
-													if($res['usr_sesion']==1){$estadoSesion = 'verde.jpg';}
+													if(empty($res['usr_sesion']) && $res['usr_sesion']==1){$estadoSesion = 'verde.jpg';}
 											?>
 											<tr>
 												<td><?=$no;?></td>
-												<td><img src="files/fotos/<?=$res['usr_foto'];?>" width="100"></td>
+												<td><img src="files/fotos/<?=$res['usr_foto'];?>" width="70"></td>
 												<td>
 													<?=$res['usr_nombre'];?><br>
 													<span style="text-decoration: underline; color:blue; font-style: italic;"><?=$res['usr_email'];?></span>
@@ -145,12 +145,12 @@ include("includes/head.php");
 												<td><a href="#areas-editar.php?id=<?=$res['usr_area'];?>"><?=$res['ar_nombre'];?></a></td>
 												<td><?=$res['usr_login'];?></td>
 												<td><?=$bloq[$res['usr_bloqueado']];?></td>
-												<td><img src="files/<?=$estadoSesion;?>"></td>
+												<td><img src="files/<?=$estadoSesion;?>" width="20"></td>
 												<td><?=$res['usr_ultimo_ingreso'];?></td>
 
 												<td>
 													<input id="<?= $res['usr_id']; ?>" type="text"  value="<?= $res['usr_meta_ventas']; ?>" style="width: 80px; text-align: center" onChange="usuarios(this)">
-													<span style="display: none;"><?=number_format($res['usr_meta_ventas'],0,".",".");?></span>
+													<span style="display: none;"><?php if(!empty($res['usr_meta_ventas']) && is_numeric($res['usr_meta_ventas'])) echo number_format($res['usr_meta_ventas'],0,".",".");?></span>
 													
 												</td>
 

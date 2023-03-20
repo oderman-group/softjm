@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-const RUTA_PROYECTO = "C:/xampp/htdocs/works-projects/softjm";
+require_once("../constantes.php");
 
 if( $_SESSION["id"]=="" || !is_numeric($_SESSION["id"]) ){
 	header("Location:../salir.php");
