@@ -29,7 +29,7 @@ function informarErrorAlUsuario($linea, $error){
 
 		<p>
 		DETALLES:<br>
-		<b>URL:</b> ".$_SERVER[REQUEST_URI]."<br>
+		<b>URL:</b> ".$_SERVER['REQUEST_URI']."<br>
 		<b>Linea:</b> $linea<br>
 		<b>Fecha y hora:</b> $DateAndTime
 		</p>

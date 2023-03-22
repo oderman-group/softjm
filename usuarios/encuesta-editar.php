@@ -1,16 +1,11 @@
 <?php include("sesion.php");?>
 <?php
-$idPagina = 52;
-$paginaActual['pag_nombre'] = "Editar Encuesta";
+$idPagina = 231;
 ?>
 <?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM encuesta_satisfaccion WHERE encs_id='".$_GET["id"]."'",$conexion));
+<?php include("includes/head.php");
+$consultaEncuesta=mysqli_query($conexionBdPrincipal,"SELECT * FROM encuesta_satisfaccion WHERE encs_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consultaEncuesta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
@@ -105,8 +100,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="cliente">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM clientes",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['cli_id'];?>" <?php if($resultadoD['encs_cliente']==$resOp[0]){echo "selected";}?>><?=$resOp['cli_nombre'];?></option>
                                             <?php
@@ -122,8 +117,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="usuario">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM usuarios",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['usr_id'];?>" <?php if($resultadoD['encs_atendido']==$resOp[0]){echo "selected";}?>><?=$resOp['usr_nombre'];?></option>
                                             <?php
@@ -140,8 +135,8 @@ include("includes/js-formularios.php");
 											<option value="0"></option>
                                             <option value="0">Ninguno</option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM productos",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['prod_id'];?>" <?php if($resultadoD['encs_producto']==$resOp[0]){echo "selected";}?>><?=$resOp['prod_nombre'];?></option>
                                             <?php

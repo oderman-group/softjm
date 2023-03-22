@@ -1,19 +1,10 @@
 <?php include("usuarios/sesion.php");?>
 <?php
-/*
-if($_SERVER['HTTP_REFERER']==""){
-	echo '<script type="text/javascript">window.location.href="index.php";</script>';
-	exit();
-}
-*/
-?>
-<?php include("conexion.php");?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM encuesta_satisfaccion
+$resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM encuesta_satisfaccion
 INNER JOIN clientes ON cli_id=encs_cliente
 INNER JOIN usuarios ON usr_id=encs_atendido
-WHERE encs_id='".$_GET["id"]."'",$conexion));
-$producto = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_id='".$resultadoD['encs_producto']."'",$conexion));
+WHERE encs_id='".$_GET["id"]."'"), MYSQLI_BOTH);
+$producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$resultadoD['encs_producto']."'"), MYSQLI_BOTH);
 if($resultadoD[5]!=""){
 ?>
 		<span style='font-family:Arial; color:red;'>Esta encuesta ya ha sido contestada. Redireccionando al inicio.</samp>
