@@ -5,13 +5,6 @@ $paginaActual['pag_nombre'] = "Facturas";
 ?>
 <?php include("includes/verificar-paginas.php"); ?>
 <?php include("includes/head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
-?>
 <!-- styles -->
 
 
@@ -33,46 +26,9 @@ if (mysql_errno() != 0) {
 <script src="js/bootbox.js"></script>
 
 <script type="text/javascript">
-	/*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
 	$(function() {
 		$('#data-table').dataTable({
 			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-			/*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
 		});
 	});
 	$(function() {
@@ -190,25 +146,26 @@ if (mysql_errno() != 0) {
 										
 
 										if (isset($_GET["cte"]) and $_GET["cte"] != "") {
-											$consulta = mysql_query("SELECT * FROM facturas
+											$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
 								LEFT JOIN clientes ON cli_id=factura_cliente AND cli_id='" . $_GET["cte"] . "'
 								ORDER BY factura_id DESC
-								", $conexion);
+								");
 										} else {
-											$consulta = mysql_query("SELECT * FROM facturas
+											$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
 								LEFT JOIN clientes ON cli_id=factura_cliente
 								LEFT JOIN proveedores ON prov_id=factura_proveedor
 								INNER JOIN usuarios ON usr_id=factura_creador
 								WHERE factura_id=factura_id $filtro
 								ORDER BY factura_id DESC
-								", $conexion);
+								");
 										}
 										$no = 1;
 										$sumaFacturasSinIva = 0;
 										$sumaFacturasConIva = 0;
-										while ($res = mysql_fetch_array($consulta)) {
+										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 											if ($datosUsuarioActual[3] != 1) {
-												$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'", $conexion));
+												$consultaZona=mysqli_query($conexionBdPrincipal, "SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
+												$numZ = mysqli_num_rows($consultaZona);
 												if ($numZ == 0) continue;
 											}
 
@@ -216,14 +173,15 @@ if (mysql_errno() != 0) {
 												continue;
 											}
 
-											$vendedor = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='" . $res['factura_vendedor'] . "'", $conexion));
+											$consultaVendedor=mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='" . $res['factura_vendedor'] . "'");
+											$vendedor = mysqli_fetch_array($consultaVendedor, MYSQLI_BOTH);
 
 
 											
-											$consultaTotal = mysql_query("SELECT * FROM cotizacion_productos
+											$consultaTotal = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
 													WHERE czpp_cotizacion='".$res['factura_id']."' AND czpp_tipo=4 AND czpp_valor>0 AND czpp_cantidad>0
 													GROUP BY czpp_id
-													",$conexion);
+													",$conexionBdPrincipal);
 
 												$total = 0;
 												$sumaTotal = 0;
@@ -236,7 +194,7 @@ if (mysql_errno() != 0) {
 												$totalFinal = 0;
 												$sumaTotalFinal = 0;
 
-												while($datos = mysql_fetch_array($consultaTotal)){
+												while($datos = mysqli_fetch_array($consultaTotal, MYSQLI_BOTH)){
 
 													$total = ($datos['czpp_valor'] * $datos['czpp_cantidad']);
 													$sumaTotal += $total;
@@ -297,12 +255,12 @@ if (mysql_errno() != 0) {
 												<td><?= strtoupper($res['prov_nombre']); ?></td>
 												<td>
 													<?php
-													$productos = mysql_query("SELECT * FROM cotizacion_productos
+													$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
 													INNER JOIN productos ON prod_id=czpp_producto
 													WHERE czpp_cotizacion='" . $res['factura_id'] . "' AND czpp_tipo=4
-													", $conexion);
+													");
 													$i = 1;
-													while ($prod = mysql_fetch_array($productos)) {
+													while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 														echo "<b>" . $i . ".</b> " . $prod['prod_nombre'] . ", ";
 														$i++;
 													}
