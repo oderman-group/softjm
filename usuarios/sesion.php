@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-const RUTA = "C:/xampp/htdocs/softjm";
+require_once($_SERVER['DOCUMENT_ROOT']."/softjm/constantes.php");
 
 if( $_SESSION["id"]=="" || !is_numeric($_SESSION["id"]) ){
 	header("Location:../salir.php");
@@ -10,7 +10,7 @@ if( $_SESSION["id"]=="" || !is_numeric($_SESSION["id"]) ){
 	
 $tiempo_inicial = microtime(true);
 	
-require_once(RUTA."/conexion.php");
-require_once(RUTA."/usuarios/config/config.php");
-require_once(RUTA."/usuarios/includes/funciones-para-el-sistema.php");
-require_once(RUTA."/usuarios/includes/sesion-usuario-actual.php");
+require_once(RUTA_PROYECTO."/conexion.php");
+require_once(RUTA_PROYECTO."/usuarios/config/config.php");
+require_once(RUTA_PROYECTO."/usuarios/includes/funciones-para-el-sistema.php");
+require_once(RUTA_PROYECTO."/usuarios/includes/sesion-usuario-actual.php");
