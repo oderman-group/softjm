@@ -181,7 +181,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 											$consultaTotal = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
 													WHERE czpp_cotizacion='".$res['factura_id']."' AND czpp_tipo=4 AND czpp_valor>0 AND czpp_cantidad>0
 													GROUP BY czpp_id
-													",$conexionBdPrincipal);
+													");
 
 												$total = 0;
 												$sumaTotal = 0;
