@@ -5,10 +5,6 @@ $paginaActual['pag_nombre'] = "Calendario";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
 
 <?php
 if(is_numeric($_GET["id"])){
@@ -16,15 +12,16 @@ if(is_numeric($_GET["id"])){
 }else{
 	$usuarioID = $_SESSION["id"];
 }
+$consultaCalendario=mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='".$usuarioID."'");
+$usuarioCalendario = mysqli_fetch_array($consultaCalendario, MYSQLI_BOTH);
 
-$usuarioCalendario = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$usuarioID."'",$conexion));
-
-$consulta = mysql_query("SELECT cseg_id, cseg_asunto, cseg_fecha_proximo_contacto, cseg_usuario_encargado, cseg_realizado, cseg_tiket, cseg_cliente, DAY(cseg_fecha_proximo_contacto) as dia, MONTH(cseg_fecha_proximo_contacto) as mes, YEAR(cseg_fecha_proximo_contacto) as agno FROM cliente_seguimiento 
+$consulta = mysqli_query($conexionBdPrincipal, "SELECT cseg_id, cseg_asunto, cseg_fecha_proximo_contacto, cseg_usuario_encargado, cseg_realizado, cseg_tiket, cseg_cliente, DAY(cseg_fecha_proximo_contacto) as dia, MONTH(cseg_fecha_proximo_contacto) as mes, YEAR(cseg_fecha_proximo_contacto) as agno FROM cliente_seguimiento 
 WHERE cseg_usuario_encargado='".$usuarioID."' AND YEAR(cseg_fecha_proximo_contacto)>='".date("Y")."' AND MONTH(cseg_fecha_proximo_contacto)>='".date("m")."'
 LIMIT 0,8
-",$conexion);
-$contReg=1; 
-while($resultado = mysql_fetch_array($consulta)){
+");
+$contReg=1;
+$eventos="";
+while($resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 	
 	$color = 'orange';
 	if($resultado["cseg_realizado"]==1){$color='blue';}
@@ -42,13 +39,13 @@ while($resultado = mysql_fetch_array($consulta)){
 $eventos = substr($eventos,0,-1);
 
 
-$proyectos = mysql_query("SELECT proy_id, proy_titulo, proy_descripcion, proy_inicio, proy_fin, proy_responsable_principal, proy_estado, DAY(proy_fin) as dia, MONTH(proy_fin) as mes, YEAR(proy_fin) as agno FROM proyectos 
+$proyectos = mysqli_query($conexionBdPrincipal, "SELECT proy_id, proy_titulo, proy_descripcion, proy_inicio, proy_fin, proy_responsable_principal, proy_estado, DAY(proy_fin) as dia, MONTH(proy_fin) as mes, YEAR(proy_fin) as agno FROM proyectos 
 WHERE proy_responsable_principal='".$usuarioID."' AND YEAR(proy_fin)>='".date("Y")."' AND MONTH(proy_fin)>='".date("m")."'
 LIMIT 0,8
-",$conexion);
+");
 
 $i=1;
-while($proy = mysql_fetch_array($proyectos)){
+while($proy = mysqli_fetch_array($proyectos, MYSQLI_BOTH)){
 	
 	$proy["mes"]--;
 	
@@ -67,13 +64,13 @@ while($proy = mysql_fetch_array($proyectos)){
 $eventos = substr($eventos,0,-1);
 
 
-$agenda = mysql_query("SELECT age_id, age_evento, age_fecha, age_usuario, DAY(age_fecha) as dia, MONTH(age_fecha) as mes, YEAR(age_fecha) as agno FROM agenda 
+$agenda = mysqli_query($conexionBdPrincipal, "SELECT age_id, age_evento, age_fecha, age_usuario, DAY(age_fecha) as dia, MONTH(age_fecha) as mes, YEAR(age_fecha) as agno FROM agenda 
 WHERE age_usuario='".$usuarioID."' AND YEAR(age_fecha)>='".date("Y")."' AND MONTH(age_fecha)>='".date("m")."'
 LIMIT 0,8
-",$conexion);
+");
 
 $i=1;
-while($age = mysql_fetch_array($agenda)){
+while($age = mysqli_fetch_array($agenda, MYSQLI_BOTH)){
 	
 	$age["mes"]--;
 	

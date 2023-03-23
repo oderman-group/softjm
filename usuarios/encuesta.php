@@ -1,14 +1,9 @@
 <?php include("sesion.php");?>
 <?php
-$idPagina = 50;
-$paginaActual['pag_nombre'] = "Encuestas";
+$idPagina = 229;
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
 <!-- styles -->
 
 
@@ -29,46 +24,9 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <script src="js/ios-orientationchange-fix.js"></script>
 <script src="js/bootbox.js"></script>
 <script type="text/javascript">
-            /*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
             $(function () {
                 $('#data-table').dataTable({
                     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                    /*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
                 });
             });
             $(function () {
@@ -142,26 +100,28 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							<tbody>
                             <?php
 							if(isset($_GET["cte"]) and $_GET["cte"]!=""){
-								$consulta = mysql_query("SELECT * FROM encuesta_satisfaccion
+								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM encuesta_satisfaccion
 								INNER JOIN clientes ON cli_id=encs_cliente
 								INNER JOIN usuarios ON usr_id=encs_atendido
 								INNER JOIN contactos ON cont_id=encs_contacto
 								WHERE encs_cliente='".$_GET["cte"]."'
-								",$conexion);
+								");
 							}else{
-								$consulta = mysql_query("SELECT * FROM encuesta_satisfaccion
+								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM encuesta_satisfaccion
 								INNER JOIN clientes ON cli_id=encs_cliente
 								INNER JOIN usuarios ON usr_id=encs_atendido
 								INNER JOIN contactos ON cont_id=encs_contacto
-								",$conexion);
+								");
 							}
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								if($datosUsuarioActual[3]!=1){
-									$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'",$conexion));
+									$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'");
+									$numZ = mysqli_num_rows($consultaZonas);
 									if($numZ==0) continue;
 								}
-								$producto = mysql_fetch_array(mysql_query("SELECT * FROM productos WHERE prod_id='".$res['encs_producto']."'",$conexion));
+								$consultaProductos=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$res['encs_producto']."'");
+								$producto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH);
 								$promedio='-';
 								if($res['encs_p1']!=""){
 									$promedio = ($res['encs_p1']+$res['encs_p2']+$res['encs_p3']+$res['encs_p4']+$res['encs_p5'])/5;

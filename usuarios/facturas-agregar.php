@@ -5,10 +5,6 @@ $paginaActual['pag_nombre'] = "Agregar factura de venta";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
 <!-- styles -->
 
 <!--[if IE 7]>
@@ -104,10 +100,11 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" onChange="clientes(this)" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM clientes",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												if($datosUsuarioActual[3]!=1){
-													$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'",$conexion));
+													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
+													$numZ = mysqli_num_rows($consultaZonas);
 													if($numZ==0) continue;
 												}
 											?>
@@ -144,8 +141,8 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" onChange="provee(this)" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysql_query("SELECT * FROM proveedores",$conexion);
-											 while($resOp = mysql_fetch_array($conOp)){
+											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores");
+											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>" <?php if(isset($_GET["prov"]) and $_GET["prov"]!="" and $_GET["prov"]==$resOp[0]) echo "selected";?>><?=$resOp['prov_nombre'];?></option>
 											 <?php
@@ -166,8 +163,9 @@ include("includes/js-formularios.php");
 								
 								
 								<?php
-								$clienteInfo = mysql_fetch_array(mysql_query("SELECT * FROM clientes 
-								WHERE cli_id='".$_GET['cte']."'",$conexion));
+								$consultaInfo=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes 
+								WHERE cli_id='".$_GET['cte']."'");
+								$clienteInfo = mysqli_fetch_array($consultaInfo, MYSQLI_BOTH);
 								?>
 								<div class="control-group">
 									<label class="control-label">Sucursal</label>
@@ -175,17 +173,17 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="sucursal" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM sucursales 
-											WHERE sucu_cliente_principal='".$_GET["cte"]."'",$conexion);
-											$numOp = mysql_num_rows($conOp);
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales 
+											WHERE sucu_cliente_principal='".$_GET["cte"]."'");
+											$numOp = mysqli_num_rows($conOp);
 											if($numOp==0){
 												//Crear automáticamente la sucursal
-												mysql_query("INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$_GET["cte"]."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')",$conexion);
+												mysqli_query($conexionBdPrincipal,"INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$_GET["cte"]."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')");
 												
 												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
 												exit();
 											}
-											while($resOp = mysql_fetch_array($conOp)){
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[7];?></option>
                                             <?php
@@ -202,17 +200,17 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM contactos 
-											WHERE cont_cliente_principal='".$_GET["cte"]."'",$conexion);
-											$numOp = mysql_num_rows($conOp);
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos 
+											WHERE cont_cliente_principal='".$_GET["cte"]."'");
+											$numOp = mysqli_num_rows($conOp);
 											if($numOp==0){
 												//Crear automáticamente el contacto
-												mysql_query("INSERT INTO contactos(cont_nombre, cont_cliente_principal)VALUES('Contacto principal (Automático)', '".$_GET["cte"]."')",$conexion);
+												mysqli_query($conexionBdPrincipal,"INSERT INTO contactos(cont_nombre, cont_cliente_principal)VALUES('Contacto principal (Automático)', '".$_GET["cte"]."')");
 												
 												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
 												exit();
 											}
-											while($resOp = mysql_fetch_array($conOp)){
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=strtoupper($resOp[1])." (".$resOp[3].")";?></option>
                                             <?php
@@ -229,8 +227,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=strtoupper($resOp[4])." (".$resOp[5].")";?></option>
                                             <?php
@@ -302,12 +300,12 @@ include("includes/js-formularios.php");
 												$filtroProd = '';
 												if(is_numeric($_GET["prov"])){ $filtroProd .=" AND prod_proveedor='".$_GET["prov"]."'";}
 
-												$conOp = mysql_query("SELECT * FROM productos 
+												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria
 												WHERE prod_id=prod_id $filtroProd
 												ORDER BY prod_nombre
-												",$conexion);
-												while($resOp = mysql_fetch_array($conOp)){
+												");
+												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												?>
 													<option value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_nombre']." - [HAY ".$resOp['prod_existencias']."]";?></option>
 												<?php
@@ -323,9 +321,9 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="combo[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT * FROM combos 
-												ORDER BY combo_nombre",$conexion);
-												while($resOp = mysql_fetch_array($conOp)){
+												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos 
+												ORDER BY combo_nombre");
+												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												?>
 													<option value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>
 												<?php
@@ -341,9 +339,9 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="servicio[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT * FROM servicios 
-												ORDER BY serv_nombre",$conexion);
-												while($resOp = mysql_fetch_array($conOp)){
+												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios 
+												ORDER BY serv_nombre");
+												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												?>
 													<option value="<?=$resOp['serv_id'];?>"><?=$resOp['serv_id'].". ".$resOp['serv_nombre'];?></option>
 												<?php

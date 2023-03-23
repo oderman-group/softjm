@@ -8,7 +8,7 @@ require 'librerias/phpmailer/Exception.php';
 require 'librerias/phpmailer/PHPMailer.php';
 require 'librerias/phpmailer/SMTP.php';
 
-$configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1", $conexion));
+$configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"), MYSQLI_BOTH);
 
 //RESPONDER ENCUESTA DE SATISFACCIÓN
 if ($_POST["idSql"] == 1) {
@@ -21,11 +21,8 @@ if ($_POST["idSql"] == 1) {
 		<?php
 		exit();
 	}
-	mysql_query("UPDATE encuesta_satisfaccion SET encs_p1='" . $_POST["p1"] . "', encs_p2='" . $_POST["p2"] . "', encs_p3='" . $_POST["p3"] . "', encs_p4='" . $_POST["p4"] . "', encs_p5='" . $_POST["p5"] . "', encs_observaciones='" . $_POST["observaciones"] . "' WHERE encs_id='" . $_POST["id"] . "'", $conexion);
-	if (mysql_errno() != 0) {
-		echo mysql_error();
-		exit();
-	}
+	mysqli_query($conexionBdPrincipal,"UPDATE encuesta_satisfaccion SET encs_p1='" . $_POST["p1"] . "', encs_p2='" . $_POST["p2"] . "', encs_p3='" . $_POST["p3"] . "', encs_p4='" . $_POST["p4"] . "', encs_p5='" . $_POST["p5"] . "', encs_observaciones='" . $_POST["observaciones"] . "' WHERE encs_id='" . $_POST["id"] . "'");
+	
 		?>
 
 		<span style='font-family:Arial; color:black; text-align:center;'>MUCHAS GRACIAS POR TOMARSE EL TIEMPO PARA RESPONDER ESTA BREVE ENCUESTA.</samp>
@@ -41,16 +38,13 @@ if ($_POST["idSql"] == 1) {
 
 	//RECUPERAR LA CLAVE
 	if ($_POST["idSql"] == 2) {
-		$emailD = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_email='" . $_POST["email"] . "'", $conexion));
+		$emailD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_email='" . $_POST["email"] . "'"), MYSQLI_BOTH);
 		if ($emailD[0] != "") {
 
 			$nuevaClave = rand(10000, 99999);
 
-			mysql_query("UPDATE usuarios SET  usr_clave=SHA1('" . $nuevaClave . "') WHERE usr_id='" . $emailD['usr_id'] . "'", $conexion);
-			if (mysql_errno() != 0) {
-				echo mysql_error();
-				exit();
-			}
+			mysqli_query($conexionBdPrincipal,"UPDATE usuarios SET  usr_clave=SHA1('" . $nuevaClave . "') WHERE usr_id='" . $emailD['usr_id'] . "'");
+			
 
 			$fin =  '<html><body style="background-color:#E6E6E6;">';
 			$fin .= '

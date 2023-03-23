@@ -5,10 +5,10 @@ $idPagina = 4;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$consuluta=$conexionBdPrincipal->query("SELECT * FROM usuarios 
+$consulta=$conexionBdPrincipal->query("SELECT * FROM usuarios 
 INNER JOIN usuarios_tipos ON utipo_id=usr_tipo
 WHERE usr_id='".$_GET["id"]."'");
-$resultadoD = mysqli_fetch_array($consuluta, MYSQLI_BOTH);
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <!--============ javascript ===========-->
@@ -177,7 +177,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ciudad">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM localidad_ciudades INNER JOIN localidad_departamentos ON dep_id=ciu_departamento ORDER BY ciu_nombre");
+											$conOp = $conexionBdAdmin->query("SELECT * FROM localidad_ciudades INNER JOIN localidad_departamentos ON dep_id=ciu_departamento ORDER BY ciu_nombre");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['ciu_id'];?>" <?php if($resultadoD['usr_ciudad']==$resOp['ciu_id']){echo "selected";}?>><?=$resOp['ciu_nombre'].", ".$resOp['dep_nombre'];?></option>

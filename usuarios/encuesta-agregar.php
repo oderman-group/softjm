@@ -1,14 +1,9 @@
 <?php include("sesion.php");?>
 <?php
-$idPagina = 51;
-$paginaActual['pag_nombre'] = "Agegar encuesta";
+$idPagina = 230;
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
 <!-- styles -->
 
 <!--[if IE 7]>
@@ -97,8 +92,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="cliente" onChange="clientes(this)">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM clientes",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['cli_id'];?>" <?php if(isset($_GET["cte"]) and $_GET["cte"]!="" and $_GET["cte"]==$resOp[0]) echo "selected";?>><?=$resOp['cli_nombre'];?></option>
                                             <?php
@@ -114,8 +109,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="contacto">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM contactos WHERE cont_cliente_principal='".$_GET["cte"]."'",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$_GET["cte"]."'");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['cont_nombre'];?></option>
                                             <?php
@@ -135,8 +130,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="usuario">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM usuarios",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['usr_id'];?>"><?=$resOp['usr_nombre'];?></option>
                                             <?php
@@ -153,8 +148,8 @@ include("includes/js-formularios.php");
 											<option value="0"></option>
                                             <option value="0">Ninguno</option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM productos",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_nombre'];?></option>
                                             <?php

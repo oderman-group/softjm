@@ -5,10 +5,6 @@ $paginaActual['pag_nombre'] = "Agregar evento";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
 <!-- styles -->
 
 <!--[if IE 7]>
@@ -174,12 +170,14 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente">
 											<option value="0"></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM clientes",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												if($datosUsuarioActual[3]!=1){
-													$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'",$conexion));
+													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
+													$numZ = mysqli_num_rows($consultaZonas);
 													
-													$numCliente = mysql_num_rows(mysql_query("SELECT * FROM clientes_usuarios WHERE cliu_usuario='".$_SESSION["id"]."' AND cliu_cliente='".$resOp['cli_id']."'",$conexion));
+													$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_usuarios WHERE cliu_usuario='".$_SESSION["id"]."' AND cliu_cliente='".$resOp['cli_id']."'");
+													$numCliente = mysqli_num_rows($consultaClientes);
 									
 													if($numZ == 0 and $numCliente == 0) continue;
 												}

@@ -4,16 +4,13 @@ $idPagina = 132;
 $paginaActual['pag_nombre'] = "Editar factura compra extranjera #".$_GET["id"];
 ?>
 <?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
 <?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
+include("includes/head.php");
 
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM facturas 
+$consultaD=mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas 
 INNER JOIN proveedores ON prov_id=factura_proveedor
-WHERE factura_id='".$_GET["id"]."'",$conexion));
+WHERE factura_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consultaD, MYSQLI_BOTH);
 ?>
 
 
@@ -160,8 +157,8 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysql_query("SELECT * FROM proveedores",$conexion);
-											 while($resOp = mysql_fetch_array($conOp)){
+											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores");
+											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>" <?php if($resultadoD['factura_proveedor']==$resOp[0]) echo "selected";?>><?=$resOp['prov_nombre'];?></option>
 											 <?php
@@ -256,13 +253,14 @@ include("includes/js-formularios.php");
 												<option value=""></option>
 												<?php
 
-												$conOp = mysql_query("SELECT * FROM productos 
+												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria 
 												WHERE prod_id=prod_id
-												ORDER BY prod_nombre",$conexion);
-												while($resOp = mysql_fetch_array($conOp)){
-													$productoN = mysql_num_rows(mysql_query("SELECT * FROM cotizacion_productos 
-													WHERE czpp_producto='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['factura_id']."' AND czpp_tipo=4",$conexion));
+												ORDER BY prod_nombre");
+												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+													$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
+													WHERE czpp_producto='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['factura_id']."' AND czpp_tipo=4");
+													$productoN = mysqli_num_rows($consultaProducto);
 												?>
 													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_id'].". ".$resOp['prod_referencia']." ".$resOp['prod_nombre']." - [HAY ".$resOp['prod_existencias']."]";?></option>
 												<?php
@@ -331,11 +329,11 @@ include("includes/js-formularios.php");
 							<!-- PRODUCTOS -->	
                             <?php
 							$no = 1;
-							$productos = mysql_query("SELECT * FROM productos 
+							$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 							INNER JOIN productos_categorias ON catp_id=prod_categoria
 							INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='".$_GET["id"]."' AND czpp_tipo=4
-							ORDER BY prod_no_inventariable DESC, czpp_orden",$conexion);
-							while($prod = mysql_fetch_array($productos)){
+							ORDER BY prod_no_inventariable DESC, czpp_orden");
+							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 								$dcto = 0;
 								$valorTotal = 0;
 
