@@ -69,8 +69,9 @@ include("includes/head.php");
 									<table class="table table-striped table-bordered" id="data-table">
 										<thead>
 											<tr>
-												<th>No</th>
+												<th>Nº</th>
 												<th>Nombre</th>
+												<th>Modulo Padre</th>
 												<th></th>
 											</tr>
 										</thead>
@@ -79,10 +80,17 @@ include("includes/head.php");
 											$consulta = $conexionBdAdmin->query("SELECT * FROM modulos");
 											$no = 1;
 											while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
+												$nombreModuloPadre="";
+												if(!empty($res['mod_padre'])){
+													$consultaModuloPadre = $conexionBdAdmin->query("SELECT * FROM modulos WHERE mod_id='".$res['mod_padre']."'");
+													$moduloPadre = mysqli_fetch_array($consultaModuloPadre, MYSQLI_BOTH);
+													$nombreModuloPadre=$moduloPadre['mod_nombre'];
+												}
 											?>
 											<tr>
 												<td><?=$no;?></td>
 												<td><?=$res['mod_nombre'];?></td>
+												<td><?=$nombreModuloPadre?></td>
 												<td><h4>
 													<a href="modulos-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
 													<a href="bd_delete/modulos-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
