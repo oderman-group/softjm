@@ -4,7 +4,7 @@ require_once("../sesion.php");
 $idPagina = 185;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-$conexionBdAdmin->query("UPDATE modulos SET mod_nombre='" . $_POST["nombre"] . "' WHERE mod_id='" . $_POST["id"] . "'");
+$conexionBdAdmin->query("UPDATE modulos SET mod_nombre='".$_POST["nombre"]."', mod_padre='".$_POST["moduloPadre"]."' WHERE mod_id='".$_POST["id"]."'");
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 

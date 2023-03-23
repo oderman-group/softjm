@@ -66,6 +66,27 @@ include("includes/js-formularios.php");
 										<input type="text" class="span6" name="nombre" value="<?=$resultadoD['mod_nombre'];?>">
 									</div>
 								</div>
+                                
+                                <div class="control-group">
+									<label class="control-label">Modulo Padre</label>
+									<div class="controls">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="moduloPadre">
+											<option value=""></option>
+                                            <?php
+											$consulta = $conexionBdAdmin->query("SELECT * FROM modulos WHERE mod_id!='".$_GET['id']."'");
+											while($resOp = mysqli_fetch_array($consulta, MYSQLI_BOTH)){												
+												$selected="";
+												if($resOp['mod_id']==$resultadoD['mod_padre']){										
+													$selected="selected";
+												}
+											?>
+                                            	<option value="<?=$resOp['mod_id'];?>" <?=$selected?>><?=$resOp['mod_nombre'];?></option>
+                                            <?php
+											}
+											?>
+                                    	</select>
+                                    </div>
+                               </div>
 
                                 <div class="form-actions">
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
