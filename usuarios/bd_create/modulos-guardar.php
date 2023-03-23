@@ -3,7 +3,7 @@
 
     $idPagina = 183;
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
-    $conexionBdAdmin->query("INSERT INTO modulos(mod_nombre)VALUES('" . $_POST["nombre"] . "')");
+    $conexionBdAdmin->query("INSERT INTO modulos(mod_nombre, mod_padre)VALUES('" . $_POST["nombre"] . "', '" . $_POST["moduloPadre"] . "')");
 
     $idInsertU = mysqli_insert_id($conexionBdAdmin);
 
