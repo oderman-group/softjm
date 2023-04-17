@@ -2053,14 +2053,7 @@ if ($_GET["get"] == 21) {
 	exit();
 }
 //ELIMINAR SUCURSALES
-if ($_GET["get"] == 23) {
-	$idPagina = 86;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM sucursales WHERE sucu_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 if ($_GET["get"] == 24) {
 	$idPagina = 91;
 	include("includes/verificar-paginas.php");

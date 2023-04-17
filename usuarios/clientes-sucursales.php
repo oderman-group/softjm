@@ -127,7 +127,7 @@ $cliente = mysqli_fetch_array($consultaClientes, MYSQLI_BOTH);
                                 <td><?=$res['cli_nombre'];?></td>
                                 <td><h4>
                                     <a href="clientes-sucursales-editar.php?id=<?=$res[0];?>&cte=<?=$_GET["cte"];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-                                    <a href="sql.php?id=<?=$res[0];?>&get=23" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                    <a href="bd_delete/clientes-sucursales-eliminar.php?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>
