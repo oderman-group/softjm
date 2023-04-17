@@ -81,8 +81,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="37">
+							<form class="form-horizontal" method="post" action="bd_create/clientes-sucursales-guardar.php">
                             <input type="hidden" name="cte" value="<?=$_GET["cte"];?>">
                             
                             	<div class="control-group">

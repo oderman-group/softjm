@@ -862,13 +862,7 @@ if ($_POST["idSql"] == 34) {
 
 
 //AGREGAR SUCURSALES
-if ($_POST["idSql"] == 37) {
-	mysqli_query($conexionBdPrincipal,"INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_telefonos, sucu_nombre)VALUES('" . $_POST["cte"] . "','" . $_POST["ciudad"] . "','" . $_POST["direccion"] . "','" . $_POST["telefono"] . "','" . $_POST["celular"] . "','" . $_POST["telefonos"] . "','" . $_POST["nombre"] . "')");
 	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-	echo '<script type="text/javascript">window.location.href="clientes-sucursales-editar.php?id=' . $idInsertU . '&msg=1&cte=' . $_POST["cte"] . '";</script>';
-	exit();
-}
 //EDITAR SUCURSALES
 if ($_POST["idSql"] == 38) {
 	mysqli_query($conexionBdPrincipal,"UPDATE sucursales SET sucu_ciudad='" . $_POST["ciudad"] . "', sucu_direccion='" . $_POST["direccion"] . "', sucu_telefono='" . $_POST["telefono"] . "', sucu_celular='" . $_POST["celular"] . "', sucu_telefonos='" . $_POST["telefonos"] . "', sucu_nombre='" . $_POST["nombre"] . "' WHERE sucu_id='" . $_POST["id"] . "'");
