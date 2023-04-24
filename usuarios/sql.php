@@ -29,44 +29,9 @@ require '../librerias/phpmailer/SMTP.php';
 //EDITAR MARCAS
 
 //AGREGAR FACTURAS
-if ($_POST["idSql"] == 11) {
 
-
-	//Ingresar la factura
-	mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion(fact_cliente, fact_fecha,  fact_usuario_responsable, fact_fecha_real, fact_tipo, fact_estado )VALUES('" . $_POST["cliente"] . "', now(), '" . $_SESSION["id"] . "', '" . $_POST["fechaFactura"] . "', 1, 1)");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-
-
-	$numero = (count($_POST["producto"]));
-	$contador = 0;
-	mysqli_query($conexionBdPrincipal,"DELETE FROM facturacion_productos WHERE fpp_factura='" . $idInsertU . "'");
-	
-	while ($contador < $numero) {
-		mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion_productos(fpp_factura, fpp_producto)VALUES('" . $idInsertU . "'," . $_POST["producto"][$contador] . ")");
-		$contador++;
-	}
-
-	echo '<script type="text/javascript">window.location.href="facturacion-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
 //EDITAR FACTURAS
-if ($_POST["idSql"] == 12) {
 
-	mysqli_query($conexionBdPrincipal,"UPDATE facturacion SET fact_cliente='" . $_POST["cliente"] . "',  fact_ultima_modificacion=now(), fact_usuario_modificacion='" . $_SESSION["id"] . "',  fact_fecha_real='" . $_POST["fechaFactura"] . "'  WHERE fact_id='" . $_POST["id"] . "'");
-	
-
-	$numero = (count($_POST["producto"]));
-	$contador = 0;
-	mysqli_query($conexionBdPrincipal,"DELETE FROM facturacion_productos WHERE fpp_factura='" . $_POST["id"] . "'");
-	
-	while ($contador < $numero) {
-		mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion_productos(fpp_factura, fpp_producto)VALUES('" . $_POST["id"] . "'," . $_POST["producto"][$contador] . ")");
-		$contador++;
-	}
-	echo '<script type="text/javascript">window.location.href="facturacion-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 //AGREGAR DOCUMENTOS
 if ($_POST["idSql"] == 13) {
 	if ($_FILES['archivo']['name'] != "") {
@@ -1456,16 +1421,7 @@ if ($_GET["get"] == 5) {
 	exit();
 }
 //ELIMINAR FACTURAS
-if ($_GET["get"] == 6) {
-	$idPagina = 58;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM facturacion_abonos WHERE fpab_factura='" . $_GET["id"] . "'");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM facturacion_productos WHERE fpp_factura='" . $_GET["id"] . "'");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM facturacion WHERE fact_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //ELIMINAR DOCUMENTOS
 if ($_GET["get"] == 7) {
 	$idPagina = 59;
