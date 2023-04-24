@@ -855,23 +855,9 @@ if ($_POST["idSql"] == 34) {
 //EDITAR SUCURSALES
 
 //AGREGAR TIKCETS CLIENTES
-if ($_POST["idSql"] == 39) {
-	$sucursal = $_POST["sucursal"];
-	if ($_POST["sucursal"] == "") $sucursal = 0;
 
-	mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_tikets(tik_asunto_principal, tik_tipo_tiket, tik_fecha_creacion, tik_usuario_responsable, tik_estado, tik_cliente, tik_prioridad, tik_canal, tik_equipo, tik_referencia, tik_sucursal, tik_etapa, tik_tipo_negocio, tik_origen_negocio, tik_valor, tik_razon_perdido,  tik_razon_ganado)VALUES('" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asuntoP"]) . "','" . $_POST["tipoS"] . "','" . $_POST["fechaInicio"] . "','" . $_SESSION["id"] . "',1,'" . $_POST["cliente"] . "','" . $_POST["prioridad"] . "','" . $_POST["canal"] . "','" . $_POST["equipo"] . "','" . $_POST["referencia"] . "','" . $sucursal . "','" . $_POST["etapa"] . "','" . $_POST["tipoNegocio"] . "','" . $_POST["origenNegocio"] . "', '" . $_POST["valor"] . "', '" . $_POST["razonPerdido"] . "', '" . $_POST["razonGanado"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-	echo '<script type="text/javascript">window.location.href="clientes-seguimiento-agregar.php?idTK=' . $idInsertU . '&msg=10";</script>';
-	exit();
-}
 //EDITAR TIKETS CLIENTES
-if ($_POST["idSql"] == 40) {
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_asunto_principal='" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asuntoP"]) . "', tik_tipo_tiket='" . $_POST["tipoS"] . "', tik_fecha_creacion='" . $_POST["fechaInicio"] . "', tik_estado='" . $_POST["estado"] . "', tik_prioridad='" . $_POST["prioridad"] . "', tik_referencia='" . $_POST["referencia"] . "', tik_canal='" . $_POST["canal"] . "', tik_equipo='" . $_POST["equipo"] . "', tik_etapa='" . $_POST["etapa"] . "', tik_tipo_negocio='" . $_POST["tipoNegocio"] . "', tik_origen_negocio='" . $_POST["origenNegocio"] . "', tik_valor='" . $_POST["valor"] . "', tik_razon_perdido='" . $_POST["razonPerdido"] . "', tik_razon_ganado='" . $_POST["razonGanado"] . "' WHERE tik_id='" . $_POST["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="clientes-tikets-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
+
 //AGREGAR ABONO A FACTURAS
 if ($_POST["idSql"] == 41) {
 	if ($_FILES['archivo']['name'] != "") {
@@ -2043,15 +2029,6 @@ if ($_GET["get"] == 21) {
 }
 //ELIMINAR SUCURSALES
 
-if ($_GET["get"] == 24) {
-	$idPagina = 91;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM cliente_seguimiento WHERE cseg_tiket='" . $_GET["id"] . "'");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM clientes_tikets WHERE tik_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 if ($_GET["get"] == 25) {
 	$idPagina = 95;
 	include("includes/verificar-paginas.php");
