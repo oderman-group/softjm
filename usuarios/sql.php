@@ -1,14 +1,13 @@
 <?php
 require_once("sesion.php");
 
-$configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"), MYSQLI_BOTH);
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
 require '../librerias/phpmailer/Exception.php';
 require '../librerias/phpmailer/PHPMailer.php';
 require '../librerias/phpmailer/SMTP.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+$configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"), MYSQLI_BOTH);
 //AGREGAR USUARIOS
 
 //EDITAR USUARIOS
@@ -74,38 +73,9 @@ if ($_POST["idSql"] == 16) {
 	exit();
 }
 //AGREGAR DEALER/GRUPOS
-if ($_POST["idSql"] == 17) {
-	mysqli_query($conexionBdPrincipal,"INSERT INTO dealer(deal_nombre)VALUES('" . $_POST["nombre"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-	$numero = (count($_POST["clientes"]));
-	$contador = 0;
-	mysqli_query($conexionBdPrincipal,"DELETE FROM clientes_categorias WHERE cpcat_categoria='" . $idInsertU . "'");
-	
-	while ($contador < $numero) {
-		mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_categorias(cpcat_cliente, cpcat_categoria)VALUES(" . $_POST["clientes"][$contador] . ",'" . $idInsertU . "')");
-		
-		$contador++;
-	}
-	echo '<script type="text/javascript">window.location.href="dealer-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
+
 //EDITAR DEALER/GRUPOS
-if ($_POST["idSql"] == 18) {
-	mysqli_query($conexionBdPrincipal,"UPDATE dealer SET deal_nombre='" . $_POST["nombre"] . "' WHERE deal_id='" . $_POST["id"] . "'");
-	
-	$numero = (count($_POST["clientes"]));
-	$contador = 0;
-	mysqli_query($conexionBdPrincipal,"DELETE FROM clientes_categorias WHERE cpcat_categoria='" . $_POST["id"] . "'");
-	
-	while ($contador < $numero) {
-		mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_categorias(cpcat_cliente, cpcat_categoria)VALUES(" . $_POST["clientes"][$contador] . ",'" . $_POST["id"] . "')");
-		
-		$contador++;
-	}
-	echo '<script type="text/javascript">window.location.href="dealer-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
+
 //AGREGAR PRODUCTOS
 
 //EDITAR PRODUCTOS
@@ -1322,14 +1292,7 @@ if ($_GET["get"] == 10) {
 	exit();
 }
 //ELIMINAR DEALER
-if ($_GET["get"] == 11) {
-	$idPagina = 60;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM dealer WHERE deal_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //ELIMINAR PRODUCTOS
 
 //ELIMINAR CATEGORÍA DE PRODUCTOS
