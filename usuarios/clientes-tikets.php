@@ -1,16 +1,12 @@
-<?php include("sesion.php"); ?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 88;
 $paginaActual['pag_nombre'] = "Tickets de clientes";
-?>
-<?php include("includes/verificar-paginas.php"); ?>
-<?php include("includes/head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'");
+$cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
@@ -31,46 +27,9 @@ if (mysql_errno() != 0) {
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script type="text/javascript">
-	/*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
 	$(function() {
 		$('#data-table').dataTable({
 			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-			/*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
 		});
 	});
 	$(function() {
@@ -109,51 +68,23 @@ if (mysql_errno() != 0) {
 		
 		<div class="main-wrapper">
 			<div class="container-fluid">
-
-
-				<div class="navbar">
-					<div class="navbar-inner">
-						<div class="container">
-							<!--<a href="#" class="brand"><img src="images/logo-small.png" width="99" height="40" alt="Falgun"></a>-->
-							<div class="nav-collapse collapse navbar-responsive-collapse">
-								<ul class="nav">
-									<li><a href="javascript:history.go(-1);"><i class="icon-arrow-left"></i> Regresar</a></li>
-									<li class="active"><a href="clientes-tikets-agregar.php?cte=<?= $_GET["cte"]; ?>&tipo=<?= $_GET["tipo"]; ?>"><i class="icon-plus"></i> Agregar nuevo</a></li>
-									<li><a href="tikets-filtros.php"><i class="icon-file"></i> Sacar informe</a></li>
-									<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Más opciones <b class="caret"></b></a>
-										<ul class="dropdown-menu">
-											<li><a href="excel-exportar.php?exp=3">Exportar todo a excel</a></li>
-											<li class="divider"></li>
-											<li class="nav-header">Nav header</li>
-											<li><a href="#">Separated link</a></li>
-										</ul>
-									</li>
-								</ul>
-
-								<form action="<?= $_SERVER['PHP_SELF']; ?>" method="GET" class="navbar-search pull-left">
-									<input type="text" placeholder="Búsqueda y pulse Enter..." name="busqueda" class="search-query span4" value="<?= $_GET["busqueda"]; ?>">
-								</form>
-
-								<ul class="nav pull-right">
-									<li><a href="#">Link</a></li>
-									<li class="divider-vertical"></li>
-									<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Dropdown <b class="caret"></b></a>
-										<ul class="dropdown-menu">
-											<li><a href="#">Action</a></li>
-											<li><a href="#">Another action</a></li>
-											<li><a href="#">Something else here</a></li>
-											<li class="divider"></li>
-											<li><a href="#">Separated link</a></li>
-										</ul>
-									</li>
-								</ul>
-
-							</div>
-							<!-- /.nav-collapse -->
+				<div class="row-fluid ">
+					<div class="span12">
+						<div class="primary-head">
+							<h3 class="page-header"><?=$paginaActual['pag_nombre'];?> de <b><?=$cliente['cli_nombre'];?></b></h3>
 						</div>
+						<ul class="breadcrumb">
+							<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
+							<li><a href="clientes.php">Clientes</a><span class="divider"><i class="icon-angle-right"></i></span></li>
+							<li class="active"><?=$paginaActual['pag_nombre'];?> de <b><?=$cliente['cli_nombre'];?></b></li>
+						</ul>
 					</div>
-					<!-- /navbar-inner -->
 				</div>
+				<?php include("includes/notificaciones.php");?>
+				<p>
+					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+					<a href="clientes-tikets-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+				</p>
 
 				<div class="row-fluid">
 					<div class="span12">
@@ -221,33 +152,36 @@ if (mysql_errno() != 0) {
 									<tbody>
 										<?php
 										if ($datosUsuarioActual[3] == 1) {
-											$consulta = mysql_query("SELECT * FROM clientes_tikets
+											$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets
 											INNER JOIN clientes ON cli_id=tik_cliente
 											INNER JOIN usuarios ON usr_id=tik_usuario_responsable
 											WHERE tik_id=tik_id $filtro
 											ORDER BY tik_id DESC
 											LIMIT $inicio, $limite
-											", $conexion);
+											");
 										} else {
-											$consulta = mysql_query("SELECT * FROM clientes_tikets
+											$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets
 											INNER JOIN clientes ON cli_id=tik_cliente
 											INNER JOIN usuarios ON usr_id=tik_usuario_responsable
 											WHERE tik_usuario_responsable='" . $_SESSION["id"] . "' $filtro
 											ORDER BY tik_id DESC
 											LIMIT $inicio, $limite
-											", $conexion);
+											");
 										}
 										$no = 1;
-										while ($res = mysql_fetch_array($consulta)) {
+										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
-											$asuntos = mysql_fetch_array(mysql_query("SELECT * FROM tikets_asuntos WHERE tkpas_id='" . $res["tik_asunto_principal"] . "'", $conexion));
+											$consultaAsuntos=mysqli_query($conexionBdPrincipal,"SELECT * FROM tikets_asuntos WHERE tkpas_id='" . $res["tik_asunto_principal"] . "'");
+											$asuntos = mysqli_fetch_array($consultaAsuntos, MYSQLI_BOTH);
 
 											if ($datosUsuarioActual[3] != 1) {
-												$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'", $conexion));
+												$consultaNumZ=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
+												$numZ = mysqli_num_rows($consultaNumZ);
 												if ($numZ == 0) continue;
 											}
 
-											$sucursal = mysql_fetch_array(mysql_query("SELECT * FROM sucursales WHERE sucu_id='" . $res['tik_sucursal'] . "'", $conexion));
+											$consultaSucursal=mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_id='" . $res['tik_sucursal'] . "'");
+											$sucursal = mysqli_fetch_array($consultaSucursal, MYSQLI_BOTH);
 											switch ($res['tik_tipo_tiket']) {
 												case 1:
 													$tipoS = 'Comercial';
@@ -285,10 +219,8 @@ if (mysql_errno() != 0) {
 													break;
 											}
 
-											$numeros = mysql_fetch_array(mysql_query("
-								SELECT
-								(SELECT count(cseg_id) FROM cliente_seguimiento WHERE cseg_tiket='" . $res['tik_id'] . "')
-								", $conexion));
+											$consultaNumeros=mysqli_query($conexionBdPrincipal,"SELECT (SELECT count(cseg_id) FROM cliente_seguimiento WHERE cseg_tiket='" . $res['tik_id'] . "') ");
+											$numeros = mysqli_fetch_array($consultaNumeros, MYSQLI_BOTH);
 										?>
 											<tr>
 												<td><?= $no; ?></td>
@@ -313,7 +245,7 @@ if (mysql_errno() != 0) {
 									-->
 
 														<a href="clientes-tikets-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-														<a href="sql.php?id=<?= $res[0]; ?>&get=24" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+														<a href="bd_delete/clientes-tikets-eliminar.php?id=<?=$res[0];?>&cte=<?=$_GET["cte"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 													</h4>
 												</td>
 											</tr>
