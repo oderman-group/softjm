@@ -1,36 +1,21 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 14;
 $paginaActual['pag_nombre'] = "Editar Seguimiento de clientes";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["idTK"]."'",$conexion));
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM cliente_seguimiento WHERE cseg_id='".$_GET["id"]."'",$conexion));
-$cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='".$resultadoD["cseg_cliente"]."'",$conexion));
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consultaTiket=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["idTK"]."'");
+$tiket = mysqli_fetch_array($consultaTiket, MYSQLI_BOTH);
+$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM cliente_seguimiento WHERE cseg_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+$consultaCliente=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$resultadoD["cseg_cliente"]."'");
+$cliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 ?>
 <!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -67,14 +52,6 @@ include("includes/js-formularios.php");
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?>: <?=$cliente["cli_nombre"];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-                        
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -91,10 +68,11 @@ include("includes/js-formularios.php");
 						<div class="widget-head bondi-blue">
 							<h3> Ticket</h3>
 							<?php
-							$infoTicket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets
+							$consultaInfoTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets
 							INNER JOIN clientes ON cli_id=tik_cliente
 							INNER JOIN usuarios ON usr_id=tik_usuario_responsable
-							WHERE tik_id='".$resultadoD["cseg_tiket"]."'",$conexion));
+							WHERE tik_id='".$resultadoD["cseg_tiket"]."'");
+							$infoTicket = mysqli_fetch_array($consultaInfoTikets, MYSQLI_BOTH);
 							
 							?>
 						</div>
@@ -203,8 +181,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?>: <?=$cliente["cli_nombre"];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-                            <input type="hidden" name="idSql" value="8">
+							<form class="form-horizontal" method="post" action="bd_update/clientes-seguimiento-actualizar.php" enctype="multipart/form-data">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
                             
                             <input type="hidden" name="idTK" value="<?=$_GET["idTK"];?>">
@@ -226,8 +203,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="contacto" required>
 											<option value="0"></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM contactos WHERE cont_cliente_principal='".$tiket["tik_cliente"]."'",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$tiket["tik_cliente"]."'");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['cseg_contacto']==$resOp['cont_id']){echo "selected";}?>><?=$resOp['cont_nombre'];?></option>
                                             <?php
@@ -343,8 +320,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="encargado">
 											<option value="0"></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM usuarios",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['cseg_usuario_encargado']==$resOp[0]) echo "selected";?>><?=$resOp[4];?></option>
                                             <?php
