@@ -1,16 +1,14 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 90;
 $paginaActual['pag_nombre'] = "Editar Tickets de clientes";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["id"]."'",$conexion));
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 if($resultadoD[0]==""){
 	echo '<script type="text/javascript">window.location.href="clientes-tikets.php";</script>';
@@ -69,15 +67,7 @@ include("includes/js-formularios.php");
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-                        
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>                        
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -92,7 +82,7 @@ include("includes/js-formularios.php");
 					<p>
 						
 						
-						<a href="sql.php?get=24&id=<?=$_GET["id"];?>" class="btn btn-danger" onClick="if(!confirm('Desea eliminar este ticket?')){return false;}"><i class="icon icon-trash"></i> Eliminar Ticket</a>
+						<a href="bd_delete/clientes-tikets-eliminar.php?cte=<?=$_GET["cte"];?>&id=<?=$_GET["id"];?>" class="btn btn-danger" onClick="if(!confirm('Desea eliminar este ticket?')){return false;}"><i class="icon icon-trash"></i> Eliminar Ticket</a>
 					</p>
 					
 					<div class="content-widgets gray">
@@ -100,9 +90,9 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="40">
+							<form class="form-horizontal" method="post" action="bd_update/clientes-tikets-actualizar.php">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
+                            <input type="hidden" name="cte" value="<?=$_GET["cte"];?>">
                             
                                 <div class="control-group">
 									<label class="control-label">Cliente (*)</label>
@@ -110,12 +100,14 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM clientes",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												if($datosUsuarioActual[3]!=1){
-													$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'",$conexion));
+													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
+													$numZ = mysqli_num_rows($consultaZonas);
 													
-													$numCliente = mysql_num_rows(mysql_query("SELECT * FROM clientes_usuarios WHERE cliu_usuario='".$_SESSION["id"]."' AND cliu_cliente='".$resOp['cli_id']."'",$conexion));
+													$consultaNumClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_usuarios WHERE cliu_usuario='".$_SESSION["id"]."' AND cliu_cliente='".$resOp['cli_id']."'");
+													$numCliente = mysqli_num_rows($consultaNumClientes);
 									
 													if($numZ == 0 and $numCliente == 0) continue;
 												}
@@ -152,8 +144,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="asuntoP">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM tikets_asuntos",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM tikets_asuntos");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['tik_asunto_principal']==$resOp[0]){echo "selected";}?>><?=$resOp[1];?></option>
                                             <?php
@@ -370,13 +362,13 @@ include("includes/js-formularios.php");
 						</div>
 						<div class="widget-container" style="font-size: 10px;">
 							<?php
-							$seguimientos = mysql_query("SELECT * FROM cliente_seguimiento
+							$seguimientos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cliente_seguimiento
 							INNER JOIN clientes ON cli_id=cseg_cliente
 							INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 							WHERE cseg_tiket='".$_GET["id"]."'
 							ORDER BY cseg_id DESC
-							",$conexion);
-							while($seg = mysql_fetch_array($seguimientos)){
+							");
+							while($seg = mysqli_fetch_array($seguimientos, MYSQLI_BOTH)){
 							?>
 								<p>
 									<a href="clientes-seguimiento-editar.php?id=<?=$seg['cseg_id'];?>&idTK=<?=$seg['cseg_tiket'];?>" title="Editar"><?=$seg['cseg_fecha_contacto'];?></a><br>

@@ -1,34 +1,18 @@
-<?php include("sesion.php");?>
-<?php
-$idPagina = 35;
-$paginaActual['pag_nombre'] = "Editar grupos";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM dealer WHERE deal_id='".$_GET["id"]."'",$conexion));
+<?php 
+include("sesion.php");
+
+$idPagina = 234;
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM dealer WHERE deal_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
 
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -63,14 +47,6 @@ include("includes/js-formularios.php");
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-                        
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -90,8 +66,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="18">
+							<form class="form-horizontal" method="post" action="bd_update/dealer-actualizar.php">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
                             	   
                                 <div class="control-group">
@@ -107,51 +82,19 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" multiple tabindex="2" name="clientes[]">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM clientes",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
-												$numD = mysql_num_rows(mysql_query("SELECT * FROM clientes_categorias WHERE cpcat_categoria='".$resultadoD['deal_id']."' AND cpcat_cliente='".$resOp[0]."'",$conexion));
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+
+												$consultaCategorias=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_categorias WHERE cpcat_categoria='".$_GET["id"]."' AND cpcat_cliente='".$resOp[0]."'");
+												$numD = mysqli_num_rows($consultaCategorias);
 											?>
-                                            	<option value="<?=$resOp[0];?>" <?php if($numD>0){echo "selected";}?>><?=$resOp[1];?></option>
+                                            	<option value="<?=$resOp[0];?>" <?php if($numD > 0){echo "selected";} ?>><?=$resOp[1];?></option>
                                             <?php
 											}
 											?>
                                     	</select>
                                     </div>
                                </div>
-                                
-                                <!--
-                                <div class="control-group">
-									<label class="control-label">Email</label>
-									<div class="controls">
-										<input type="email" class="span4" name="email" value="<?=$resultadoD['deal_email'];?>">
-									</div>
-								</div>
-                                
-                                <div class="control-group">
-									<label class="control-label">Teléfono</label>
-									<div class="controls">
-										<input type="text" class="span4" name="telefono" value="<?=$resultadoD['deal_telefono'];?>">
-									</div>
-								</div>   
-                               
-                               <div class="control-group">
-									<label class="control-label">Ciudad</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ciudad">
-											<option value=""></option>
-                                            <?php
-											$conOp = mysql_query("SELECT * FROM localidad_ciudades INNER JOIN localidad_departamentos ON dep_id=ciu_departamento ORDER BY ciu_nombre",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
-											?>
-                                            	<option value="<?=$resOp['ciu_id'];?>" <?php if($resultadoD['deal_ciudad']==$resOp['ciu_id']){echo "selected";}?>><?=$resOp['ciu_nombre'].", ".$resOp['dep_nombre'];?></option>
-                                            <?php
-											}
-											?>
-                                    	</select>
-                                    </div>
-                               </div>
-                               -->
-                                
                                
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>

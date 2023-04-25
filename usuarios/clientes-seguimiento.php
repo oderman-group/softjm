@@ -1,20 +1,16 @@
-<?php include("sesion.php"); ?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 12;
 $paginaActual['pag_nombre'] = "Seguimiento de clientes";
-?>
 
-<?php include("includes/verificar-paginas.php"); ?>
-<?php include("includes/head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
-?>
-<?php
-$tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_id='" . $_GET["idTK"] . "'", $conexion));
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'");
+$cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
+
+$consultaTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='" . $_GET["idTK"] . "'");
+$tiket = mysqli_fetch_array($consultaTikets, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
@@ -35,46 +31,9 @@ $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script type="text/javascript">
-	/*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
 	$(function() {
 		$('#data-table').dataTable({
 			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-			/*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
 		});
 	});
 	$(function() {
@@ -113,35 +72,23 @@ $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_
 		
 		<div class="main-wrapper">
 			<div class="container-fluid">
-
-				<div class="navbar">
-					<div class="navbar-inner">
-						<div class="container">
-							<!--<a href="#" class="brand"><img src="images/logo-small.png" width="99" height="40" alt="Falgun"></a>-->
-							<div class="nav-collapse collapse navbar-responsive-collapse">
-								<ul class="nav">
-									<li><a href="javascript:history.go(-1);"><i class="icon-arrow-left"></i> Regresar</a></li>
-									<?php if (isset($_GET["idTK"]) or isset($_GET["cte"])) { ?>
-										<li class="active"><a href="clientes-seguimiento-agregar.php?idTK=<?= $_GET["idTK"]; ?>&cte=<?= $_GET["cte"]; ?>"><i class="icon-plus"></i> Agregar nuevo</a></li>
-									<?php } ?>
-									<li><a href="usuarios-filtro.php"><i class="icon-file"></i> Informe de usuarios</a></li>
-									<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Más opciones <b class="caret"></b></a>
-										<ul class="dropdown-menu">
-											<li><a href="clientes-seguimiento-filtro.php?idTK=<?= $_GET["idTK"]; ?>&cte=<?= $_GET["cte"]; ?>">Imprimir informe</a></li>
-										</ul>
-									</li>
-								</ul>
-
-								<form action="<?= $_SERVER['PHP_SELF']; ?>" method="GET" class="navbar-search pull-left">
-									<input type="text" placeholder="Búsqueda y pulse Enter..." name="busqueda" class="search-query span4" value="<?= $_GET["busqueda"]; ?>">
-								</form>
-
-							</div>
-							<!-- /.nav-collapse -->
+				<div class="row-fluid ">
+					<div class="span12">
+						<div class="primary-head">
+							<h3 class="page-header"><?=$paginaActual['pag_nombre'];?> de <b><?=$cliente['cli_nombre'];?></b></h3>
 						</div>
+						<ul class="breadcrumb">
+							<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
+							<li><a href="clientes.php">Clientes</a><span class="divider"><i class="icon-angle-right"></i></span></li>
+							<li class="active"><?=$paginaActual['pag_nombre'];?> de <b><?=$cliente['cli_nombre'];?></b></li>
+						</ul>
 					</div>
-					<!-- /navbar-inner -->
 				</div>
+				<?php include("includes/notificaciones.php");?>
+				<p>
+					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+					<a href="clientes-seguimiento-agregar.php?idTK=<?= $_GET["idTK"]; ?>&cte=<?= $_GET["cte"]; ?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+				</p>
 
 				<div class="alert alert-info">
 					<i class="icon-exclamation-sign"></i>
@@ -218,21 +165,21 @@ $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_
 				if ($_GET["inf"] == 1) {
 					$SQL = "SELECT * FROM cliente_seguimiento
 				INNER JOIN clientes ON cli_id=cseg_cliente
-				INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
+				INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 				INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 				WHERE cseg_usuario_responsable='" . $_GET["usuario"] . "' AND cseg_fecha_reporte>='" . $_GET["desde"] . "' AND cseg_fecha_reporte<='" . $_GET["hasta"] . "' AND (cseg_canal='" . $_GET["canal"] . "' OR cseg_canal='" . $_GET["canalDos"] . "')
 				";
 				} elseif ($_GET["inf"] == 2) {
 					$SQL = "SELECT * FROM cliente_seguimiento
 				INNER JOIN clientes ON cli_id=cseg_cliente
-				INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
+				INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 				INNER JOIN usuarios ON usr_id=cseg_usuario_encargado
 				WHERE cseg_usuario_encargado='" . $_GET["usuario"] . "' AND cseg_fecha_proximo_contacto>='" . $_GET["desde"] . "' AND cseg_fecha_proximo_contacto<='" . $_GET["hasta"] . "' AND (cseg_canal='" . $_GET["canal"] . "' OR cseg_canal='" . $_GET["canalDos"] . "') AND (cseg_realizado IS NULL OR cseg_realizado=0)
 				";
 				} else {
 					$SQL = "SELECT * FROM cliente_seguimiento
 				INNER JOIN clientes ON cli_id=cseg_cliente
-				INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
+				INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 				INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 				WHERE cseg_id=cseg_id $filtroUsuario $filtro  
 				$orden
@@ -272,45 +219,48 @@ $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_
 									<tbody>
 										<?php
 										if ($_GET["inf"] == 1) {
-											$consulta = mysql_query("SELECT * FROM cliente_seguimiento
+											$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cliente_seguimiento
 								INNER JOIN clientes ON cli_id=cseg_cliente
-								INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
+								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 								INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 								WHERE cseg_usuario_responsable='" . $_GET["usuario"] . "' AND cseg_fecha_reporte>='" . $_GET["desde"] . "' AND cseg_fecha_reporte<='" . $_GET["hasta"] . "' AND (cseg_canal='" . $_GET["canal"] . "' OR cseg_canal='" . $_GET["canalDos"] . "')
 								LIMIT $inicio, $limite
-								", $conexion);
+								");
 										} elseif ($_GET["inf"] == 2) {
-											$consulta = mysql_query("SELECT * FROM cliente_seguimiento
+											$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cliente_seguimiento
 								INNER JOIN clientes ON cli_id=cseg_cliente
-								INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
+								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 								INNER JOIN usuarios ON usr_id=cseg_usuario_encargado
 								WHERE cseg_usuario_encargado='" . $_GET["usuario"] . "' AND cseg_fecha_proximo_contacto>='" . $_GET["desde"] . "' AND cseg_fecha_proximo_contacto<='" . $_GET["hasta"] . "' AND (cseg_canal='" . $_GET["canal"] . "' OR cseg_canal='" . $_GET["canalDos"] . "') AND (cseg_realizado IS NULL OR cseg_realizado=0)
 								LIMIT $inicio, $limite
-								", $conexion);
+								");
 										} else {
-											$consulta = mysql_query("SELECT * FROM cliente_seguimiento
+											$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cliente_seguimiento
 								INNER JOIN clientes ON cli_id=cseg_cliente
-								INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
+								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 								INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 								WHERE cseg_id=cseg_id $filtroUsuario $filtro  
 								$orden
 								LIMIT $inicio, $limite
-								", $conexion);
+								");
 										}
 
 
 										$opcionesSino = array("NO", "SI");
 										$no = 1;
-										while ($res = mysql_fetch_array($consulta)) {
+										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
-											$encargado = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='" . $res['cseg_usuario_encargado'] . "'", $conexion));
+											$consultaEncargado=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $res['cseg_usuario_encargado'] . "'");
+											$encargado = mysqli_fetch_array($consultaEncargado, MYSQLI_BOTH);
 
-											$contacto = mysql_fetch_array(mysql_query("SELECT * FROM contactos 
-								INNER JOIN sucursales ON sucu_id=cont_sucursal
-								WHERE cont_id='" . $res['cseg_contacto'] . "'", $conexion));
+											$consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos 
+											INNER JOIN sucursales ON sucu_id=cont_sucursal
+											WHERE cont_id='" . $res['cseg_contacto'] . "'");
+											$contacto = mysqli_fetch_array($consultaContacto, MYSQLI_BOTH);
 
 											if ($datosUsuarioActual[3] != 1) {
-												$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'", $conexion));
+												$consultaNumZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
+												$numZ = mysqli_num_rows($consultaNumZonas);
 												if ($numZ == 0) continue;
 											}
 
@@ -328,7 +278,8 @@ $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_
 													break;
 											}
 
-											$ticketR = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_id='" . $res['cseg_tiket'] . "'", $conexion));
+											$consultaTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='" . $res['cseg_tiket'] . "'");
+											$ticketR = mysqli_fetch_array($consultaTikets, MYSQLI_BOTH);
 										?>
 											<tr>
 												<td <?= $fondoColor; ?>><?= $no; ?></td>
@@ -342,7 +293,7 @@ $tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_
 													<h4 style="margin-top:10px;">
 														<a href="clientes-seguimiento-agregar.php?idTK=<?= $res['cseg_tiket']; ?>" data-toggle="tooltip" title="Nuevo Seguimiento"><i class="icon-plus"></i></a>
 														<a href="clientes-seguimiento-editar.php?id=<?= $res[0]; ?>&idTK=<?= $_GET["idTK"]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
-														<a href="sql.php?id=<?= $res[0]; ?>&get=4&idTK=<?= $_GET["idTK"]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+														<a href="bd_delete/clientes-seguimiento-eliminar.php?id=<?=$res[0]; ?>&cte=<?=$_GET["cte"];?>&idTK=<?= $_GET["idTK"]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 
 													</h4>
 												</td>

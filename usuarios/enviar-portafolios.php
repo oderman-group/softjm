@@ -1,38 +1,20 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 110;
 $paginaActual['pag_nombre'] = "Enviar portafolios";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
 
-<?php
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
 if($_GET["em"]==3){
-	mysql_query("UPDATE clientes SET cli_estado_mercadeo=3, cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='".$_SESSION["id"]."' WHERE cli_id='".$_GET["cte"]."'",$conexion);
-	if(mysql_errno()!=0){echo mysql_error(); exit();}	
+	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_estado_mercadeo=3, cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='".$_SESSION["id"]."' WHERE cli_id='".$_GET["cte"]."'");	
 }	
 ?>
 <!-- styles -->
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
 
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -70,8 +52,8 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-                            <input type="hidden" name="idSql" value="47">
+							<form class="form-horizontal" method="post" action="bd_create/enviar-portafolio-guardar.php" enctype="multipart/form-data">
+                            <input type="hidden" name="cte" value="<?=$_GET["cte"];?>">
 							<fieldset class="default">
 								<legend>Opciones</legend>
 								
@@ -81,8 +63,8 @@ include("includes/js-formularios.php");
                                             <select data-placeholder="Escoja varias opciones..." class="chzn-select span8" multiple tabindex="2" name="clientes[]">
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = mysql_query("SELECT * FROM clientes",$conexion);
-                                                while($resOp = mysql_fetch_array($conOp)){
+                                                $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+                                                while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
                                                 ?>
                                                     <option value="<?=$resOp[0];?>" <?php if($resOp[0]==$_GET["cte"]){echo "selected";}?>><?=$resOp[1]." (".$resOp['cli_email'].")";?></option>
                                                 <?php

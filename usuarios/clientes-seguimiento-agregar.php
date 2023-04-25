@@ -1,17 +1,15 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 13;
 $paginaActual['pag_nombre'] = "Agregar Seguimiento de clientes";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
 if(isset($_GET["idTK"]) and is_numeric($_GET["idTK"])){
-	$tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["idTK"]."'",$conexion));
+	$consultaTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["idTK"]."'");
+	$tiket = mysqli_fetch_array($consultaTikets, MYSQLI_BOTH);
 	$tiketID = $_GET["idTK"];
 	$cliente = $tiket["tik_cliente"];
 	$tipoSeguimiento = $tiket["tik_tipo_tiket"];
@@ -25,23 +23,7 @@ if(isset($_GET["idTK"]) and is_numeric($_GET["idTK"])){
 	exit();
 }
 ?>
-<!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -78,14 +60,6 @@ include("includes/js-formularios.php");
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-                        
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -102,10 +76,11 @@ include("includes/js-formularios.php");
 						<div class="widget-head bondi-blue">
 							<h3> Ticket</h3>
 							<?php
-							$infoTicket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets
+							$consultaInfoTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets
 							INNER JOIN clientes ON cli_id=tik_cliente
 							INNER JOIN usuarios ON usr_id=tik_usuario_responsable
-							WHERE tik_id='".$_GET["idTK"]."'",$conexion));
+							WHERE tik_id='".$_GET["idTK"]."'");
+							$infoTicket = mysqli_fetch_array($consultaInfoTikets, MYSQLI_BOTH);
 							
 							?>
 						</div>
@@ -142,8 +117,14 @@ include("includes/js-formularios.php");
 							<?php if($infoTicket['tik_tipo_tiket']!=3){?>
 							<div class="control-group">
 								<label class="control-label" style="font-weight: bold;">Valor</label>
+								<?php
+									$valor=0;
+									if(!empty($infoTicket['tik_valor']) AND $infoTicket['tik_valor']>0){
+										$valor=$infoTicket['tik_valor'];
+									}
+								?>
 								<div class="controls">
-									$<?=number_format($infoTicket['tik_valor'],0,",",".");?>
+									$<?=number_format($valor,0,",",".");?>
 								</div>
 							</div>
 							
@@ -212,8 +193,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-                            <input type="hidden" name="idSql" value="7">
+							<form class="form-horizontal" method="post" action="bd_create/clientes-seguimiento-guardar.php" enctype="multipart/form-data">
                             
                             <input type="hidden" name="idTK" value="<?=$tiketID;?>">
                             <input type="hidden" name="tipoS" value="<?=$tipoSeguimiento;?>">
@@ -226,8 +206,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM contactos WHERE cont_cliente_principal='".$cliente."'",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$cliente."'");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['cont_nombre']." (".$resOp['cont_email']." - ".$resOp['cont_telefono'].")";?></option>
                                             <?php
@@ -246,8 +226,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tiketCreado">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM clientes_tikets WHERE tik_cliente='".$cliente."'",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_cliente='".$cliente."'");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['tik_asunto_principal'];?></option>
                                             <?php
@@ -408,8 +388,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="encargado[]" multiple>
 											<option value="0"></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM usuarios WHERE usr_bloqueado!=1",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=strtoupper($resOp[4]);?></option>
                                             <?php

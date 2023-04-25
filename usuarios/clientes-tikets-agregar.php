@@ -1,25 +1,16 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 89;
 $paginaActual['pag_nombre'] = "Agregar Tikets de clientes";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-
-<?php
 if($_GET["em"]==4){
-	mysql_query("UPDATE clientes SET cli_estado_mercadeo=4, cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='".$_SESSION["id"]."' WHERE cli_id='".$_GET["cte"]."'",$conexion);
-	if(mysql_errno()!=0){echo mysql_error(); exit();}	
-}	
-?>
+	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_estado_mercadeo=4, cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='".$_SESSION["id"]."' WHERE cli_id='".$_GET["cte"]."'");
+}
 
-<?php
-$tiket = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["idTK"]."'",$conexion));
+$tiket = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["idTK"]."'"), MYSQLI_BOTH);
 ?>
 
 <!-- styles -->
@@ -83,13 +74,6 @@ include("includes/js-formularios.php");
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -106,8 +90,8 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="39">
+							<form class="form-horizontal" method="post" action="bd_create/clientes-tikets-guardar.php">
+                            <input type="hidden" name="cte" value="<?=$_GET["cte"];?>">
                             	
 								
 								<script type="application/javascript">
@@ -124,12 +108,12 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" onChange="clientes(this)" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM clientes",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												if($datosUsuarioActual[3]!=1){
-													$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'",$conexion));
+													$numZ = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'"));
 													
-													$numCliente = mysql_num_rows(mysql_query("SELECT * FROM clientes_usuarios WHERE cliu_usuario='".$_SESSION["id"]."' AND cliu_cliente='".$resOp['cli_id']."'",$conexion));
+													$numCliente = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_usuarios WHERE cliu_usuario='".$_SESSION["id"]."' AND cliu_cliente='".$resOp['cli_id']."'"));
 									
 													if($numZ == 0 and $numCliente == 0) continue;
 												}
@@ -143,7 +127,7 @@ include("includes/js-formularios.php");
                                </div>
 								
 								<?php if(is_numeric($_GET['cte'])){
-								$clienteInfo = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='".$_GET['cte']."'",$conexion));
+								$clienteInfo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET['cte']."'"), MYSQLI_BOTH);
 								?>
 								<div class="control-group">
 									<label class="control-label">Sucursal (*)</label>
@@ -151,17 +135,17 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="sucursal" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM sucursales 
-											WHERE sucu_cliente_principal='".$_GET["cte"]."'",$conexion);
-											$numOp = mysql_num_rows($conOp);
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales 
+											WHERE sucu_cliente_principal='".$_GET["cte"]."'");
+											$numOp = mysqli_num_rows($conOp);
 											if($numOp==0){
 												//Crear automáticamente la sucursal
-												mysql_query("INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$_GET["cte"]."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')",$conexion);
+												mysqli_query($conexionBdPrincipal,"INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$_GET["cte"]."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')");
 												
 												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
 												exit();
 											}
-											while($resOp = mysql_fetch_array($conOp)){
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[7];?></option>
                                             <?php
@@ -193,8 +177,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="asuntoP">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM tikets_asuntos",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM tikets_asuntos");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
                                             <?php
