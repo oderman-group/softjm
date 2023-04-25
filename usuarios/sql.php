@@ -618,30 +618,7 @@ if ($_POST["idSql"] == 53) {
 	exit();
 }
 //EDITAR PUBLICIDAD DE CONFIGURACIÓN
-if ($_POST["idSql"] == 54) {
 
-	if ($_FILES['bTop']['name'] != "") {
-		$archivo = $_FILES['bTop']['name'];
-		$destino = "files/publicidad";
-		move_uploaded_file($_FILES['bTop']['tmp_name'], $destino . "/" . $archivo);
-		mysqli_query($conexionBdPrincipal,"UPDATE configuracion SET conf_banner_top='" . $archivo . "' WHERE conf_id=1");
-		
-	}
-
-	if ($_FILES['bLat']['name'] != "") {
-		$archivo = $_FILES['bLat']['name'];
-		$destino = "files/publicidad";
-		move_uploaded_file($_FILES['bLat']['tmp_name'], $destino . "/" . $archivo);
-		mysqli_query($conexionBdPrincipal,"UPDATE configuracion SET conf_banner_lateral='" . $archivo . "' WHERE conf_id=1");
-		
-	}
-
-	mysqli_query($conexionBdPrincipal,"UPDATE configuracion SET conf_url_top='" . $_POST["urlTop"] . "', conf_url_lateral='" . $_POST["urlLat"] . "' WHERE conf_id=1");
-	
-
-	echo '<script type="text/javascript">window.location.href="publicidad.php?msg=2";</script>';
-	exit();
-}
 //AGREGAR CUPONES
 if ($_POST["idSql"] == 55) {
 	mysqli_query($conexionBdPrincipal,"INSERT INTO cupones(cupo_codigo, cupo_descuento, cupo_activo, cupo_redimido, cupo_compra_minima, cupo_creacion, cupo_vencimiento, cupo_cliente)VALUES('" . $_POST["codigo"] . "','" . $_POST["descuento"] . "','" . $_POST["estado"] . "',0,'" . $_POST["compraMinima"] . "',now(),'" . $_POST["fechaVencimiento"] . "','" . $_POST["cliente"] . "')");
@@ -1546,20 +1523,7 @@ if ($_GET["get"] == 37) {
 	echo '<script type="text/javascript">window.location.href="calendario.php?id=' . $_SESSION["id"] . '";</script>';
 	exit();
 }
-if ($_GET["get"] == 38) {
-	//$idPagina = 100; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE configuracion SET conf_banner_top='' WHERE conf_id=1");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 39) {
-	//$idPagina = 100; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE configuracion SET conf_banner_lateral='' WHERE conf_id=1");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 if ($_GET["get"] == 40) {
 	//$idPagina = 118; include("includes/verificar-paginas.php");
 	mysqli_query($conexionBdPrincipal,"DELETE FROM cupones WHERE cupo_id='" . $_GET["id"] . "'");
