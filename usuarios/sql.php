@@ -620,14 +620,7 @@ if ($_POST["idSql"] == 53) {
 //EDITAR PUBLICIDAD DE CONFIGURACIÓN
 
 //AGREGAR CUPONES
-if ($_POST["idSql"] == 55) {
-	mysqli_query($conexionBdPrincipal,"INSERT INTO cupones(cupo_codigo, cupo_descuento, cupo_activo, cupo_redimido, cupo_compra_minima, cupo_creacion, cupo_vencimiento, cupo_cliente)VALUES('" . $_POST["codigo"] . "','" . $_POST["descuento"] . "','" . $_POST["estado"] . "',0,'" . $_POST["compraMinima"] . "',now(),'" . $_POST["fechaVencimiento"] . "','" . $_POST["cliente"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
-	echo '<script type="text/javascript">window.location.href="cupones.php";</script>';
-	exit();
-}
 //CONDICIONAR PRODUCTOS
 
 //ENVIAR COTIZACIÓN AL CORREO ELABORADO
@@ -1525,11 +1518,6 @@ if ($_GET["get"] == 37) {
 }
 
 if ($_GET["get"] == 40) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM cupones WHERE cupo_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
 }
 if ($_GET["get"] == 41) {
 	//$idPagina = 100; include("includes/verificar-paginas.php");
