@@ -11,7 +11,7 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 	if (isset($_POST["usuario"]) and trim($_POST["usuario"]) != "") {
         $consultaClienteV = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_usuario='" . trim($_POST["usuario"]) . "' AND cli_id!='" . $_POST["id"] . "'");
-		$clienteV = mysql_num_rows($consultaClienteV);
+		$clienteV = mysqli_num_rows($consultaClienteV);
 		if ($clienteV > 0) {
 			echo "<div style='font-family:arial; text-align:center'>Ya existe un cliente con este n&uacute;mero de NIT. Verifique para que no lo registre nuevamente.<br><br>
 			<a href='javascript:history.go(-1);'>[P&aacute;gina anterior]</a></span> | <a href='clientes.php'>[Ir a clientes]</a></div>";

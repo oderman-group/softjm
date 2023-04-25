@@ -1,16 +1,12 @@
-<?php include("sesion.php");?>
 <?php
+include("sesion.php");
+
 $idPagina = 83;
 $paginaActual['pag_nombre'] = "Sucursales";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'",$conexion));
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'");
+$cliente = mysqli_fetch_array($consultaClientes, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
@@ -31,46 +27,9 @@ $cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='"
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script type="text/javascript">
-            /*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
             $(function () {
                 $('#data-table').dataTable({
                     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                    /*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
                 });
             });
             $(function () {
@@ -151,13 +110,13 @@ $cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='"
 							</thead>
 							<tbody>
                             <?php
-							$consulta = mysql_query("SELECT * FROM sucursales
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales
 							INNER JOIN clientes ON cli_id=sucu_cliente_principal 
-							INNER JOIN localidad_ciudades ON ciu_id=sucu_ciudad 
-							INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
-							WHERE sucu_cliente_principal='".$_GET["cte"]."'",$conexion);
+							INNER JOIN orioncrmcom_dev_crm_admin.localidad_ciudades ON ciu_id=sucu_ciudad 
+							INNER JOIN orioncrmcom_dev_crm_admin.localidad_departamentos ON dep_id=ciu_departamento
+							WHERE sucu_cliente_principal='".$_GET["cte"]."'");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 							?>
 							<tr>
 								<td><?=$no;?></td>
@@ -168,7 +127,7 @@ $cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='"
                                 <td><?=$res['cli_nombre'];?></td>
                                 <td><h4>
                                     <a href="clientes-sucursales-editar.php?id=<?=$res[0];?>&cte=<?=$_GET["cte"];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-                                    <a href="sql.php?id=<?=$res[0];?>&get=23" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                    <a href="bd_delete/clientes-sucursales-eliminar.php?id=<?=$res[0];?>&cte=<?=$_GET["cte"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>
