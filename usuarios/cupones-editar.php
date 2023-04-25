@@ -1,7 +1,7 @@
 <?php 
 include("sesion.php");
 
-$idPagina = 166;
+$idPagina = 235;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
