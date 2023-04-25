@@ -157,7 +157,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 								</div>
 							</li>
 							<li><a href="clientes-tikets.php?tipo=1"><i class=" icon-unlock"></i>Tickets/Negociación</a></li>
-							<li><a href="#"><i class=" icon-unlock"></i>Seguimientos</a></li>	
+							<li><a href="clientes-seguimiento.php"><i class=" icon-unlock"></i>Seguimientos</a></li>	
 							<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Productos</a>
 								<div class="dropdown-menu">
 									<ul>
