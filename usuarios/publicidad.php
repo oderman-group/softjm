@@ -1,34 +1,18 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 42;
-$paginaActual['pag_nombre'] = "Publicidad";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1",$conexion));
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
 
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -62,14 +46,6 @@ include("includes/js-formularios.php");
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-                        
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -85,65 +61,64 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-                            <input type="hidden" name="idSql" value="54">
+							<form class="form-horizontal" method="post" action="bd_update/publicidad-actualizar.php" enctype="multipart/form-data">
                                 
                                 <fieldset class="default">
 									<legend>Banners publicitarios</legend>
                                 
-                                <div class="control-group">
-									<label class="control-label">Banner Superior</label>
-									<div class="controls">
-										<div class="fileupload fileupload-new" data-provides="fileupload">
-											<div class="input-append">
-												<div class="uneditable-input span3">
-													<i class="icon-file fileupload-exists"></i><span class="fileupload-preview"></span>
+									<div class="control-group">
+										<label class="control-label">Banner Superior</label>
+										<div class="controls">
+											<div class="fileupload fileupload-new" data-provides="fileupload">
+												<div class="input-append">
+													<div class="uneditable-input span3">
+														<i class="icon-file fileupload-exists"></i><span class="fileupload-preview"></span>
+													</div>
+													<span class="btn btn-file"><span class="fileupload-new">Seleccionar archivo</span><span class="fileupload-exists">Cambiar</span>
+													<input type="file" name="bTop"/>
+													</span><a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remover</a>
 												</div>
-												<span class="btn btn-file"><span class="fileupload-new">Seleccionar archivo</span><span class="fileupload-exists">Cambiar</span>
-												<input type="file" name="bTop"/>
-												</span><a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remover</a>
 											</div>
 										</div>
+										<?php if($resultadoD['conf_banner_top']!=""){?>
+											<img src="files/publicidad/<?=$resultadoD['conf_banner_top'];?>" width="100"><br>
+											<a href="bd_delete/publicidad-eliminar.php?ope=1" onClick="if(!confirm('Desea quitar este banner?')){return false;}">Quitar</a>
+										<?php }?>
 									</div>
-									<?php if($resultadoD['conf_banner_top']!=""){?>
-										<img src="files/publicidad/<?=$resultadoD['conf_banner_top'];?>" width="100"><br>
-										<a href="sql.php?get=38" onClick="if(!confirm('Desea quitar este banner?')){return false;}">Quitar</a>
-									<?php }?>
-								</div>
-									
-								<div class="control-group">
-									<label class="control-label">URL banner superior</label>
-									<div class="controls">
-										<input type="url" class="span10" name="urlTop" value="<?=$resultadoD['conf_url_top'];?>">
-									</div>
-								</div>	
-									
-								<div class="control-group">
-									<label class="control-label">Banner Lateral</label>
-									<div class="controls">
-										<div class="fileupload fileupload-new" data-provides="fileupload">
-											<div class="input-append">
-												<div class="uneditable-input span3">
-													<i class="icon-file fileupload-exists"></i><span class="fileupload-preview"></span>
+										
+									<div class="control-group">
+										<label class="control-label">URL banner superior</label>
+										<div class="controls">
+											<input type="url" class="span10" name="urlTop" value="<?=$resultadoD['conf_url_top'];?>">
+										</div>
+									</div>	
+										
+									<div class="control-group">
+										<label class="control-label">Banner Lateral</label>
+										<div class="controls">
+											<div class="fileupload fileupload-new" data-provides="fileupload">
+												<div class="input-append">
+													<div class="uneditable-input span3">
+														<i class="icon-file fileupload-exists"></i><span class="fileupload-preview"></span>
+													</div>
+													<span class="btn btn-file"><span class="fileupload-new">Seleccionar archivo</span><span class="fileupload-exists">Cambiar</span>
+													<input type="file" name="bLat"/>
+													</span><a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remover</a>
 												</div>
-												<span class="btn btn-file"><span class="fileupload-new">Seleccionar archivo</span><span class="fileupload-exists">Cambiar</span>
-												<input type="file" name="bLat"/>
-												</span><a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remover</a>
 											</div>
 										</div>
+										<?php if($resultadoD['conf_banner_lateral']!=""){?>
+											<img src="files/publicidad/<?=$resultadoD['conf_banner_lateral'];?>" width="100"><br>
+											<a href="bd_delete/publicidad-eliminar.php?ope=2" onClick="if(!confirm('Desea quitar este banner?')){return false;}">Quitar</a>
+										<?php }?>
 									</div>
-									<?php if($resultadoD['conf_banner_lateral']!=""){?>
-										<img src="files/publicidad/<?=$resultadoD['conf_banner_lateral'];?>" width="100"><br>
-										<a href="sql.php?get=39" onClick="if(!confirm('Desea quitar este banner?')){return false;}">Quitar</a>
-									<?php }?>
-								</div>
-									
-								<div class="control-group">
-									<label class="control-label">URL banner lateral</label>
-									<div class="controls">
-										<input type="url" class="span10" name="urlLat" value="<?=$resultadoD['conf_url_lateral'];?>">
-									</div>
-								</div>	
+										
+									<div class="control-group">
+										<label class="control-label">URL banner lateral</label>
+										<div class="controls">
+											<input type="url" class="span10" name="urlLat" value="<?=$resultadoD['conf_url_lateral'];?>">
+										</div>
+									</div>	
 									
 									
                                 </fieldset>
