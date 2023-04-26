@@ -1,11 +1,10 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 if($_FILES['planilla']['name']!=""){
 	$archivo = $_FILES['planilla']['name']; $destino = "files/excel";
 	move_uploaded_file($_FILES['planilla']['tmp_name'], $destino ."/".$archivo);
 }
-?>
-<?php
 //set_time_limit (0);
 
 // Test CVS
@@ -33,9 +32,9 @@ for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 	if(trim($data->sheets[0]['cells'][$i][2])!="" and $data->sheets[0]['cells'][$i][7]!=""){
 		
 
-		$datosUsuario = mysql_fetch_array(mysql_query("SELECT * FROM proveedores 
-		WHERE (prov_documento='".$data->sheets[0]['cells'][$i][1]."' AND prov_documento!='') OR (prov_email='".$data->sheets[0]['cells'][$i][4]."' AND prov_email!='')",$conexion));
-		if(mysql_errno()!=0){echo mysql_error()." - CONSULTAR PROVEEDOR<br>";}
+		$consultaUsuario=mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores 
+		WHERE (prov_documento='".$data->sheets[0]['cells'][$i][1]."' AND prov_documento!='') OR (prov_email='".$data->sheets[0]['cells'][$i][4]."' AND prov_email!='')");
+		$datosUsuario = mysqli_fetch_array($consultaUsuario);
 		
 		//SI EL PROVEEDOR YA EXISTE CON EL NIT
 		if($datosUsuario['cli_id']!=""){
@@ -47,7 +46,7 @@ for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 		else{
 
 			
-			mysql_query("INSERT INTO proveedores(prov_documento, prov_clave, prov_nombre, prov_email, prov_telefono, prov_ciudad, prov_fecha_registro, prov_responsable, prov_eliminado,  prov_tipo_regimen, prov_direccion)VALUES(
+			mysqli_query($conexionBdPrincipal,"INSERT INTO proveedores(prov_documento, prov_clave, prov_nombre, prov_email, prov_telefono, prov_ciudad, prov_fecha_registro, prov_responsable, prov_eliminado,  prov_tipo_regimen, prov_direccion)VALUES(
 			'".$data->sheets[0]['cells'][$i][1]."',
 			'".$data->sheets[0]['cells'][$i][1]."',
 			'".$data->sheets[0]['cells'][$i][2]."',
@@ -61,12 +60,10 @@ for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 			'".$data->sheets[0]['cells'][$i][3]."',
 			'".$data->sheets[0]['cells'][$i][8]."'
 			)
-			",$conexion);
-			if(mysql_errno()!=0){echo mysql_error()." - ERROR INSERTAR<br>";}
-			$clienteID = mysql_insert_id();
+			");
+			$clienteID = mysqli_insert_id($conexionBdPrincipal);
 			
-			//mysql_query("INSERT INTO clientes_categorias(cpcat_cliente, cpcat_categoria)VALUES('".$clienteID."',".$data->sheets[0]['cells'][$i][10].")",$conexion);
-			//if(mysql_errno()!=0){echo mysql_error()." - ERROR CATEGORIAS<br>";}
+			//mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_categorias(cpcat_cliente, cpcat_categoria)VALUES('".$clienteID."',".$data->sheets[0]['cells'][$i][10].")");
 		}
 		
 		/*
