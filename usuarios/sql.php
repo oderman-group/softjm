@@ -656,34 +656,9 @@ if ($_POST["idSql"] == 69) {
 	exit();
 }
 //AGREGAR PROVEEDORES
-if ($_POST["idSql"] == 70) {
-	$clave = round($_POST["pais"]);
-	mysqli_query($conexionBdPrincipal,"INSERT INTO proveedores(prov_documento, prov_clave, prov_nombre, prov_email, prov_telefono, prov_ciudad, prov_fecha_registro, prov_responsable, prov_eliminado, prov_tipo_regimen, prov_direccion, prov_pais, prov_otra_ciudad)VALUES('" . $_POST["dni"] . "', '" . $clave . "', '" . $_POST["nombre"] . "', '" . $_POST["email"] . "', '" . $_POST["telefono"] . "', '" . $_POST["ciudad"] . "', now(), '" . $_SESSION["id"] . "', 0, '" . $_POST["regimen"] . "', '" . $_POST["direccion"] . "', '" . $_POST["pais"] . "', '" . $_POST["otraCiudad"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
-	echo '<script type="text/javascript">window.location.href="proveedores-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
 //EDITAR PROVEEDORES
-if ($_POST["idSql"] == 71) {
 
-	if ($_FILES['logo']['name'] != "") {
-		$extension = end(explode(".", $_FILES['logo']['name']));
-		$logo = uniqid('prov_') . "." . $extension;
-		$destino = "files/proveedores";
-		move_uploaded_file($_FILES['logo']['tmp_name'], $destino . "/" . $logo);
-
-		mysqli_query($conexionBdPrincipal,"UPDATE proveedores SET prov_logo='" . $logo . "' WHERE prov_id='" . $_POST["id"] . "'");
-		
-	}
-
-	mysqli_query($conexionBdPrincipal,"UPDATE proveedores SET prov_documento='" . $_POST["dni"] . "', prov_nombre='" . $_POST["nombre"] . "', prov_email='" . $_POST["email"] . "', prov_telefono='" . $_POST["telefono"] . "', prov_ciudad='" . $_POST["ciudad"] . "', prov_tipo_regimen='" . $_POST["regimen"] . "', prov_direccion='" . $_POST["direccion"] . "', prov_pais='" . $_POST["pais"] . "', prov_otra_ciudad='" . $_POST["otraCiudad"] . "' WHERE prov_id='" . $_POST["id"] . "'");
-	
-
-	echo '<script type="text/javascript">window.location.href="proveedores-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 //EDITAR PEDIDOS
 if ($_POST["idSql"] == 72) {
 	mysqli_query($conexionBdPrincipal,"UPDATE pedidos SET pedid_fecha_propuesta='" . $_POST["fecha"] . "', pedid_estado='" . $_POST["estado"] . "', pedid_empresa_envio='" . $_POST["empresaEnvio"] . "', pedid_codigo_seguimiento='" . $_POST["codigoSeguimiento"] . "' WHERE pedid_id='" . $_POST["id"] . "'");
@@ -1750,13 +1725,7 @@ if ($_GET["get"] == 60) {
 	exit();
 }
 //ELIMINAR PROVEEDORES
-if ($_GET["get"] == 61) {
-	mysqli_query($conexionBdPrincipal,"UPDATE proveedores SET prov_eliminado=1, prov_fecha_eliminado=now(), prov_responsable_elimacion='" . $_SESSION["id"] . "' WHERE prov_id='" . $_GET["id"] . "'");
-	
 
-	echo '<script type="text/javascript">window.location.href="proveedores.php?msg=1";</script>';
-	exit();
-}
 //ELIMINAR BODEGAS
 
 //ELIMINAR BODEGAS POR PRODUCTOS
