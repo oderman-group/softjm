@@ -1,13 +1,10 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 151;
-$paginaActual['pag_nombre'] = "Pedidos";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -30,46 +27,9 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <script src="js/bootbox.js"></script>
 
 <script type="text/javascript">
-            /*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
             $(function () {
                 $('#data-table').dataTable({
                     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                    /*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
                 });
             });
             $(function () {
@@ -128,22 +88,37 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 						<div class="widget-head green">
 							<h3><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
+                            <?php
+							$filtro = '';
+							if($_GET["busqueda"]!=""){$filtro .= " AND (pedid_id='".$_GET["busqueda"]."' OR cli_nombre='".$_GET["busqueda"]."' OR usr_nombre='".$_GET["busqueda"]."')";}
+								
+							if(isset($_GET["cte"]) and $_GET["cte"]!=""){
+								$SQL = "SELECT * FROM pedidos
+								INNER JOIN clientes ON cli_id=pedid_cliente AND cli_id='".$_GET["cte"]."'
+								ORDER BY pedid_id DESC";
+							}else{
+								$SQL = "SELECT * FROM pedidos
+								INNER JOIN clientes ON cli_id=pedid_cliente
+								INNER JOIN usuarios ON usr_id=pedid_creador
+								WHERE pedid_id=pedid_id $filtro
+								ORDER BY pedid_id DESC";
+							}
+						?>
 						<div class="widget-container">
-							<p></p>
-							
-							<div style="border:thin; border-style:solid; height:150px; margin:10px;">
-                            	<h4 align="center">-Búsqueda por ID-</h4>
+                            <div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
+                                <h4 align="center">-Busqueda general y paginación-</h4>
                                 <p> 
-                                    <form class="form-horizontal" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
+                                    <form class="form-horizontal" style="text-align: right;" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
                                         <div class="search-box">
                                             <div class="input-append input-icon">
-                                                <input class="search-input" placeholder="ID..." type="text" name="q" value="<?=$_GET["q"];?>">
+                                                <input placeholder="Buscar..." type="text" name="busqueda" value="<?php if(isset($_GET["busqueda"])) echo $_GET["busqueda"]; ?>">
                                                 <i class=" icon-search"></i>
-                                                <input class="btn" type="submit" name="buscar" value="Buscar">
+                                                <input class="btn" type="submit" value="Buscar">
                                             </div>
-                                            <?php if($_GET["q"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
+                                            <?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
                                         </div>
-                                    </form> 
+                                    </form>
+                                    <p style="margin: 10px;"><?php include("includes/paginacion.php");?></p> 
                                 </p>
                             </div>
 						
@@ -162,33 +137,32 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							</tr>
 							</thead>
 							<tbody>
-                            <?php
-							$filtro = '';
-							if($_GET["q"]!=""){$filtro .= " AND pedid_id='".$_GET["q"]."'";}	
-								
+                            <?php								
 							if(isset($_GET["cte"]) and $_GET["cte"]!=""){
-								$consulta = mysql_query("SELECT * FROM pedidos
+								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos
 								INNER JOIN clientes ON cli_id=pedid_cliente AND cli_id='".$_GET["cte"]."'
 								ORDER BY pedid_id DESC
-								",$conexion);
+								LIMIT $inicio, $limite
+								");
 							}else{
-								$consulta = mysql_query("SELECT * FROM pedidos
+								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos
 								INNER JOIN clientes ON cli_id=pedid_cliente
 								INNER JOIN usuarios ON usr_id=pedid_creador
 								WHERE pedid_id=pedid_id $filtro
 								ORDER BY pedid_id DESC
-								",$conexion);
+								LIMIT $inicio, $limite
+								");
 							}
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								if($datosUsuarioActual[3]!=1){
-									$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'",$conexion));
+									$numZ = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'"));
 									if($numZ==0) continue;
 								}
 								
-								$vendedor = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['pedid_vendedor']."'",$conexion));
+								$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['pedid_vendedor']."'"), MYSQLI_BOTH);
 
-								$generoRemision = mysql_fetch_array(mysql_query("SELECT * FROM remisionbdg WHERE remi_pedido='" . $res['pedid_id'] . "'", $conexion));
+								$generoRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg WHERE remi_pedido='" . $res['pedid_id'] . "'"), MYSQLI_BOTH);
 
 
 											$infoRem = '';
