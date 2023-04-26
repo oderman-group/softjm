@@ -6,11 +6,22 @@ $paginaActual['pag_nombre'] = "Seguimiento de clientes";
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'");
-$cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 
-$consultaTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='" . $_GET["idTK"] . "'");
-$tiket = mysqli_fetch_array($consultaTikets, MYSQLI_BOTH);
+$nombreCliente="";
+if(!empty($_GET["cte"])){
+	$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'");
+	$cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
+	$nombreCliente=" de <b>".$cliente['cli_nombre']."</b>";
+
+	$filtroUsuario = " AND (cseg_usuario_responsable='" . $_SESSION["id"] . "' OR cseg_usuario_encargado='" . $_SESSION["id"] . "')";
+}
+
+if(!empty($_GET["idTK"])){
+	$consultaTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='" . $_GET["idTK"] . "'");
+	$tiket = mysqli_fetch_array($consultaTikets, MYSQLI_BOTH);
+
+	$filtroUsuario = " AND (cseg_usuario_responsable='" . $_SESSION["id"] . "' OR cseg_usuario_encargado='" . $_SESSION["id"] . "')";
+}
 ?>
 <!-- styles -->
 
@@ -75,12 +86,12 @@ $tiket = mysqli_fetch_array($consultaTikets, MYSQLI_BOTH);
 				<div class="row-fluid ">
 					<div class="span12">
 						<div class="primary-head">
-							<h3 class="page-header"><?=$paginaActual['pag_nombre'];?> de <b><?=$cliente['cli_nombre'];?></b></h3>
+							<h3 class="page-header"><?=$paginaActual['pag_nombre'].$nombreCliente?></h3>
 						</div>
 						<ul class="breadcrumb">
 							<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
 							<li><a href="clientes.php">Clientes</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-							<li class="active"><?=$paginaActual['pag_nombre'];?> de <b><?=$cliente['cli_nombre'];?></b></li>
+							<li class="active"><?=$paginaActual['pag_nombre'].$nombreCliente?></li>
 						</ul>
 					</div>
 				</div>
@@ -127,15 +138,13 @@ $tiket = mysqli_fetch_array($consultaTikets, MYSQLI_BOTH);
 				<?php
 				$filtro = "";
 				if (isset($_GET["busqueda"]) and $_GET["busqueda"] != "") {
-					$filtro .= " AND (cseg_id LIKE '%" . $_GET["busqueda"] . "%' OR cseg_observacion LIKE '%" . $_GET["busqueda"] . "%' OR cseg_asunto LIKE '%" . $_GET["busqueda"] . "%')";
+					$filtro .= " AND (cseg_id LIKE '%" . $_GET["busqueda"] . "%' OR cseg_observacion LIKE '%" . $_GET["busqueda"] . "%' OR cseg_asunto LIKE '%" . $_GET["busqueda"] . "%' OR cli_nombre LIKE '%" . $_GET["busqueda"] . "%')";
 				}
 
 				$orden = 'ORDER BY cseg_id DESC';
 				if (isset($_GET["seg"]) and $_GET["seg"] != "" and is_numeric($_GET["seg"])) {
 					$orden = 'ORDER BY cseg_id=' . $_GET["seg"] . ' DESC';
 				}
-
-				$filtroUsuario = " AND (cseg_usuario_responsable='" . $_SESSION["id"] . "' OR cseg_usuario_encargado='" . $_SESSION["id"] . "')";
 
 				if ($_GET["estado"] == 1) {
 					$filtro .= ' AND cseg_realizado=1';
@@ -194,15 +203,28 @@ $tiket = mysqli_fetch_array($consultaTikets, MYSQLI_BOTH);
 							DT = Consiguió datos | CZ = Hubo cotización | VT = Hubo venta
 						</p>
 
-						<p style="margin: 10px;"><?php include("includes/paginacion.php"); ?></p>
-
 						<div class="content-widgets light-gray">
 							<div class="widget-head green">
 								<h3><?= $paginaActual['pag_nombre']; ?> : <b><?= $tiket['tik_asunto_principal']; ?></b></h3>
 							</div>
 							<div class="widget-container">
 								<?php include("includes/notificaciones.php"); ?>
-								<p></p>
+								<div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
+									<h4 align="center">-Busqueda general y paginación-</h4>
+									<p> 
+										<form class="form-horizontal" style="text-align: right;" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
+											<div class="search-box">
+												<div class="input-append input-icon">
+													<input placeholder="Buscar..." type="text" name="busqueda" value="<?php if(isset($_GET["busqueda"])) echo $_GET["busqueda"]; ?>">
+													<i class=" icon-search"></i>
+													<input class="btn" type="submit" value="Buscar">
+												</div>
+												<?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
+											</div>
+										</form>
+									<p style="margin: 10px;"><?php include("includes/paginacion.php");?></p> 
+									</p>
+								</div>
 								<table class="table table-striped table-bordered" id="data-table">
 									<thead>
 										<tr>
