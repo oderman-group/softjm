@@ -1,13 +1,10 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 148;
-$paginaActual['pag_nombre'] = "Remisiones";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -30,46 +27,9 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <script src="js/bootbox.js"></script>
 
 <script type="text/javascript">
-            /*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
             $(function () {
                 $('#data-table').dataTable({
                     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                    /*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
                 });
             });
             $(function () {
@@ -120,12 +80,6 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						<ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -136,7 +90,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
             <?php include("includes/notificaciones.php");?>
             <p>
             <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-            <a href="#remisionbdg-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+            <a href="remisionbdg-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -144,22 +98,37 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 						<div class="widget-head green">
 							<h3><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
+						<?php
+							$filtro = '';
+							if($_GET["busqueda"]!=""){$filtro .= " AND (remi_id='".$_GET["busqueda"]."' OR cli_nombre='".$_GET["busqueda"]."' OR usr_nombre='".$_GET["busqueda"]."')";}	
+								
+							if(isset($_GET["cte"]) and $_GET["cte"]!=""){
+								$SQL="SELECT * FROM remisionbdg
+								INNER JOIN clientes ON cli_id=remi_cliente AND cli_id='".$_GET["cte"]."'
+								ORDER BY remi_id DESC";
+							}else{
+								$SQL="SELECT * FROM remisionbdg
+								INNER JOIN clientes ON cli_id=remi_cliente
+								INNER JOIN usuarios ON usr_id=remi_creador
+								WHERE remi_id=remi_id $filtro
+								ORDER BY remi_id DESC";
+							}
+						?>
 						<div class="widget-container">
-							<p></p>
-							
-							<div style="border:thin; border-style:solid; height:150px; margin:10px;">
-                            	<h4 align="center">-Búsqueda por ID-</h4>
+                            <div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
+                                <h4 align="center">-Busqueda general y paginación-</h4>
                                 <p> 
-                                    <form class="form-horizontal" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
+                                    <form class="form-horizontal" style="text-align: right;" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
                                         <div class="search-box">
                                             <div class="input-append input-icon">
-                                                <input class="search-input" placeholder="ID..." type="text" name="q" value="<?=$_GET["q"];?>">
+                                                <input placeholder="Buscar..." type="text" name="busqueda" value="<?php if(isset($_GET["busqueda"])) echo $_GET["busqueda"]; ?>">
                                                 <i class=" icon-search"></i>
-                                                <input class="btn" type="submit" name="buscar" value="Buscar">
+                                                <input class="btn" type="submit" value="Buscar">
                                             </div>
-                                            <?php if($_GET["q"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
+                                            <?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
                                         </div>
-                                    </form> 
+                                    </form>
+                                    <p style="margin: 10px;"><?php include("includes/paginacion.php");?></p> 
                                 </p>
                             </div>
 						
@@ -179,33 +148,35 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							</thead>
 							<tbody>
                             <?php
-							$filtro = '';
-							if($_GET["q"]!=""){$filtro .= " AND remi_id='".$_GET["q"]."'";}	
-								
 							if(isset($_GET["cte"]) and $_GET["cte"]!=""){
-								$consulta = mysql_query("SELECT * FROM remisionbdg
+								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg
 								INNER JOIN clientes ON cli_id=remi_cliente AND cli_id='".$_GET["cte"]."'
 								ORDER BY remi_id DESC
-								",$conexion);
+								LIMIT $inicio, $limite
+								");
 							}else{
-								$consulta = mysql_query("SELECT * FROM remisionbdg
+								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg
 								INNER JOIN clientes ON cli_id=remi_cliente
 								INNER JOIN usuarios ON usr_id=remi_creador
 								WHERE remi_id=remi_id $filtro
 								ORDER BY remi_id DESC
-								",$conexion);
+								LIMIT $inicio, $limite
+								");
 							}
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								if($datosUsuarioActual[3]!=1){
-									$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'",$conexion));
+									$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'");
+									$numZ = mysqli_num_rows($consultaZonas);
 									if($numZ==0) continue;
 								}
 								
-								$vendedor = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['remi_vendedor']."'",$conexion));
+								$consultaVendedor=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['remi_vendedor']."'");
+								$vendedor = mysqli_fetch_array($consultaVendedor, MYSQLI_BOTH);
 
 
-								$generoFactura = mysql_fetch_array(mysql_query("SELECT * FROM facturas WHERE factura_remision='" . $res['remi_id'] . "'", $conexion));
+								$consultaFactura=mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas WHERE factura_remision='" . $res['remi_id'] . "'");
+								$generoFactura = mysqli_fetch_array($consultaFactura, MYSQLI_BOTH);
 
 											$infoFac = '';
 											$fondoRemision = '';
@@ -228,19 +199,19 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 										<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span>
 										</button>
 										<ul class="dropdown-menu">
-											<?php if($_SESSION["id"]==$res['remi_creador'] or $_SESSION["id"]==$res['remi_vendedor'] or $datosUsuarioActual[3]==13){?>
+											<?php if($_SESSION["id"]==$res['remi_creador'] or $_SESSION["id"]==57 or $_SESSION["id"]==$res['remi_vendedor'] or $datosUsuarioActual[3]==13){?>
 											<li><a href="remisionbdg-editar.php?id=<?=$res[0];?>#productos"> Editar</a></li>
 											<?php }?>
 											
-											<?php if($_SESSION["id"]==$res['remi_creador'] or $_SESSION["id"]==$res['remi_vendedor']){?>
-											<li><a href="sql.php?id=<?=$res[0];?>&get=50" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
+											<?php if($_SESSION["id"]==$res['remi_creador'] or $_SESSION["id"]==57 or $_SESSION["id"]==$res['remi_vendedor']){?>
+											<li><a href="bd_delete/remisionbdg-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 											<?php }?>
 											
 											<li><a href="reportes/formato-remision-1.php?id=<?=$res[0];?>" target="_blank">Imprimir</a></li>
 
 											<?php if($generoFactura[0]==""){?>
 											
-											<li><a href="sql.php?get=65&id=<?=$res[0];?>" onClick="if(!confirm('Desea generar factura de esta remisión?')){return false;}">Generar Factura</a></li>
+											<li><a href="bd_create/remisionbdg-generar-factura.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea generar factura de esta remisión?')){return false;}">Generar Factura</a></li>
 
 											<?php }?>
 											
