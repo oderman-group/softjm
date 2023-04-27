@@ -714,99 +714,7 @@ if ($_POST["idSql"] == 77) {
 //AGREGAR O ACTUALIZAR PRODUCTOS EN BODEGAS
 
 //AGREGAR REMISIONES
-if ($_POST["idSql"] == 81) {
 
-	//En proceso pendiente...
-
-	mysqli_query($conexionBdPrincipal,"INSERT INTO remisionbdg(cotiz_fecha_propuesta, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, cotiz_creador, cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, cotiz_fecha_creacion, cotiz_moneda, cotiz_observaciones, cotiz_envio, cotiz_proveedor)VALUES('" . $_POST["fechaPropuesta"] . "','" . $_POST["cliente"] . "','" . $_POST["fechaVencimiento"] . "','" . $_POST["influyente"] . "','" . $_SESSION["id"] . "','" . $_POST["sucursal"] . "','" . $_POST["contacto"] . "','" . $_POST["formaPago"] . "',now(),'" . $_POST["moneda"] . "','" . $_POST["notas"] . "','" . $_POST["envio"] . "','" . $_POST["proveedor"] . "')");
-	
-	$idInsert = mysqli_insert_id($conexionBdPrincipal);
-
-	//Productos
-	$numero = (count($_POST["producto"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-			$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='" . $_POST["producto"][$contador] . "'"));
-			
-
-			$valorProducto = $productoDatos['prod_precio'];
-			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['prod_precio'] / $configuracion['conf_trm_compra']), 0);
-			}
-
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["producto"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 1)");
-			
-			$contador++;
-		}
-	}
-
-	//COMBOS
-	$numero = (count($_POST["combo"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-
-			$datosCombos = mysqli_query($conexionBdPrincipal,"SELECT ROUND((SUM(copp_cantidad)*prod_precio),0), combo_descuento FROM combos
-			INNER JOIN combos_productos ON copp_combo=combo_id
-			INNER JOIN productos ON prod_id=copp_producto
-			WHERE combo_id='" . $_POST["combo"][$contador] . "'
-			GROUP BY copp_producto
-			");
-			$precioCombo = 0;
-			$dctoCombo = 0;
-			while ($dCombos = mysqli_fetch_array($datosCombos)) {
-				$precioCombo += $dCombos[0];
-				$dctoCombo = $dCombos[1];
-			}
-			if ($dctoCombo > 0) {
-				$precioCombo = round($precioCombo - ($precioCombo * ($dctoCombo / 100)), 0);
-			}
-
-
-			$productoNum = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_combo='" . $_POST["combo"][$contador] . "'"));
-			
-
-
-			if ($productoNum['czpp_id'] == '') {
-				$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM combos WHERE combo_id='" . $_POST["combo"][$contador] . "'"));
-				
-
-				$valorProducto = $precioCombo;
-				if ($_POST["moneda"] == 2) {
-					$valorProducto = round(($precioCombo / $configuracion['conf_trm_compra']), 0);
-				}
-
-				mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["combo"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 1)");
-				
-			}
-
-			$contador++;
-		}
-	}
-
-	//Servicios
-	$numero = (count($_POST["servicio"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-			$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id='" . $_POST["servicio"][$contador] . "'"));
-			
-
-			$valorProducto = $productoDatos['serv_precio'];
-			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['serv_precio'] / $configuracion['conf_trm_compra']), 0);
-			}
-
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_servicio, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["servicio"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 1)");
-			
-			$contador++;
-		}
-	}
-
-	echo '<script type="text/javascript">window.location.href="cotizaciones-editar.php?id=' . $idInsert . '&msg=1";</script>';
-	exit();
-}
 //TRASNFERIR PRODUCTOS ENTRE BODEGAS
 
 //AGREGAR FACTURAS DE VENTA
@@ -1508,13 +1416,6 @@ if ($_GET["get"] == 42) {
 	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
 	exit();
 }
-if ($_GET["get"] == 43) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_id='" . $_GET["idItem"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 //ENVIAR COTIZACIÓN AL CORREO
 if ($_GET["get"] == 44) {
 
@@ -1744,40 +1645,6 @@ if ($_GET["get"] == 64) {
 	exit();
 }
 //GENERAR FACTURA DE VENTA A PARTIR DE REMISIÓN
-if ($_GET["get"] == 65) {
-	//$idPagina = 72; include("includes/verificar-paginas.php");
-
-	$generoFactura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas WHERE factura_remision='" . $_GET["id"] . "'"));
-	if($generoFactura[0]!=""){
-		echo "<span style='font-family:arial; text-align:center; color:red;'>Esta Remisión ya generó la factura con ID: ".$generoFactura[0].". En la fecha: ".$generoFactura['factura_fecha_creacion']."</div>";
-		exit();
-	}
-
-	$valorProductos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT sum(czpp_valor*czpp_cantidad) + sum(czpp_valor*czpp_cantidad)*(czpp_impuesto/100) FROM cotizacion_productos 
-	WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=3"));
-
-	mysqli_query($conexionBdPrincipal,"INSERT INTO facturas(factura_fecha_propuesta, factura_observaciones, factura_cliente, factura_fecha_vencimiento, factura_vendedor, factura_creador, factura_sucursal, factura_contacto, factura_forma_pago, factura_fecha_creacion, factura_moneda, factura_estado, factura_tipo, factura_concepto, factura_extranjera, factura_remision)
-	SELECT now(), remi_observaciones, remi_cliente, remi_fecha_vencimiento, remi_vendedor, '" . $_SESSION["id"] . "', remi_sucursal, remi_contacto, remi_forma_pago, now(), remi_moneda, 1, 1, 'Traída de remisión', 0, remi_id FROM remisionbdg WHERE remi_id='" . $_GET["id"] . "'");
-	
-	$idInsert = mysqli_insert_id($conexionBdPrincipal);
-
-
-	$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=3");
-	
-
-	while ($prod = mysqli_fetch_array($productos)) {
-		if ($prod['czpp_orden'] == "") $prod['czpp_orden'] = 1;
-		if ($prod['czpp_cantidad'] == "") $prod['czpp_cantidad'] = 1;
-
-		mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_descuento, czpp_observacion, czpp_servicio, czpp_combo, czpp_bodega)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '" . $prod['czpp_cantidad'] . "', '" . $prod['czpp_impuesto'] . "', 4, '" . $prod['czpp_descuento'] . "', '" . $prod['czpp_observacion'] . "', '" . $prod['czpp_servicio'] . "', '" . $prod['czpp_combo'] . "', '" . $prod['czpp_bodega'] . "')");
-		
-
-		$contador++;
-	}
-
-	echo '<script type="text/javascript">window.location.href="facturas.php?q=' . $idInsert . '";</script>';
-	exit();
-}
 
 //COLOCAR REDIMIDA UNA FACTURA, PUNTOS DEL CLIENTE
 if ($_GET["get"] == 66) {
