@@ -163,6 +163,12 @@ $paginaActual['pag_nombre'] = "Facturas";
 										$sumaFacturasSinIva = 0;
 										$sumaFacturasConIva = 0;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
+											
+											$czppFactura=$res['factura_id'];
+											if($res['factura_concepto']=="Traída de remisión"){
+												$czppFactura=$res['factura_remision'];
+											}
+
 											if ($datosUsuarioActual[3] != 1) {
 												$consultaZona=mysqli_query($conexionBdPrincipal, "SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
 												$numZ = mysqli_num_rows($consultaZona);
@@ -179,7 +185,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 
 											
 											$consultaTotal = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
-													WHERE czpp_cotizacion='".$res['factura_id']."' AND czpp_tipo=4 AND czpp_valor>0 AND czpp_cantidad>0
+													WHERE czpp_cotizacion='".$czppFactura."' AND czpp_valor>0 AND czpp_cantidad>0
 													GROUP BY czpp_id
 													");
 
@@ -244,6 +250,23 @@ $paginaActual['pag_nombre'] = "Facturas";
 													$colorRedimidoV = 'aquamarine';
 											}
 
+											$nombreCliente="";
+											if(!empty($res['cli_nombre'])){
+												$nombreCliente=strtoupper($res['cli_nombre']);
+											}
+											$nombreProveedor="";
+											if(!empty($res['prov_nombre'])){
+												$nombreProveedor=strtoupper($res['prov_nombre']);
+											}
+											$nombreResponsable="";
+											if(!empty($res['usr_nombre'])){
+												$nombreResponsable=strtoupper($res['usr_nombre']);
+											}
+											$nombreVendedor="";
+											if(!empty($vendedor['usr_nombre'])){
+												$nombreVendedor=strtoupper($vendedor['usr_nombre']);
+											}
+
 										?>
 											<tr>
 											<td><?= $no; ?></td>	
@@ -251,13 +274,13 @@ $paginaActual['pag_nombre'] = "Facturas";
 												<td><span class="badge badge-<?= $nacionEtiqueta[$res['factura_extranjera']]; ?>"><?= $nacionFactura[$res['factura_extranjera']]; ?></span></td>
 												<td><?= $res['factura_fecha_propuesta']; ?></td>
 												<td><?= $res['factura_concepto']; ?></td>
-												<td><?= strtoupper($res['cli_nombre']); ?></td>
-												<td><?= strtoupper($res['prov_nombre']); ?></td>
+												<td><?= $nombreCliente; ?></td>
+												<td><?= $nombreProveedor; ?></td>
 												<td>
 													<?php
 													$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
 													INNER JOIN productos ON prod_id=czpp_producto
-													WHERE czpp_cotizacion='" . $res['factura_id'] . "' AND czpp_tipo=4
+													WHERE czpp_cotizacion='" . $czppFactura . "'
 													");
 													$i = 1;
 													while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
@@ -266,8 +289,8 @@ $paginaActual['pag_nombre'] = "Facturas";
 													}
 													?>
 												</td>
-												<td><?= strtoupper($res['usr_nombre']); ?></td>
-												<td><?= strtoupper($vendedor['usr_nombre']); ?></td>
+												<td><?= $nombreResponsable; ?></td>
+												<td><?= $nombreVendedor; ?></td>
 												<td><?= $tipoFactura[$res['factura_tipo']]; ?></td>
 												<td><?= $res['factura_remision']; ?></td>
 												<td align="center">$<?= number_format($sumaTotalConDcto, 0, ".", "."); ?></td>
