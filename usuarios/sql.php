@@ -660,21 +660,8 @@ if ($_POST["idSql"] == 69) {
 //EDITAR PROVEEDORES
 
 //EDITAR PEDIDOS
-if ($_POST["idSql"] == 72) {
-	mysqli_query($conexionBdPrincipal,"UPDATE pedidos SET pedid_fecha_propuesta='" . $_POST["fecha"] . "', pedid_estado='" . $_POST["estado"] . "', pedid_empresa_envio='" . $_POST["empresaEnvio"] . "', pedid_codigo_seguimiento='" . $_POST["codigoSeguimiento"] . "' WHERE pedid_id='" . $_POST["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="pedidos-timeline.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
+
 //AGREGAR NOVEDADES PEDIDO
-if ($_POST["idSql"] == 73) {
-
-	mysqli_query($conexionBdPrincipal,"INSERT INTO pedidos_novedades(pednov_dia, pednov_mes, pednov_estado, pednov_novedad, pednov_pedido, pednov_usuario)VALUES('" . $_POST["dia"] . "', '" . $_POST["mes"] . "', '" . $_POST["estado"] . "', '" . $_POST["novedad"] . "', '" . $_POST["id"] . "', '" . $_SESSION["id"] . "')");
-	
-
-	echo '<script type="text/javascript">window.location.href="pedidos-timeline.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 
 //aqui estaba la actualización de estructura de mensajes.
 
