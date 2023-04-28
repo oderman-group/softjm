@@ -1,13 +1,10 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 133;
-$paginaActual['pag_nombre'] = "Importaciones";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -165,14 +162,14 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							if($_GET["q"]!=""){$filtro .= " AND imp_id='".$_GET["q"]."'";}	
 								
 							
-								$consulta = mysql_query("SELECT * FROM importaciones
+								$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones
 								INNER JOIN proveedores ON prov_id=imp_proveedor
 								INNER JOIN usuarios ON usr_id=imp_responsable
 								WHERE imp_id=imp_id $filtro
-								",$conexion);
+								");
 							
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
 							?>
 							<tr>
@@ -184,12 +181,12 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 								<td><?=strtoupper($res['usr_nombre']);?></td>
 								<td>
 									<?php
-										$productos = mysql_query("SELECT * FROM cotizacion_productos
+										$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
 										INNER JOIN productos ON prod_id=czpp_producto
 										WHERE czpp_cotizacion='".$res['imp_id']."'
-										",$conexion);
+										");
 										$i = 1;
-										while($prod = mysql_fetch_array($productos)){
+										while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 											echo "<b>".$i.".</b> ".$prod['prod_nombre'].", ";
 											$i++;
 										}

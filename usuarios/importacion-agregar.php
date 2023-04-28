@@ -1,13 +1,10 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 134;
-$paginaActual['pag_nombre'] = "Agregar importaciones";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -105,8 +102,8 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysql_query("SELECT * FROM proveedores",$conexion);
-											 while($resOp = mysql_fetch_array($conOp)){
+											 $conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM proveedores");
+											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>"><?=$resOp['prov_nombre'];?></option>
 											 <?php
