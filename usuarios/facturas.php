@@ -90,21 +90,47 @@ $paginaActual['pag_nombre'] = "Facturas";
 								<h3><?= $paginaActual['pag_nombre']; ?></h3>
 							</div>
 							<div class="widget-container">
-								<p></p>
+								<?php
+									$filtro = '';
+									if ($_GET["busqueda"] != "") {
+										$filtro .= " AND factura_id='" . $_GET["busqueda"] . "'";
+									}
+									if ($_GET["usuario"] != "") {
+										$filtro .= " AND factura_vendedor='" . $_GET["usuario"] . "'";
+									}
 
-								<div style="border:thin; border-style:solid; height:150px; margin:10px;">
-									<h4 align="center">-Búsqueda por ID-</h4>
-									<p>
-									<form class="form-horizontal" action="<?= $_SERVER['PHP_SELF']; ?>" method="get">
-										<div class="search-box">
-											<div class="input-append input-icon">
-												<input class="search-input" placeholder="ID..." type="text" name="q" value="<?= $_GET["q"]; ?>">
-												<i class=" icon-search"></i>
-												<input class="btn" type="submit" name="buscar" value="Buscar">
+									if($_GET["desde"]!="" or $_GET["hasta"]!=""){
+												$filtro .= " AND factura_fecha_propuesta BETWEEN '".$_GET["desde"]."' AND '".$_GET["hasta"]."'";
+											}
+									
+
+									if (isset($_GET["cte"]) and $_GET["cte"] != "") {
+										$SQL = "SELECT * FROM facturas
+										LEFT JOIN clientes ON cli_id=factura_cliente AND cli_id='" . $_GET["cte"] . "'
+										ORDER BY factura_id DESC";
+									} else {
+										$SQL = "SELECT * FROM facturas
+										LEFT JOIN clientes ON cli_id=factura_cliente
+										LEFT JOIN proveedores ON prov_id=factura_proveedor
+										INNER JOIN usuarios ON usr_id=factura_creador
+										WHERE factura_id=factura_id $filtro
+										ORDER BY factura_id DESC";
+									}
+								?>
+								<div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
+									<h4 align="center">-Busqueda general y paginación-</h4>
+									<p> 
+										<form class="form-horizontal" style="text-align: right;" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
+											<div class="search-box">
+												<div class="input-append input-icon">
+													<input placeholder="Buscar..." type="text" name="busqueda" value="<?php if(isset($_GET["busqueda"])) echo $_GET["busqueda"]; ?>">
+													<i class=" icon-search"></i>
+													<input class="btn" type="submit" value="Buscar">
+												</div>
+												<?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
 											</div>
-											<?php if ($_GET["q"] != "") { ?> <a href="<?= $_SERVER['PHP_SELF']; ?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
-										</div>
-									</form>
+										</form>
+										<p style="margin: 10px;"><?php include("includes/paginacion.php");?></p> 
 									</p>
 								</div>
 
@@ -132,32 +158,21 @@ $paginaActual['pag_nombre'] = "Facturas";
 									</thead>
 									<tbody>
 										<?php
-										$filtro = '';
-										if ($_GET["q"] != "") {
-											$filtro .= " AND factura_id='" . $_GET["q"] . "'";
-										}
-										if ($_GET["usuario"] != "") {
-											$filtro .= " AND factura_vendedor='" . $_GET["usuario"] . "'";
-										}
-
-										if($_GET["desde"]!="" or $_GET["hasta"]!=""){
-													$filtro .= " AND factura_fecha_propuesta BETWEEN '".$_GET["desde"]."' AND '".$_GET["hasta"]."'";
-												}
-										
-
 										if (isset($_GET["cte"]) and $_GET["cte"] != "") {
 											$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
-								LEFT JOIN clientes ON cli_id=factura_cliente AND cli_id='" . $_GET["cte"] . "'
-								ORDER BY factura_id DESC
-								");
+											LEFT JOIN clientes ON cli_id=factura_cliente AND cli_id='" . $_GET["cte"] . "'
+											ORDER BY factura_id DESC
+											LIMIT $inicio, $limite
+											");
 										} else {
 											$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
-								LEFT JOIN clientes ON cli_id=factura_cliente
-								LEFT JOIN proveedores ON prov_id=factura_proveedor
-								INNER JOIN usuarios ON usr_id=factura_creador
-								WHERE factura_id=factura_id $filtro
-								ORDER BY factura_id DESC
-								");
+											LEFT JOIN clientes ON cli_id=factura_cliente
+											LEFT JOIN proveedores ON prov_id=factura_proveedor
+											INNER JOIN usuarios ON usr_id=factura_creador
+											WHERE factura_id=factura_id $filtro
+											ORDER BY factura_id DESC
+											LIMIT $inicio, $limite
+											");
 										}
 										$no = 1;
 										$sumaFacturasSinIva = 0;
@@ -284,7 +299,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 													");
 													$i = 1;
 													while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
-														echo "<b>" . $i . ".</b> " . $prod['prod_nombre'] . ", ";
+														echo "<b>" . $i . ".</b> " . $prod['prod_nombre'] . "</br>";
 														$i++;
 													}
 													?>

@@ -371,6 +371,9 @@ include("includes/js-formularios.php");
 										$trmMult = $resultadoD['factura_trm_euro'];
 									}
 								}
+								if(!is_numeric($trmMult) || $trmMult<1){
+									$trmMult=0;
+								}
 							?>
 							<tr>
 								<td><?=$no;?></td>
