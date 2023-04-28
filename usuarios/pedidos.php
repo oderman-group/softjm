@@ -190,16 +190,16 @@ include("includes/head.php");
 											<!--
 											<li><a href="#pedidos-editar.php?id=<?=$res[0];?>#productos"> Editar</a></li>
 											
-											<li><a href="sql.php?id=<?=$res[0];?>&get=51" onClick="if(!confirm('Desea anular el registro?')){return false;}">Anular</a></li>-->
+											<li><a href="bd_delete/pedidos-anular.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea anular el registro?')){return false;}">Anular</a></li>-->
 											
-											<li><a href="sql.php?id=<?=$res[0];?>&get=50" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
+											<li><a href="bd_delete/pedidos-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 											<?php }?>
 											
 											<li><a href="reportes/formato-pedido-1.php?id=<?=$res[0];?>" target="_blank">Imprimir</a></li>
 
 											<?php if($generoRemision[0]==""){?>
 											
-												<li><a href="sql.php?get=52&id=<?=$res[0];?>" onClick="if(!confirm('Desea generar remisión de este pedido?')){return false;}">Generar remisión</a></li>
+												<li><a href="pedidos-generar-remision.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea generar remisión de este pedido?')){return false;}">Generar remisión</a></li>
 
 											<?php }?>
 											
