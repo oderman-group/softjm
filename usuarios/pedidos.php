@@ -171,14 +171,27 @@ include("includes/head.php");
 												$infoRem = 'Este pedido ya generó la remisión con ID: '.$generoRemision[0].". En la fecha: ".$generoRemision['remi_fecha_creacion'];
 												$fondoPedido = 'aquamarine';
 											}
+
+											$nombreCliente="";
+											if(!empty($res['cli_nombre'])){
+												$nombreCliente=strtoupper($res['cli_nombre']);
+											}
+											$nombreResponsable="";
+											if(!empty($res['usr_nombre'])){
+												$nombreResponsable=strtoupper($res['usr_nombre']);
+											}
+											$nombreVendedor="";
+											if(!empty($vendedor['usr_nombre'])){
+												$nombreVendedor=strtoupper($vendedor['usr_nombre']);
+											}
 							?>
 							<tr>
 							<td><?= $no; ?></td>	
 							<td style="background-color: <?= $fondoPedido; ?>;" title="<?=$infoRem;?>"><?=$res['pedid_id'];?></td>
                                 <td><?=$res['pedid_fecha_propuesta'];?></td>
-                                <td><?=strtoupper($res['cli_nombre']);?></td>
-								<td><?=strtoupper($res['usr_nombre']);?></td>
-								<td><?=strtoupper($vendedor['usr_nombre']);?></td>
+                                <td><?=$nombreCliente;?></td>
+								<td><?=$nombreResponsable;?></td>
+								<td><?=$nombreVendedor;?></td>
 								<td><a href="pedidos-timeline.php?id=<?=$res['pedid_id'];?>" target="_blank">En camino</a></td>
 								<td><?=$res['pedid_cotizacion'];?></td>
                                 <td>
