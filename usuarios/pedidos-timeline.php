@@ -1,7 +1,7 @@
 <?php 
 include("sesion.php");
 
-$idPagina = 19;
+$idPagina = 237;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
@@ -188,7 +188,7 @@ DEMO
 =====
 */
 
-@media (min-width: 768px){
+/* @media (min-width: 768px){
 
   html{
     font-size: 62.5%;
@@ -200,11 +200,11 @@ DEMO
   html{
     font-size: 55%;
   }
-}
+} */
 
 body{
   
-  font-size: 1.6rem;
+  /* font-size: 1.6rem; */
   color: #222;
 
   background-color: #f0f0f0;
