@@ -1,13 +1,10 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 141;
-$paginaActual['pag_nombre'] = "Pedidos Store";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -162,13 +159,13 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							$filtro = '';
 							if($_GET["q"]!=""){$filtro .= " AND ped_id='".$_GET["q"]."'";}	
 
-							$consulta = mysql_query("SELECT * FROM store_pedidos
+							$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM store_pedidos
 							WHERE ped_id=ped_id $filtro
 							ORDER BY ped_id DESC
-							",$conexion);
+							");
 							
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								$estadoColor = 'crimson';
 								switch($res['ped_estado']){
 									case 4: $estadoPedido = 'APROBADA'; $estadoColor = 'darkgreen'; break;
@@ -196,12 +193,12 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 								</td>
 								<td>
 									<?php
-										$productos = mysql_query("SELECT * FROM store_pedidos_items
+										$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM store_pedidos_items
 										INNER JOIN productos ON prod_id=pedit_producto
 										WHERE pedit_pedido='".$res['ped_id']."'
-										",$conexion);
+										");
 										$i = 1;
-										while($prod = mysql_fetch_array($productos)){
+										while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 											echo "<b>".$i.".</b> ".$prod['prod_nombre']." - [<b>Cant:</b> ".$prod['pedit_cantidad']."] - $".number_format($prod['pedit_valor_base'],0,",",".")."<br> ";
 											$i++;
 										}
