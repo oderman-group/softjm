@@ -157,56 +157,9 @@ if ($_POST["idSql"] == 29) {
 	exit();
 }
 //AGREGAR MATERIALES A PRODUCTOS
-if ($_POST["idSql"] == 30) {
-	$numero = (count($_FILES['documento']['name']));
-	if ($numero > 0 and $_FILES['documento']['name'][0] != "") {
-		$contador = 0;
-		while ($contador < $numero) {
-			$extension = end(explode(".", $_FILES['documento']['name'][$contador]));
-			$archivo = uniqid('file_') . "." . $extension;
 
-			//$archivo = $_FILES['documento']['name'][$contador];
-			$destino = "files/materiales";
-			move_uploaded_file($_FILES['documento']['tmp_name'][$contador], $destino . "/" . $archivo);
-			$material = $archivo;
-			mysqli_query($conexionBdPrincipal,"INSERT INTO productos_materiales(ppmt_material, ppmt_tipo, ppmt_activo, ppmt_producto, ppmt_nombre)VALUES('" . $material . "','" . $_POST["tipo"] . "','" . $_POST["activo"] . "','" . $_POST["pdto"] . "','" . $_POST["nombre"] . "')");
-			
-			$contador++;
-		}
-	} else {
-		$material = $_POST["video"];
-		mysqli_query($conexionBdPrincipal,"INSERT INTO productos_materiales(ppmt_material, ppmt_tipo, ppmt_activo, ppmt_producto, ppmt_nombre)VALUES('" . $material . "','" . $_POST["tipo"] . "','" . $_POST["activo"] . "','" . $_POST["pdto"] . "','" . $_POST["nombre"] . "')");
-		
-		$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-	}
-	echo '<script type="text/javascript">window.location.href="productos-materiales.php?msg=1&pdto=' . $_POST["pdto"] . '";</script>';
-	exit();
-}
 //EDITAR MATERIALES A PRODUCTOS
-if ($_POST["idSql"] == 31) {
 
-	if ($_FILES['documento']['name'] != "") {
-
-		$extension = end(explode(".", $_FILES['documento']['name']));
-		$archivo = uniqid('file_') . "." . $extension;
-
-		//$archivo = $_FILES['documento']['name'][$contador];
-		$destino = "files/materiales";
-		move_uploaded_file($_FILES['documento']['tmp_name'], $destino . "/" . $archivo);
-		$material = $archivo;
-		mysqli_query($conexionBdPrincipal,"UPDATE productos_materiales SET ppmt_material='" . $material . "' WHERE ppmt_id='" . $_POST["id"] . "'");
-		
-	} else {
-		$material = $_POST["video"];
-		if ($_POST["tipo"] == 2) {
-			mysqli_query($conexionBdPrincipal,"UPDATE productos_materiales SET ppmt_material='" . $material . "' WHERE ppmt_id='" . $_POST["id"] . "'");
-		}
-	}
-	mysqli_query($conexionBdPrincipal,"UPDATE productos_materiales SET ppmt_tipo='" . $_POST["tipo"] . "', ppmt_activo='" . $_POST["activo"] . "', ppmt_nombre='" . $_POST["nombre"] . "' WHERE ppmt_id='" . $_POST["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="productos-materiales.php?msg=2&pdto=' . $_POST["pdto"] . '";</script>';
-	exit();
-}
 //ENVIAR BOLETIN  DE MENSAJES
 if ($_POST["idSql"] == 32) {
 
@@ -1067,14 +1020,7 @@ if ($_GET["get"] == 16) {
 	exit();
 }
 //ELIMINAR MATERIALES DE PRODUCTOS
-if ($_GET["get"] == 17) {
-	$idPagina = 71;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM productos_materiales WHERE ppmt_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //ENVIAR ENCUESTA AL CORREO
 if ($_GET["get"] == 18) {
 	$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='" . $_GET["cont"] . "'"));
