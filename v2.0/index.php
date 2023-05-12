@@ -1,6 +1,6 @@
 <?php
 include("modelo/conexion.php");
-$configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1",$conexion));
+$configuracion = mysqli_fetch_array(mysqli_query($conexion,"SELECT * FROM configuracion WHERE conf_id=1"), MYSQLI_BOTH);
 ?>
 <!DOCTYPE html>
 <html dir="ltr">

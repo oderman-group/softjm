@@ -12,9 +12,9 @@ else
 	include("../config/config.php");
 	
 	//USUARIO ACTUAL
-	$consultaUsuarioActual = mysql_query("SELECT * FROM usuarios WHERE usr_id='".$_SESSION["id"]."'",$conexion);
-	$numUsuarioActual = mysql_num_rows($consultaUsuarioActual);
-	$datosUsuarioActual = mysql_fetch_array($consultaUsuarioActual);
+	$consultaUsuarioActual = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$_SESSION["id"]."'");
+	$numUsuarioActual = mysqli_num_rows($consultaUsuarioActual);
+	$datosUsuarioActual = mysqli_fetch_array($consultaUsuarioActual, MYSQLI_BOTH);
 	//SABER SI ESTA BLOQUEADO
 	if($datosUsuarioActual['usr_bloqueado']==1)
 	{

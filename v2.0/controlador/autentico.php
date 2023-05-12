@@ -1,8 +1,8 @@
 <?php 
 include("../modelo/conexion.php");
-$rst_usr = mysql_query("SELECT * FROM usuarios WHERE usr_login='".trim($_POST["Usuario"])."' AND usr_clave='".$_POST["Clave"]."'",$conexion);
-$num = mysql_num_rows($rst_usr);
-$fila = mysql_fetch_array($rst_usr);
+$rst_usr = mysqli_query($conexion,"SELECT * FROM usuarios WHERE usr_login='".trim($_POST["Usuario"])."' AND usr_clave='".$_POST["Clave"]."'");
+$num = mysqli_num_rows($rst_usr);
+$fila = mysqli_fetch_array($rst_usr, MYSQLI_BOTH);
 if($num>0)
 {
 	//VERIFICAR SI EL USUARIO ESTÁ BLOQUEADO
