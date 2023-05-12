@@ -6,7 +6,9 @@ usuarios/files/productos
 usuarios/files/proveedores
 usuarios/files/publicidad
 usuarios/css2020
-v2.0
+v2.0/assets
+v2.0/dist
+v2.0/usuarios/empresa/dist
 excelClientesCRM.xls
 excelproveedoresCRM.xls
 limpiar-orion.php
