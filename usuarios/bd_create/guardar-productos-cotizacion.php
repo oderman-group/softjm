@@ -17,7 +17,7 @@ if($_POST["producto"]!=''){
                 $valorProducto = productosPrecioListaUSD($productoDatos['prod_utilidad'], $productoDatos['prod_costo_dolar']);
             }
 
-            $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_costo, czpp_utilidad_porcentaje)VALUES('" . $idInsert . "','" . $_POST["producto"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 1, '".$productoDatos['prod_costo']."', '".$productoDatos['prod_utilidad']."')");
+            $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_costo, czpp_utilidad_porcentaje)VALUES('" . $idInsert . "','" . $_POST["producto"][$contador] . "', '" . $valorProducto . "', '" . $numero . "', 1, 19, 1, '".$productoDatos['prod_costo']."', '".$productoDatos['prod_utilidad']."')");
 
             $contador++;
 

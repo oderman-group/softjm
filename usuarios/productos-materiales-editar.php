@@ -1,37 +1,21 @@
-<?php include("sesion.php");?>
 <?php
+include("sesion.php");
+
 $idPagina = 70;
-$paginaActual['pag_nombre'] = "Editar materiales";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM productos_materiales WHERE ppmt_id='".$_GET["id"]."'",$conexion));
-?>
-<?php
-$producto = mysql_fetch_array(mysql_query("SELECT * FROM productos_soptec WHERE prod_id='".$_GET["pdto"]."'",$conexion));
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_materiales WHERE ppmt_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+
+$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec WHERE prod_id='".$_GET["pdto"]."'");
+$producto = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
 
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -68,14 +52,6 @@ include("includes/js-formularios.php");
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-                        
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -94,8 +70,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-                            <input type="hidden" name="idSql" value="31">
+							<form class="form-horizontal" method="post" action="bd_update/productos-materiales-actualizar.php" enctype="multipart/form-data">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
                             <input type="hidden" name="pdto" value="<?=$_GET["pdto"];?>">
                             
@@ -109,7 +84,7 @@ include("includes/js-formularios.php");
                             	<div class="control-group">
 									<label class="control-label">Tipo de material</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipo" onChange="material(this)">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipo" id="tipo" onChange="material(this)">
 											<option value=""></option>
                                             <option value="1" <?php if($resultadoD[2]==1){echo "selected";}?>>Documento</option>
                                             <option value="2" <?php if($resultadoD[2]==2){echo "selected";}?>>Video</option>
@@ -118,6 +93,16 @@ include("includes/js-formularios.php");
                                     </div>
                                </div>
                                
+								<?php
+									if($resultadoD[2]==1 || $resultadoD[2]==3){
+										$displayD="block";
+										$displayV="none";
+									}else{
+										$displayD="none";
+										$displayV="block";
+									}
+								?>
+								
                                <script type="text/javascript">
 							    function material(valor){
 									if(valor.value==1 || valor.value==3){
@@ -130,7 +115,7 @@ include("includes/js-formularios.php");
 								}
                                </script>
                                
-                                <div class="control-group" id="documento" style="display:block;">
+                                <div class="control-group" id="documento" style="display:<?=$displayD?>;">
 									<label class="control-label">Escoja Documento/Software</label>
 									<div class="controls">
 										<input type="file" class="span4" name="documento" value="<?=$resultadoD[1];?>">
@@ -138,7 +123,7 @@ include("includes/js-formularios.php");
                                     <?php if($resultadoD[2]==1 or $resultadoD[2]==3){echo '<a href="files/materiales/'.$resultadoD[1].'" target="_blank">'.$resultadoD[1].'</a>';}?>
 								</div>
                                 
-                                <div class="control-group" id="video" style="display:block;">
+                                <div class="control-group" id="video" style="display:<?=$displayV?>;">
 									<label class="control-label">Código de Video (YouTube)</label>
 									<div class="controls">
 										<input type="text" class="span4" name="video" value="<?php if($resultadoD[2]==2){echo $resultadoD[1];}?>"> <span style="color:#C00;">Mira la imagen de ejemplo.</span>

@@ -1,30 +1,27 @@
 <?php
 session_start();
-if ($_GET["cte"] == 1) {
+include("../../conexion.php");
+
+if (!empty($_GET["cte"]) AND $_GET["cte"] == 1) {
 	$_GET["id"] = base64_decode($_GET["id"]);
 } else {
 	if ($_SESSION["id"] == "")
 		header("Location:../../salir.php");
 }
-?>
 
-<?php include("../../conexion.php"); ?>
-
-<?php
 //CONFIGURACIÓN DEL PROGRAMA
 $monedas = array("", "COP", "USD");
 $simbolosMonedas = array("", "$", "USD");
-?>
 
-<?php
-$configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1", $conexion));
 
-$resultado = mysql_fetch_array(mysql_query("SELECT * FROM pedidos
+$configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"), MYSQLI_BOTH);
+
+$resultado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos
 INNER JOIN clientes ON cli_id=pedid_cliente
 INNER JOIN sucursales ON sucu_id=pedid_sucursal
 INNER JOIN contactos ON cont_id=pedid_contacto
 INNER JOIN usuarios ON usr_id=pedid_vendedor
-WHERE pedid_id='" . $_GET["id"] . "'", $conexion));
+WHERE pedid_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
@@ -101,12 +98,12 @@ WHERE pedid_id='" . $_GET["id"] . "'", $conexion));
 
 					<!-- COMBOS -->
 					<?php
-						$productos = mysql_query("SELECT * FROM combos
+						$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos
 		INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2
-		ORDER BY czpp_orden", $conexion);
+		ORDER BY czpp_orden");
 
 
-						while ($prod = mysql_fetch_array($productos)) {
+						while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 							$dcto = 0;
 							$valorTotal = 0;
 
@@ -131,9 +128,9 @@ WHERE pedid_id='" . $_GET["id"] . "'", $conexion));
 								$fondo = 'lightgray';
 							}
 
-							$precioNormalCombo = mysql_fetch_array(mysql_query("SELECT SUM(copp_cantidad*prod_precio) FROM combos_productos
+							$precioNormalCombo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT SUM(copp_cantidad*prod_precio) FROM combos_productos
 								INNER JOIN productos ON prod_id=copp_producto
-								WHERE copp_combo='".$prod['combo_id']."'",$conexion));
+								WHERE copp_combo='".$prod['combo_id']."'"), MYSQLI_BOTH);
 						?>
 							<tr style="height: 30px; background-color: <?= $fondo; ?>;">
 								<td align="center"><?= $no; ?></td>
@@ -153,12 +150,12 @@ WHERE pedid_id='" . $_GET["id"] . "'", $conexion));
 									<span style="font-size: 9px; color: darkblue;"><?= $prod['combo_descripcion']; ?></span><br>
 									<span style="font-size: 9px; color: teal;">
 										<?php
-										$productosCombo = mysql_query("SELECT * FROM productos 
+										$productosCombo = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 										INNER JOIN productos_categorias ON catp_id=prod_categoria
 										INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='" . $prod['combo_id'] . "'
-										ORDER BY copp_id", $conexion);
+										ORDER BY copp_id");
 										$c = 1;
-										while ($prodCombo = mysql_fetch_array($productosCombo)) {
+										while ($prodCombo = mysqli_fetch_array($productosCombo, MYSQLI_BOTH)) {
 											if ($c == 1) {
 												echo "<br><b>INCLUYE:</b><br>";
 											}
@@ -185,11 +182,11 @@ WHERE pedid_id='" . $_GET["id"] . "'", $conexion));
 					<?php
 					//Productos
 					$no = 1;
-					$productos = mysql_query("SELECT * FROM productos 
+					$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 		INNER JOIN productos_categorias ON catp_id=prod_categoria
 		INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2
-		ORDER BY czpp_orden", $conexion);
-					while ($prod = mysql_fetch_array($productos)) {
+		ORDER BY czpp_orden");
+					while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 						$dcto = 0;
 							$valorTotal = 0;
 
@@ -242,10 +239,10 @@ WHERE pedid_id='" . $_GET["id"] . "'", $conexion));
 						
 					<?php
 					//Servicios
-					$productos = mysql_query("SELECT * FROM servicios
+					$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios
 		INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2
-		ORDER BY czpp_orden", $conexion);
-					while ($prod = mysql_fetch_array($productos)) {
+		ORDER BY czpp_orden");
+					while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 						$valorTotal += ($prod['czpp_valor'] * $prod['czpp_cantidad']);
 
 						$totalIva += ($prod['czpp_cantidad'] * ($prod['czpp_valor'] * ($prod['czpp_impuesto'] / 100)));

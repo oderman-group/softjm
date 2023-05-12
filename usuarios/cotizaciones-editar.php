@@ -619,7 +619,7 @@ include("includes/js-formularios.php");
 								<td><?=$no;?></td>
 								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td>
-									<a href="sql.php?get=43&idItem=<?=$prod['czpp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<a href="bd_delete/cotizaciones-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
 									<a href="combos-editar.php?id=<?=$prod['combo_id'];?>" target="_blank"><?=$prod['combo_nombre'];?></a><br>
 									<?php if($prod['combo_descuento']!="" and $resultadoD['cotiz_ocultar_descuento_combo']=='0'){?>
 										<span><b>Precio Normal:</b> $<?=number_format($precioNormalCombo[0],0,".",".");?></span><br>
@@ -728,7 +728,7 @@ include("includes/js-formularios.php");
 								<td><?=$no;?></td>
 								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td>
-									<a href="sql.php?get=43&idItem=<?=$prod['czpp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<a href="bd_delete/cotizaciones-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
 									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_nombre'];?></a><br>
 									
 									<span style="font-size: 9px; color: darkblue;"><?=$prod['prod_descripcion_corta'];?></span><br>
@@ -826,7 +826,7 @@ include("includes/js-formularios.php");
 								<td><?=$no;?></td>
 								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td>
-									<a href="sql.php?get=43&idItem=<?=$prod['czpp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<a href="bd_delete/cotizaciones-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
 									<a href="servicios-editar.php?id=<?=$prod['serv_id'];?>" target="_blank"><?=$prod['serv_nombre'];?></a>
 										
 									<p><textarea title="czpp_observacion" name="<?=$prod['czpp_id'];?>" onChange="productos(this)" style="width: 300px;" rows="4"><?=$prod['czpp_observacion'];?></textarea></p>

@@ -370,11 +370,12 @@ include("includes/js-formularios.php");
 							<?php 
 								$no ++;
 							}
-							?>	
 							
-							<?php
 							$total = $subtotal - $totalDescuento;
 							$total += $totalIva;
+							if(!is_numeric($totalDescuento) || $totalDescuento<1){
+								$totalDescuento=0;
+							}
 							?>	
 							</tbody>
 							<tfoot>

@@ -359,11 +359,16 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 												<input type="text" class="span2" name="utilidad" value="<?= $resultadoD['prod_utilidad']; ?>">
 											</div>
 										</div>
-
+										<?php
+											$num=0;
+											if(!empty($resultadoD['prod_precio'])){
+												$num=$resultadoD['prod_precio'];
+											}
+										?>
 										<div class="control-group">
 											<label class="control-label">Precio lista ($)</label>
 											<div class="controls">
-												<input type="text" class="span6" name="precio1" value="<?= number_format($resultadoD['prod_precio'], 0, ",", "."); ?>" readonly>
+												<input type="text" class="span6" name="precio1" value="<?= number_format($num, 0, ",", "."); ?>" readonly>
 											</div>
 										</div>
 

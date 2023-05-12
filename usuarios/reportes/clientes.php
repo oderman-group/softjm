@@ -98,19 +98,20 @@
 							if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro .= " AND (cli_fecha_registro>='".$_GET["desde"]."')";}
 							if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro .= " AND (cli_fecha_registro<='".$_GET["hasta"]."')";}
 								
-							$consulta = mysql_query("SELECT * FROM clientes
-							INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-							INNER JOIN localidad_departamentos ON dep_id=ciu_departamento 
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes
+							INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+							INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento 
 							$filtro2
 							$filtro3
 							WHERE cli_id=cli_id $filtro
 							ORDER BY ".$_GET['orden']." ".$_GET['formaOrden']."
-							",$conexion);
+							");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
 								if($datosUsuarioActual[3]!=1){
-									$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'",$conexion));
+									$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'");
+									$numZ = mysqli_num_rows($consultaZonas);
 									if($numZ==0) continue;
 								}
 								
@@ -123,13 +124,16 @@
 									case 2: $categ = 'Cliente'; break;
 								}
 								
-								$numContac = mysql_num_rows(mysql_query("SELECT * FROM contactos WHERE cont_cliente_principal='".$res['cli_id']."'",$conexion));
+								$consultaContactos=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$res['cli_id']."'");
+								$numContac = mysqli_num_rows($consultaContactos);
 								
-								$usuarioMod = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['cli_usuario_modificacion']."'",$conexion));
+								$consultaUsuarios=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['cli_usuario_modificacion']."'");
+								$usuarioMod = mysqli_fetch_array($consultaUsuarios, MYSQLI_BOTH);
 								
-								$usuarioMercadeo = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['cli_estado_mercadeo_usuario']."'",$conexion));
+								$consultaUsuarios2=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['cli_estado_mercadeo_usuario']."'");
+								$usuarioMercadeo = mysqli_fetch_array($consultaUsuarios2, MYSQLI_BOTH);
 								
-								$numeros = mysql_fetch_array(mysql_query("
+								$consultaNumeros=mysqli_query($conexionBdPrincipal,"
 								SELECT
 								(SELECT count(tik_id) FROM clientes_tikets WHERE tik_cliente='".$res['cli_id']."'),
 								(SELECT count(cseg_id) FROM cliente_seguimiento 
@@ -139,7 +143,8 @@
 								(SELECT count(cont_id) FROM contactos WHERE cont_cliente_principal='".$res['cli_id']."'),
 								(SELECT count(fact_id) FROM facturacion WHERE fact_cliente='".$res['cli_id']."'),
 								(SELECT count(rem_id) FROM remisiones WHERE rem_cliente='".$res['cli_id']."')
-								",$conexion));
+								");
+								$numeros = mysqli_fetch_array($consultaNumeros, MYSQLI_BOTH);
 								
 								$color1='#FFF';	$color2='#FFF';	$color3='#FFF';	$color4='#FFF';	$color5='#FFF';	$color6='#FFF';
 								if($numeros[0]==0){$color1='#FFF090';}
@@ -208,11 +213,11 @@
 								
 							<?php if($_GET['sucursales']==1){
 								$i = 1;
-								$sucursales = mysql_query("SELECT * FROM sucursales 
-								INNER JOIN localidad_ciudades ON ciu_id=sucu_ciudad
-								INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
-								WHERE sucu_cliente_principal='".$res['cli_id']."'",$conexion);
-								$sucNum = mysql_num_rows($sucursales);
+								$sucursales = mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales 
+								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=sucu_ciudad
+								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
+								WHERE sucu_cliente_principal='".$res['cli_id']."'");
+								$sucNum = mysqli_num_rows($sucursales);
 								if($sucNum>0){
 							?>
 								<tr style="background-color: dimgray; height: 20px; font-weight: bold; color:white;">
@@ -226,7 +231,7 @@
 								</tr>
 							<?php
 								}
-								while($sucu = mysql_fetch_array($sucursales)){
+								while($sucu = mysqli_fetch_array($sucursales, MYSQLI_BOTH)){
 							?>
 							<tr style="background-color: gainsboro;">
 								<td align="center"><?=$i;?></td>
@@ -242,9 +247,9 @@
 								
 							<?php if($_GET['contacto']==1){	
 								$i = 1;
-								$contacto = mysql_query("SELECT * FROM contactos
-								WHERE cont_cliente_principal='".$res['cli_id']."'",$conexion);
-								$contNum = mysql_num_rows($contacto);
+								$contacto = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos
+								WHERE cont_cliente_principal='".$res['cli_id']."'");
+								$contNum = mysqli_num_rows($contacto);
 								if($contNum>0){
 							?>
 								<tr style="background-color: dimgray; height: 20px; font-weight: bold; color:white;">
@@ -260,7 +265,7 @@
 								</tr>
 							<?php
 								}
-								while($cont = mysql_fetch_array($contacto)){
+								while($cont = mysqli_fetch_array($contacto, MYSQLI_BOTH)){
 							?>
 							<tr style="background-color: gainsboro;">
 								<td align="center"><?=$i;?></td>

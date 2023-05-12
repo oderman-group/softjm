@@ -262,7 +262,7 @@ include("includes/head.php");
 						?>
 						
 						<div class="widget-container">
-							<div style="border:thin; border-style:solid; height:150px; margin:10px;">
+							<div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
                             	<h4 align="center">-Busqueda general y paginación-</h4>
                                 <p> 
                                     <form class="form-horizontal" style="text-align: right;" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
@@ -270,7 +270,7 @@ include("includes/head.php");
                                             <div class="input-append input-icon">
                                                 <input placeholder="Buscar..." type="text" name="busqueda" value="<?php if(isset($_GET["busqueda"])) echo $_GET["busqueda"]; ?>">
                                                 <i class=" icon-search"></i>
-                                                <input class="btn" type="submit" name="buscar" value="Buscar">
+                                                <input class="btn" type="submit" value="Buscar">
                                             </div>
                                             <?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
                                         </div>

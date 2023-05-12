@@ -1,16 +1,14 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 68;
 $paginaActual['pag_nombre'] = "Materiales";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$producto = mysql_fetch_array(mysql_query("SELECT * FROM productos_soptec WHERE prod_id='".$_GET["pdto"]."'",$conexion));
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec WHERE prod_id='".$_GET["pdto"]."'");
+$producto = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
@@ -31,46 +29,9 @@ $producto = mysql_fetch_array(mysql_query("SELECT * FROM productos_soptec WHERE 
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script type="text/javascript">
-            /*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
             $(function () {
                 $('#data-table').dataTable({
                     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                    /*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
                 });
             });
             $(function () {
@@ -112,12 +73,6 @@ $producto = mysql_fetch_array(mysql_query("SELECT * FROM productos_soptec WHERE 
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?> de <b><?=$producto['prod_nombre'];?></b></h3>
-						<ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -164,9 +119,9 @@ $producto = mysql_fetch_array(mysql_query("SELECT * FROM productos_soptec WHERE 
 							</thead>
 							<tbody>
                             <?php
-							$consulta = mysql_query("SELECT * FROM productos_materiales WHERE ppmt_producto='".$_GET["pdto"]."'",$conexion);
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_materiales WHERE ppmt_producto='".$_GET["pdto"]."'");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								switch($res[2]){
 									case 1: $categ = 'Documento'; break;
 									case 2: $categ = 'Video'; break;
@@ -181,7 +136,7 @@ $producto = mysql_fetch_array(mysql_query("SELECT * FROM productos_soptec WHERE 
                                 <td><?=$res[3];?></td>
                                 <td><h4>
                                     <a href="productos-materiales-editar.php?id=<?=$res[0];?>&pdto=<?=$_GET["pdto"];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-                                    <a href="sql.php?id=<?=$res[0];?>&get=17" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                    <a href="bd_delete/productos-materiales-eliminar.php?id=<?=$res[0];?>&pdto=<?=$_GET["pdto"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>

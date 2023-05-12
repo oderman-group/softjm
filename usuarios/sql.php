@@ -157,56 +157,9 @@ if ($_POST["idSql"] == 29) {
 	exit();
 }
 //AGREGAR MATERIALES A PRODUCTOS
-if ($_POST["idSql"] == 30) {
-	$numero = (count($_FILES['documento']['name']));
-	if ($numero > 0 and $_FILES['documento']['name'][0] != "") {
-		$contador = 0;
-		while ($contador < $numero) {
-			$extension = end(explode(".", $_FILES['documento']['name'][$contador]));
-			$archivo = uniqid('file_') . "." . $extension;
 
-			//$archivo = $_FILES['documento']['name'][$contador];
-			$destino = "files/materiales";
-			move_uploaded_file($_FILES['documento']['tmp_name'][$contador], $destino . "/" . $archivo);
-			$material = $archivo;
-			mysqli_query($conexionBdPrincipal,"INSERT INTO productos_materiales(ppmt_material, ppmt_tipo, ppmt_activo, ppmt_producto, ppmt_nombre)VALUES('" . $material . "','" . $_POST["tipo"] . "','" . $_POST["activo"] . "','" . $_POST["pdto"] . "','" . $_POST["nombre"] . "')");
-			
-			$contador++;
-		}
-	} else {
-		$material = $_POST["video"];
-		mysqli_query($conexionBdPrincipal,"INSERT INTO productos_materiales(ppmt_material, ppmt_tipo, ppmt_activo, ppmt_producto, ppmt_nombre)VALUES('" . $material . "','" . $_POST["tipo"] . "','" . $_POST["activo"] . "','" . $_POST["pdto"] . "','" . $_POST["nombre"] . "')");
-		
-		$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-	}
-	echo '<script type="text/javascript">window.location.href="productos-materiales.php?msg=1&pdto=' . $_POST["pdto"] . '";</script>';
-	exit();
-}
 //EDITAR MATERIALES A PRODUCTOS
-if ($_POST["idSql"] == 31) {
 
-	if ($_FILES['documento']['name'] != "") {
-
-		$extension = end(explode(".", $_FILES['documento']['name']));
-		$archivo = uniqid('file_') . "." . $extension;
-
-		//$archivo = $_FILES['documento']['name'][$contador];
-		$destino = "files/materiales";
-		move_uploaded_file($_FILES['documento']['tmp_name'], $destino . "/" . $archivo);
-		$material = $archivo;
-		mysqli_query($conexionBdPrincipal,"UPDATE productos_materiales SET ppmt_material='" . $material . "' WHERE ppmt_id='" . $_POST["id"] . "'");
-		
-	} else {
-		$material = $_POST["video"];
-		if ($_POST["tipo"] == 2) {
-			mysqli_query($conexionBdPrincipal,"UPDATE productos_materiales SET ppmt_material='" . $material . "' WHERE ppmt_id='" . $_POST["id"] . "'");
-		}
-	}
-	mysqli_query($conexionBdPrincipal,"UPDATE productos_materiales SET ppmt_tipo='" . $_POST["tipo"] . "', ppmt_activo='" . $_POST["activo"] . "', ppmt_nombre='" . $_POST["nombre"] . "' WHERE ppmt_id='" . $_POST["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="productos-materiales.php?msg=2&pdto=' . $_POST["pdto"] . '";</script>';
-	exit();
-}
 //ENVIAR BOLETIN  DE MENSAJES
 if ($_POST["idSql"] == 32) {
 
@@ -618,39 +571,9 @@ if ($_POST["idSql"] == 53) {
 	exit();
 }
 //EDITAR PUBLICIDAD DE CONFIGURACIÓN
-if ($_POST["idSql"] == 54) {
 
-	if ($_FILES['bTop']['name'] != "") {
-		$archivo = $_FILES['bTop']['name'];
-		$destino = "files/publicidad";
-		move_uploaded_file($_FILES['bTop']['tmp_name'], $destino . "/" . $archivo);
-		mysqli_query($conexionBdPrincipal,"UPDATE configuracion SET conf_banner_top='" . $archivo . "' WHERE conf_id=1");
-		
-	}
-
-	if ($_FILES['bLat']['name'] != "") {
-		$archivo = $_FILES['bLat']['name'];
-		$destino = "files/publicidad";
-		move_uploaded_file($_FILES['bLat']['tmp_name'], $destino . "/" . $archivo);
-		mysqli_query($conexionBdPrincipal,"UPDATE configuracion SET conf_banner_lateral='" . $archivo . "' WHERE conf_id=1");
-		
-	}
-
-	mysqli_query($conexionBdPrincipal,"UPDATE configuracion SET conf_url_top='" . $_POST["urlTop"] . "', conf_url_lateral='" . $_POST["urlLat"] . "' WHERE conf_id=1");
-	
-
-	echo '<script type="text/javascript">window.location.href="publicidad.php?msg=2";</script>';
-	exit();
-}
 //AGREGAR CUPONES
-if ($_POST["idSql"] == 55) {
-	mysqli_query($conexionBdPrincipal,"INSERT INTO cupones(cupo_codigo, cupo_descuento, cupo_activo, cupo_redimido, cupo_compra_minima, cupo_creacion, cupo_vencimiento, cupo_cliente)VALUES('" . $_POST["codigo"] . "','" . $_POST["descuento"] . "','" . $_POST["estado"] . "',0,'" . $_POST["compraMinima"] . "',now(),'" . $_POST["fechaVencimiento"] . "','" . $_POST["cliente"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
-	echo '<script type="text/javascript">window.location.href="cupones.php";</script>';
-	exit();
-}
 //CONDICIONAR PRODUCTOS
 
 //ENVIAR COTIZACIÓN AL CORREO ELABORADO
@@ -686,50 +609,12 @@ if ($_POST["idSql"] == 69) {
 	exit();
 }
 //AGREGAR PROVEEDORES
-if ($_POST["idSql"] == 70) {
-	$clave = round($_POST["pais"]);
-	mysqli_query($conexionBdPrincipal,"INSERT INTO proveedores(prov_documento, prov_clave, prov_nombre, prov_email, prov_telefono, prov_ciudad, prov_fecha_registro, prov_responsable, prov_eliminado, prov_tipo_regimen, prov_direccion, prov_pais, prov_otra_ciudad)VALUES('" . $_POST["dni"] . "', '" . $clave . "', '" . $_POST["nombre"] . "', '" . $_POST["email"] . "', '" . $_POST["telefono"] . "', '" . $_POST["ciudad"] . "', now(), '" . $_SESSION["id"] . "', 0, '" . $_POST["regimen"] . "', '" . $_POST["direccion"] . "', '" . $_POST["pais"] . "', '" . $_POST["otraCiudad"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
-	echo '<script type="text/javascript">window.location.href="proveedores-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
 //EDITAR PROVEEDORES
-if ($_POST["idSql"] == 71) {
 
-	if ($_FILES['logo']['name'] != "") {
-		$extension = end(explode(".", $_FILES['logo']['name']));
-		$logo = uniqid('prov_') . "." . $extension;
-		$destino = "files/proveedores";
-		move_uploaded_file($_FILES['logo']['tmp_name'], $destino . "/" . $logo);
-
-		mysqli_query($conexionBdPrincipal,"UPDATE proveedores SET prov_logo='" . $logo . "' WHERE prov_id='" . $_POST["id"] . "'");
-		
-	}
-
-	mysqli_query($conexionBdPrincipal,"UPDATE proveedores SET prov_documento='" . $_POST["dni"] . "', prov_nombre='" . $_POST["nombre"] . "', prov_email='" . $_POST["email"] . "', prov_telefono='" . $_POST["telefono"] . "', prov_ciudad='" . $_POST["ciudad"] . "', prov_tipo_regimen='" . $_POST["regimen"] . "', prov_direccion='" . $_POST["direccion"] . "', prov_pais='" . $_POST["pais"] . "', prov_otra_ciudad='" . $_POST["otraCiudad"] . "' WHERE prov_id='" . $_POST["id"] . "'");
-	
-
-	echo '<script type="text/javascript">window.location.href="proveedores-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 //EDITAR PEDIDOS
-if ($_POST["idSql"] == 72) {
-	mysqli_query($conexionBdPrincipal,"UPDATE pedidos SET pedid_fecha_propuesta='" . $_POST["fecha"] . "', pedid_estado='" . $_POST["estado"] . "', pedid_empresa_envio='" . $_POST["empresaEnvio"] . "', pedid_codigo_seguimiento='" . $_POST["codigoSeguimiento"] . "' WHERE pedid_id='" . $_POST["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="pedidos-timeline.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
+
 //AGREGAR NOVEDADES PEDIDO
-if ($_POST["idSql"] == 73) {
-
-	mysqli_query($conexionBdPrincipal,"INSERT INTO pedidos_novedades(pednov_dia, pednov_mes, pednov_estado, pednov_novedad, pednov_pedido, pednov_usuario)VALUES('" . $_POST["dia"] . "', '" . $_POST["mes"] . "', '" . $_POST["estado"] . "', '" . $_POST["novedad"] . "', '" . $_POST["id"] . "', '" . $_SESSION["id"] . "')");
-	
-
-	echo '<script type="text/javascript">window.location.href="pedidos-timeline.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 
 //aqui estaba la actualización de estructura de mensajes.
 
@@ -753,15 +638,7 @@ if ($_POST["idSql"] == 76) {
 	}
 }*/
 //AGREGAR IMPORTACIONES
-if ($_POST["idSql"] == 77) {
 
-	mysqli_query($conexionBdPrincipal,"INSERT INTO importaciones(imp_fecha, imp_proveedor, imp_concepto, imp_liquidada, imp_responsable)VALUES('" . $_POST["fecha"] . "','" . $_POST["proveedor"] . "', '" . $_POST["concepto"] . "', 0, '" . $_SESSION["id"] . "')");
-	
-	$idInsert = mysqli_insert_id($conexionBdPrincipal);
-
-	echo '<script type="text/javascript">window.location.href="importacion-editar.php?id=' . $idInsert . '&msg=1";</script>';
-	exit();
-}
 //AGREGAR BODEGAS
 
 //EDITAR BODEGAS
@@ -769,99 +646,7 @@ if ($_POST["idSql"] == 77) {
 //AGREGAR O ACTUALIZAR PRODUCTOS EN BODEGAS
 
 //AGREGAR REMISIONES
-if ($_POST["idSql"] == 81) {
 
-	//En proceso pendiente...
-
-	mysqli_query($conexionBdPrincipal,"INSERT INTO remisionbdg(cotiz_fecha_propuesta, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, cotiz_creador, cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, cotiz_fecha_creacion, cotiz_moneda, cotiz_observaciones, cotiz_envio, cotiz_proveedor)VALUES('" . $_POST["fechaPropuesta"] . "','" . $_POST["cliente"] . "','" . $_POST["fechaVencimiento"] . "','" . $_POST["influyente"] . "','" . $_SESSION["id"] . "','" . $_POST["sucursal"] . "','" . $_POST["contacto"] . "','" . $_POST["formaPago"] . "',now(),'" . $_POST["moneda"] . "','" . $_POST["notas"] . "','" . $_POST["envio"] . "','" . $_POST["proveedor"] . "')");
-	
-	$idInsert = mysqli_insert_id($conexionBdPrincipal);
-
-	//Productos
-	$numero = (count($_POST["producto"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-			$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='" . $_POST["producto"][$contador] . "'"));
-			
-
-			$valorProducto = $productoDatos['prod_precio'];
-			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['prod_precio'] / $configuracion['conf_trm_compra']), 0);
-			}
-
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["producto"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 1)");
-			
-			$contador++;
-		}
-	}
-
-	//COMBOS
-	$numero = (count($_POST["combo"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-
-			$datosCombos = mysqli_query($conexionBdPrincipal,"SELECT ROUND((SUM(copp_cantidad)*prod_precio),0), combo_descuento FROM combos
-			INNER JOIN combos_productos ON copp_combo=combo_id
-			INNER JOIN productos ON prod_id=copp_producto
-			WHERE combo_id='" . $_POST["combo"][$contador] . "'
-			GROUP BY copp_producto
-			");
-			$precioCombo = 0;
-			$dctoCombo = 0;
-			while ($dCombos = mysqli_fetch_array($datosCombos)) {
-				$precioCombo += $dCombos[0];
-				$dctoCombo = $dCombos[1];
-			}
-			if ($dctoCombo > 0) {
-				$precioCombo = round($precioCombo - ($precioCombo * ($dctoCombo / 100)), 0);
-			}
-
-
-			$productoNum = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_combo='" . $_POST["combo"][$contador] . "'"));
-			
-
-
-			if ($productoNum['czpp_id'] == '') {
-				$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM combos WHERE combo_id='" . $_POST["combo"][$contador] . "'"));
-				
-
-				$valorProducto = $precioCombo;
-				if ($_POST["moneda"] == 2) {
-					$valorProducto = round(($precioCombo / $configuracion['conf_trm_compra']), 0);
-				}
-
-				mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["combo"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 1)");
-				
-			}
-
-			$contador++;
-		}
-	}
-
-	//Servicios
-	$numero = (count($_POST["servicio"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-			$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id='" . $_POST["servicio"][$contador] . "'"));
-			
-
-			$valorProducto = $productoDatos['serv_precio'];
-			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['serv_precio'] / $configuracion['conf_trm_compra']), 0);
-			}
-
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_servicio, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["servicio"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 1)");
-			
-			$contador++;
-		}
-	}
-
-	echo '<script type="text/javascript">window.location.href="cotizaciones-editar.php?id=' . $idInsert . '&msg=1";</script>';
-	exit();
-}
 //TRASNFERIR PRODUCTOS ENTRE BODEGAS
 
 //AGREGAR FACTURAS DE VENTA
@@ -1135,95 +920,6 @@ if ($_POST["idSql"] == 85) {
 	exit();
 }
 //EDITAR IMPORTACIÓN
-if ($_POST["idSql"] == 86) {
-
-	mysqli_query($conexionBdPrincipal,"UPDATE importaciones SET imp_fecha='" . $_POST["fecha"] . "', imp_proveedor='" . $_POST["proveedor"] . "', imp_concepto='" . $_POST["concepto"] . "', imp_responsable='" . $_SESSION["id"] . "', imp_liquidada='" . $_POST["liquidada"] . "', imp_fce='" . $_POST["fce"] . "', imp_valor_nacionalizacion='" . $_POST["nacionalizacion"] . "', imp_otros_gastos='" . $_POST["otrosCostos"] . "' WHERE imp_id='" . $_POST["id"] . "'");
-	
-
-
-	//Facturas asociadas
-	$numero = (count($_POST["facturas"]));
-	if ($numero > 0) {
-		mysqli_query($conexionBdPrincipal,"DELETE FROM importaciones_facturas
-		WHERE impf_importacion='" . $_POST["id"] . "' AND impf_preferencia='0'");
-		
-		$contador = 0;
-		while ($contador < $numero) {
-
-			mysqli_query($conexionBdPrincipal,"INSERT INTO importaciones_facturas(impf_fecha, impf_importacion, impf_factura, impf_responsable)VALUES(now(), '" . $_POST["id"] . "', '" . $_POST["facturas"][$contador] . "', '" . $_SESSION["id"] . "')");
-			
-			$contador++;
-		}
-	}
-
-	//Facturas costos nacionalización
-	$numero = (count($_POST["facturasNac"]));
-	if ($numero > 0) {
-		mysqli_query($conexionBdPrincipal,"DELETE FROM importaciones_facturas
-		WHERE impf_importacion='" . $_POST["id"] . "' AND impf_preferencia=1");
-		
-		$contador = 0;
-		while ($contador < $numero) {
-
-			mysqli_query($conexionBdPrincipal,"INSERT INTO importaciones_facturas(impf_fecha, impf_importacion, impf_factura, impf_responsable, impf_preferencia)VALUES(now(), '" . $_POST["id"] . "', '" . $_POST["facturasNac"][$contador] . "', '" . $_SESSION["id"] . "', 1)");
-			
-			$contador++;
-		}
-	}
-
-	//Cuando se liquida una factura
-	if ($_POST["liquidada"]) {
-		//Facturas asociadas
-		$facturasValor =  mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT SUM(factura_valor) FROM importaciones_facturas
-		INNER JOIN facturas ON factura_id=impf_factura
-		WHERE impf_importacion='" . $_POST["id"] . "'
-		"));
-		
-
-
-		//Cantidad de productos asociados
-		$productoNum = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT SUM(czpp_cantidad) FROM cotizacion_productos
-		WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=5"));
-		
-
-		$valorRepartido = ($facturasValor[0] / $productoNum[0]);
-
-		//Consulto productos
-		$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
-		WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=5");
-		
-
-		//Actualizo el costo y las cantidades en la bodega general
-		while ($prod = mysqli_fetch_array($productos)) {
-
-			$costoProducto = ($prod['czpp_valor'] + $valorRepartido);
-
-			mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_costo='" . $costoProducto . "' 
-			WHERE prod_id='" . $prod['czpp_producto'] . "'");
-			
-
-			//En Bodega...
-			$bpp = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_bodegas WHERE prodb_producto='" . $prod['czpp_producto'] . "' AND prodb_bodega=1"));
-			
-
-			if ($bpp[0] == "") {
-				mysqli_query($conexionBdPrincipal,"INSERT INTO productos_bodegas(prodb_producto, prodb_bodega, prodb_existencias, prodb_fecha_actualizacion, prodb_usuario_actualizacion)VALUES('" . $prod['czpp_producto'] . "', 1, '" . $prod['czpp_cantidad'] . "', now(), '" . $_SESSION["id"] . "')");
-				
-				$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-			} else {
-				$nuevaCantidad = $bpp['prodb_existencias'] + $prod['czpp_cantidad'];
-
-				mysqli_query($conexionBdPrincipal,"UPDATE productos_bodegas SET prodb_existencias= '" . $nuevaCantidad . "', prodb_fecha_actualizacion=now(), prodb_usuario_actualizacion='" . $_SESSION["id"] . "' WHERE prodb_producto='" . $prod['czpp_producto'] . "' AND prodb_bodega=1");
-				
-			}
-		}
-	}
-
-
-
-	echo '<script type="text/javascript">window.location.href="importacion-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
 
 //aquí iba la parte de actualizar las métricas.
 
@@ -1324,14 +1020,7 @@ if ($_GET["get"] == 16) {
 	exit();
 }
 //ELIMINAR MATERIALES DE PRODUCTOS
-if ($_GET["get"] == 17) {
-	$idPagina = 71;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM productos_materiales WHERE ppmt_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //ENVIAR ENCUESTA AL CORREO
 if ($_GET["get"] == 18) {
 	$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='" . $_GET["cont"] . "'"));
@@ -1546,26 +1235,8 @@ if ($_GET["get"] == 37) {
 	echo '<script type="text/javascript">window.location.href="calendario.php?id=' . $_SESSION["id"] . '";</script>';
 	exit();
 }
-if ($_GET["get"] == 38) {
-	//$idPagina = 100; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE configuracion SET conf_banner_top='' WHERE conf_id=1");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 39) {
-	//$idPagina = 100; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE configuracion SET conf_banner_lateral='' WHERE conf_id=1");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 if ($_GET["get"] == 40) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM cupones WHERE cupo_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
 }
 if ($_GET["get"] == 41) {
 	//$idPagina = 100; include("includes/verificar-paginas.php");
@@ -1577,13 +1248,6 @@ if ($_GET["get"] == 41) {
 if ($_GET["get"] == 42) {
 	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_estado_mercadeo='" . $_GET["em"] . "', cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='" . $_SESSION["id"] . "' WHERE cli_id='" . $_GET["idR"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 43) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_id='" . $_GET["idItem"] . "'");
 	
 	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
 	exit();
@@ -1666,78 +1330,11 @@ if ($_GET["get"] == 44) {
 //ELIMINAR SERVICIOS
 
 //ELIMINAR PEDIDO
-if ($_GET["get"] == 50) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM pedidos WHERE pedid_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //ANULAR PEDIDO
-if ($_GET["get"] == 51) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE pedidos SET pedid_estado=2 WHERE pedid_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //GENERAR REMISIÓN A PARTIR DE PEDIDOS
-if ($_GET["get"] == 52) {
-	//$idPagina = 72; include("includes/verificar-paginas.php");
 
-	$generoRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg WHERE remi_pedido='" . $_GET["id"] . "'"));
-	if($generoRemision[0]!=""){
-		echo "<span style='font-family:arial; text-align:center; color:red;'>Este Pedido ya generó la remision con ID: ".$generoRemision[0].". En la fecha: ".$generoRemision['remi_fecha_creacion']."</div>";
-		exit();
-	}
-
-	mysqli_query($conexionBdPrincipal,"INSERT INTO remisionbdg(remi_fecha_propuesta, remi_observaciones, remi_cliente, remi_fecha_vencimiento, remi_vendedor, remi_creador, remi_sucursal, remi_contacto, remi_forma_pago, remi_fecha_creacion, remi_moneda, remi_pedido, remi_estado) SELECT now(), pedid_observaciones, pedid_cliente, pedid_fecha_vencimiento, pedid_vendedor, '" . $_SESSION["id"] . "', pedid_sucursal, pedid_contacto, pedid_forma_pago, pedid_fecha_creacion, pedid_moneda, pedid_id, 1 FROM pedidos WHERE pedid_id='" . $_GET["id"] . "'");
-	
-	$idInsert = mysqli_insert_id($conexionBdPrincipal);
-
-
-	$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2 AND czpp_producto!=''");
-	
-
-	while ($prod = mysqli_fetch_array($productos)) {
-		if ($prod['czpp_orden'] == "") $prod['czpp_orden'] = 1;
-		if ($prod['czpp_cantidad'] == "") $prod['czpp_cantidad'] = 1;
-
-		mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '".$prod['czpp_cantidad']."', '" . $prod['czpp_impuesto'] . "', 3, 1, '" . $prod['czpp_descuento'] . "')");
-		
-		$contador++;
-	}
-
-
-	//Ingresar todos los productos cuando son combos
-	$productosCombos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2 AND czpp_combo!=''");
-	
-
-	while ($combo = mysqli_fetch_array($productosCombos)) {
-		if ($combo['czpp_orden'] == "") $combo['czpp_orden'] = 1;
-		if ($combo['czpp_cantidad'] == "") $combo['czpp_cantidad'] = 1;
-
-		$combos = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos_productos 
-		INNER JOIN productos ON prod_id=copp_producto
-		INNER JOIN combos ON combo_id=copp_combo
-		WHERE copp_combo='" . $combo['czpp_combo'] . "'");
-		
-		
-		while($comProd = mysqli_fetch_array($combos)){
-
-			$porcentajeDcto = ($comProd['combo_descuento'] / 100);
-			$precioConDctoCombo = $comProd['prod_precio'] - ($comProd['prod_precio'] * $porcentajeDcto);
-
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento)VALUES('" . $idInsert . "','" . $comProd['prod_id'] . "', '" . $precioConDctoCombo. "', '" . $combo['czpp_orden'] . "', '".$comProd['copp_cantidad']."', '" . $combo['czpp_impuesto'] . "', 3, 1, '".$combo['czpp_descuento']."')");
-			
-
-		}
-
-	}
-
-	echo '<script type="text/javascript">window.location.href="remisionbdg.php?q=' . $idInsert . '";</script>';
-	exit();
-}
 //ELIMINAR COMBO
 
 if ($_GET["get"] == 55) {
@@ -1798,13 +1395,7 @@ if ($_GET["get"] == 60) {
 	exit();
 }
 //ELIMINAR PROVEEDORES
-if ($_GET["get"] == 61) {
-	mysqli_query($conexionBdPrincipal,"UPDATE proveedores SET prov_eliminado=1, prov_fecha_eliminado=now(), prov_responsable_elimacion='" . $_SESSION["id"] . "' WHERE prov_id='" . $_GET["id"] . "'");
-	
 
-	echo '<script type="text/javascript">window.location.href="proveedores.php?msg=1";</script>';
-	exit();
-}
 //ELIMINAR BODEGAS
 
 //ELIMINAR BODEGAS POR PRODUCTOS
@@ -1823,40 +1414,6 @@ if ($_GET["get"] == 64) {
 	exit();
 }
 //GENERAR FACTURA DE VENTA A PARTIR DE REMISIÓN
-if ($_GET["get"] == 65) {
-	//$idPagina = 72; include("includes/verificar-paginas.php");
-
-	$generoFactura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas WHERE factura_remision='" . $_GET["id"] . "'"));
-	if($generoFactura[0]!=""){
-		echo "<span style='font-family:arial; text-align:center; color:red;'>Esta Remisión ya generó la factura con ID: ".$generoFactura[0].". En la fecha: ".$generoFactura['factura_fecha_creacion']."</div>";
-		exit();
-	}
-
-	$valorProductos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT sum(czpp_valor*czpp_cantidad) + sum(czpp_valor*czpp_cantidad)*(czpp_impuesto/100) FROM cotizacion_productos 
-	WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=3"));
-
-	mysqli_query($conexionBdPrincipal,"INSERT INTO facturas(factura_fecha_propuesta, factura_observaciones, factura_cliente, factura_fecha_vencimiento, factura_vendedor, factura_creador, factura_sucursal, factura_contacto, factura_forma_pago, factura_fecha_creacion, factura_moneda, factura_estado, factura_tipo, factura_concepto, factura_extranjera, factura_remision)
-	SELECT now(), remi_observaciones, remi_cliente, remi_fecha_vencimiento, remi_vendedor, '" . $_SESSION["id"] . "', remi_sucursal, remi_contacto, remi_forma_pago, now(), remi_moneda, 1, 1, 'Traída de remisión', 0, remi_id FROM remisionbdg WHERE remi_id='" . $_GET["id"] . "'");
-	
-	$idInsert = mysqli_insert_id($conexionBdPrincipal);
-
-
-	$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=3");
-	
-
-	while ($prod = mysqli_fetch_array($productos)) {
-		if ($prod['czpp_orden'] == "") $prod['czpp_orden'] = 1;
-		if ($prod['czpp_cantidad'] == "") $prod['czpp_cantidad'] = 1;
-
-		mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_descuento, czpp_observacion, czpp_servicio, czpp_combo, czpp_bodega)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '" . $prod['czpp_cantidad'] . "', '" . $prod['czpp_impuesto'] . "', 4, '" . $prod['czpp_descuento'] . "', '" . $prod['czpp_observacion'] . "', '" . $prod['czpp_servicio'] . "', '" . $prod['czpp_combo'] . "', '" . $prod['czpp_bodega'] . "')");
-		
-
-		$contador++;
-	}
-
-	echo '<script type="text/javascript">window.location.href="facturas.php?q=' . $idInsert . '";</script>';
-	exit();
-}
 
 //COLOCAR REDIMIDA UNA FACTURA, PUNTOS DEL CLIENTE
 if ($_GET["get"] == 66) {

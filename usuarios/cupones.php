@@ -1,13 +1,10 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 165;
-$paginaActual['pag_nombre'] = "Cupones";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -28,46 +25,9 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script type="text/javascript">
-            /*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
             $(function () {
                 $('#data-table').dataTable({
                     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                    /*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
                 });
             });
             $(function () {
@@ -108,12 +68,6 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						<ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -150,10 +104,11 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							<tbody>
                             <?php
 							$opcionesSINO = array("NO","SI");
-							$consulta = mysql_query("SELECT * FROM cupones",$conexion);
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
-								$cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='".$res['cupo_cliente']."'",$conexion));
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
+								$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$res['cupo_cliente']."'");
+								$cliente = mysqli_fetch_array($consultaClientes, MYSQLI_BOTH);
 							?>
 							<tr>
 								<td><?=$no;?></td>
@@ -166,9 +121,9 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 								<td><?=$opcionesSINO[$res['cupo_redimido']];?></td>
 								
                                 <td><h4>
-                                    <a href="#" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+                                    <a href="cupones-editar.php?id=<?=$res[0]?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
 									<?php if($res['cupo_redimido']==0){?>
-                                    	<a href="sql.php?id=<?=$res[0];?>&get=40" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                    	<a href="bd_delete/cupones-eliminar.php?id=<?=$res[0]?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 									<?php }?>
 									
                                 </h4></td>

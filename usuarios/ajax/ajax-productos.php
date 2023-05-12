@@ -2,37 +2,37 @@
 include("../sesion.php");
 //EDITAR PRODUCTOS
 if($_POST["proceso"]==1){
-	$conexionBdPrincipal->query("UPDATE ".$_POST["tabla"]." SET ".$_POST["campo"]."='".$_POST["valor"]."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE ".$_POST["pk"]."='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE ".$_POST["tabla"]." SET ".$_POST["campo"]."='".$_POST["valor"]."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE ".$_POST["pk"]."='".$_POST["producto"]."'");
 	
 	if($_POST["campo"]=='prod_utilidad'){
-		$consulta=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'");
+		$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'");
 		$datos = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 		$utilidad = $_POST["valor"]/100;
 		$precio1 = $datos['prod_costo'] + ($datos['prod_costo']*$utilidad);
 
-		$conexionBdPrincipal->query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$_POST["producto"]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', 2)");
+		mysqli_query($conexionBdPrincipal,"INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$_POST["producto"]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', 2)");
 
-		$conexionBdPrincipal->query("UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$_POST["producto"]."'");
+		mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$_POST["producto"]."'");
 
 	}
 	
 	if($_POST["campo"]=='prod_costo'){
-		$consulta=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'");
+		$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'");
 		$datos = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 		
 		$utilidad = $datos['prod_utilidad']/100;
 		$precio1 = $_POST["valor"] + ($_POST["valor"]*$utilidad);
 
-		$conexionBdPrincipal->query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$_POST["producto"]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', 1)");
+		mysqli_query($conexionBdPrincipal,"INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$_POST["producto"]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', 1)");
 
-		$conexionBdPrincipal->query("UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$_POST["producto"]."'");
+		mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$_POST["producto"]."'");
 	}
 }
 
 //PRODUCTOS DE LA COTIZACIÓN
 if($_POST["proceso"]==2){
-	$consultaProducto=$conexionBdPrincipal->query("SELECT * FROM cotizacion_productos INNER JOIN productos ON prod_id=czpp_producto WHERE czpp_id='".$_POST["producto"]."' ");
+	$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos INNER JOIN productos ON prod_id=czpp_producto WHERE czpp_id='".$_POST["producto"]."' ");
 	$datosProducto = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
 
 	if($_POST["campo"]=='czpp_descuento'){
@@ -52,83 +52,83 @@ if($_POST["proceso"]==2){
 		}
 	}
 
-	$conexionBdPrincipal->query("UPDATE cotizacion_productos SET ".$_POST["campo"]."='".$conexionBdPrincipal->real_escape_string( $_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
 	
 	//echo '<script type="text/javascript">location.reload();</script>';
 }
 
 //PRODUCTOS DESDE LA CATEGORIA
 if($_POST["proceso"]==3){
-	$conexionBdPrincipal->query("UPDATE productos SET ".$_POST["campo"]."='".$_POST["valor"]."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_categoria='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
+	mysqli_query($conexionBdPrincipal,"UPDATE productos SET ".$_POST["campo"]."='".$_POST["valor"]."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_categoria='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
 	
 	
 	if($_POST["campo"]=='prod_utilidad'){
 		$utilidad = $_POST["valor"]/100;
-		$productos = $conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_categoria='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
+		$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_categoria='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
 		while($datos = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 			$precio1 = $datos['prod_costo'] + ($datos['prod_costo']*$utilidad);
-			$conexionBdPrincipal->query("UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$datos['prod_id']."' AND prod_precio_predeterminado=0");
+			mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$datos['prod_id']."' AND prod_precio_predeterminado=0");
 			
 		}	
 	}
 	
-	$conexionBdPrincipal->query("UPDATE productos_categorias SET ".$_POST["nombreCat"]."='".$_POST["valor"]."', catp_usuario='".$_SESSION["id"]."', catp_fecha=now() WHERE catp_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE productos_categorias SET ".$_POST["nombreCat"]."='".$_POST["valor"]."', catp_usuario='".$_SESSION["id"]."', catp_fecha=now() WHERE catp_id='".$_POST["producto"]."'");
 	
 }
 
 //PRODUCTOS DESDE EL GRUPO
 if($_POST["proceso"]==4){
-	$conexionBdPrincipal->query("UPDATE productos SET ".$_POST["campo"]."='".$_POST["valor"]."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_grupo1='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
+	mysqli_query($conexionBdPrincipal,"UPDATE productos SET ".$_POST["campo"]."='".$_POST["valor"]."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_grupo1='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
 	
 	
 	if($_POST["campo"]=='prod_utilidad'){
 		$utilidad = $_POST["valor"]/100;
-		$productos = $conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_grupo1='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
+		$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_grupo1='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
 		while($datos = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 			$precio1 = $datos['prod_costo'] + ($datos['prod_costo']*$utilidad);
-			$conexionBdPrincipal->query("UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$datos['prod_id']."' AND prod_precio_predeterminado=0");
+			mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$datos['prod_id']."' AND prod_precio_predeterminado=0");
 			
 		}
 		
 	}
 	
-	$conexionBdPrincipal->query("UPDATE productos_categorias SET ".$_POST["nombreCat"]."='".$_POST["valor"]."', catp_usuario='".$_SESSION["id"]."', catp_fecha=now() WHERE catp_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE productos_categorias SET ".$_POST["nombreCat"]."='".$_POST["valor"]."', catp_usuario='".$_SESSION["id"]."', catp_fecha=now() WHERE catp_id='".$_POST["producto"]."'");
 	
 }
 
 //PRODUCTOS DESDE LA MARCA
 if($_POST["proceso"]==5){
-	$conexionBdPrincipal->query("UPDATE productos SET ".$_POST["campo"]."='".$_POST["valor"]."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_marca='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
+	mysqli_query($conexionBdPrincipal,"UPDATE productos SET ".$_POST["campo"]."='".$_POST["valor"]."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_marca='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
 	
 	
 	if($_POST["campo"]=='prod_utilidad'){
 		$utilidad = $_POST["valor"]/100;
-		$productos = $conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_marca='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
+		$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_marca='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
 		while($datos = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 			$precio1 = $datos['prod_costo'] + ($datos['prod_costo']*$utilidad);
-			$conexionBdPrincipal->query("UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$datos['prod_id']."' AND prod_precio_predeterminado=0");
+			mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$datos['prod_id']."' AND prod_precio_predeterminado=0");
 			
 		}
 		
 	}
 	/*
 	//Actualizar los datos en la marca pagar el historial
-	$conexionBdPrincipal->query("UPDATE marcas SET ".$_POST["nombreCat"]."='".$_POST["valor"]."', mar_usuario='".$_SESSION["id"]."', mar_fecha=now() WHERE mar_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE marcas SET ".$_POST["nombreCat"]."='".$_POST["valor"]."', mar_usuario='".$_SESSION["id"]."', mar_fecha=now() WHERE mar_id='".$_POST["producto"]."'");
 	
 	*/
 }
 //PRODUCTOS PREDETERMINADOS
 if($_POST["proceso"]==6){
-	$datos = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'"), MYSQLI_BOTH);
+	$datos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'"), MYSQLI_BOTH);
 	$estado = 0;
 	if($datos['prod_precio_predeterminado']=='0') $estado = 1;
 	
-	$conexionBdPrincipal->query("UPDATE productos SET prod_precio_predeterminado='".$estado."' WHERE prod_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_precio_predeterminado='".$estado."' WHERE prod_id='".$_POST["producto"]."'");
 	
 }
 //PRODUCTOS DE LOS COMBOS
 if($_POST["proceso"]==7){
-	$conexionBdPrincipal->query("UPDATE combos_productos SET ".$_POST["campo"]."='".$_POST["valor"]."' WHERE copp_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE combos_productos SET ".$_POST["campo"]."='".$_POST["valor"]."' WHERE copp_id='".$_POST["producto"]."'");
 	
 	
 	//echo '<script type="text/javascript">location.reload();</script>';
@@ -136,7 +136,7 @@ if($_POST["proceso"]==7){
 //PRODUCTOS DE LA REMISIÓN
 if($_POST["proceso"]==8){
 	if($_POST["campo"]=='czpp_descuento'){
-		$datosProducto = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM cotizacion_productos INNER JOIN productos ON prod_id=czpp_producto
+		$datosProducto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos INNER JOIN productos ON prod_id=czpp_producto
 		WHERE czpp_id='".$_POST["producto"]."'
 		"), MYSQLI_BOTH);
 		
@@ -147,7 +147,7 @@ if($_POST["proceso"]==8){
 	}
 
 	if($_POST["campo"]=='czpp_cantidad'){
-		$datosProducto = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM cotizacion_productos 
+		$datosProducto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
 		INNER JOIN productos_bodegas ON prodb_producto=czpp_producto AND prodb_bodega=czpp_bodega
 		WHERE czpp_id='".$_POST["producto"]."'
 		"), MYSQLI_BOTH);
@@ -161,19 +161,19 @@ if($_POST["proceso"]==8){
 		if($_POST["valor"]>$datosProducto['czpp_cantidad']){
 			$result = $_POST["valor"] - $datosProducto['czpp_cantidad'];
 
-			$conexionBdPrincipal->query("UPDATE productos_bodegas SET prodb_existencias=(prodb_existencias - $result) WHERE prodb_id='".$datosProducto["prodb_id"]."'");
+			mysqli_query($conexionBdPrincipal,"UPDATE productos_bodegas SET prodb_existencias=(prodb_existencias - $result) WHERE prodb_id='".$datosProducto["prodb_id"]."'");
 			
 		}else{
 			$result = $datosProducto['czpp_cantidad'] - $_POST["valor"] ;
 
-			$conexionBdPrincipal->query("UPDATE productos_bodegas SET prodb_existencias=(prodb_existencias + $result) WHERE prodb_id='".$datosProducto["prodb_id"]."'");
+			mysqli_query($conexionBdPrincipal,"UPDATE productos_bodegas SET prodb_existencias=(prodb_existencias + $result) WHERE prodb_id='".$datosProducto["prodb_id"]."'");
 			
 		}
 
 		
 	}
 
-	$conexionBdPrincipal->query("UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysql_real_escape_string($_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
 	
 	
 	//echo '<script type="text/javascript">location.reload();</script>';
@@ -181,7 +181,7 @@ if($_POST["proceso"]==8){
 //PRODUCTOS DE LA IMPORTACIÓN
 if($_POST["proceso"]==9){
 	if($_POST["campo"]=='czpp_descuento'){
-		$datosProducto = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM cotizacion_productos INNER JOIN productos ON prod_id=czpp_producto
+		$datosProducto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos INNER JOIN productos ON prod_id=czpp_producto
 		WHERE czpp_id='".$_POST["producto"]."'
 		"), MYSQLI_BOTH);
 		
@@ -191,25 +191,25 @@ if($_POST["proceso"]==9){
 		}
 	}
 
-	$conexionBdPrincipal->query("UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysql_real_escape_string($_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
 	
 	
 	//echo '<script type="text/javascript">location.reload();</script>';
 }
 //PRODUCTOS VISIBLES WEB
 if($_POST["proceso"]==10){
-	$datos = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'"), MYSQLI_BOTH);
+	$datos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'"), MYSQLI_BOTH);
 	$estado = 0;
 	if($datos['prod_visible_web']=='0') $estado = 1;
 	
-	$conexionBdPrincipal->query("UPDATE productos SET prod_visible_web='".$estado."' WHERE prod_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_visible_web='".$estado."' WHERE prod_id='".$_POST["producto"]."'");
 	
 }
 
 //DESCUENTO DE COMBOS DE LA COTIZACIÓN
 if($_POST["proceso"]==11){
 
-	$datosProducto = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM cotizacion_productos 
+	$datosProducto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
 	INNER JOIN combos ON combo_id=czpp_combo
 	WHERE czpp_id='".$_POST["producto"]."'
 	"), MYSQLI_BOTH);
@@ -223,7 +223,7 @@ if($_POST["proceso"]==11){
 	}
 
 
-	$conexionBdPrincipal->query("UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysql_real_escape_string($_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
 	
 	
 	//echo '<script type="text/javascript">location.reload();</script>';

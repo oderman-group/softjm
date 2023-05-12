@@ -1,23 +1,16 @@
-<?php include("sesion.php"); ?>
-<?php
-$idPagina = 135;
-$paginaActual['pag_nombre'] = "IMPORTACIÓN #" . $_GET["id"];
-?>
-<?php include("includes/verificar-paginas.php"); ?>
-<?php include("includes/head.php"); ?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-if (mysql_errno() != 0) {
-	echo mysql_error();
-	exit();
-}
-?>
+<?php 
+include("sesion.php");
 
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM importaciones 
+$idPagina = 135;
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consultaResultadoD = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones 
 INNER JOIN proveedores ON prov_id=imp_proveedor
 LEFT JOIN facturas ON factura_id=imp_fce
-WHERE imp_id='" . $_GET["id"] . "'", $conexion));
+WHERE imp_id='" . $_GET["id"] . "'");
+$resultadoD = mysqli_fetch_array($consultaResultadoD, MYSQLI_BOTH);
 
 //Moneda a multiplicar
 if ($resultadoD['factura_moneda'] == 1) {
@@ -28,47 +21,42 @@ if ($resultadoD['factura_moneda'] == 1) {
 	$trmMultFlete = $resultadoD['factura_trm_euro_flete'];
 }
 
-$valorCostosNac = mysql_fetch_array(mysql_query("SELECT SUM(factura_valor) FROM importaciones_facturas
+$valorCostosNacConsulta = mysqli_query($conexionBdPrincipal, "SELECT SUM(factura_valor) FROM importaciones_facturas
 INNER JOIN facturas ON factura_id=impf_factura AND factura_preferencia=1
-WHERE impf_importacion='".$resultadoD['imp_id']."'",$conexion));
+WHERE impf_importacion='".$resultadoD['imp_id']."'");
+$valorCostosNac = mysqli_fetch_array($valorCostosNacConsulta, MYSQLI_BOTH);
 
-$valorCostosFletes = mysql_fetch_array(mysql_query("SELECT SUM(factura_valor) FROM importaciones_facturas
+$valorCostosFletes = mysqli_query($conexionBdPrincipal, "SELECT SUM(factura_valor) FROM importaciones_facturas
 INNER JOIN facturas ON factura_id=impf_factura AND factura_preferencia=2
-WHERE impf_importacion='".$resultadoD['imp_id']."'",$conexion));
+WHERE impf_importacion='".$resultadoD['imp_id']."'");
+$valorCostosFletes = mysqli_fetch_array($valorCostosFletes, MYSQLI_BOTH);
 
-$valorFletes = mysql_fetch_array(mysql_query("SELECT SUM(czpp_valor) FROM cotizacion_productos
+$valorFletes = mysqli_query($conexionBdPrincipal, "SELECT SUM(czpp_valor) FROM cotizacion_productos
 INNER JOIN productos ON prod_id=czpp_producto AND prod_no_inventariable=1
-WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
+WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4");
+$valorFletes = mysqli_fetch_array($valorFletes, MYSQLI_BOTH);
 
 $totalFlete = ($valorFletes[0] * $trmMultFlete);
 
-$totalCostoNac = ($resultadoD['imp_valor_nacionalizacion'] + $valorCostosNac[0]);
+if (!empty($valorCostosNac[0])) {
+	$totalCostoNac = ($resultadoD['imp_valor_nacionalizacion'] + $valorCostosNac[0]);
+}
 
-$totalGastos = ($totalFlete + $totalCostoNac + $resultadoD['imp_otros_gastos']);
+if (!empty($resultadoD['imp_otros_gastos']) && !empty($totalFlete)) {
+	$totalGastos = ($totalFlete + $totalCostoNac + $resultadoD['imp_otros_gastos']);
+}	
 
-$valorTotalProductosImp = mysql_fetch_array(mysql_query("SELECT SUM((czpp_cantidad*czpp_valor)) FROM cotizacion_productos
+$valorTotalProductosImpConsulta = mysqli_query($conexionBdPrincipal, "SELECT SUM((czpp_cantidad*czpp_valor)) FROM cotizacion_productos
 INNER JOIN productos ON prod_id=czpp_producto AND prod_no_inventariable='0'
-WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
+WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4");
+$valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MYSQLI_BOTH);
 ?>
 
 
 <!-- styles -->
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
 
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -224,14 +212,6 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 					<div class="span12">
 						<div class="primary-head">
 							<h3 class="page-header"><?= $paginaActual['pag_nombre']; ?></h3>
-
-							<ul class="top-right-toolbar">
-								<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-								</li>
-								<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-								<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-							</ul>
-
 						</div>
 						<ul class="breadcrumb">
 							<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -261,8 +241,7 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 								<h3> <?= $paginaActual['pag_nombre']; ?></h3>
 							</div>
 							<div class="widget-container">
-								<form class="form-horizontal" method="post" action="sql.php">
-									<input type="hidden" name="idSql" value="86">
+								<form class="form-horizontal" method="post" action="bd_update/importacion-actualizar.php">
 									<input type="hidden" name="id" value="<?= $_GET["id"]; ?>">
 									<input type="hidden" name="monedaActual" value="<?= $resultadoD['factura_moneda']; ?>">
 
@@ -288,8 +267,8 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT * FROM proveedores", $conexion);
-												while ($resOp = mysql_fetch_array($conOp)) {
+												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM proveedores");
+												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['imp_proveedor'] == $resOp[0]) echo "selected"; ?>><?= $resOp['prov_nombre']; ?></option>
 												<?php
@@ -320,8 +299,8 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 											<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="fce" required>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT * FROM facturas WHERE factura_extranjera=1 AND factura_proveedor='" . $resultadoD['imp_proveedor'] . "'", $conexion);
-												while ($resOp = mysql_fetch_array($conOp)) {
+												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas WHERE factura_extranjera=1 AND factura_proveedor='" . $resultadoD['imp_proveedor'] . "'");
+												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['imp_fce'] == $resOp[0]) echo "selected"; ?>>#<?= $resOp['factura_id'] . " - " . $resOp['factura_concepto']; ?></option>
 												<?php
@@ -373,7 +352,7 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 										<label class="control-label">Costo nacionalización</label>
 										<div class="controls">
 											<input type="text" class="span4" name="nacionalizacion" value="<?= $resultadoD['imp_valor_nacionalizacion']; ?>">
-											+ $<?=number_format($valorCostosNac[0],0,".",".");?>
+											+ $<?php if(!empty($valorCostosNac[0])) echo number_format($valorCostosNac[0],0,".",".");?>
 										</div>
 									</div>
 
@@ -393,11 +372,12 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="facturas[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT * FROM facturas WHERE factura_tipo=2 AND factura_preferencia='0'
-												", $conexion);
-												while ($resOp = mysql_fetch_array($conOp)) {
-													$facturasN = mysql_num_rows(mysql_query("SELECT * FROM importaciones_facturas 
-													WHERE impf_factura='" . $resOp[0] . "' AND impf_importacion='" . $resultadoD['imp_id'] . "'", $conexion));
+												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas WHERE factura_tipo=2 AND factura_preferencia='0'
+												");
+												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
+													$facturasNConsulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones_facturas 
+													WHERE impf_factura='" . $resOp[0] . "' AND impf_importacion='" . $resultadoD['imp_id'] . "'");
+													$facturasN = mysqli_num_rows($facturasNConsulta);
 												?>
 													<option <?php if ($facturasN > 0) {
 																echo "selected";
@@ -416,13 +396,14 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="facturasNac[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysql_query("SELECT * FROM facturas
+												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
 												LEFT JOIN proveedores ON prov_id=factura_proveedor  
 												WHERE factura_tipo=2 AND factura_preferencia=1
-												", $conexion);
-												while ($resOp = mysql_fetch_array($conOp)) {
-													$facturasN = mysql_num_rows(mysql_query("SELECT * FROM importaciones_facturas 
-													WHERE impf_factura='" . $resOp[0] . "' AND impf_importacion='" . $resultadoD['imp_id'] . "' AND impf_preferencia=1", $conexion));
+												");
+												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
+													$facturasNConsulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones_facturas 
+													WHERE impf_factura='" . $resOp[0] . "' AND impf_importacion='" . $resultadoD['imp_id'] . "' AND impf_preferencia=1");
+													$facturasN = mysqli_num_rows($facturasNConsulta);
 												?>
 													<option <?php if ($facturasN > 0) {
 																echo "selected";
@@ -495,11 +476,11 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 										<!-- PRODUCTOS -->
 										<?php
 										$no = 1;
-										$productos = mysql_query("SELECT * FROM productos 
-							INNER JOIN productos_categorias ON catp_id=prod_categoria
-							INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $resultadoD['imp_fce'] . "' AND czpp_tipo=4
-							ORDER BY prod_no_inventariable DESC, czpp_orden", $conexion);
-										while ($prod = mysql_fetch_array($productos)) {
+										$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM productos 
+										INNER JOIN productos_categorias ON catp_id=prod_categoria
+										INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $resultadoD['imp_fce'] . "' AND czpp_tipo=4
+										ORDER BY prod_no_inventariable DESC, czpp_orden");
+										while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 											$dcto = 0;
 											$valorTotal = 0;
 											$costoNacionalizacion = 0;
@@ -572,10 +553,10 @@ WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4",$conexion));
 										<?php
 										$no = 1;
 										$fletesOtros = 0;
-										$facturas = mysql_query("SELECT * FROM importaciones_facturas 
+										$facturas = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones_facturas 
 							INNER JOIN facturas ON factura_id=impf_factura
-							WHERE impf_importacion='".$_GET["id"]."'", $conexion);
-										while ($fact = mysql_fetch_array($facturas)) {
+							WHERE impf_importacion='".$_GET["id"]."'");
+										while ($fact = mysqli_fetch_array($facturas, MYSQLI_BOTH)) {
 
 											$vlrUniCop = ($fact['factura_valor'] * $trmMult);
 											$valorTotal = ($fact['factura_valor']);

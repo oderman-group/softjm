@@ -1,35 +1,19 @@
-<?php include("sesion.php");?>
-<?php
-$idPagina = 19;
-$paginaActual['pag_nombre'] = "Timeline de pedidos";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM pedidos 
-WHERE pedid_id='".$_GET["id"]."'",$conexion));
+<?php 
+include("sesion.php");
+
+$idPagina = 237;
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos 
+WHERE pedid_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
 
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -204,7 +188,7 @@ DEMO
 =====
 */
 
-@media (min-width: 768px){
+/* @media (min-width: 768px){
 
   html{
     font-size: 62.5%;
@@ -216,11 +200,11 @@ DEMO
   html{
     font-size: 55%;
   }
-}
+} */
 
 body{
   
-  font-size: 1.6rem;
+  /* font-size: 1.6rem; */
   color: #222;
 
   background-color: #f0f0f0;
@@ -298,8 +282,7 @@ LinkedIn
 						</div>
 						<div class="widget-container">
 							
-						<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="72">
+						<form class="form-horizontal" method="post" action="bd_update/pedido-timelina-actualizar.php">
 							<input type="hidden" name="id" value="<?=$_GET["id"];?>">
                             	
                                 <div class="control-group">
@@ -357,8 +340,7 @@ LinkedIn
 						</div>
 						<div class="widget-container">
 							
-						<form class="form-horizontal" method="post" action="sql.php">
-                            <input type="hidden" name="idSql" value="73">
+						<form class="form-horizontal" method="post" action="bd_create/pedido-timeline-novedades-guardar.php">
 							<input type="hidden" name="id" value="<?=$_GET["id"];?>">
                             	
                             <div class="control-group">
@@ -420,8 +402,8 @@ LinkedIn
       <span class="timeline__year">EN PREPARACIÓN</span>
       
 		<?php
-		$preparacionNov = mysql_query("SELECT * FROM pedidos_novedades WHERE pednov_pedido='".$_GET["id"]."' AND pednov_estado=1",$conexion);
-		while($preparacion = mysql_fetch_array($preparacionNov)){
+		$preparacionNov = mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos_novedades WHERE pednov_pedido='".$_GET["id"]."' AND pednov_estado=1");
+		while($preparacion = mysqli_fetch_array($preparacionNov, MYSQLI_BOTH)){
 		?>
 		
 			<div class="timeline__box">
@@ -445,8 +427,8 @@ LinkedIn
       <span class="timeline__year">EN CAMINO</span>
       
 		<?php
-		$encaminoNov = mysql_query("SELECT * FROM pedidos_novedades WHERE pednov_pedido='".$_GET["id"]."' AND pednov_estado=2",$conexion);
-		while($encamino = mysql_fetch_array($encaminoNov)){
+		$encaminoNov = mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos_novedades WHERE pednov_pedido='".$_GET["id"]."' AND pednov_estado=2");
+		while($encamino = mysqli_fetch_array($encaminoNov, MYSQLI_BOTH)){
 		?>
 		
 			<div class="timeline__box">

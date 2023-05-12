@@ -1,13 +1,9 @@
-<?php include("sesion.php");?>
-<?php
+<?php include("sesion.php");
+
 $idPagina = 123;
-$paginaActual['pag_nombre'] = "Proveedores";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -152,20 +148,20 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
                 <a href="proveedores.php" style="margin-bottom:10px;">TODOS</a><br>
                 <?php
                 if($datosUsuarioActual[3]==1){
-					$departamentos = mysql_query("SELECT * FROM localidad_departamentos ORDER BY dep_nombre",$conexion);
+					$departamentos = mysqli_query($conexionBdAdmin,"SELECT * FROM localidad_departamentos ORDER BY dep_nombre");
 				}else{
-					$departamentos = mysql_query("SELECT * FROM localidad_departamentos
+					$departamentos = mysqli_query($conexionBdAdmin,"SELECT * FROM localidad_departamentos
 					INNER JOIN zonas_usuarios ON zpu_usuario='".$_SESSION["id"]."' AND zpu_zona=dep_id
 					ORDER BY dep_nombre
-					",$conexion);
+					");
 				}
-                while($deptos = mysql_fetch_array($departamentos)){
+                while($deptos = mysqli_fetch_array($departamentos, MYSQLI_BOTH)){
                     if($deptos[0]==$_GET["dpto"]) $color = 'green'; else $color = 'blue';
 					
-					$contarClientes = mysql_num_rows(mysql_query("SELECT * FROM proveedores 
-					INNER JOIN localidad_ciudades ON ciu_id=prov_ciudad
-					INNER JOIN localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$deptos[0]."'
-					",$conexion));
+                    $consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores 
+					INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=prov_ciudad
+					INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$deptos[0]."'");
+					$contarClientes = mysqli_num_rows($consultaClientes);
                 ?>
                     <a href="proveedores.php?dpto=<?=$deptos[0];?>" style="margin-bottom:10px; color:<?=$color;?>"><?=$deptos[1]." (".$contarClientes.")";?></a><br>
                 <?php }?>
@@ -191,27 +187,27 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 						if(isset($_GET["dpto"]) and $_GET["dpto"]!=""){$filtroDepto .=" AND dep_id='".$_GET["dpto"]."'";}
 						
 						$SQL = "SELECT * FROM proveedores
-						INNER JOIN localidad_ciudades ON ciu_id=prov_ciudad
-						INNER JOIN localidad_departamentos ON dep_id=ciu_departamento $filtroDepto
+						INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=prov_ciudad
+						INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento $filtroDepto
 						WHERE prov_eliminado='0' ".$filtro."
 						";
 						?>
 						
 						<div class="widget-container">
-							<div style="border:thin; border-style:solid; height:150px; margin:10px;">
-                            	<h4 align="center">-Busqueda general y paginación-</h4>
+                            <div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
+                                <h4 align="center">-Busqueda general y paginación-</h4>
                                 <p> 
-                                    <form class="form-horizontal" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
+                                    <form class="form-horizontal" style="text-align: right;" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
                                         <div class="search-box">
                                             <div class="input-append input-icon">
-                                                <input class="search-input" placeholder="Buscar..." type="text" name="busqueda" value="<?=$_GET["busqueda"];?>">
+                                                <input placeholder="Buscar..." type="text" name="busqueda" value="<?php if(isset($_GET["busqueda"])) echo $_GET["busqueda"]; ?>">
                                                 <i class=" icon-search"></i>
-                                                <input class="btn" type="submit" name="buscar" value="Buscar">
+                                                <input class="btn" type="submit" value="Buscar">
                                             </div>
                                             <?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
                                         </div>
                                     </form>
-								<p style="margin: 10px;"><?php include("includes/paginacion.php");?></p> 
+                                    <p style="margin: 10px;"><?php include("includes/paginacion.php");?></p> 
                                 </p>
                             </div>
 						
@@ -227,15 +223,15 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							</thead>
 							<tbody>
                             <?php
-								$consulta = mysql_query("SELECT * FROM proveedores
-                                LEFT JOIN localidad_paises ON pais_id=prov_pais
-								LEFT JOIN localidad_ciudades ON ciu_id=prov_ciudad
-								LEFT JOIN localidad_departamentos ON dep_id=ciu_departamento $filtroDepto
+								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores
+                                LEFT JOIN ".BDADMIN.".localidad_paises ON pais_id=prov_pais
+								LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=prov_ciudad
+								LEFT JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento $filtroDepto
 								WHERE prov_eliminado='0' ".$filtro."
 								LIMIT $inicio, $limite
-								",$conexion);
+								");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){	
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){	
 							?>
 							<tr>
 								<td><?php echo $no;?></td>
@@ -256,7 +252,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 									
                                     <h4 style="margin-top:5px;">
                                         <a href="proveedores-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
-                                        <a href="sql.php?id=<?=$res[0];?>&get=61" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                        <a href="bd_delete/proveedores-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
                                 	</h4>
                                 </td>
 								<td>

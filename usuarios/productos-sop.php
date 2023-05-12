@@ -1,17 +1,13 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 160;
-$paginaActual['pag_nombre'] = "Productos Soporte Op.";
 
 $tabla = 'productos_soptec';
 $pk = 'prod_id';
-?>
 
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 
@@ -32,46 +28,9 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script type="text/javascript">
-            /*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
             $(function () {
                 $('#data-table').dataTable({
                     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                    /*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
                 });
             });
             $(function () {
@@ -102,15 +61,15 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 
 <script type="text/javascript">
   function productos(enviada){
-  	  var campo = enviada.title;
-	  var producto = enviada.name;
-	  var proceso = 1;
-	  var valor = enviada.value;
-	  
+	var campo = enviada.title;
+	var producto = enviada.name;
+	var proceso = 1;
+	var valor = enviada.value;
 	
-	  if(campo == 'prod_costo'){
-		  
-		 /* 
+
+	if(campo == 'prod_costo'){
+		
+		/* 
 		document.getElementById("costo"+producto).value=valor;
 		
 		var utilidad = (parseFloat(enviada.alt)/100);
@@ -135,44 +94,44 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 		document.getElementById("precioLista"+producto).innerHTML="$"+precioNuevo.toLocaleString();
 		document.getElementById("precioListaIva"+producto).innerHTML="$"+precioNuevoIva.toLocaleString();
 	}
-	  
-	  $('#resp').empty().hide().html("Esperando...").show(1);
+	
+	$('#resp').empty().hide().html("Esperando...").show(1);
 		datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&tabla="+$("#tabla").val()+"&pk="+$("#pk").val();
-			   $.ajax({
-				   type: "POST",
-				   url: "ajax/ajax-productos.php",
-				   data: datos,
-				   success: function(data){
-				   	$('#resp').empty().hide().html(data).show(1);
-				   }
-			   });
+			$.ajax({
+				type: "POST",
+				url: "ajax/ajax-productos.php",
+				data: datos,
+				success: function(data){
+				$('#resp').empty().hide().html(data).show(1);
+				}
+			});
 	}
 	
 	function pred(enviada){
-  	  var valorActual = enviada.title;
-	  var producto = enviada.name;
-	  var proceso = 6;
+	var valorActual = enviada.title;
+	var producto = enviada.name;
+	var proceso = 6;
 		
 		if(valorActual==0){
-		   	document.getElementById("p"+producto).innerHTML="SI";
+			document.getElementById("p"+producto).innerHTML="SI";
 			document.getElementById("p"+producto).title=1;
 		}
 		
 		if(valorActual==1){
-		   	document.getElementById("p"+producto).innerHTML="NO";
+			document.getElementById("p"+producto).innerHTML="NO";
 			document.getElementById("p"+producto).title=0;
-		 }
+		}
 		
-	  $('#resp').empty().hide().html("Esperando...").show(1);
+	$('#resp').empty().hide().html("Esperando...").show(1);
 		datos = "producto="+(producto)+"&proceso="+(proceso)+"&valorActual="+(valorActual);
-			   $.ajax({
-				   type: "POST",
-				   url: "ajax/ajax-productos.php",
-				   data: datos,
-				   success: function(data){
-				   $('#resp').empty().hide().html(data).show(1);
-				   }
-			   });
+			$.ajax({
+				type: "POST",
+				url: "ajax/ajax-productos.php",
+				data: datos,
+				success: function(data){
+				$('#resp').empty().hide().html(data).show(1);
+				}
+			});
 	}
 </script>
 
@@ -193,9 +152,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 			
 			<span id="resp"></span>
             <p>
-
-					<a href="#" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-
+				<a href="#" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
             </p>
 			
 
@@ -225,20 +182,19 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							if(is_numeric($_GET["grupo2"])){$filtro .=" AND prod_categoria='".$_GET["grupo2"]."'";}
 							if(is_numeric($_GET["marca"])){$filtro .=" AND prod_marca='".$_GET["marca"]."'";}	
 								
-							$consulta = mysql_query("SELECT * FROM productos_soptec 
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec 
 							LEFT JOIN productos_categorias ON catp_id=prod_categoria
-							WHERE prod_id=prod_id $filtro
-							",$conexion);
+							WHERE prod_id=prod_id $filtro");
 							$no = 1;
 							$visible = array("SI","SI","NO");
 							$estadoVisible = array(2,2,1);	
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
-								$grupo1 = mysql_fetch_array(mysql_query("SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'
-								",$conexion));
+								$consultaGrupo=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'");
+								$grupo1 = mysqli_fetch_array($consultaGrupo, MYSQLI_BOTH);
 								
-								$marca = mysql_fetch_array(mysql_query("SELECT * FROM marcas WHERE mar_id='".$res['prod_marca']."'
-								",$conexion));
+								$consultaMarca=mysqli_query($conexionBdPrincipal,"SELECT * FROM marcas WHERE mar_id='".$res['prod_marca']."'");
+								$marca = mysqli_fetch_array($consultaMarca, MYSQLI_BOTH);
 
 							?>
 							<tr>
