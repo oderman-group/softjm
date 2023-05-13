@@ -94,10 +94,10 @@ include("verificar-paginas.php");
 													<div class="col-sm-9">	
 														<select class="select2 form-control" multiple="multiple" style="width: 100%; height:36px;" name="remisiones[]">
 																	<?php
-																	$consultaSelect = mysql_query("SELECT * FROM remisiones
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
 																	INNER JOIN clientes ON cli_id=rem_cliente
-																	",$conexion);
-																	while($datosSelect = mysql_fetch_array($consultaSelect)){
+																	");
+																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																	?>
 																	<option value="<?=$datosSelect[0];?>"><?=strtoupper($datosSelect['rem_id']." - ".$datosSelect['rem_equipo']." - ".$datosSelect['cli_nombre']);?></option>
 																	<?php }?>

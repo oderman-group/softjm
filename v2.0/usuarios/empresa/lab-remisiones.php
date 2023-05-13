@@ -123,9 +123,10 @@ if(is_numeric($_GET["idRem"])){
 								$m = 1;
 								$meses = array("","Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic");
 								while($m<=12){
-									$numRem = mysql_num_rows(mysql_query("SELECT * FROM remisiones 
+									$consultaRemisiones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 									INNER JOIN clientes ON cli_id=rem_cliente
-									WHERE rem_estado=1 AND MONTH(rem_fecha_registro)='".$m."'",$conexion));
+									WHERE rem_estado=1 AND MONTH(rem_fecha_registro)='".$m."'");
+									$numRem = mysqli_num_rows($consultaRemisiones);
 									if($m==$_GET["m"])
 										echo '<a style="font-weight:bold;">'.$meses[$m].'('.$numRem.')</a>&nbsp;&nbsp;&nbsp;';
 									else
@@ -183,41 +184,44 @@ if(is_numeric($_GET["idRem"])){
 											
 											if($datosUsuarioActual[3] == 14){
 
-												$consulta = mysql_query("SELECT * FROM remisiones
+												$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
 												LEFT JOIN clientes ON cli_id=rem_cliente
 												LEFT JOIN usuarios ON usr_id=rem_asesor
 												LEFT JOIN sucursales_propias ON sucp_id=usr_sucursal
 												WHERE rem_id=rem_id $filtro
 												ORDER BY rem_id DESC
-												",$conexion);
+												");
 												
 											}else{
 
-												$consulta = mysql_query("SELECT * FROM remisiones
+												$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
 												LEFT JOIN clientes ON cli_id=rem_cliente
 												LEFT JOIN usuarios ON usr_id=rem_asesor
 												LEFT JOIN sucursales_propias ON sucp_id=usr_sucursal
 												WHERE rem_id=rem_id $filtro
 												ORDER BY rem_id DESC
 												LIMIT 0, 100
-												",$conexion);
+												");
 											}
 
 											$conRegistros = 1;
 											
-											while($resultado = mysql_fetch_array($consulta)){
+											while($resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 
 												//Solo Vendedores externos
 												if($datosUsuarioActual[3] == 14){
-													$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resultado['cli_zona']."'",$conexion));
+													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resultado['cli_zona']."'");
+													$numZ = mysqli_num_rows($consultaZonas);
 													if($numZ==0) continue;
 												}
 												
-												$remisionesEnt = mysql_fetch_array(mysql_query("SELECT DATEDIFF(now(), rem_fecha_registro), rem_id FROM remisiones 
-												WHERE rem_id='".$resultado['rem_id']."'",$conexion));
+												$consultaRemisionesEnt=mysqli_query($conexionBdPrincipal,"SELECT DATEDIFF(now(), rem_fecha_registro), rem_id FROM remisiones 
+												WHERE rem_id='".$resultado['rem_id']."'");
+												$remisionesEnt = mysqli_fetch_array($consultaRemisionesEnt, MYSQLI_BOTH);
 												
-												$remisionesSeg = mysql_num_rows(mysql_query("SELECT * FROM remisiones_seguimiento 
-												WHERE remseg_id_remisiones='".$resultado['rem_id']."'",$conexion));
+												$consultaRemisioneSeg=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_seguimiento 
+												WHERE remseg_id_remisiones='".$resultado['rem_id']."'");
+												$remisionesSeg = mysqli_num_rows($consultaRemisioneSeg);
 												
 												$colorEntrada = 'info';
 												
@@ -241,11 +245,12 @@ if(is_numeric($_GET["idRem"])){
 													$certificado = '<span class="label label-danger">Vencido</span>';
 												}
 												//Para obtener la fecha
-												$camposRemision = mysql_fetch_array(mysql_query("SELECT 
+												$consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT 
 												DAY(rem_fecha), MONTH(rem_fecha), YEAR(rem_fecha),
 												DAY(DATE_ADD(rem_fecha, INTERVAL '".$resultado['rem_tiempo_certificado']."' MONTH)), MONTH(DATE_ADD(rem_fecha, INTERVAL '".$resultado['rem_tiempo_certificado']."' MONTH)), YEAR(DATE_ADD(rem_fecha, INTERVAL '".$resultado['rem_tiempo_certificado']."' MONTH))
 												FROM remisiones 
-												WHERE rem_id='".$resultado['rem_id']."'",$conexion));
+												WHERE rem_id='".$resultado['rem_id']."'");
+												$camposRemision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 												
 												
 														$msjFoto = '-';

@@ -6,18 +6,20 @@ $idPagina = 1;
 $tituloPagina = "Cotización";
 //include("verificar-paginas.php");
 
-$remision = mysql_fetch_array(mysql_query("SELECT * FROM remisiones 
+$consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 INNER JOIN clientes ON cli_id=rem_cliente
-INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
+INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='" . $_GET["id"] . "'", $conexion));
+WHERE rem_id='" . $_GET["id"] . "'");
+$remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 
-$camposRemision = mysql_fetch_array(mysql_query("SELECT 
+$ConsultaCampoRemision=mysqli_query($conexionBdPrincipal,"SELECT 
 DAY(rem_fecha), MONTH(rem_fecha), YEAR(rem_fecha),
 DAY(DATE_ADD(rem_fecha, INTERVAL '" . $remision['rem_tiempo_certificado'] . "' MONTH)), MONTH(DATE_ADD(rem_fecha, INTERVAL '" . $remision['rem_tiempo_certificado'] . "' MONTH)), YEAR(DATE_ADD(rem_fecha, INTERVAL '" . $remision['rem_tiempo_certificado'] . "' MONTH))
 FROM remisiones 
-WHERE rem_id='" . $_GET["id"] . "'", $conexion));
+WHERE rem_id='" . $_GET["id"] . "'");
+$camposRemision = mysqli_fetch_array($ConsultaCampoRemision, MYSQLI_BOTH);
 
 $estadosCertificados = array("", "ACEPTABLE", "VENCIDO", "PROVICIONAL");
 

@@ -6,14 +6,16 @@ $idPagina = 1;
 $tituloPagina = "Cotización";
 //include("verificar-paginas.php");
 
-$remision = mysql_fetch_array(mysql_query("SELECT * FROM remisiones 
+$consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 INNER JOIN clientes ON cli_id=rem_cliente
-INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
+INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_GET["id"]."'",$conexion));
+WHERE rem_id='".$_GET["id"]."'");
+$remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 
-$contacto = mysql_fetch_array(mysql_query("SELECT * FROM contactos WHERE cont_id='".$remision['rem_contacto']."'",$conexion));
+$consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$remision['rem_contacto']."'");
+$contacto = mysqli_fetch_array($consultaContacto, MYSQLI_BOTH);
 
 switch($_GET['estado']){
 	case 1: 
@@ -150,11 +152,12 @@ switch($_GET['estado']){
 			<td width="65%">
 				<div style="padding-bottom: 100px; padding-left:10px;  position: inherit;">
 					<?php
-					$consultaSelect = mysql_query("SELECT * FROM servicios",$conexion);
-					while($datosSelect = mysql_fetch_array($consultaSelect)){
-																	
-						$numOpciones = mysql_num_rows(mysql_query("SELECT * FROM remisiones_servicios 
-						WHERE remxs_id_remision='".$_GET["id"]."' AND remxs_id_servicio='".$datosSelect[0]."'",$conexion));
+					$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+					while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
+						
+						$consultaOpciones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios 
+						WHERE remxs_id_remision='".$_GET["id"]."' AND remxs_id_servicio='".$datosSelect[0]."'");
+						$numOpciones = mysqli_num_rows($consultaOpciones);
 						
 						if($numOpciones>0){
 							echo strtoupper($datosSelect['serv_nombre'])."<br>";	

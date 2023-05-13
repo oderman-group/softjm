@@ -5,12 +5,13 @@ $idPagina = 1;
 $tituloPagina = "Cotización";
 include("verificar-paginas.php");
 
-$remision = mysql_fetch_array(mysql_query("SELECT * FROM remisiones 
+$consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 INNER JOIN clientes ON cli_id=rem_cliente
-INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
+INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_GET["id"]."'",$conexion));
+WHERE rem_id='".$_GET["id"]."'");
+$remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 ?>
     <!-- This page plugin CSS -->
     <link href="../../assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.css" rel="stylesheet">
@@ -64,12 +65,11 @@ WHERE rem_id='".$_GET["id"]."'",$conexion));
                                         </thead>
                                         <tbody>
 											<?php											
-											$consulta = mysql_query("SELECT * FROM remisiones_servicios
+											$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios
 											INNER JOIN servicios ON serv_id=remxs_id_servicio
-											WHERE remxs_id_remision='".$_GET["id"]."'
-											",$conexion);
+											WHERE remxs_id_remision='".$_GET["id"]."'");
 											$conRegistros = 1;
-											while($resultado = mysql_fetch_array($consulta)){
+											while($resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 												$html = '<span class="label label-warning">Entrada</a>';
 												
 												if($resultado['rem_estado']==2){

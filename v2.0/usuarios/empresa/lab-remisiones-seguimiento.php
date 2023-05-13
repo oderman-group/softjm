@@ -4,16 +4,17 @@ include("../compartido/head.php");
 $idPagina = 1;
 $tituloPagina = "Seguimiento a remisiones";
 include("verificar-paginas.php");
-?>
-<?php
-$remision = mysql_fetch_array(mysql_query("SELECT * FROM remisiones 
-INNER JOIN clientes ON cli_id=rem_cliente
-INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
-INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_GET["id"]."'",$conexion));
 
-$contacto = mysql_fetch_array(mysql_query("SELECT * FROM contactos WHERE cont_id='".$remision["rem_contacto"]."'",$conexion));
+$consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
+INNER JOIN clientes ON cli_id=rem_cliente
+INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
+INNER JOIN usuarios ON usr_id=rem_asesor
+WHERE rem_id='".$_GET["id"]."'");
+$remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
+
+$consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$remision["rem_contacto"]."'");
+$contacto = mysqli_fetch_array($consultaContacto, MYSQLI_BOTH);
 
 $estadosRemision = array("","Entrada","Salida");
 ?>
@@ -97,13 +98,13 @@ $estadosRemision = array("","Entrada","Salida");
                                 <h4 class="card-title">Seguimiento</h4>
                                 <ul class="list-unstyled m-t-40">
                                     <?php	
-									$consulta = mysql_query("SELECT * FROM remisiones_seguimiento
+									$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_seguimiento
 									INNER JOIN usuarios ON usr_id=remseg_usuario
 									WHERE remseg_id_remisiones='".$_GET["id"]."'
 									ORDER BY remseg_id DESC
-									",$conexion);
+									");
 									$conRegistros = 1;
-									while($resultado = mysql_fetch_array($consulta)){
+									while($resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 										$html = '<a href="sql.php?id='.$resultado['cseg_id'].'&get=28&idTK='.$_GET["idTK"].'" class="label label-warning">No notificado</a>';
 										if($resultado['remseg_notificar_cliente']==1){
 											$html = '<span class="label label-success">Notificado</span>';
@@ -157,11 +158,11 @@ $estadosRemision = array("","Entrada","Salida");
 												<select name="obsLista">
 													<option value="">Escoja una ya existente</option>
 													<?php
-													$observaciones = mysql_query("SELECT * FROM remisiones_seguimiento 
+													$observaciones = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_seguimiento 
 													GROUP BY remseg_comentario
 													ORDER BY remseg_comentario
-													",$conexion);		 
-													while($obs = mysql_fetch_array($observaciones)){
+													");		 
+													while($obs = mysqli_fetch_array($observaciones, MYSQLI_BOTH)){
 													?>
 														<option value="<?=$obs['remseg_comentario'];?>"><?=$obs['remseg_comentario'];?></option>
 													<?php

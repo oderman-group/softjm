@@ -5,9 +5,10 @@ $idPagina = 1;
 $tituloPagina = "Editar remisión";
 include("verificar-paginas.php");
 
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM remisiones 
+$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_GET["id"]."'",$conexion));
+WHERE rem_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
     <!-- Custom CSS -->
     <link href="../../dist/css/style.min.css" rel="stylesheet">
@@ -570,10 +571,11 @@ WHERE rem_id='".$_GET["id"]."'",$conexion));
 													<div class="col-sm-9">	
 														<select class="select2 form-control custom-select" multiple="multiple" style="width: 100%; height:36px;" name="servicios[]">
 																	<?php
-																	$consultaSelect = mysql_query("SELECT * FROM servicios",$conexion);
-																	while($datosSelect = mysql_fetch_array($consultaSelect)){
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																		
-																		$numOpciones = mysql_num_rows(mysql_query("SELECT * FROM remisiones_servicios WHERE remxs_id_remision='".$_GET["id"]."' AND remxs_id_servicio='".$datosSelect[0]."'",$conexion));	
+																		$consultaOpciones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios WHERE remxs_id_remision='".$_GET["id"]."' AND remxs_id_servicio='".$datosSelect[0]."'");
+																		$numOpciones = mysqli_num_rows($consultaOpciones);	
 																	?>
 																	<option value="<?=$datosSelect[0];?>" <?php if($numOpciones > 0){echo "selected";} ?> ><?=strtoupper($datosSelect['serv_nombre']);?></option>
 																	<?php }?>
@@ -589,12 +591,13 @@ WHERE rem_id='".$_GET["id"]."'",$conexion));
 														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="cliente">
 															<option>Cliente</option>
 																	<?php
-																	$consultaSelect = mysql_query("SELECT * FROM clientes",$conexion);
-																	while($datosSelect = mysql_fetch_array($consultaSelect)){
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																		
 																		//Solo Vendedores externos
 																		if($datosUsuarioActual[3] == 14){
-																			$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$datosSelect['cli_zona']."'",$conexion));
+																			$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$datosSelect['cli_zona']."'");
+																			$numZ = mysqli_num_rows($consultaZonas);
 																			if($numZ==0) continue;
 																		}
 																		

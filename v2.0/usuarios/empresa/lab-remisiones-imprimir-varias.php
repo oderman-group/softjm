@@ -5,14 +5,16 @@ $idPagina = 1;
 $tituloPagina = "Cotización";
 //include("verificar-paginas.php");
 
-$remision = mysql_fetch_array(mysql_query("SELECT * FROM remisiones 
+$consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 INNER JOIN clientes ON cli_id=rem_cliente
-INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
+INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_POST["remisiones"][0]."'",$conexion));
+WHERE rem_id='".$_POST["remisiones"][0]."'");
+$remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 
-$contacto = mysql_fetch_array(mysql_query("SELECT * FROM contactos WHERE cont_id='".$remision['rem_contacto']."'",$conexion));
+$consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$remision['rem_contacto']."'");
+$contacto = mysqli_fetch_array($consultaContacto, MYSQLI_BOTH);
 
 switch($_POST['estado']){
 	case 1: 
@@ -124,12 +126,12 @@ switch($_POST['estado']){
 				$numero =(count($_POST["remisiones"]));
 				$contador=0;
 				while($contador<$numero){
-					$remi = mysql_fetch_array(mysql_query("SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."'",$conexion));
+					$consultaRemi=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."'");
+					$remi = mysqli_fetch_array($consultaRemi, MYSQLI_BOTH);
 					
 					if($_POST['estado']==2){
-						mysql_query("UPDATE remisiones SET rem_estado=2, rem_fecha_salida=now() 
-						WHERE rem_id='".$_POST["remisiones"][$contador]."'",$conexion);
-						if(mysql_errno()!=0){echo mysql_error(); exit();}
+						mysqli_query($conexionBdPrincipal,"UPDATE remisiones SET rem_estado=2, rem_fecha_salida=now() 
+						WHERE rem_id='".$_POST["remisiones"][$contador]."'");
 					}
 					
 					
@@ -142,7 +144,7 @@ switch($_POST['estado']){
 				</h3>	
 			</td>
 		</tr>
-    	  
+
 	</table>
 	<p>&nbsp;</p>
 	
@@ -156,9 +158,9 @@ switch($_POST['estado']){
 				<?php
 				$numero =(count($_POST["remisiones"]));
 				$contador=0;
-				if(mysql_errno()!=0){echo mysql_error(); exit();}
 				while($contador<$numero){
-					$remi = mysql_fetch_array(mysql_query("SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."'",$conexion));
+					$consultaRemi=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."'");
+					$remi = mysqli_fetch_array($consultaRemi, MYSQLI_BOTH);
 				?>
 				
 					<p>
@@ -191,15 +193,16 @@ switch($_POST['estado']){
 				<?php
 				$numero =(count($_POST["remisiones"]));
 				$contador=0;
-				if(mysql_errno()!=0){echo mysql_error(); exit();}
 				while($contador<$numero){
-					$remis = mysql_fetch_array(mysql_query("SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."'",$conexion));
+					$consultaRemi=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."'");
+					$remis = mysqli_fetch_array($consultaRemi, MYSQLI_BOTH);
 					
-					$consultaSelect = mysql_query("SELECT * FROM servicios",$conexion);
-					while($datosSelect = mysql_fetch_array($consultaSelect)){
-																	
-						$numOpciones = mysql_num_rows(mysql_query("SELECT * FROM remisiones_servicios 
-						WHERE remxs_id_remision='".$_POST["remisiones"][$contador]."' AND remxs_id_servicio='".$datosSelect[0]."'",$conexion));
+					$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+					while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
+						
+						$consultaOpciones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios 
+						WHERE remxs_id_remision='".$_POST["remisiones"][$contador]."' AND remxs_id_servicio='".$datosSelect[0]."'");
+						$numOpciones = mysqli_num_rows($consultaOpciones);
 						
 						if($numOpciones>0){
 							echo strtoupper($datosSelect['serv_nombre'])."<br>";	
@@ -228,8 +231,8 @@ switch($_POST['estado']){
 	<p>&nbsp;</p>
 	
 	<div style="margin-left: 70px; margin-right: 70px;">
-	 <p>&#9679; <?=$mensaje1;?></p>
-	 <p>&#9679; <?=$mensaje2;?></p>
+	<p>&#9679; <?=$mensaje1;?></p>
+	<p>&#9679; <?=$mensaje2;?></p>
 	</div>	
 	
 	<p>&nbsp;</p><p>&nbsp;</p>
@@ -287,7 +290,7 @@ switch($_POST['estado']){
 	Medellín - Colombia	
 	</div>
 	
-      
+
 </body>
 
 <script type="application/javascript">

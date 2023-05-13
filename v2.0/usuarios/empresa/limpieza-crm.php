@@ -1,25 +1,19 @@
 <?php
 include("../../modelo/conexion.php");
-$clientes = mysql_query("SELECT * FROM clientes",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+$clientes = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
 
 $cont = 0;
-while($cliente = mysql_fetch_array($clientes)){
-	$tickets = mysql_num_rows(mysql_query("SELECT * FROM clientes_tikets WHERE tik_cliente='".$cliente['cli_id']."'",$conexion));
-	if(mysql_errno()!=0){echo mysql_error(); exit();}
+while($cliente = mysqli_fetch_array($clientes, MYSQLI_BOTH)){
+	$tickets = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_cliente='".$cliente['cli_id']."'"));
 	
-	$seguimientos = mysql_num_rows(mysql_query("SELECT * FROM cliente_seguimiento WHERE cseg_cliente='".$cliente['cli_id']."'",$conexion));
-	if(mysql_errno()!=0){echo mysql_error(); exit();}
+	$seguimientos = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM cliente_seguimiento WHERE cseg_cliente='".$cliente['cli_id']."'"));
 	
-	$facturas = mysql_num_rows(mysql_query("SELECT * FROM facturacion WHERE fact_cliente='".$cliente['cli_id']."'",$conexion));
-	if(mysql_errno()!=0){echo mysql_error(); exit();}
+	$facturas = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM facturacion WHERE fact_cliente='".$cliente['cli_id']."'"));
 	
-	$remisiones = mysql_num_rows(mysql_query("SELECT * FROM remisiones WHERE rem_cliente='".$cliente['cli_id']."'",$conexion));
-	if(mysql_errno()!=0){echo mysql_error(); exit();}
+	$remisiones = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_cliente='".$cliente['cli_id']."'"));
 	
 	if($tickets==0 and $seguimientos==0 and $facturas==0 and $remisiones==0){
-		mysql_query("DELETE FROM clientes WHERE cli_id='".$cliente['cli_id']."'",$conexion);
-		if(mysql_errno()!=0){echo mysql_error(); exit();}
+		mysqli_query($conexionBdPrincipal,"DELETE FROM clientes WHERE cli_id='".$cliente['cli_id']."'");
 		$cont++;
 	}
 }

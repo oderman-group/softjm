@@ -102,13 +102,14 @@ include("verificar-paginas.php");
 														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="cliente" onChange="clientes(this)">
 															<option value="">Cliente</option>
 																	<?php
-																	$consultaSelect = mysql_query("SELECT * FROM clientes",$conexion);
-																	while($datosSelect = mysql_fetch_array($consultaSelect)){
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 
 
 																		//Solo Vendedores externos
 																		if($datosUsuarioActual[3] == 14){
-																			$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$datosSelect['cli_zona']."'",$conexion));
+																			$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$datosSelect['cli_zona']."'");
+																			$numZ = mysqli_num_rows($consultaZonas);
 																			if($numZ==0) continue;
 																		}
 																	?>
@@ -130,8 +131,8 @@ include("verificar-paginas.php");
 														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="contacto">
 															<option value="">Contactos</option>
 																	<?php
-																	$consultaSelect = mysql_query("SELECT * FROM contactos WHERE cont_cliente_principal='".$_GET["cte"]."'",$conexion);
-																	while($datosSelect = mysql_fetch_array($consultaSelect)){
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$_GET["cte"]."'");
+																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																	?>
 																	<option value="<?=$datosSelect[0];?>" <?php if($_GET['contacto']==$datosSelect[0]){echo "selected";} ?>><?=strtoupper($datosSelect['cont_nombre']);?></option>
 																	<?php }?>
@@ -165,10 +166,10 @@ include("verificar-paginas.php");
 														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="ciudadCliente">
 															<option value="">--</option>
 															<?php
-																	$ciudades = mysql_query("SELECT * FROM localidad_ciudades 
-																	INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
-																	ORDER BY ciu_nombre",$conexion);
-																	while($ciudad = mysql_fetch_array($ciudades)){
+																	$ciudades = mysqli_query($conexionBdPrincipal,"SELECT * FROM ".BDADMIN.".localidad_ciudades 
+																	INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
+																	ORDER BY ciu_nombre");
+																	while($ciudad = mysqli_fetch_array($ciudades, MYSQLI_BOTH)){
 																	?>
 																	<option value="<?=$ciudad['ciu_id'];?>"><?=$ciudad['ciu_nombre'].", ".$ciudad['dep_nombre'];?></option>
 																	<?php }?>
@@ -426,8 +427,8 @@ include("verificar-paginas.php");
 													<div class="col-sm-9">	
 														<select class="select2 form-control" multiple="multiple" style="width: 100%; height:36px;" name="servicios[]">
 																	<?php
-																	$consultaSelect = mysql_query("SELECT * FROM servicios",$conexion);
-																	while($datosSelect = mysql_fetch_array($consultaSelect)){
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																	?>
 																	<option value="<?=$datosSelect[0];?>"><?=strtoupper($datosSelect['serv_nombre']);?></option>
 																	<?php }?>

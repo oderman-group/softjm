@@ -90,12 +90,11 @@ include("verificar-paginas.php");
                                         </thead>
                                         <tbody>
 											<?php											
-											$consulta = mysql_query("SELECT * FROM remisiones_servicios
+											$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios
 											INNER JOIN servicios ON serv_id=remxs_id_servicio
-											WHERE remxs_id_remision='".$_GET["id"]."'
-											",$conexion);
+											WHERE remxs_id_remision='".$_GET["id"]."'");
 											$conRegistros = 1;
-											while($resultado = mysql_fetch_array($consulta)){
+											while($resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 												$html = '<span class="label label-warning">Entrada</a>';
 												
 												if($resultado['rem_estado']==2){
