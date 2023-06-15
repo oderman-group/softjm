@@ -1,32 +1,12 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $tituloPagina = "Mis Contactos";
+
+include("head.php");
+
+$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'"), MYSQLI_BOTH);
 ?>
-
-<?php include("head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'",$conexion));
-?>
-<!-- styles -->
-
-<!--[if IE 7]>
-            <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-        <![endif]-->
-
-
-<!--[if IE 7]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-        <![endif]-->
-<!--[if IE 8]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-        <![endif]-->
-<!--[if IE 9]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-        <![endif]-->
 <link href="css/tablecloth.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
@@ -49,46 +29,9 @@ $cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='"
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script type="text/javascript">
-            /*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
             $(function () {
                 $('#data-table').dataTable({
                     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                    /*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
                 });
             });
             $(function () {
@@ -129,12 +72,6 @@ $cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='"
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$tituloPagina;?></h3>
-						<ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -170,10 +107,10 @@ $cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='"
 							<tbody>
                             <?php
 							$roles = array("","Topógrafo", "Administrativo", "Otro");
-							$consulta = mysql_query("SELECT * FROM contactos WHERE cont_cliente_principal='".$_SESSION["id"]."'",$conexion);
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$_SESSION["id"]."'");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
-								$sucursal = mysql_fetch_array(mysql_query("SELECT * FROM sucursales WHERE sucu_id='".$res['cont_sucursal']."'",$conexion));
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
+								$sucursal = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_id='".$res['cont_sucursal']."'"), MYSQLI_BOTH);
 							?>
 							<tr>
 								<td><?=$no;?></td>
@@ -183,7 +120,7 @@ $cliente = mysql_fetch_array(mysql_query("SELECT * FROM clientes WHERE cli_id='"
                                 <td><?=$roles[$res['cont_rol']];?></td>
 								<td><?=$sucursal['sucu_nombre'];?></td>
                                 <td><h4>
-                                    <a href="#contactos-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+                                    <a href="contactos-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>

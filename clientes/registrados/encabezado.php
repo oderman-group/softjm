@@ -1,9 +1,9 @@
 <?php
-$notificaciones = mysql_query("SELECT * FROM remisiones_seguimiento
+$notificaciones = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_seguimiento
 INNER JOIN remisiones ON rem_id=remseg_id_remisiones AND rem_cliente='".$_SESSION["id"]."'
 WHERE remseg_notificar_cliente=1 AND (remseg_visto_cliente=0 OR remseg_visto_cliente IS NULL)
-",$conexion);
-$numNotf = mysql_num_rows($notificaciones);
+");
+$numNotf = mysqli_num_rows($notificaciones);
 ?>	
 <!-- Navbar
     ================================================== -->
@@ -24,7 +24,7 @@ $numNotf = mysql_num_rows($notificaciones);
 								<span class="notify-h"> Tienes <?=$numNotf;?> notificaciones</span>
                                 <?php 
 								$i=1;
-								while($notf = mysql_fetch_array($notificaciones)){
+								while($notf = mysqli_fetch_array($notificaciones, MYSQLI_BOTH)){
 								if($i==6) break;
 								?>
                                 <a href="notificaciones-lista.php" class="msg-container clearfix"><span class="notification-thumb"><img src="images/notify-thumb.png" width="50" height="50" alt="user-thumb"></span><span class="notification-intro"> Nueva notificación (ID:<?=$notf["remseg_id"];?>) - <b><?=$notf['rem_equipo']?></b><span class="notify-time"> <?=$notf['remseg_fecha']?> </span></span></a>

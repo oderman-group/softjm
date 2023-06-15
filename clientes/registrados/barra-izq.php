@@ -31,9 +31,9 @@
 							</div>
 						</div>
 					</div>
-			<?php if($config['conf_banner_lateral']!=""){?>
+			<?php if($configu['conf_banner_lateral']!=""){?>
 				<p style="padding: 5px;">
-					<a href="<?=$config['conf_url_lateral'];?>" target="_blank"><img src="../../usuarios/files/publicidad/<?=$config['conf_banner_lateral'];?>"></a>
+					<a href="<?=$configu['conf_url_lateral'];?>" target="_blank"><img src="../../usuarios/files/publicidad/<?=$configu['conf_banner_lateral'];?>"></a>
 				</p>
 			<?php }?>
 

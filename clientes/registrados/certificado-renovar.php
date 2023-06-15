@@ -1,40 +1,20 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $idPagina = 19;
 $tituloPagina = "Renovar certificado";
-?>
-<?php include("verificar-paginas.php");?>
-<?php include("head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM clientes 
-WHERE cli_id='".$_SESSION["id"]."'",$conexion));
-?>
 
-<?php
-$equipo = mysql_fetch_array(mysql_query("SELECT * FROM remisiones WHERE rem_id='".$_GET["id"]."'",$conexion));
-?>
-<!-- styles -->
+include("verificar-paginas.php");
+include("head.php");
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
+$resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes 
+WHERE cli_id='".$_SESSION["id"]."'"), MYSQLI_BOTH);
+
+$equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_GET["id"]."'"), MYSQLI_BOTH);
+?>
 <link href="css/chosen.css" rel="stylesheet">
 <link href="css/styles.css" rel="stylesheet">
 <link href="css/theme-wooden.css" rel="stylesheet">
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
 <link rel="shortcut icon" href="ico/favicon.ico">
@@ -168,13 +148,6 @@ $equipo = mysql_fetch_array(mysql_query("SELECT * FROM remisiones WHERE rem_id='
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$tituloPagina;?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -224,8 +197,8 @@ $equipo = mysql_fetch_array(mysql_query("SELECT * FROM remisiones WHERE rem_id='
 										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="servicio" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM servicios",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['serv_nombre']." ($".number_format($resOp['serv_precio'],0,",",".").")";?></option>
                                             <?php

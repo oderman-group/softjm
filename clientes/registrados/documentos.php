@@ -1,30 +1,14 @@
-<?php include("sesion.php");?>
-<?php include("sesion-documentos.php");?>
-<?php
-$tituloPagina = "Mis Documentos";
-?>
-<?php include("head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<!-- styles -->
+<?php 
+include("sesion.php");
+include("sesion-documentos.php");
 
-<!--[if IE 7]>
-            <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-        <![endif]-->
+$tituloPagina = "Mis Documentos";
+
+include("head.php");
+?>
+
 <link href="css/styles.css" rel="stylesheet">
 <link href="css/theme-wooden.css" rel="stylesheet">
-
-<!--[if IE 7]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-        <![endif]-->
-<!--[if IE 8]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-        <![endif]-->
-<!--[if IE 9]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-        <![endif]-->
 <link href="css/tablecloth.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
@@ -47,46 +31,9 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script type="text/javascript">
-            /*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
             $(function () {
                 $('#data-table').dataTable({
                     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                    /*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
                 });
             });
             $(function () {
@@ -180,23 +127,23 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
                             <?php	
 								
 							
-							$consulta = mysql_query("SELECT * FROM cotizacion
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion
 							INNER JOIN clientes ON cli_id=cotiz_cliente
 							INNER JOIN usuarios ON usr_id=cotiz_creador
 							WHERE cotiz_cliente='".$_SESSION["id"]."'
-							",$conexion);
+							");
 							
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
-								$vendedor = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."'",$conexion));
+								$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."'"), MYSQLI_BOTH);
 								
 								$fondoCotiz = '';
 								if($res['cotiz_vendida']==1){
 									$fondoCotiz = 'aquamarine';
 								}
 								
-								$vencimiento = mysql_fetch_array(mysql_query("SELECT DATEDIFF(cotiz_fecha_vencimiento, now()) FROM cotizacion WHERE cotiz_id='".$res['cotiz_id']."'",$conexion));
+								$vencimiento = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT DATEDIFF(cotiz_fecha_vencimiento, now()) FROM cotizacion WHERE cotiz_id='".$res['cotiz_id']."'"), MYSQLI_BOTH);
 								
 								if($vencimiento[0]<0){continue;}
 							?>
@@ -206,12 +153,12 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
                                 <td><?=$res['cotiz_fecha_vencimiento'];?></td>
 								<td>
 									<?php
-										$productos = mysql_query("SELECT * FROM cotizacion_productos
+										$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
 										INNER JOIN productos ON prod_id=czpp_producto
 										WHERE czpp_cotizacion='".$res['cotiz_id']."'
-										",$conexion);
+										");
 										$i = 1;
-										while($prod = mysql_fetch_array($productos)){
+										while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 											echo "<b>".$i.".</b> ".$prod['prod_nombre'].", ";
 											$i++;
 										}
@@ -253,20 +200,20 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							<p></p>
 							
                             <?php
-							$consultaC = mysql_query("SELECT * FROM remisiones 
+							$consultaC = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 							WHERE rem_cliente='".$_SESSION["id"]."' AND rem_fecha_certificado!=''
 							ORDER BY rem_id DESC
-							",$conexion);
+							");
 							$no = 1;
 							$meses = array("","ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE");	
 							$estadosCertificados = array("","Vigente","Vencido","Provisional");
 							$labCert = array("","success","important","warning");
-							while($resC = mysql_fetch_array($consultaC)){
-								$camposRemision = mysql_fetch_array(mysql_query("SELECT 
+							while($resC = mysqli_fetch_array($consultaC, MYSQLI_BOTH)){
+								$camposRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT 
 								DAY(rem_fecha), MONTH(rem_fecha), YEAR(rem_fecha),
 								DAY(DATE_ADD(rem_fecha, INTERVAL 6 MONTH)), MONTH(DATE_ADD(rem_fecha, INTERVAL 6 MONTH)), YEAR(DATE_ADD(rem_fecha, INTERVAL 6 MONTH))
 								FROM remisiones 
-								WHERE rem_id='".$resC['rem_id']."'",$conexion));
+								WHERE rem_id='".$resC['rem_id']."'"));
 							?>
 							<h5 style="font-weight: bold;">
 								<?=$no;?>. C<?=$resC['rem_id'];?>

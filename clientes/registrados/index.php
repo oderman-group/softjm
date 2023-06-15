@@ -1,26 +1,8 @@
-<?php include("sesion.php");?>
-<?php include("head.php");?>
+<?php 
+include("sesion.php");
+include("head.php");
+?>
 
-<!-- styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/jquery.gritter.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="css/font-awesome.css">
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
-<link href="css/tablecloth.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
 <link rel="shortcut icon" href="ico/favicon.ico">
@@ -276,7 +258,7 @@ FLOT PIE CHART
 		<div class="container-fluid">
 			
 			<div style="padding: 5px; display: none;" align="center">
-				<a href="<?=$config['conf_url_top'];?>" target="_blank"><img src="../../usuarios/files/publicidad/<?=$config['conf_banner_top'];?>"></a>
+				<a href="<?=$configu['conf_url_top'];?>" target="_blank"><img src="../../usuarios/files/publicidad/<?=$configu['conf_banner_top'];?>"></a>
 			</div>
 			
 			<div class="row-fluid ">
