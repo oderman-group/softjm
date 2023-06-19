@@ -1,33 +1,13 @@
-<?php include("sesion.php");?>
-<?php
+<?php 
+include("sesion.php");
+
 $tituloPagina = "Editar Contactos";
-?>
 
-<?php include("head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM contactos WHERE cont_id='".$_GET["id"]."'",$conexion));
-?>
-<!-- styles -->
+include("head.php");
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
+$resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$_GET["id"]."'"), MYSQLI_BOTH);
+?>
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
 <link rel="shortcut icon" href="ico/favicon.ico">
@@ -164,13 +144,6 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM contactos WHERE cont_
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$tituloPagina;?></h3>
-						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -199,8 +172,8 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM contactos WHERE cont_
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="sucursal">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_SESSION["id"]."'",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_SESSION["id"]."'");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['cont_sucursal']==$resOp[0]) echo "selected";?>><?=$resOp[7];?></option>
                                             <?php

@@ -1,29 +1,12 @@
-<?php include("sesion.php");?>
 <?php
-$tituloPagina = "Seguimiento de los equipos";
-?>
-<?php include("head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<!-- styles -->
+include("sesion.php");
 
-<!--[if IE 7]>
-            <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-        <![endif]-->
+$tituloPagina = "Seguimiento de los equipos";
+
+include("head.php");
+?>
 <link href="css/styles.css" rel="stylesheet">
 <link href="css/theme-wooden.css" rel="stylesheet">
-
-<!--[if IE 7]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-        <![endif]-->
-<!--[if IE 8]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-        <![endif]-->
-<!--[if IE 9]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-        <![endif]-->
 <link href="css/tablecloth.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
@@ -46,46 +29,9 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script type="text/javascript">
-            /*$( function () {
-		  // Set the classes that TableTools uses to something suitable for Bootstrap
-		  $.extend( true, $.fn.DataTable.TableTools.classes, {
-			  "container": "btn-group",
-			  "buttons": {
-				  "normal": "btn",
-				  "disabled": "btn disabled"
-			  },
-			  "collection": {
-				  "container": "DTTT_dropdown dropdown-menu",
-				  "buttons": {
-					  "normal": "",
-					  "disabled": "disabled"
-				  }
-			  }
-		  } );
-		  // Have the collection use a bootstrap compatible dropdown
-		  $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-			  "collection": {
-				  "container": "ul",
-				  "button": "li",
-				  "liner": "a"
-			  }
-		  } );
-		  });
-		  */
             $(function () {
                 $('#data-table').dataTable({
                     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                    /*"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": 'Save <span class="caret" />',
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		}*/
                 });
             });
             $(function () {
@@ -152,11 +98,11 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							</thead>
 							<tbody>
                             <?php
-							$consulta = mysql_query("SELECT * FROM remisiones_seguimiento
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_seguimiento
 							WHERE remseg_id_remisiones='".$_GET["id"]."'
-							",$conexion);
+							");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 							?>
 							<tr>
 								<td><?=$no;?></td>

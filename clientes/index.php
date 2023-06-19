@@ -1,3 +1,6 @@
+<?php
+	include("../conexion.php");
+?>
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
@@ -59,7 +62,7 @@
 	<div class="container">
 		<form class="form-signin" action="autentico.php" method="post">
 			<input type="hidden" name="idseg" value="<?=$_GET["idseg"];?>">
-			<input type="hidden" name="bd" value="odermancom_jm_crm">
+			<input type="hidden" name="bd" value="<?=MAINBD;?>">
 			
             <div align="center">
                 <h3 class="form-signin-heading">Ingreso al Área de Clientes</h3>
