@@ -605,9 +605,15 @@ include("includes/js-formularios.php");
 								");
 
 								$sumaCostosProductosCombos = 0;
+								$precioDealer = 0;
 								while($pdCombo = mysqli_fetch_array($productosDelCombo, MYSQLI_BOTH)){
 
 									$sumaCostosProductosCombos += $pdCombo['prod_costo'];
+
+									$utilidadDealer = $pdCombo['prod_descuento2'] / 100;
+									$precioDealer = $pdCombo['prod_costo'] + ($pdCombo['prod_costo'] * $utilidadDealer);
+									$subtotalDealer = ($precioDealer * $pdCombo['copp_cantidad']);
+									$totalDealer +=$subtotalDealer;
 
 								}
 
@@ -643,6 +649,11 @@ include("includes/js-formularios.php");
 								</td>
                                 <td><input type="number" title="czpp_cantidad" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td>
+									<?php
+									if($resultadoD['cli_categoria']==3 and $datosUsuarioActual['usr_tipo']==1){
+										echo "<b>Precio Dealer: $".number_format($totalDealer, 0, ",", ".")."</b><br>";
+									}
+									?>
                                 	<input type="text" title="czpp_valor" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_valor'];?>" onChange="productos(this)" style="width: 200px;" disabled><br>
                                 	<?php
 									if($datosUsuarioActual['usr_tipo']==1){
