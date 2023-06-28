@@ -32,7 +32,7 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     cli_categoria='" . $_POST["categoria"] . "', 
     cli_email='" . $_POST["email"] . "', 
     cli_telefono='" . $_POST["telefono"] . "', 
-    cli_ciudad='" . $_POST["ciudad"] . "', 
+    cli_ciudad='" . $ciudad . "', 
     cli_usuario='" . trim($_POST["usuarioCliente"]) . "', 
     cli_clave='" . $_POST["claveCliente"] . "', 
     cli_direccion='" . $_POST["direccion"] . "', 
