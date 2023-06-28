@@ -103,6 +103,9 @@ include("includes/head.php");
 										$filtro .= " AND cotiz_descuentos_especiales=1";
 									}
 								}
+								if($datosUsuarioActual['usr_tipo']!=1){
+									$filtro.='AND cli_ciudad!="1122"';
+								}
 
 								//Consulta de contar registros Solo para paginación
 								if (isset($_GET["cte"]) and $_GET["cte"] != "") {

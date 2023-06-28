@@ -107,6 +107,9 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 							if (isset($_GET["tipo"]) and $_GET["tipo"] != "") {
 								$filtro .= " AND tik_tipo_tiket='" . $_GET["tipo"] . "'";
 							}
+							if($datosUsuarioActual['usr_tipo']!=1){
+								$filtro.=' AND cli_ciudad!="1122"';
+							}
 							?>
 
 							<?php
