@@ -7,6 +7,11 @@ include("includes/head.php");
 
 $consultaCombos=$conexionBdPrincipal->query("SELECT * FROM combos WHERE combo_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consultaCombos, MYSQLI_BOTH);
+
+$disabled="disabled";
+if($datosUsuarioActual['usr_tipo']==1){
+	$disabled="";
+}
 ?>
 <!-- styles -->
 <link href="css/chosen.css" rel="stylesheet">
@@ -105,28 +110,28 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Nombre</label>
 									<div class="controls">
-										<input type="text" class="span8" name="nombre" value="<?=$resultadoD['combo_nombre'];?>">
+										<input type="text" class="span8" name="nombre" value="<?=$resultadoD['combo_nombre'];?>" <?=$disabled;?>>
 									</div>
 								</div>
 								
 								<div class="control-group">
 									<label class="control-label">Imagen</label>
 									<div class="controls">
-										<input type="file" class="span8" name="foto">
+										<input type="file" class="span8" name="foto" <?=$disabled;?>>
 									</div>
 								</div>
 								
 								<div class="control-group">
 									<label class="control-label">Descripción</label>
 									<div class="controls">
-										<textarea rows="5" cols="80" style="width: 80%" name="descripcion"><?=$resultadoD['combo_descripcion'];?></textarea>
+										<textarea rows="5" cols="80" style="width: 80%" name="descripcion" <?=$disabled;?>><?=$resultadoD['combo_descripcion'];?></textarea>
 									</div>
 								</div>
 								
 								<div class="control-group">
 										<label class="control-label">Productos</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="producto[]" multiple>
+											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="producto[]" multiple <?=$disabled;?>>
 												<option value=""></option>
 												<?php
 												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos 
@@ -147,7 +152,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Descuento</label>
 									<div class="controls">
-										<input type="text" class="span2" name="dcto" value="<?=$resultadoD['combo_descuento'];?>">
+										<input type="text" class="span2" name="dcto" value="<?=$resultadoD['combo_descuento'];?>" <?=$disabled;?>>
 									</div>
 								</div>
 
@@ -156,17 +161,17 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Descuento Dealer</label>
 									<div class="controls">
-										<input type="text" class="span2" name="dctoDealer" value="<?=$resultadoD['combo_descuento_dealer'];?>">
+										<input type="text" class="span2" name="dctoDealer" value="<?=$resultadoD['combo_descuento_dealer'];?>" <?=$disabled;?>>
 									</div>
 								</div>-->
 
-								<input type="hidden" class="span2" name="dctoDealer" value="<?=$resultadoD['combo_descuento_dealer'];?>">
+								<input type="hidden" class="span2" name="dctoDealer" value="<?=$resultadoD['combo_descuento_dealer'];?>" <?=$disabled;?>>
 
                                    
                                <div class="control-group">
 									<label class="control-label">Estado</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="estado">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="estado" <?=$disabled;?>>
 											<option value="0"></option>
 											<option value="1" <?php if($resultadoD['combo_estado']==1)echo "selected";?>>Activo</option>
 											<option value="0" <?php if($resultadoD['combo_estado']==0)echo "selected";?>>Inactivo</option>
@@ -177,13 +182,13 @@ include("includes/js-formularios.php");
 							   <div class="control-group">
 									<label class="control-label">Descuento Máximo en Cotización</label>
 									<div class="controls">
-										<input type="text" class="span2" name="descuentoMax" value="<?=$resultadoD['combo_descuento_maximo'];?>">
+										<input type="text" class="span2" name="descuentoMax" value="<?=$resultadoD['combo_descuento_maximo'];?>" <?=$disabled;?>>
 									</div>
 								</div>
  
 								<div class="form-actions">
-									
-									<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15 or $_SESSION["id"]==17 or $_SESSION["id"]==13 or $_SESSION["id"]==57){?>
+
+									<?php if($datosUsuarioActual['usr_tipo'] == 1){?>
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									<?php }?>
 									
@@ -224,11 +229,6 @@ include("includes/js-formularios.php");
 							</thead>
 							<tbody>
                             <?php
-							$editarCantidad = 'disabled';
-							if ($datosUsuarioActual['usr_tipo'] == 1 ) {
-								$editarCantidad = '';
-							}
-
 							$no = 1;
 							$totalDealer=0;
 							$total=0;
@@ -255,10 +255,12 @@ include("includes/js-formularios.php");
 							<tr>
 								<td><?=$no;?></td>
                                 <td>
-									<a href="sql.php?get=55&idItem=<?=$prod['copp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<?php if ($datosUsuarioActual['usr_tipo'] == 1 ) { ?>
+										<a href="sql.php?get=55&idItem=<?=$prod['copp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<?php } ?>
 									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_id']." - ".$prod['prod_nombre'];?></a>
 								</td>
-                                <td><input type="number" title="copp_cantidad" name="<?=$prod['copp_id'];?>" value="<?=$prod['copp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;" <?=$editarCantidad;?>></td>
+                                <td><input type="number" title="copp_cantidad" name="<?=$prod['copp_id'];?>" value="<?=$prod['copp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;" <?=$disabled;?>></td>
                                 <td>$<?=number_format($prod['copp_precio'],0,",",".");?></td>
                                 <td>$<?=number_format($prod['prod_precio'],0,",",".");?></td>
 								<td>$<?=number_format($subtotal,0,",",".");?></td>
