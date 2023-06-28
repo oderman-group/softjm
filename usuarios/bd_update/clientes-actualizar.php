@@ -19,6 +19,13 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 		}
 	}
 
+	$ciudad=$_POST["ciudad"];
+	$city="";
+	if($_POST["pais"]!="Colombia"){
+		$ciudad="1122";
+		$city=$_POST["ciuExtra"];
+	}
+
 	$conexionBdPrincipal->query("UPDATE clientes SET 
     cli_nombre='" . $_POST["nombre"] . "', 
     cli_referencia='" . $_POST["referencia"] . "', 
@@ -45,7 +52,9 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     cli_saldo='" . $_POST["saldo"] . "', 
     cli_clave_documentos='" . $_POST["claveDocumentos"] . "', 
     cli_credito='" . $_POST["credito"] . "', 
-    cli_tipo_documento='" . $_POST["tipoDocumento"] . "' 
+    cli_tipo_documento='" . $_POST["tipoDocumento"] . "', 
+    cli_pais='" . $_POST["pais"] . "', 
+    cli_ciudad_extranjera='" . $city . "'
     WHERE cli_id='" . $_POST["id"] . "'");
 
 if(isset($_POST["grupos"])){
