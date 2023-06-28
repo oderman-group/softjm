@@ -104,13 +104,16 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 										
 										<?php if($resultadoD['rem_generar_certificado']==1 and $resultadoD['rem_estado']==1){?>
 										<a href="sql.php?get=30&id=<?=$resultadoD['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Remisión salida</a>
-										<?php }?>
-										
-										<?php if($resultadoD['rem_generar_certificado']!=1){?>
+										<?php 
+											}
+											$disabled="";
+											if($resultadoD['rem_generar_certificado']!=1){
+										?>
 										<a href="sql.php?get=31&id=<?=$resultadoD['rem_id'];?>&cte=<?=$resultadoD['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Generar Certificado</a>
-										<?php }?>
-										
-										<?php if($resultadoD['rem_generar_certificado']==1){?>
+										<?php 
+											}else{
+												$disabled="disabled";
+										?>
 										<a href="lab-certificado-imprimir.php?id=<?=$resultadoD['rem_id'];?>" target="_blank" class="btn btn-success waves-effect waves-light">Certificado</a>
 										<?php }?>
 										
