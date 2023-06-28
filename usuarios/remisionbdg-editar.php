@@ -48,23 +48,27 @@ include("includes/js-formularios.php");
 <?php if($resultadoD['remi_vendida']!=1){?>
 
 	<script type="text/javascript">
-	  function productos(enviada){
-		  var idRemision = <?=$_GET['id'];?>;
+	function productos(enviada){
+		var idRemision = <?=$_GET['id'];?>;
 
-		  var campo = enviada.title;
-		  var producto = enviada.name;
-		  var proceso = 8;
-		  var valor = enviada.value;
-		  $('#resp').empty().hide().html("Esperando...").show(1);
-			datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&idRemision="+(idRemision);
-				   $.ajax({
-					   type: "POST",
-					   url: "ajax/ajax-productos.php",
-					   data: datos,
-					   success: function(data){
-					   $('#resp').empty().hide().html(data).show(1);
-					   }
-				   });
+		var campo = enviada.title;
+		var producto = enviada.name;
+		var proceso = 8;
+		var combo = enviada.alt;
+		if(combo==1){
+			var proceso = 11;
+		}
+		var valor = enviada.value;
+		$('#resp').empty().hide().html("Esperando...").show(1);
+		datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&idRemision="+(idRemision);
+				$.ajax({
+					type: "POST",
+					url: "ajax/ajax-productos.php",
+					data: datos,
+					success: function(data){
+					$('#resp').empty().hide().html(data).show(1);
+					}
+				});
 	}	
 	</script>
 <?php }?>
@@ -468,7 +472,7 @@ include("includes/js-formularios.php");
                                 <td><input type="number" title="czpp_cantidad" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td><input type="text" title="czpp_valor" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_valor'];?>" onChange="productos(this)" style="width: 200px;"></td>
                                 <td><input type="text" title="czpp_impuesto" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_impuesto'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-								<td><input type="text" title="czpp_descuento" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
+								<td><input type="text" title="czpp_descuento" name="<?=$prod['czpp_id'];?>" alt="1" value="<?=$prod['czpp_descuento'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td><?=$simbolosMonedas[$resultadoD['remi_moneda']];?><?=number_format($valorTotal,0,",",".");?></td>
 							</tr>
 							<?php 
