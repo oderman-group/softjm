@@ -7,22 +7,7 @@ include("includes/head.php");
 
 <!-- styles -->
 <link href="css/jquery.gritter.css" rel="stylesheet">
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/tablecloth.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
-
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -234,6 +219,7 @@ include("includes/head.php");
 										<li><a href="reportes/historial-dctos-especiales.php" target="_blank">14. Descuentos especiales en cotizaciones</a></li>
 										<li><a href="reportes/historial-costos-cotizaciones.php" target="_blank">15. Historial costos y utilidad en cotizaciones</a></li>
 										<li><a href="reportes/combos-dealer.php" target="_blank">16. Combos Dealer</a></li>
+										<li><a href="cotizacion-servicios-filtros.php">17. Informe cotizaciones con servicios</a></li>
 									</ul>
 								</div>
 							</div>
