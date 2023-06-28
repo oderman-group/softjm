@@ -24,7 +24,7 @@
                         </li>
 						
 						<li class="sidebar-item">
-                            <a class="sidebar-link waves-effect waves-dark" href="../../../usuarios/certificados-filtros.php" aria-expanded="false">
+                            <a class="sidebar-link waves-effect waves-dark" href="lab-informes-todos.php" aria-expanded="false">
                                 <i class="mdi mdi-av-timer"></i>
                                 <span class="hide-menu">Informe certificados </span>
                             </a>

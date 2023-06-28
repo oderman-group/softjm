@@ -1,6 +1,5 @@
 <?php
-//include("sesion.php"); //exit();
-include("../../modelo/conexion.php");
+include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 1;
 $tituloPagina = "Cotización";
