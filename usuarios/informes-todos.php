@@ -1,31 +1,14 @@
-<?php include("sesion.php");?>
 <?php 
+include("sesion.php");
+
 $idPagina = 120;
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 <link href="css/jquery.gritter.css" rel="stylesheet">
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/tablecloth.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
-
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -96,6 +79,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 								<li><a href="historial-acciones-filtro.php">7. Historial de acciones</a></li>
 								<li><a href="productos-filtros.php">8. Productos</a></li>
 								<li><a href="cotizacion-filtros.php">9. Cotizaciones</a></li>
+								<li><a href="cotizacion-servicios-filtros.php">10. Informe cotizaciones con servicios</a></li>
 							</ul>
 						</div>
 					</div>

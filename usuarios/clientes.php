@@ -243,6 +243,9 @@ include("includes/head.php");
 						}
 						if(isset($_GET["pap"]) and $_GET["pap"]==1){ $filtro .= " AND cli_papelera=1";}
 						if(isset($_GET["tipoDoc"]) and is_numeric($_GET["tipoDoc"])){ $filtro .= " AND cli_tipo_documento='".$_GET["tipoDoc"]."'";}
+						if($datosUsuarioActual['usr_tipo']!=1){
+							$filtro.=' AND cli_ciudad!="1122"';
+						}
 						?>
                         
 						<?php
@@ -300,14 +303,14 @@ include("includes/head.php");
 								
 							if(isset($_GET["dpto"]) and $_GET["dpto"]!=""){
 								$consulta = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".clientes
-								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+								LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$_GET["dpto"]."'
 								WHERE cli_id=cli_id ".$filtro."
 								LIMIT $inicio, $limite
 								");
 							}else{
 								$consulta = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".clientes
-								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+								LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 								$filtroGrupos
 								WHERE cli_id=cli_id ".$filtro."

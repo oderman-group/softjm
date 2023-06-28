@@ -1,6 +1,5 @@
 <?php
-//include("sesion.php"); //exit();
-include("../../modelo/conexion.php");
+include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 1;
 $tituloPagina = "Cotización";
@@ -13,6 +12,13 @@ INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
 WHERE rem_id='" . $_GET["id"] . "'");
 $remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
+
+$consultaAnulado = mysqli_query($conexionBdPrincipal,"SELECT * FROM certificados_anulados WHERE certanu_id_certificado='".$_GET["id"]."'");
+$numAnulado=mysqli_num_rows($consultaAnulado);
+$version="";
+if($numAnulado>0){
+	$version=" v".($numAnulado+1);
+}
 
 $ConsultaCampoRemision=mysqli_query($conexionBdPrincipal,"SELECT 
 DAY(rem_fecha), MONTH(rem_fecha), YEAR(rem_fecha),
@@ -93,7 +99,7 @@ switch ($remision['rem_tipo_equipo']) {
 
 			<td style="width: 30%; border-radius: 10px; background-color: lightgray;" align="center" ;>
 				<h3>CERTIFICADO<br>
-					NO. <?= "C" . $remision['rem_id']; ?></h3>
+					NO. <?= "C" . $remision['rem_id'].$version; ?></h3>
 			</td>
 		</tr>
 
@@ -586,7 +592,7 @@ switch ($remision['rem_tipo_equipo']) {
 
 				<td style="width: 30%; border-radius: 10px; background-color: lightgray;" align="center" ;>
 					<h3>CERTIFICADO<br>
-						NO. <?= "C" . $remision['rem_id']; ?></h3>
+						NO. <?= "C" . $remision['rem_id'].$version; ?></h3>
 				</td>
 			</tr>
 
@@ -767,7 +773,7 @@ switch ($remision['rem_tipo_equipo']) {
 </body>
 
 <script type="application/javascript">
-	//print();
+	print();
 </script>
 
 </html>

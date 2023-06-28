@@ -222,7 +222,6 @@ include("includes/js-formularios.php");
 							<tr>
 								<td><?=$no;?></td>
                                 <td>
-									<a href="sql.php?get=55&idItem=<?=$prod['copp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
 									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_id']." - ".$prod['prod_nombre'];?></a>
 								</td>
                                 <td><?=$prod['copp_cantidad'];?></td>

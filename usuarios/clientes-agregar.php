@@ -6,24 +6,7 @@ $paginaActual['pag_nombre'] = "Agegar clientes";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
-<!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
-
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -60,6 +43,15 @@ include("includes/js-formularios.php");
 				   }
 			   });
 
+	}
+	function mostrar(data) {
+		if(data.value == "Colombia"){
+			document.getElementById("local").style.display = "block";
+			document.getElementById("extrangero").style.display = "none";
+		}else{
+			document.getElementById("local").style.display = "none";
+			document.getElementById("extrangero").style.display = "block";
+		}
 	}
 </script>
 <?php include("includes/funciones-js.php");?>
@@ -229,23 +221,53 @@ include("includes/js-formularios.php");
                                         <input type="text" class="span2" name="op7" style="text-transform:uppercase;" placeholder="Oficina, Apto...">
 									</div>
 								</div>   
-                               
-                               <div class="control-group">
-									<label class="control-label">Ciudad</label>
+                            
+								<div class="control-group">
+									<label class="control-label">Pais</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ciudad">
-											<option value="1"></option>
-                                            <?php
-											$conOp = mysqli_query($conexionBdAdmin,"SELECT * FROM localidad_ciudades INNER JOIN localidad_departamentos ON dep_id=ciu_departamento ORDER BY ciu_nombre");
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="pais" required onChange="mostrar(this)">
+											<option value=""></option>
+											<?php
+											$service_url = 'https://restcountries.com/v3.1/all';
+											$jsonObject = json_decode(file_get_contents($service_url),true);
+											foreach ($jsonObject as $object){
+											$nombrePais=$object["name"]["common"];
 											?>
-                                            	<option value="<?=$resOp['ciu_id'];?>"><?=$resOp['ciu_nombre'].", ".$resOp['dep_nombre'];?></option>
-                                            <?php
+												<option value="<?=$nombrePais;?>" <?php if($nombrePais=="Colombia"){echo "selected";}?>><?=$nombrePais;?></option>
+											<?php
 											}
 											?>
-                                    	</select>
-                                    </div>
-                               </div>
+										</select>
+									</div>
+								</div>
+                            
+								<div id="local" style="display: block;">
+									<div class="control-group">
+											<label class="control-label">Ciudad</label>
+											<div class="controls">
+												<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ciudad">
+													<option value="1"></option>
+													<?php
+													$conOp = mysqli_query($conexionBdAdmin,"SELECT * FROM localidad_ciudades INNER JOIN localidad_departamentos ON dep_id=ciu_departamento ORDER BY ciu_nombre");
+													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+													?>
+														<option value="<?=$resOp['ciu_id'];?>"><?=$resOp['ciu_nombre'].", ".$resOp['dep_nombre'];?></option>
+													<?php
+													}
+													?>
+												</select>
+											</div>
+									</div>
+								</div>
+                                
+								<div id="extrangero" style="display: none;">
+									<div class="control-group">
+										<label class="control-label">Ciudad</label>
+										<div class="controls">
+											<input type="text" class="span4" name="ciuExtra">
+										</div>
+									</div>
+								</div>
                                </fieldset>
                                
                                <fieldset class="default">

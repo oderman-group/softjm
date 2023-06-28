@@ -332,6 +332,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 											<?php } ?>
 
 											<th>Precio lista</th>
+											<th>Precio lista</br>Segun dolar hoy</th>
 											<th>Precio lista (USD)</th>
 
 											<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
@@ -454,6 +455,8 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 											$valorComision = ($res['prod_precio'] * $comision);
 
 											$precioConIva = $res['prod_precio'] + ($res['prod_precio'] * 0.19);
+
+											$precioListaDolarHoy = ($precioListaUSD * $configuracion['conf_trm_venta']);
 										?>
 											<tr>
 												<td><?= $no; ?></td>
@@ -540,6 +543,8 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 													}
 												?>
 												<td id="precioLista<?= $res['prod_id']; ?>">$<?= number_format($num, 0, ",", "."); ?></td>
+
+												<td id="precioListaDolarHoy<?= $res['prod_id']; ?>">$<?= number_format($precioListaDolarHoy, 0, ",", "."); ?></td>
 
 												<td id="precioListaUSD<?= $res['prod_id']; ?>">USD <?= number_format($precioListaUSD, 2, ",", "."); ?></td>
 

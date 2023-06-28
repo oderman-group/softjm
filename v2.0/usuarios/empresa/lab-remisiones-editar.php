@@ -9,6 +9,24 @@ $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
 INNER JOIN usuarios ON usr_id=rem_asesor
 WHERE rem_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+
+$consultaAnulado = mysqli_query($conexionBdPrincipal,"SELECT * FROM certificados_anulados WHERE certanu_id_certificado='".$_GET["id"]."'");
+$numAnulado=mysqli_num_rows($consultaAnulado);
+$version="";
+if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
+	$version='
+	<div class="row">
+		<div class="col-sm-12 col-lg-6">
+			<div class="form-group row">
+				<label for="fname" class="col-sm-3 text-right control-label col-form-label">Versión del certificado</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control" value="v'.($numAnulado+1).'" disabled>
+				</div>
+			</div>
+		</div>
+	</div>
+	';
+}
 ?>
     <!-- Custom CSS -->
     <link href="../../dist/css/style.min.css" rel="stylesheet">
@@ -91,30 +109,41 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 								<div class="card-body">
                                     <div class="form-group m-b-0 text-left">
                                         <a href="lab-remisiones-cotizacion.php?id=<?=$_GET["id"];?>" class="btn btn-success waves-effect waves-light">Cotización</a>
-										<a href="lab-remisiones-seguimiento.php?id=<?=$_GET["id"];?>" class="btn btn-danger waves-effect waves-light">Seguimiento</a>
+										<a href="lab-remisiones-seguimiento.php?id=<?=$_GET["id"];?>" class="btn btn-warning waves-effect waves-light">Seguimiento</a>
                                     </div>
 									
 									
 									<div class="form-group m-b-0 text-right">
                                         <a href="lab-remisiones-imprimir.php?id=<?=$resultadoD['rem_id'];?>&estado=1" target="_blank" class="btn btn-success waves-effect waves-light">Remisión entrada</a>
 										
-										<?php if($resultadoD['rem_estado']==2){?>
+										<?php
+											if($resultadoD['rem_estado']==2){
+										?>
 										<a href="lab-remisiones-imprimir.php?id=<?=$resultadoD['rem_id'];?>&estado=2" target="_blank" class="btn btn-success waves-effect waves-light">Remisión salida</a>
-										<?php }?>
-										
-										<?php if($resultadoD['rem_generar_certificado']==1 and $resultadoD['rem_estado']==1){?>
+										<?php 
+											}
+											if($resultadoD['rem_generar_certificado']==1 and $resultadoD['rem_estado']==1){
+										?>
 										<a href="sql.php?get=30&id=<?=$resultadoD['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Remisión salida</a>
-										<?php }?>
-										
-										<?php if($resultadoD['rem_generar_certificado']!=1){?>
+										<?php 
+											}
+											$disabled="";
+											if($resultadoD['rem_generar_certificado']!=1){
+										?>
 										<a href="sql.php?get=31&id=<?=$resultadoD['rem_id'];?>&cte=<?=$resultadoD['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Generar Certificado</a>
-										<?php }?>
-										
-										<?php if($resultadoD['rem_generar_certificado']==1){?>
+										<?php 
+											}else{
+												$disabled="disabled";
+										?>
 										<a href="lab-certificado-imprimir.php?id=<?=$resultadoD['rem_id'];?>" target="_blank" class="btn btn-success waves-effect waves-light">Certificado</a>
+										<?php 
+											}
+											if($numAnulado==0 && $resultadoD['rem_certificado_anulado']!=1 && $resultadoD['rem_generar_certificado']==1){
+										?>
+										<a href="lab-certificado-anular.php?id=<?=$resultadoD['rem_id'];?>" class="btn btn-danger waves-effect waves-light">Anular Certificado</a>
 										<?php }?>
 										
-										<a href="../../../usuarios/files/adjuntos/<?=$resultadoD['rem_archivo'];?>" target="_blank" class="btn btn-success waves-effect waves-light">Ver imagen</a>
+										<a href="../../../usuarios/files/adjuntos/<?=$resultadoD['rem_archivo'];?>" target="_blank" class="btn btn-info waves-effect waves-light">Ver imagen</a>
 										
                                     </div>
                                 </div>
@@ -155,7 +184,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Fecha</label>
 													<div class="col-sm-9">
-														<input type="date" class="form-control" id="fname" name="fecha" value="<?=$resultadoD['rem_fecha'];?>">
+														<input type="date" class="form-control" id="fname" name="fecha" value="<?=$resultadoD['rem_fecha'];?>" <?=$disabled;?>>
 													</div>
 												</div>
 											</div>	
@@ -185,7 +214,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Referencia</label>
 													<div class="col-sm-9">
-														<input type="text" class="form-control" name="referencia" value="<?=$resultadoD['rem_referencia'];?>">
+														<input type="text" class="form-control" name="referencia" value="<?=$resultadoD['rem_referencia'];?>" <?=$disabled;?>>
 													</div>
 												</div>
 											</div>
@@ -196,7 +225,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Marca</label>
 													<div class="col-sm-9">
-														<input type="text" class="form-control" id="fname" name="marca" value="<?=$resultadoD['rem_marca'];?>">
+														<input type="text" class="form-control" id="fname" name="marca" value="<?=$resultadoD['rem_marca'];?>" <?=$disabled;?>>
 													</div>
 												</div>
 											</div>	
@@ -205,7 +234,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Tipo de equipo</label>
 													<div class="col-sm-9">
-														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="tipoEquipo">
+														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="tipoEquipo" <?=$disabled;?>>
 															<option value="">--</option>
 															<option value="1" <?php if($resultadoD['rem_tipo_equipo']==1){echo "selected";} ?> >Estación total</option>
 															<option value="2" <?php if($resultadoD['rem_tipo_equipo']==2){echo "selected";} ?>>Teodolito</option>
@@ -236,7 +265,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Serial</label>
 													<div class="col-sm-9">
-														<input type="text" class="form-control" id="fname" name="serial" value="<?=$resultadoD['rem_serial'];?>">
+														<input type="text" class="form-control" id="fname" name="serial" value="<?=$resultadoD['rem_serial'];?>" <?=$disabled;?>>
 													</div>
 												</div>
 											</div>
@@ -245,7 +274,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Nuevo o usado?</label>
 													<div class="col-sm-9">
-														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="tiposEquipos" required>
+														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="tiposEquipos" <?=$disabled;?>>
 															<option value="2">--</option>
 															<option value="1" <?php if($resultadoD['rem_tipos_equipos']==1){echo "selected";} ?>>Nuevo</option>
 															<option value="2" <?php if($resultadoD['rem_tipos_equipos']==2){echo "selected";} ?>>Usado</option>
@@ -261,7 +290,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Precisión angular "</label>
 													<div class="col-sm-9">
-														<input type="text" class="form-control" id="fname" name="pAngular" value="<?=$resultadoD['rem_precision_angular'];?>" maxlength="1">
+														<input type="text" class="form-control" id="fname" name="pAngular" value="<?=$resultadoD['rem_precision_angular'];?>" maxlength="1" <?=$disabled;?>>
 													</div>
 												</div>
 											</div>	
@@ -270,7 +299,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Precisión a distancia</label>
 													<div class="col-sm-9">
-														<input type="text" class="form-control" id="fname" name="pDistancia" value="<?=$resultadoD['rem_precision_distancia'];?>">
+														<input type="text" class="form-control" id="fname" name="pDistancia" value="<?=$resultadoD['rem_precision_distancia'];?>" <?=$disabled;?>>
 													</div>
 												</div>
 											</div>
@@ -281,7 +310,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Tiempo de entrega</label>
 													<div class="col-sm-9">
-														<input type="text" class="form-control" id="fname" name="tiempoEntrega" value="<?=$resultadoD['rem_dias_entrega'];?>">
+														<input type="text" class="form-control" id="fname" name="tiempoEntrega" value="<?=$resultadoD['rem_dias_entrega'];?>" <?=$disabled;?>>
 													</div>
 												</div>
 											</div>	
@@ -290,40 +319,40 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Días para reclamar el equipo</label>
 													<div class="col-sm-9">
-														<input type="text" class="form-control" name="tiempoReclamar" value="<?=$resultadoD['rem_dias_reclamar'];?>">
+														<input type="text" class="form-control" name="tiempoReclamar" value="<?=$resultadoD['rem_dias_reclamar'];?>" <?=$disabled;?>>
 													</div>
 												</div>
 											</div>
 										</div>
 									
 									<div class="row">
-											<div class="col-sm-12 col-lg-6">
-												<div class="form-group row">
-													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Vigencia cerificado (meses)</label>
-													<div class="col-sm-9">
-														<input type="text" class="form-control" id="fname" name="vigenciaCerificado" value="<?=$resultadoD['rem_tiempo_certificado'];?>">
-													</div>
-												</div>
-											</div>	
-										
 										<div class="col-sm-12 col-lg-6">
-												<div class="form-group row">
-													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Imagen Certificado</label>
-													<div class="col-sm-9">
-														<input type="file" class="form-control" id="fname" name="imgCertificado">
-														<?php
-														$msjFoto = 'Sin foto.';
-														if($resultadoD['rem_foto_certificado']!=""){
-															$msjFoto = 'La foto está OK.';
-														}
-														echo $msjFoto;
-														?>
-													</div>
+											<div class="form-group row">
+												<label for="fname" class="col-sm-3 text-right control-label col-form-label">Vigencia cerificado (meses)</label>
+												<div class="col-sm-9">
+													<input type="text" class="form-control" id="fname" name="vigenciaCerificado" value="<?=$resultadoD['rem_tiempo_certificado'];?>" <?=$disabled;?>>
 												</div>
 											</div>
-											
-											
+										</div>	
+										
+										<div class="col-sm-12 col-lg-6">
+											<div class="form-group row">
+												<label for="fname" class="col-sm-3 text-right control-label col-form-label">Imagen Certificado</label>
+												<div class="col-sm-9">
+													<input type="file" class="form-control" id="fname" name="imgCertificado" <?=$disabled;?>>
+													<?php
+													$msjFoto = 'Sin foto.';
+													if($resultadoD['rem_foto_certificado']!=""){
+														$msjFoto = 'La foto está OK.';
+													}
+													echo $msjFoto;
+													?>
+												</div>
+											</div>
 										</div>
+									</div>
+									
+									<?=$version;?>
 									
 									
 									
@@ -355,24 +384,24 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 											<td>
 												<table style="width:100%; padding: 10px;" border="1" rules="all">
 													<tr align="center">
-														<td><input value="<?=$resultadoD['rem_p1vd_grados'];?>" name="p1vd_grados" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p1vd_minutos'];?>" name="p1vd_minutos" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p1vd_segundos'];?>" name="p1vd_segundos" style="text-align: center;"></td>
+														<td><input value="<?=$resultadoD['rem_p1vd_grados'];?>" name="p1vd_grados" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p1vd_minutos'];?>" name="p1vd_minutos" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p1vd_segundos'];?>" name="p1vd_segundos" style="text-align: center;" <?=$disabled;?>></td>
 													</tr>
 													<tr align="center">
-														<td><input value="<?=$resultadoD['rem_p1hd_grados'];?>" name="p1hd_grados" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p1hd_minutos'];?>" name="p1hd_minutos" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p1hd_segundos'];?>" name="p1hd_segundos" style="text-align: center;"></td>
+														<td><input value="<?=$resultadoD['rem_p1hd_grados'];?>" name="p1hd_grados" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p1hd_minutos'];?>" name="p1hd_minutos" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p1hd_segundos'];?>" name="p1hd_segundos" style="text-align: center;" <?=$disabled;?>></td>
 													</tr>
 													<tr align="center">
-														<td><input value="<?=$resultadoD['rem_p1vi_grados'];?>" name="p1vi_grados" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p1vi_minutos'];?>" name="p1vi_minutos" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p1vi_segundos'];?>" name="p1vi_segundos" style="text-align: center;"></td>
+														<td><input value="<?=$resultadoD['rem_p1vi_grados'];?>" name="p1vi_grados" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p1vi_minutos'];?>" name="p1vi_minutos" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p1vi_segundos'];?>" name="p1vi_segundos" style="text-align: center;" <?=$disabled;?>></td>
 													</tr>
 													<tr align="center">
-														<td><input value="<?=$resultadoD['rem_p1hi_grados'];?>" name="p1hi_grados" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p1hi_minutos'];?>" name="p1hi_minutos" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p1hi_segundos'];?>" name="p1hi_segundos" style="text-align: center;"></td>
+														<td><input value="<?=$resultadoD['rem_p1hi_grados'];?>" name="p1hi_grados" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p1hi_minutos'];?>" name="p1hi_minutos" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p1hi_segundos'];?>" name="p1hi_segundos" style="text-align: center;" <?=$disabled;?>></td>
 													</tr>
 													
 													<?php
@@ -433,24 +462,24 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 											<td>
 												<table style="width:100%; padding: 10px;" border="1" rules="all">
 													<tr align="center">
-														<td><input value="<?=$resultadoD['rem_p2vd_grados'];?>" name="p2vd_grados" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p2vd_minutos'];?>" name="p2vd_minutos" style="text-align: center;"></td>
+														<td><input value="<?=$resultadoD['rem_p2vd_grados'];?>" name="p2vd_grados" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p2vd_minutos'];?>" name="p2vd_minutos" style="text-align: center;" <?=$disabled;?>></td>
 														<td><input value="<?=$resultadoD['rem_p2vd_segundos'];?>" name="p2vd_segundos" style="text-align: center;"></td>
 													</tr>
 													<tr align="center">
-														<td><input value="<?=$resultadoD['rem_p2hd_grados'];?>" name="p2hd_grados" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p2hd_minutos'];?>" name="p2hd_minutos" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p2hd_segundos'];?>" name="p2hd_segundos" style="text-align: center;"></td>
+														<td><input value="<?=$resultadoD['rem_p2hd_grados'];?>" name="p2hd_grados" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p2hd_minutos'];?>" name="p2hd_minutos" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p2hd_segundos'];?>" name="p2hd_segundos" style="text-align: center;" <?=$disabled;?>></td>
 													</tr>
 													<tr align="center">
-														<td><input value="<?=$resultadoD['rem_p2vi_grados'];?>" name="p2vi_grados" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p2vi_minutos'];?>" name="p2vi_minutos" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p2vi_segundos'];?>" name="p2vi_segundos" style="text-align: center;"></td>
+														<td><input value="<?=$resultadoD['rem_p2vi_grados'];?>" name="p2vi_grados" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p2vi_minutos'];?>" name="p2vi_minutos" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p2vi_segundos'];?>" name="p2vi_segundos" style="text-align: center;" <?=$disabled;?>></td>
 													</tr>
 													<tr align="center">
-														<td><input value="<?=$resultadoD['rem_p2hi_grados'];?>" name="p2hi_grados" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p2hi_minutos'];?>" name="p2hi_minutos" style="text-align: center;"></td>
-														<td><input value="<?=$resultadoD['rem_p2hi_segundos'];?>" name="p2hi_segundos" style="text-align: center;"></td>
+														<td><input value="<?=$resultadoD['rem_p2hi_grados'];?>" name="p2hi_grados" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p2hi_minutos'];?>" name="p2hi_minutos" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_p2hi_segundos'];?>" name="p2hi_segundos" style="text-align: center;" <?=$disabled;?>></td>
 													</tr>
 													
 													
@@ -499,24 +528,24 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 											<td width="30%">
 												<table style="width:100%;" border="0">
 													<tr><td><strong>L1:</strong></td></tr>
-													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l1a'];?>" name="l1a" style="text-align: center;"></td><td> m</td></tr>
-													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l1b'];?>" name="l1b" style="text-align: center;"></td><td> m</td></tr>
-													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l1c'];?>" name="l1c" style="text-align: center;"></td><td> mm</td></tr>
+													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l1a'];?>" name="l1a" style="text-align: center;" <?=$disabled;?>></td><td> m</td></tr>
+													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l1b'];?>" name="l1b" style="text-align: center;" <?=$disabled;?>></td><td> m</td></tr>
+													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l1c'];?>" name="l1c" style="text-align: center;" <?=$disabled;?>></td><td> mm</td></tr>
 												</table>
 											</td>
 
 											<td width="30%">
 												<table style="width:100%;" border="0">
 													<tr><td><strong>L2:</strong></td></tr>
-													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l2a'];?>" name="l2a" style="text-align: center;"></td><td> m</td></tr>
-													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l2b'];?>" name="l2b" style="text-align: center;"></td><td> m</td></tr>
-													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l2c'];?>" name="l2c" style="text-align: center;"></td><td> mm</td></tr>
+													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l2a'];?>" name="l2a" style="text-align: center;" <?=$disabled;?>></td><td> m</td></tr>
+													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l2b'];?>" name="l2b" style="text-align: center;" <?=$disabled;?>></td><td> m</td></tr>
+													<tr><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_l2c'];?>" name="l2c" style="text-align: center;" <?=$disabled;?>></td><td> mm</td></tr>
 												</table>
 											</td>
 
 											<td width="40%">
 												<table style="width:100%;" border="0">
-													<tr><td>ERROR DETECTADO</td><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_error_detectado'];?>" name="errorDetectado" style="text-align: center;"></td><td> mm</td></tr>
+													<tr><td>ERROR DETECTADO</td><td style="border: thin; border-style: solid;" align="center"><input value="<?=$resultadoD['rem_error_detectado'];?>" name="errorDetectado" style="text-align: center;" <?=$disabled;?>></td><td> mm</td></tr>
 												</table>
 											</td>
 										</tr>
@@ -532,7 +561,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 											<div class="col-sm-12 col-lg-12">
 												<div class="form-group row">
 													<div class="col-sm-12">	
-														<textarea rows="5" style="width: 100%;" name="detalles" placeholder="Escriba los detalles..."><?=$resultadoD['rem_detalles'];?></textarea>
+														<textarea rows="5" style="width: 100%;" name="detalles" placeholder="Escriba los detalles..." <?=$disabled;?>><?=$resultadoD['rem_detalles'];?></textarea>
 													</div>
 												</div>
 											</div>
@@ -544,7 +573,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 											<div class="col-sm-12 col-lg-12">
 												<div class="form-group row">
 													<div class="col-sm-12">	
-														<textarea rows="5" style="width: 100%;" name="descripcion" placeholder="Observaciones de entrada"><?=$resultadoD['rem_descripcion'];?></textarea>
+														<textarea rows="5" style="width: 100%;" name="descripcion" placeholder="Observaciones de entrada" <?=$disabled;?>><?=$resultadoD['rem_descripcion'];?></textarea>
 													</div>
 												</div>
 											</div>
@@ -556,7 +585,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 											<div class="col-sm-12 col-lg-12">
 												<div class="form-group row">
 													<div class="col-sm-12">	
-														<textarea rows="5" style="width: 100%;" name="obsSalida" placeholder="Observaciones de salida"><?=$resultadoD['rem_observacion_salida'];?></textarea>
+														<textarea rows="5" style="width: 100%;" name="obsSalida" placeholder="Observaciones de salida" <?=$disabled;?>><?=$resultadoD['rem_observacion_salida'];?></textarea>
 													</div>
 												</div>
 											</div>
@@ -569,7 +598,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Servicios</label>
 													<div class="col-sm-9">	
-														<select class="select2 form-control custom-select" multiple="multiple" style="width: 100%; height:36px;" name="servicios[]">
+														<select class="select2 form-control custom-select" multiple="multiple" style="width: 100%; height:36px;" name="servicios[]" <?=$disabled;?>>
 																	<?php
 																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
 																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
@@ -588,7 +617,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 												<div class="form-group row">
 													<label for="fname" class="col-sm-3 text-right control-label col-form-label">Cliente</label>
 													<div class="col-sm-9">	
-														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="cliente">
+														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="cliente" <?=$disabled;?>>
 															<option>Cliente</option>
 																	<?php
 																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
@@ -614,11 +643,13 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 									
                                 </div>
 								
+								<?php if($resultadoD['rem_generar_certificado']!=1){?>
 								<div class="card-body">
                                     <div class="form-group m-b-0 text-right">
                                         <button type="submit" class="btn btn-info waves-effect waves-light">Guardar cambios</button>
                                     </div>
                                 </div>
+								<?php }?>
 								
                             </form>
                         </div>

@@ -19,13 +19,20 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 		}
 	}
 
+	$ciudad=$_POST["ciudad"];
+	$city="";
+	if($_POST["pais"]!="Colombia"){
+		$ciudad="1122";
+		$city=$_POST["ciuExtra"];
+	}
+
 	$conexionBdPrincipal->query("UPDATE clientes SET 
     cli_nombre='" . $_POST["nombre"] . "', 
     cli_referencia='" . $_POST["referencia"] . "', 
     cli_categoria='" . $_POST["categoria"] . "', 
     cli_email='" . $_POST["email"] . "', 
     cli_telefono='" . $_POST["telefono"] . "', 
-    cli_ciudad='" . $_POST["ciudad"] . "', 
+    cli_ciudad='" . $ciudad . "', 
     cli_usuario='" . trim($_POST["usuarioCliente"]) . "', 
     cli_clave='" . $_POST["claveCliente"] . "', 
     cli_direccion='" . $_POST["direccion"] . "', 
@@ -45,7 +52,9 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     cli_saldo='" . $_POST["saldo"] . "', 
     cli_clave_documentos='" . $_POST["claveDocumentos"] . "', 
     cli_credito='" . $_POST["credito"] . "', 
-    cli_tipo_documento='" . $_POST["tipoDocumento"] . "' 
+    cli_tipo_documento='" . $_POST["tipoDocumento"] . "', 
+    cli_pais='" . $_POST["pais"] . "', 
+    cli_ciudad_extranjera='" . $city . "'
     WHERE cli_id='" . $_POST["id"] . "'");
 
 if(isset($_POST["grupos"])){

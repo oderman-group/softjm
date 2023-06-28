@@ -101,6 +101,10 @@ include("includes/head.php");
 						<?php
 							$filtro = '';
 							if($_GET["busqueda"]!=""){$filtro .= " AND (remi_id='".$_GET["busqueda"]."' OR cli_nombre='".$_GET["busqueda"]."' OR usr_nombre='".$_GET["busqueda"]."')";}	
+							
+							if($datosUsuarioActual['usr_tipo']!=1){
+								$filtro.=' AND cli_ciudad!="1122"';
+							}
 								
 							if(isset($_GET["cte"]) and $_GET["cte"]!=""){
 								$SQL="SELECT * FROM remisionbdg

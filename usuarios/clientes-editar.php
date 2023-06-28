@@ -7,23 +7,7 @@ include("includes/head.php");
 $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
-
-
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-<![endif]-->
-<!--[if IE 8]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-<![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-<![endif]-->
-
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -39,6 +23,17 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+<script>
+	function mostrar(data) {
+		if(data.value == "Colombia"){
+			document.getElementById("local").style.display = "block";
+			document.getElementById("extrangero").style.display = "none";
+		}else{
+			document.getElementById("local").style.display = "none";
+			document.getElementById("extrangero").style.display = "block";
+		}
+	}
+</script>
 
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
@@ -180,25 +175,63 @@ include("includes/js-formularios.php");
 															<input type="text" class="span4" name="direccion" value="<?=$resultadoD['cli_direccion'];?>">
 														</div>
 													</div>   
+													
+													<div class="control-group">
+															<label class="control-label">Pais</label>
+															<div class="controls">
+																<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="pais" required onChange="mostrar(this)">
+																	<option value=""></option>
+																	<?php
+																	$service_url = 'https://restcountries.com/v3.1/all';
+																	$jsonObject = json_decode(file_get_contents($service_url),true);
+																	foreach ($jsonObject as $object){
+																	$nombrePais=$object["name"]["common"];
+																	?>
+																		<option value="<?=$nombrePais;?>"  <?php if($resultadoD['cli_pais']==$nombrePais){echo "selected";}?>><?=$nombrePais;?></option>
+																	<?php
+																	}
+																	?>
+																</select>
+															</div>
+													</div>
+													
+													<?php if(($resultadoD['cli_pais'] == "Colombia") || ($resultadoD['cli_pais'] == "1122")){ 
+														$displayCol="display: block;";
+														$displayExtr="display: none;";
+													}else{ 
+														$displayCol="display: none;";
+														$displayExtr="display: block;";
+													}?>
 
-												   <div class="control-group">
-														<label class="control-label">Ciudad</label>
-														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ciudad">
-																<option value=""></option>
-																<?php
-																$conOp = $conexionBdAdmin->query("SELECT * FROM localidad_ciudades 
-																INNER JOIN localidad_departamentos ON dep_id=ciu_departamento 
-																ORDER BY ciu_nombre");
-																while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-																?>
-																	<option value="<?=$resOp['ciu_id'];?>" <?php if($resultadoD['cli_ciudad']==$resOp['ciu_id']){echo "selected";}?>><?=$resOp['ciu_nombre'].", ".$resOp['dep_nombre'];?></option>
-																<?php
-																}
-																?>
-															</select>
+													<div id="local" style="<?=$displayCol;?>">
+														<div class="control-group">
+																<label class="control-label">Ciudad</label>
+																<div class="controls">
+																	<select data-placeholder="Escoja una opción..." class="span4" tabindex="2" name="ciudad">
+																		<option value=""></option>
+																		<?php
+																		$conOp = $conexionBdAdmin->query("SELECT * FROM localidad_ciudades 
+																		INNER JOIN localidad_departamentos ON dep_id=ciu_departamento 
+																		ORDER BY ciu_nombre");
+																		while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+																		?>
+																			<option value="<?=$resOp['ciu_id'];?>" <?php if($resultadoD['cli_ciudad']==$resOp['ciu_id']){echo "selected";}?>><?=$resOp['ciu_nombre'].", ".$resOp['dep_nombre'];?></option>
+																		<?php
+																		}
+																		?>
+																	</select>
+																</div>
 														</div>
-												   </div>
+													</div>
+													
+													<div id="extrangero" style="<?=$displayExtr;?>">
+														<div class="control-group">
+															<label class="control-label">Ciudad</label>
+															<div class="controls">
+																<input type="text" class="span4" name="ciuExtra" value="<?=$resultadoD['cli_ciudad_extranjera'];?>">
+															</div>
+														</div>
+													</div>
 
 												   <div class="control-group">
 														<label class="control-label">Zona</label>

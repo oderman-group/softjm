@@ -83,7 +83,10 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" onChange="clientes(this)" required>
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_ciudad!='1122'");
+											if($datosUsuarioActual['usr_tipo']==1){
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes");
+											}
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
 												if($datosUsuarioActual[3]!=1){
