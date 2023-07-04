@@ -13,14 +13,14 @@ switch($_SERVER['HTTP_HOST']){
         break;
 
 	case 'developer.orioncrm.com.co':
-        define('RUTA_PROYECTO', '/home4/orioncrmcom/public_html/developer.orioncrm.com.co/softjm');
-        define('REDIRECT_ROUTE', 'https://developer.orioncrm.com.co/softjm');
+        define('RUTA_PROYECTO', '/home4/orioncrmcom/public_html/developer.orioncrm.com.co');
+        define('REDIRECT_ROUTE', 'https://developer.orioncrm.com.co');
         error_reporting (E_ALL ^ E_NOTICE ^ E_WARNING);
         break;
 
 	case 'jm.orioncrm.com.co':
-        define('RUTA_PROYECTO', '/home4/orioncrmcom/public_html/jm.orioncrm.com.co/softjm');
-        define('REDIRECT_ROUTE', 'https://jm.orioncrm.com.co/softjm');
+        define('RUTA_PROYECTO', '/home4/orioncrmcom/public_html/jm.orioncrm.com.co');
+        define('REDIRECT_ROUTE', 'https://jm.orioncrm.com.co');
         error_reporting (E_ALL ^ E_NOTICE ^ E_WARNING);
         break;
 }
