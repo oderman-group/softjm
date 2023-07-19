@@ -163,7 +163,7 @@ include("includes/head.php");
 
 <?php
 $columna = '';
-if ($datosUsuarioActual['usr_tipo'] == 1) {
+if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) {
 	$columna = 'columnas1';
 ?>
 
@@ -229,7 +229,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 
 				<p>
 					<a href="productos.php?todo=1" style="text-decoration: underline; font-weight: bold; color: navy; font-size: 16px;">[VER TODOS]</a>&nbsp;|&nbsp;
-					<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+					<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 						<a href="productos.php?web=1" style="text-decoration: underline;">Tienda/Visible Web</a>&nbsp;|&nbsp;
 						<a href="productos.php?pdt=1" style="text-decoration: underline;">Predeterminados</a>&nbsp;|&nbsp;
 						<a href="productos.php?nopdt=1" style="text-decoration: underline;">No predeterminados</a>&nbsp;|&nbsp;
@@ -309,7 +309,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 									<thead>
 										<tr>
 											<th>No</th>
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 												<th>PDT</th>
 												<th>VIS. WEB</th>
 											<?php } ?>
@@ -318,12 +318,12 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10 or $datosUsuarioActual['usr_tipo'] == 13) { ?>
 												<th>Costo</th>
 											<?php } ?>
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 												<th>Utilidad (%)</th>
 											<?php } ?>
 											<th title="Sobre el precio de lista.">Dcto. Max. (%)</th>
 
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 												<th>Comisión (%)</th>
 												<th>Comisión externo (%)</th>
 												<th title="Sobre el precio de lista.">Utilidad Web. (%)</th>
@@ -335,17 +335,17 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 											<th>Precio lista</br>Segun dolar hoy</th>
 											<th>Precio lista (USD)</th>
 
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 												<th>Precio lista + IVA</th>
 												<th>Precio dealer</th>	
 											<?php } ?>
 
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 												<th>Grupo 1</th>
 											<?php } ?>
 											<th>Grupo 2</th>
 											<th>Marca</th>
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 												<th>P. Fábrica<br>USD</th>
 												<th>Flete<br>USD</th>
 												<th>Aduana<br>USD</th>
@@ -461,14 +461,14 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 											<tr>
 												<td><?= $no; ?></td>
 
-												<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+												<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 													<td><a href="#" onClick="pred(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_precio_predeterminado']; ?>" id="p<?= $res[$pk]; ?>"><?=$opcionSINO[$res['prod_precio_predeterminado']];?></a></td>
 
 													<td><a href="#" onClick="visweb(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_visible_web']; ?>" id="vw<?= $res[$pk];?>"><?= $opcionSINO[$res['prod_visible_web']]; ?></a></td>
 												<?php } ?>
 
 												<td align="center" style="font-weight: bold;">
-													<input type="text" title="prod_referencia" name="<?= $res[$pk]; ?>" value="<?= $res['prod_referencia']; ?>" style="width: 60px; text-align: center" onChange="productos(this)" <?php if (!$datosUsuarioActual['usr_tipo'] == 1) {echo "disabled";} ?>>
+													<input type="text" title="prod_referencia" name="<?= $res[$pk]; ?>" value="<?= $res['prod_referencia']; ?>" style="width: 60px; text-align: center" onChange="productos(this)" <?php if (!$datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) {echo "disabled";} ?>>
 													<span style="visibility: hidden;"><?= $res['prod_referencia']; ?></span>
 												</td>
 
@@ -495,7 +495,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 													</td>
 													<?php } ?>	
 
-													<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+													<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 
 													<td>
 														<input id="utilidad<?= $res['prod_id']; ?>" type="text" alt="<?= $res['prod_costo']; ?>" title="prod_utilidad" name="<?= $res[$pk]; ?>" value="<?= $res['prod_utilidad']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
@@ -509,7 +509,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 													<span style="visibility: hidden;"><?= $res['prod_descuento1']; ?></span>
 												</td>
 
-												<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+												<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 													<td>
 														<input type="text" title="prod_comision" name="<?= $res[$pk]; ?>" value="<?= $res['prod_comision']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
 														<span style="visibility: hidden;"><?= $res['prod_comision']; ?></span>
@@ -548,7 +548,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 
 												<td id="precioListaUSD<?= $res['prod_id']; ?>">USD <?= number_format($precioListaUSD, 2, ",", "."); ?></td>
 
-												<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+												<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 													<td id="precioListaIva<?= $res['prod_id']; ?>">$<?= number_format($precioConIva, 0, ",", "."); ?></td>
 
 													<td>$<?= number_format($precioDealer, 0, ",", "."); ?></td>
@@ -556,7 +556,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 													
 												<?php } ?>
 
-												<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+												<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 													<td><?= $grupo1['catp_nombre']; ?></td>
 												<?php } ?>
 
@@ -565,7 +565,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1) {
 
 
 
-												<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+												<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
 													<td>
 														<input type="text" title="prod_precio_fabrica" name="<?= $res[$pk]; ?>" value="<?= $res['prod_precio_fabrica']; ?>" style="width: 80px; text-align: center" onChange="productos(this)">
 														<span style="visibility: hidden;"><?= $res['prod_precio_fabrica']; ?></span>
