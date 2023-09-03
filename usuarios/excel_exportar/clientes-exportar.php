@@ -19,14 +19,14 @@ include(RUTA_PROYECTO."/usuarios/head.php");
 
 <body>
 	<?php
-    if (isset($_GET["dpto"]) and $_GET["dpto"] != "") {
+    if (!empty($_GET["dpto"])) {
         $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes
-        INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-        INNER JOIN localidad_departamentos ON dep_id=ciu_departamento AND dep_id='" . $_GET["dpto"] . "'");
+        INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+        INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='" . $_GET["dpto"] . "'");
     } else {
         $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes
-        INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-        INNER JOIN localidad_departamentos ON dep_id=ciu_departamento");
+        INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+        INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento");
     }
 ?>
 
@@ -34,7 +34,7 @@ include(RUTA_PROYECTO."/usuarios/head.php");
 			<table width="100%" border="1" rules="all">
 				<thead>
 					<tr>
-						<th colspan="7" style="background:#060; color:#FFF;">CLIENTES/EMPRESAS</th>
+						<th colspan="8" style="background:#060; color:#FFF;">CLIENTES/EMPRESAS</th>
 					</tr>
 					<tr>
 						<th>No</th>
@@ -42,6 +42,7 @@ include(RUTA_PROYECTO."/usuarios/head.php");
 						<th>Email</th>
 						<th>Teléfono</th>
 						<th>Ciudad</th>
+						<th>Departamento</th>
 						<th>Categoría</th>
 						<th>Referencia</th>
 					</tr>
@@ -75,9 +76,38 @@ include(RUTA_PROYECTO."/usuarios/head.php");
 							<td><?= $res['cli_email']; ?></td>
 							<td><?= $res['cli_telefono']; ?></td>
 							<td><?= $res['ciu_nombre']; ?></td>
+							<td><?= $res['dep_nombre']; ?></td>
 							<td><?= $categ; ?></td>
 							<td><?= $res['cli_referencia']; ?></td>
 						</tr>
+							<?php
+								$i = 1;
+								$contacto = $conexionBdPrincipal->query("SELECT * FROM contactos
+								WHERE cont_cliente_principal='".$res['cli_id']."'");
+								$contNum = $contacto->num_rows;
+								if($contNum>0){
+							?>
+								<tr style="background-color: dimgray; height: 20px; font-weight: bold; color:white;">
+									<td align="center" colspan="8">CONTACTOS</td>
+								</tr>
+							<?php
+								}
+								while($cont = mysqli_fetch_array($contacto, MYSQLI_BOTH)){
+							?>
+							<tr style="background-color: gainsboro;">
+								<td align="center"><?=$i;?></td>
+                                <td colspan="1"><?=$cont['cont_nombre'];?></td>
+                                <td colspan="1"><?=$cont['cont_email'];?></td>
+								<td colspan="1"><?=$cont['cont_telefono']." - ".$cont['cont_celular'];?></td>
+								<td colspan="1"><?= $res['ciu_nombre']; ?></td>
+								<td colspan="1"><?= $res['dep_nombre']; ?></td>
+								<td colspan="1"><?=$cont['cont_area'];?></td>
+								<td colspan="1"></td>
+							</tr>	
+							<?php
+									$i++;
+								}
+							?>
 
 					<?php
 						$conta++;

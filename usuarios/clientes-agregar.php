@@ -225,7 +225,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Pais</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="pais" required onChange="mostrar(this)">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="pais" onChange="mostrar(this)">
 											<option value=""></option>
 											<?php
 											$service_url = 'https://restcountries.com/v3.1/all';

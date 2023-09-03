@@ -4,4 +4,4 @@ $_SESSION['id'] = $_SESSION['admin'];
 $_SESSION['admin'] = '';
 unset( $_SESSION["admin"] );
 
-header("Location:perfil-editar.php");
+header("Location:index.php");

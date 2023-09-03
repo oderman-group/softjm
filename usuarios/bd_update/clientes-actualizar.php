@@ -19,6 +19,11 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 		}
 	}
 
+    $pais=$_POST["pais"];
+    if(empty($_POST["pais"])){
+        $pais="Colombia";
+    }
+    
 	$ciudad=$_POST["ciudad"];
 	$city="";
 	if($_POST["pais"]!="Colombia"){
@@ -53,7 +58,7 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     cli_clave_documentos='" . $_POST["claveDocumentos"] . "', 
     cli_credito='" . $_POST["credito"] . "', 
     cli_tipo_documento='" . $_POST["tipoDocumento"] . "', 
-    cli_pais='" . $_POST["pais"] . "', 
+    cli_pais='" . $pais . "', 
     cli_ciudad_extranjera='" . $city . "'
     WHERE cli_id='" . $_POST["id"] . "'");
 
