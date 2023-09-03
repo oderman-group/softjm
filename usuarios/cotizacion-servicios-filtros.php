@@ -215,7 +215,7 @@ include("head.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ciudad">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM localidad_ciudades INNER JOIN localidad_departamentos ON dep_id=ciu_departamento ORDER BY ciu_nombre");
+											$conOp = mysqli_query($conexionBdAdmin,"SELECT * FROM localidad_ciudades INNER JOIN localidad_departamentos ON dep_id=ciu_departamento ORDER BY ciu_nombre");
 											while($resOp = mysqli_fetch_array($conOp)){
 											?>
                                             	<option value="<?=$resOp['ciu_id'];?>"><?=$resOp['ciu_nombre'].", ".$resOp['dep_nombre'];?></option>

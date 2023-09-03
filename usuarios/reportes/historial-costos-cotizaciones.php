@@ -1,6 +1,6 @@
 <?php include("../sesion.php"); ?>
 <?php include("../../conexion.php"); ?>
-<?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1", $conexion)); ?>
+<?php $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1")); ?>
 <!DOCTYPE HTML>
 <html lang="en">
 
@@ -29,13 +29,12 @@
 		<tbody>
 			<?php
 			$no = 1;
-			$consulta = mysql_query("SELECT * FROM cotizacion_productos 
+			$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
 									INNER JOIN productos ON prod_id=czpp_producto
 									WHERE (czpp_producto!='' OR czpp_producto IS NOT NULL) AND (czpp_servicio='' OR czpp_servicio IS NULL)
-									ORDER BY czpp_cotizacion DESC
-									", $conexion);
+									ORDER BY czpp_cotizacion DESC");
 
-			while ($res = mysql_fetch_array($consulta)) {
+			while ($res = mysqli_fetch_array($consulta)) {
 
 				$colorCosto = '';
 				$colorUtilidad = '';
@@ -51,9 +50,9 @@
 					<td align="center"><?= $no; ?></td>
 					<td align="center"><?= $res['czpp_cotizacion']; ?></td>
 					<td><?= $res['prod_id']." - ".$res['prod_nombre']; ?> </td>
-					<td align="center" style="background-color: <?=$colorCosto;?>;">$<?= number_format($res['czpp_costo'],0,".","."); ?></td>
+					<td align="center" style="background-color: <?=$colorCosto;?>;">$<?php if(!empty($res['czpp_costo'])){ echo number_format($res['czpp_costo'],0,".",".");} ?></td>
 					<td align="center" style="background-color: <?=$colorUtilidad;?>;"><?= $res['czpp_utilidad_porcentaje']; ?>%</td>
-					<td align="center">$<?= number_format($res['prod_costo'],0,".","."); ?></td>
+					<td align="center">$<?php if(!empty($res['prod_costo'])){ echo number_format($res['prod_costo'],0,".",".");}?></td>
 					<td align="center"><?= $res['prod_utilidad']; ?>%</td>
 				</tr>
 			<?php $no++;

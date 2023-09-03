@@ -235,13 +235,10 @@ include("includes/head.php");
 								</div>
 								<div class="widget-container">
 									<ul class="sample-noty">
+										<li> <a href="excel-exportar.php?exp=2">1. Informe de servicios (Remisiones)</a></li>
+										<li> <a href="excel-exportar.php?exp=3">2. Tickets</a></li>
 										<?php if ($_SESSION["id"] == 7 or $_SESSION["id"] == 15 or $_SESSION["id"] == 17) { ?>
-											<li> <a href="excel-exportar.php?exp=1">1. Clientes</a></li>
-										<?php } ?>
-										<li> <a href="excel-exportar.php?exp=2">2. Informe de servicios (Remisiones)</a></li>
-										<li> <a href="excel-exportar.php?exp=3">3. Tickets</a></li>
-										<?php if ($_SESSION["id"] == 7 or $_SESSION["id"] == 15 or $_SESSION["id"] == 17) { ?>
-											<li> <a href="excel-exportar.php?exp=6">4. Comisiones</a></li>
+											<li> <a href="excel-exportar.php?exp=6">3. Comisiones</a></li>
 										<?php } ?>
 									</ul>
 								</div>

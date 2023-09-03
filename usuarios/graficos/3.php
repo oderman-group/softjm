@@ -30,13 +30,12 @@ $filtro2 = '';
 if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro2 .= " AND (cotiz_fecha_propuesta>='".$_GET["desde"]."')";}
 if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro2 .= " AND (cotiz_fecha_propuesta<='".$_GET["hasta"]."')";}	
 
-$clientes = mysql_query("SELECT cotiz_id, cli_nombre, usr_nombre, SUM(czpp_valor) AS cant FROM cotizacion_productos
+$clientes = mysqli_query($conexionBdPrincipal,"SELECT cotiz_id, cli_nombre, usr_nombre, SUM(czpp_valor) AS cant FROM cotizacion_productos
 INNER JOIN cotizacion ON cotiz_id=czpp_cotizacion $filtro2
 INNER JOIN clientes ON cli_id=cotiz_cliente
 INNER JOIN usuarios ON usr_id=cotiz_vendedor $filtro1
-GROUP BY czpp_cotizacion ORDER BY cant DESC LIMIT 0,10
-",$conexion);
-while($cte = mysql_fetch_array($clientes)){
+GROUP BY czpp_cotizacion ORDER BY cant DESC LIMIT 0,10");
+while($cte = mysqli_fetch_array($clientes)){
 	if($cte[3]==0) continue;
 	$cotizacionesResultados .= "['#".$cte[0]." - ".$cte[1]." / ".$cte[2]."', '".$cte[3]."'],";	
 }	
