@@ -4,10 +4,7 @@ header("Content-Type: application/vnd.ms-excel");
 header("Expires: 0");
 header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 header("content-disposition: attachment;filename=INFORMES_ORION_CRM_" . date("d/m/Y") . ".xls");
-include("../conexion.php");
 ?>
-<?php include("includes/head.php"); ?>
-<?php $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"));?>
 </head>
 
 <body>
@@ -122,9 +119,7 @@ INNER JOIN clientes ON cli_id=rem_cliente");
 INNER JOIN clientes ON cli_id=tik_cliente
 INNER JOIN usuarios ON usr_id=tik_usuario_responsable
 WHERE tik_id=tik_id " . $filtro . "
-ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
-					$conexion
-				);
+ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"]);
 			?>
 				<div align="center">
 					<table width="100%" border="1" rules="all">
@@ -224,9 +219,7 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
 INNER JOIN clientes ON cli_id=tik_cliente
 INNER JOIN usuarios ON usr_id=tik_usuario_responsable
 WHERE tik_id=tik_id " . $filtro . "
-ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
-						$conexion
-					);
+ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"]);
 				?>
 					<div align="center">
 						<table width="100%" border="1" rules="all">
@@ -310,9 +303,7 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
 							INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento $filtro2
 							INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 							WHERE cseg_id=cseg_id " . $filtro . "
-							ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
-									$conexion
-								);
+							ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"]);
 								$opcionesSino = array("NO", "SI");
 								$conta = 1;
 								while ($res = mysqli_fetch_array($consulta)) {
@@ -357,8 +348,7 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
 					<?php
 					if (isset($_GET["exp"]) and $_GET["exp"] == 5) {
 						$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
-INNER JOIN clientes ON cli_id=rem_cliente
-");
+            INNER JOIN clientes ON cli_id=rem_cliente");
 					?>
 						<div align="center">
 							<table width="100%" border="1" rules="all">
@@ -462,8 +452,7 @@ INNER JOIN clientes ON cli_id=rem_cliente
 							if(isset($_GET["hastaF"]) and $_GET["hastaF"]!=""){$filtro .= " AND (factura_fecha_propuesta<='".$_GET["hastaF"]."')";}
 
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
-INNER JOIN clientes ON cli_id=rem_cliente
-");
+              INNER JOIN clientes ON cli_id=rem_cliente");
 						?>
 							<div align="center">
 								<table width="100%" border="1" rules="all">
@@ -495,8 +484,7 @@ INNER JOIN clientes ON cli_id=rem_cliente
 											$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $res['factura_vendedor'] . "'"));
 
 											$valorFactura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT SUM(czpp_cantidad * czpp_valor) FROM cotizacion_productos 
-								WHERE czpp_cotizacion='" . $res['factura_id'] . "' and czpp_tipo=4
-								"));
+                      WHERE czpp_cotizacion='" . $res['factura_id'] . "' and czpp_tipo=4"));
 
 											$pCom = $configuracion['conf_comision_vendedores'] / 100;
 

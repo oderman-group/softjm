@@ -1,6 +1,6 @@
 <?php include("../sesion.php");?>
 <?php include("../../conexion.php");?>
-<?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1",$conexion));?>
+<?php $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"));?>
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
@@ -40,23 +40,20 @@
 							if(isset($_POST["hastaF"]) and $_POST["hastaF"]!=""){$filtro .= " AND (factura_fecha_propuesta<='".$_POST["hastaF"]."')";}
 
 
-							$consulta = mysql_query("SELECT * FROM facturas
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas
 							INNER JOIN clientes ON cli_id=factura_cliente
 							INNER JOIN usuarios ON usr_id=factura_creador
 							WHERE factura_id=factura_id $filtro
-							ORDER BY factura_vendedor
-							",$conexion);
+							ORDER BY factura_vendedor");
 							
 							$no = 1;
 							$totalVendidas = 0;
 							$totalNoVendidas = 0;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta)){
 								
-								$vendedor = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['factura_vendedor']."'",$conexion));
+								$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['factura_vendedor']."'"));
 
-								$valorFactura = mysql_fetch_array(mysql_query("SELECT SUM(czpp_cantidad * czpp_valor) FROM cotizacion_productos 
-								WHERE czpp_cotizacion='".$res['factura_id']."' and czpp_tipo=4
-								",$conexion));
+								$valorFactura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT SUM(czpp_cantidad * czpp_valor) FROM cotizacion_productos"));
 
 								$pCom = $configuracion['conf_comision_vendedores']/100;
 
@@ -71,12 +68,11 @@
                                 <td><?=strtoupper($res['cli_nombre']);?></td>
 								<td>
 									<?php
-										$productos = mysql_query("SELECT * FROM cotizacion_productos
+										$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
 										INNER JOIN productos ON prod_id=czpp_producto
-										WHERE czpp_cotizacion='".$res['factura_id']."' AND czpp_tipo=4
-										",$conexion);
+										WHERE czpp_cotizacion='".$res['factura_id']."' AND czpp_tipo=4");
 										$i = 1;
-										while($prod = mysql_fetch_array($productos)){
+										while($prod = mysqli_fetch_array($productos)){
 											echo "<b>".$i.".</b> ".$prod['prod_nombre'].", ";
 											$i++;
 										}

@@ -30,12 +30,12 @@ $filtro2 = '';
 if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro2 .= " AND (fact_fecha_real>='".$_GET["desde"]."')";}
 if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro2 .= " AND (fact_fecha_real<='".$_GET["hasta"]."')";}
 
-$clientes = mysql_query("SELECT fpp_producto, prod_nombre, COUNT(fpp_id) AS cant FROM facturacion_productos
+$clientes = mysqli_query($conexionBdPrincipal,"SELECT fpp_producto, prod_nombre, COUNT(fpp_id) AS cant FROM facturacion_productos
 INNER JOIN productos ON prod_id=fpp_producto $filtro
 INNER JOIN facturacion ON fact_id=fpp_factura $filtro2
 GROUP BY fpp_producto ORDER BY cant DESC LIMIT 0,10
-",$conexion);
-while($cte = mysql_fetch_array($clientes)){
+");
+while($cte = mysqli_fetch_array($clientes)){
 	//if($cte[3]==0) continue;
 	$cotizacionesResultados .= "['#".$cte[0]." - ".$cte[1]."', '".$cte[2]."'],";
 }	

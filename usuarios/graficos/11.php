@@ -27,12 +27,12 @@ $filtro2 = '';
 if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro2 .= " AND (rem_fecha>='".$_GET["desde"]."')";}
 if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro2 .= " AND (rem_fecha<='".$_GET["hasta"]."')";}
 
-$clientes = mysql_query("SELECT cli_nombre, COUNT(rem_id) AS cant FROM remisiones
+$clientes = mysqli_query($conexionBdPrincipal,"SELECT cli_nombre, COUNT(rem_id) AS cant FROM remisiones
 INNER JOIN clientes ON cli_id=rem_cliente
 WHERE rem_id=rem_id $filtro2
 GROUP BY rem_cliente ORDER BY cant DESC LIMIT 0,10
-",$conexion);
-while($cte = mysql_fetch_array($clientes)){
+");
+while($cte = mysqli_fetch_array($clientes)){
 	//if($cte[3]==0) continue;
 	$cotizacionesResultados .= "['".$cte[0]."', '".$cte[1]."'],";
 }	

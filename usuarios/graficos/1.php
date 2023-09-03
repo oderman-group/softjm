@@ -30,15 +30,13 @@ $filtro2 = '';
 if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro2 .= " AND (cotiz_fecha_propuesta>='".$_GET["desde"]."')";}
 if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro2 .= " AND (cotiz_fecha_propuesta<='".$_GET["hasta"]."')";}	
 	
-$usuarios = mysql_query("SELECT * FROM usuarios 
-WHERE usr_bloqueado=0 $filtro1
-",$conexion);
-while($usr = mysql_fetch_array($usuarios)){
-	$cte = mysql_fetch_array(mysql_query("
+$usuarios = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios 
+WHERE usr_bloqueado=0 $filtro1");
+while($usr = mysqli_fetch_array($usuarios)){
+	$cte = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 	SELECT
 	(SELECT COUNT(cotiz_id) FROM cotizacion WHERE cotiz_vendedor='".$usr['usr_id']."' $filtro2),
-	(SELECT COUNT(cotiz_id) FROM cotizacion WHERE cotiz_vendedor='".$usr['usr_id']."' AND cotiz_vendida=1 $filtro2)
-	",$conexion));
+	(SELECT COUNT(cotiz_id) FROM cotizacion WHERE cotiz_vendedor='".$usr['usr_id']."' AND cotiz_vendida=1 $filtro2)"));
 	
 	if($cte[0]==0 and $cte[1]==0) continue;
 	$cotizacionesResultados .= "['".strtoupper($usr[14])."', '".$cte[0]."', '".$cte[1]."'],";	

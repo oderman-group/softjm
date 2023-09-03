@@ -30,14 +30,13 @@ if($_GET["usuario"]){$filtro .=" AND tik_usuario_responsable='".$_GET["usuario"]
 if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro .= " AND (tik_fecha_creacion>='".$_GET["desde"]."')";}
 if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro .= " AND (tik_fecha_creacion<='".$_GET["hasta"]."')";}	
 
-$cte = mysql_fetch_array(mysql_query("
+$cte = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 SELECT
 (SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_etapa=1 $filtro),
 (SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_etapa=2 $filtro),
 (SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_etapa=3 $filtro),
 (SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_etapa=5 $filtro),
-(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_etapa=6 $filtro)
-	",$conexion));
+(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_etapa=6 $filtro)"));
 	
 	//if($cte[3]==0) continue;
 	$cotizacionesResultados .= "['".strtoupper($usr[4])."', '".$cte[0]."', '".$cte[1]."', '".$cte[2]."'],";	

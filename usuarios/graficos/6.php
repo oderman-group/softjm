@@ -32,14 +32,12 @@ $filtro2 = '';
 if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro2 .= " AND (tik_fecha_creacion>='".$_GET["desde"]."')";}
 if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro2 .= " AND (tik_fecha_creacion<='".$_GET["hasta"]."')";}	
 
-$usuarios = mysql_query("SELECT * FROM usuarios WHERE usr_bloqueado=0 $filtro
-",$conexion);
-while($usr = mysql_fetch_array($usuarios)){
-	$cte = mysql_fetch_array(mysql_query("
+$usuarios = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado=0 $filtro");
+while($usr = mysqli_fetch_array($usuarios)){
+	$cte = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 	SELECT
 	(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_tipo_tiket=1 AND tik_usuario_responsable='".$usr['usr_id']."' $filtro2),
-	(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_tipo_tiket=3 AND tik_usuario_responsable='".$usr['usr_id']."' $filtro2)
-	",$conexion));
+	(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_tipo_tiket=3 AND tik_usuario_responsable='".$usr['usr_id']."' $filtro2)"));
 	
 	if($cte[0]==0 and $cte[1]==0) continue;
 	$cotizacionesResultados .= "['".strtoupper($usr['usr_seudonimo'])."', '".$cte[0]."', '".$cte[1]."'],";	
@@ -106,14 +104,12 @@ anychart.onDocumentReady(function () {
 <?php
 $filtro = '';
 if($_GET["usuario"]){$filtro .=" AND usr_id='".$_GET["usuario"]."'";}	
-$usuarios = mysql_query("SELECT * FROM usuarios WHERE usr_bloqueado=0 $filtro
-",$conexion);
-while($usr = mysql_fetch_array($usuarios)){
-	$cte = mysql_fetch_array(mysql_query("
+$usuarios = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado=0 $filtro");
+while($usr = mysqli_fetch_array($usuarios)){
+	$cte = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 	SELECT
 	(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_estado=1 AND tik_usuario_responsable='".$usr['usr_id']."'),
-	(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_estado=2 AND tik_usuario_responsable='".$usr['usr_id']."')
-	",$conexion));
+	(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_estado=2 AND tik_usuario_responsable='".$usr['usr_id']."')"));
 	
 	if($cte[0]==0 and $cte[1]==0) continue;
 	$cotizacionesResultados .= "['".strtoupper($usr['usr_seudonimo'])."', '".$cte[0]."', '".$cte[1]."'],";	

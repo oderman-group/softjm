@@ -6,7 +6,7 @@ header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 header("content-disposition: attachment;filename=Combos_".date("d/m/Y").".xls");
 ?>
 <?php include("../../conexion.php"); ?>
-<?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1", $conexion)); ?>
+<?php $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1")); ?>
 <!DOCTYPE HTML>
 <html lang="en">
 
@@ -35,22 +35,24 @@ header("content-disposition: attachment;filename=Combos_".date("d/m/Y").".xls");
 		<tbody>
 			<?php
 			$no = 1;
-			$consulta = mysql_query("SELECT * FROM combos", $conexion);
+			$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos");
 
-			while ($res = mysql_fetch_array($consulta)) {
-				$datosCombos = mysql_query("SELECT ROUND((SUM(copp_cantidad)*prod_precio),0) FROM combos
+			while ($res = mysqli_fetch_array($consulta)) {
+				$datosCombos = mysqli_query($conexionBdPrincipal,"SELECT ROUND((SUM(copp_cantidad)*prod_precio),0) FROM combos
 								INNER JOIN combos_productos ON copp_combo=combo_id
 								INNER JOIN productos ON prod_id=copp_producto
 								WHERE combo_id='" . $res['combo_id'] . "'
-								GROUP BY copp_producto
-								", $conexion);
+								GROUP BY copp_producto");
 
 				$precioCombo = 0;
-				while ($dCombos = mysql_fetch_array($datosCombos)) {
+				while ($dCombos = mysqli_fetch_array($datosCombos)) {
 					$precioCombo += $dCombos[0];
 				}
 
-				$dcto = $res['combo_descuento'] / 100;
+				$dcto = 0;
+				if(!empty($res['combo_descuento'])){
+					$dcto = $res['combo_descuento'] / 100;
+				}
 				$precioFinal = round($precioCombo - ($precioCombo * $dcto), 0);
 			?>
 				<tr style="height: 30px; font-size: 15px; background-color: yellow;">
@@ -72,11 +74,11 @@ header("content-disposition: attachment;filename=Combos_".date("d/m/Y").".xls");
 
 				<?php
 				$nop = 1;
-				$productos = mysql_query("SELECT * FROM productos 
+				$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 				INNER JOIN productos_categorias ON catp_id=prod_categoria
 				INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='".$res['combo_id']."'
-				ORDER BY copp_id",$conexion);
-				while($prod = mysql_fetch_array($productos)){
+				ORDER BY copp_id");
+				while($prod = mysqli_fetch_array($productos)){
 						
 					$subtotal = ($prod['prod_precio'] * $prod['copp_cantidad']);
 					$total +=$subtotal;

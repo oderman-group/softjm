@@ -5,10 +5,6 @@ $paginaActual['pag_nombre'] = "Filtro historial de precios";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
 <!-- styles -->
 
 <!--[if IE 7]>
@@ -82,44 +78,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="reportes/historial-precios.php" target="_blank">  
-                               
-                                
-                            
-                                <!--   
-                            <div class="control-group">
-									<label class="control-label">Año</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="agno" required>
-											<option value=""></option>
-                                            <option value="2019">2019</option>
-                                            <option value="2020">2020</option>
-                                            <option value="2021">2021</option>
-                                    	</select>
-                                    </div>
-                               </div>
-                               
-                               <div class="control-group">
-									<label class="control-label">Mes</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="mes" required>
-											<option value=""></option>
-                                            <option value="01">Enero</option>
-                                            <option value="02">Febrero</option>
-                                            <option value="03">Marzo</option>
-                                            <option value="04">Abril</option>
-                                            <option value="05">Mayo</option>
-                                            <option value="06">Junio</option>
-                                            <option value="07">Julio</option>
-                                            <option value="08">Agosto</option>
-                                            <option value="09">Septiembre</option>
-                                            <option value="10">Octubre</option>
-                                            <option value="11">Noviembre</option>
-                                            <option value="12">Diciembre</option>
-                                    	</select>
-                                    </div>
-                               </div>-->
-
+							<form class="form-horizontal" method="post" action="reportes/historial-precios.php" target="_blank">
                                <div class="control-group">
 									<label class="control-label">Rango Desde</label>
 									<div class="controls">
@@ -140,8 +99,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="producto">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM productos",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos");
+											while($resOp = mysqli_fetch_array($conOp)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['prod_nombre'];?></option>
                                             <?php
@@ -158,8 +117,8 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="responsable">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM usuarios",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios");
+											while($resOp = mysqli_fetch_array($conOp)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['usr_nombre'];?></option>
                                             <?php
