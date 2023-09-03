@@ -70,41 +70,41 @@ $campos = array(
 							</thead>
 							<tbody>
                             <?php
-							$filtro = '';	
-							$numero =(count($_POST["grupos1"]));
-							if($numero>0){
-								$filtro .= " AND (prod_grupo1='".$_POST["grupos1"][0]."'";
-								$contador=1;
-								while($contador<$numero){
-									$filtro .= " OR prod_grupo1='".$_POST["grupos1"][$contador]."'";
-									$contador++;
+							$filtro = '';
+							if(!empty($_POST["grupos1"])){
+								$numero =(count($_POST["grupos1"]));
+								if($numero>0){
+									$filtro .= " AND (prod_grupo1='".$_POST["grupos1"][0]."'";
+									$contador=1;
+									while($contador<$numero){
+										$filtro .= " OR prod_grupo1='".$_POST["grupos1"][$contador]."'";
+										$contador++;
+									}
+									$filtro .= ")";
 								}
-								$filtro .= ")";
 							}
-								
-							$filtro2 = '';	
-							$numero =(count($_POST["grupos2"]));
-							if($numero>0){
-								$filtro2 .= " AND (prod_categoria='".$_POST["grupos2"][0]."'";
-								$contador=1;
-								while($contador<$numero){
-									$filtro2 .= " OR prod_categoria='".$_POST["grupos2"][$contador]."'";
-									$contador++;
+							$filtro2 = '';
+							if(!empty($_POST["grupos2"])){
+								$numero =(count($_POST["grupos2"]));
+								if($numero>0){
+									$filtro2 .= " AND (prod_categoria='".$_POST["grupos2"][0]."'";
+									$contador=1;
+									while($contador<$numero){
+										$filtro2 .= " OR prod_categoria='".$_POST["grupos2"][$contador]."'";
+										$contador++;
+									}
+									$filtro2 .= ")";
 								}
-								$filtro2 .= ")";
-							}	
-								
-							$consulta = mysql_query("SELECT * FROM productos
+							}
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos
 							INNER JOIN productos_categorias ON catp_id=prod_categoria 
 							WHERE prod_id=prod_id 
 							$filtro
 							$filtro2
-							ORDER BY ".$_POST['orden']." ".$_POST['formaOrden']."
-							",$conexion);
+							ORDER BY ".$_POST['orden']." ".$_POST['formaOrden']."");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
-								$grupo1 = mysql_fetch_array(mysql_query("SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'
-								",$conexion));
+							while($res = mysqli_fetch_array($consulta)){
+								$grupo1 = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'"));
 							?>
 							<tr style="height: 20px;">
 								<td align="center"><?=$no;?></td>

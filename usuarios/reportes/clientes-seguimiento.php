@@ -67,19 +67,18 @@ if($_POST["formato"]==2){
 							if($_POST["ciudad"]!=""){$filtroCli .= " AND cli_ciudad='".$_POST["ciudad"]."'";}
 							if($_POST["tipoDocumento"]!=""){$filtroCli .= " AND cli_tipo_documento='".$_POST["tipoDocumento"]."'";}
 								
-							$consulta = mysql_query("SELECT * FROM cliente_seguimiento
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cliente_seguimiento
 							INNER JOIN clientes_tikets ON tik_id=cseg_tiket
 							INNER JOIN clientes ON cli_id=cseg_cliente $filtroCli
-							INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-							INNER JOIN localidad_departamentos ON dep_id=ciu_departamento $filtro2
+							INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+							INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento $filtro2
 							INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 							WHERE cseg_id=cseg_id ".$filtro."
-							ORDER BY ".$_POST["orden"]." ".$_POST["formaOrden"]
-							,$conexion);
+							ORDER BY ".$_POST["orden"]." ".$_POST["formaOrden"]);
 							$opcionesSino = array("NO","SI");	
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
-								$encargado = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['cseg_usuario_encargado']."'",$conexion));
+							while($res = mysqli_fetch_array($consulta)){
+								$encargado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['cseg_usuario_encargado']."'"));
 								switch($res['cseg_realizado']){
 									case 1: $html = 'Completado'; break;
 									default: $html = '<span class="label label-important">Pendiente'; break;

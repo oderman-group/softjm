@@ -436,20 +436,23 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 
 											$utilidadDealer = $res['prod_descuento2'] / 100;
 
-											if($res['prod_costo']!=''){
+											if(!empty($res['prod_costo'])){
 											$precioDealer = $res['prod_costo'] + ($res['prod_costo'] * $utilidadDealer);
 											}
 
-											$utilidadWeb = $res['prod_descuento_web'] / 100;
-											if($res['prod_costo']!=''){
+											$utilidadWeb = 0;
+											if(!empty($res['prod_descuento_web'])){
+												$utilidadWeb = $res['prod_descuento_web'] / 100;
+											}
+											if(!empty($res['prod_costo'])){
 											$precioWeb = $res['prod_costo'] + ($res['prod_costo'] * $utilidadWeb);
 											}
 
-											if($res['prod_utilidad']!='' AND $res['prod_costo_dolar']!=''){
+											if(!empty($res['prod_utilidad']) AND !empty($res['prod_costo_dolar'])){
 											$precioListaUSD = productosPrecioListaUSD($res['prod_utilidad'], $res['prod_costo_dolar']);
 											}
 
-											if($res['prod_comision']!=''){
+											if(!empty($res['prod_comision'])){
 											$comision = $res['prod_comision'] / 100;
 											}
 											$valorComision = ($res['prod_precio'] * $comision);

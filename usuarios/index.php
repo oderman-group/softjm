@@ -207,7 +207,7 @@ include("includes/head.php");
 										<li><a href="tikets-filtros.php">2. Tickets</a></li>
 										<li><a href="clientes-seguimiento-filtro.php">3. Seguimientos</a></li>
 										<li><a href="usuarios-filtro.php">4. Gestión de usuarios</a></li>
-										<li><a href="facturacion-filtros.php">5. Facturas</a></li>
+										<li><a href="facturas-filtros.php">5. Facturas</a></li>
 										<li><a href="remisiones-filtros.php">6. Informe de servicios (Remisiones)</a></li>
 										<li><a href="historial-acciones-filtro.php">7. Historial de acciones</a></li>
 										<li><a href="productos-filtros.php">8. Productos</a></li>

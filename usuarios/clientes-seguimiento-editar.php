@@ -110,7 +110,7 @@ include("includes/js-formularios.php");
 							<div class="control-group">
 								<label class="control-label" style="font-weight: bold;">Valor</label>
 								<div class="controls">
-									$<?=number_format($infoTicket['tik_valor'],0,",",".");?>
+									$<?php if(!empty($infoTicket['tik_valor'])){ echo number_format($infoTicket['tik_valor'],0,",",".");}?>
 								</div>
 							</div>
 							

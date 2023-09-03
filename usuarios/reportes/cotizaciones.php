@@ -1,6 +1,6 @@
 <?php include("../sesion.php");?>
 <?php include("../../conexion.php");?>
-<?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1",$conexion));?>
+<?php $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"));?>
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
@@ -41,20 +41,19 @@
 							$filtroCli = '';	
 							if($_POST["ciudad"]!=""){$filtroCli .= " AND cli_ciudad='".$_POST["ciudad"]."'";}	
 
-							$consulta = mysql_query("SELECT * FROM cotizacion
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion
 							INNER JOIN clientes ON cli_id=cotiz_cliente $filtroCli
-							LEFT JOIN localidad_ciudades ON ciu_id=cli_ciudad
-							LEFT JOIN localidad_departamentos ON dep_id=ciu_departamento
+							LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+							LEFT JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 							INNER JOIN usuarios ON usr_id=cotiz_creador
-							WHERE cotiz_id=cotiz_id $filtro
-							",$conexion);
+							WHERE cotiz_id=cotiz_id $filtro");
 							
 							$no = 1;
 							$totalVendidas = 0;
 							$totalNoVendidas = 0;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta)){
 								
-								$vendedor = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."'",$conexion));
+								$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."'"));
 								
 								switch($res['cotiz_vendida']){
 									case 0: $estadoF = 'No vendida'; break;
@@ -77,12 +76,11 @@
                                 <td><?=strtoupper($res['cli_nombre']);?></td>
 								<td>
 									<?php
-										$productos = mysql_query("SELECT * FROM cotizacion_productos
+										$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
 										INNER JOIN productos ON prod_id=czpp_producto
-										WHERE czpp_cotizacion='".$res['cotiz_id']."'
-										",$conexion);
+										WHERE czpp_cotizacion='".$res['cotiz_id']."'");
 										$i = 1;
-										while($prod = mysql_fetch_array($productos)){
+										while($prod = mysqli_fetch_array($productos)){
 											echo "<b>".$i.".</b> ".$prod['prod_nombre'].", ";
 											$i++;
 										}

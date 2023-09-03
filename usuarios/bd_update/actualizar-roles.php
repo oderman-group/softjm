@@ -12,14 +12,16 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
         $numeroA =0;
     }
 	if ($numeroA == 0) {
-		$numero = (count($_POST["paginasP"]));
-		$contador = 0;
-		$conexionBdPrincipal->query("DELETE FROM paginas_perfiles WHERE pper_tipo_usuario='" . $_POST["id"] . "'");
+		if(!empty($_POST["paginasP"])){
+			$numero = (count($_POST["paginasP"]));
+			$contador = 0;
+			$conexionBdPrincipal->query("DELETE FROM paginas_perfiles WHERE pper_tipo_usuario='" . $_POST["id"] . "'");
 
-		while ($contador < $numero) {
-			$conexionBdPrincipal->query("INSERT INTO paginas_perfiles(pper_pagina, pper_tipo_usuario)VALUES(" . $_POST["paginasP"][$contador] . ",'" . $_POST["id"] . "')");
+			while ($contador < $numero) {
+				$conexionBdPrincipal->query("INSERT INTO paginas_perfiles(pper_pagina, pper_tipo_usuario)VALUES(" . $_POST["paginasP"][$contador] . ",'" . $_POST["id"] . "')");
 
-			$contador++;
+				$contador++;
+			}
 		}
 	} else {
 		$conexionBdPrincipal->query("DELETE FROM paginas_perfiles WHERE pper_tipo_usuario='" . $_POST["id"] . "'");
@@ -27,7 +29,7 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 		$contador = 0;
 		while ($contador < $numeroA) {
 			$paginas = $conexionBdAdmin->query("SELECT * FROM paginas WHERE pag_tipo_crud='" . $_POST["accionesNP"][$contador] . "'");
-			while ($pag = mysql_fetch_array($paginas)) {
+			while ($pag = mysqli_fetch_array($paginas)) {
 				$conexionBdPrincipal->query("INSERT INTO paginas_perfiles(pper_pagina, pper_tipo_usuario)VALUES(" . $pag[0] . ",'" . $_POST["id"] . "')");
 			}
 			$contador++;
