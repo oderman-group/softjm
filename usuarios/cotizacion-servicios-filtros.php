@@ -4,8 +4,8 @@ include("sesion.php");
 $idPagina = 127;
 $tituloPagina = "Filtro de cotizaciones con servicios";
 
-include("verificar-paginas.php");
-include("head.php");
+include("includes/verificar-paginas.php");
+include("includes/head.php");
 ?>
 <!-- styles -->
 <link href="css/bootstrap.css" rel="stylesheet">
