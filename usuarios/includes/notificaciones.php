@@ -100,6 +100,13 @@ if(isset($_GET["msg"])){
 		</div>
 	<?php }?>
 
+	<?php if($_GET["msg"]==15){?>
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-exclamation-sign"></i><strong>Exito!</strong> <?=$_GET["summary"]?>
+		</div>
+	<?php }?>
+
 
 <?php }?>
 
@@ -118,6 +125,13 @@ if(isset($_GET["error"])){
 		<div class="alert alert-danger">
 			<button type="button" class="close" data-dismiss="alert">&times;</button>
 			<i class="icon-exclamation-sign"></i><strong>Error!</strong> La contraseña nueva no cumple con los criterios de aceptación.
+		</div>
+	<?php }?>
+
+	<?php if($_GET["error"]==3){?>
+		<div class="alert alert-danger">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-exclamation-sign"></i><strong>Error!</strong> <?=$_GET["message"]?>
 		</div>
 	<?php }?>
 
