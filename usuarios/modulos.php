@@ -93,7 +93,7 @@ include("includes/head.php");
 												<td><?=$nombreModuloPadre?></td>
 												<td><h4>
 													<a href="modulos-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-													<a href="bd_delete/modulos-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+													<!-- <a href="bd_delete/modulos-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a> -->
 												</h4></td>
 											</tr>
 											<?php $no++;}?>

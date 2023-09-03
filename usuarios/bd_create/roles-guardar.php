@@ -5,18 +5,20 @@
 
 	$conexionBdPrincipal->query("INSERT INTO usuarios_tipos(utipo_nombre)VALUES('" . $_POST["nombre"] . "')");
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-    if(isset($_POST["accionesNP"])){
+    if(!empty($_POST["accionesNP"])){
 	    $numeroA = (count($_POST["accionesNP"]));
     }else{
         $numeroA =0;
     }
 	if ($numeroA == 0) {
-		$numero = (count($_POST["paginasP"]));
-		$contador = 0;
-		$conexionBdPrincipal->query("DELETE FROM paginas_perfiles WHERE pper_tipo_usuario='" . $idInsertU . "'");
-		while ($contador < $numero) {
-			$conexionBdPrincipal->query("INSERT INTO paginas_perfiles(pper_pagina, pper_tipo_usuario)VALUES(" . $_POST["paginasP"][$contador] . ",'" . $idInsertU . "')");
-			$contador++;
+		if(!empty($_POST["paginasP"])){
+			$numero = (count($_POST["paginasP"]));
+			$contador = 0;
+			$conexionBdPrincipal->query("DELETE FROM paginas_perfiles WHERE pper_tipo_usuario='" . $idInsertU . "'");
+			while ($contador < $numero) {
+				$conexionBdPrincipal->query("INSERT INTO paginas_perfiles(pper_pagina, pper_tipo_usuario)VALUES(" . $_POST["paginasP"][$contador] . ",'" . $idInsertU . "')");
+				$contador++;
+			}
 		}
 	} else {
 		$conexionBdPrincipal->query("DELETE FROM paginas_perfiles WHERE pper_tipo_usuario='" . $idInsertU . "'");

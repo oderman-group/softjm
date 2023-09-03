@@ -41,16 +41,15 @@ if($_POST["formato"]==2){
 
 							if(isset($_POST["desde"]) and $_POST["desde"]!=""){$filtro .= " AND (tik_fecha_creacion>='".$_POST["desde"]."')";}
 							if(isset($_POST["hasta"]) and $_POST["hasta"]!=""){$filtro .= " AND (tik_fecha_creacion<='".$_POST["hasta"]."')";}
-							$consulta = mysql_query("SELECT * FROM clientes_tikets
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets
 							INNER JOIN clientes ON cli_id=tik_cliente
 							INNER JOIN usuarios ON usr_id=tik_usuario_responsable
 							WHERE tik_id=tik_id ".$filtro."
-							ORDER BY ".$_POST["orden"]." ".$_POST["formaOrden"]
-							,$conexion);
+							ORDER BY ".$_POST["orden"]." ".$_POST["formaOrden"]);
 							$no = 1;
 							$canales = array("","Facebook","WhatsApp","Fijo","Celular","Personal","Skype","Otro");
-							while($res = mysql_fetch_array($consulta)){
-								$encargado = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['cseg_usuario_encargado']."'",$conexion));
+							while($res = mysqli_fetch_array($consulta)){
+								$encargado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['cseg_usuario_encargado']."'"));
 								switch($res['tik_tipo_tiket']){
 									case 1: $tipoS = 'Comercial'; break;
 									case 2: $tipoS = 'Soporte técnico'; break;
@@ -61,17 +60,14 @@ if($_POST["formato"]==2){
 									case 2: $estado = 'Cerrado'; break;
 								}
 								
-								$seguimientos = mysql_fetch_array(mysql_query("
+								$seguimientos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 								SELECT
-								
 								(SELECT COUNT(cseg_id) FROM cliente_seguimiento 
 								INNER JOIN clientes ON cli_id=cseg_cliente
 								WHERE cseg_tiket='".$res['tik_id']."' AND cseg_realizado=1),
-								
 								(SELECT COUNT(cseg_id) FROM cliente_seguimiento 
 								INNER JOIN clientes ON cli_id=cseg_cliente
-								WHERE cseg_tiket='".$res['tik_id']."' AND cseg_realizado IS NULL)
-								",$conexion));
+								WHERE cseg_tiket='".$res['tik_id']."' AND cseg_realizado IS NULL)"));
 							?>
 							<tr style="height: 30px;">
 								<td align="center"><?=$no;?></td>

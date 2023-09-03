@@ -76,7 +76,7 @@ if ($numero > 0) {
 				echo '<div style="display:block;">';
 				try {
 					//Server settings
-					$mail->SMTPDebug = 2;                                       // Enable verbose debug output
+					$mail->SMTPDebug = 0;                                       // Enable verbose debug output
 					$mail->isSMTP();                                            // Set mailer to use SMTP
 					$mail->Host       = 'mail.orioncrm.com.co';  // Specify main and backup SMTP servers
 					$mail->SMTPAuth   = true;                                   // Enable SMTP authentication
@@ -100,7 +100,6 @@ if ($numero > 0) {
 					$mail->CharSet = 'UTF-8';
 
 					$mail->send();
-					echo 'Enviado portafolio al cliente.';
 
 					mysqli_query($conexionBdPrincipal,"INSERT INTO buzon_salida(buz_remite, buz_destino, buz_tipo, buz_estado, buz_observacion, buz_referencia, buz_cliente, buz_usuario)VALUES('" . $asesor['usr_email'] . "', '" . $ctes['cli_email'] . "', 1, 1, 'Enviados correctamente.<br> Portafolios:<br> " . $portafolios . "', '" . $ctes['cli_id'] . "', '" . $ctes['cli_id'] . "', '" . $_SESSION["id"] . "')");
 					
@@ -116,10 +115,6 @@ if ($numero > 0) {
 		$contador++;
 	}
 }
-
-$numC = strlen($emails) - 1;
-$emails = substr($emails, 0, $numC);
-
 
 echo '<script type="text/javascript">window.location.href="../enviar-portafolios.php?envd=1&cte='.$_POST['cte'].'";</script>';
 exit();

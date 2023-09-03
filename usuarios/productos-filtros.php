@@ -5,15 +5,6 @@ $paginaActual['pag_nombre'] = "Filtro productos";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<!-- styles -->
-
-<!--[if IE 7]>
-<link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-<![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
 
 
@@ -92,8 +83,8 @@ include("includes/js-formularios.php");
                                             <select data-placeholder="Escoja varias opciones..." class="chzn-select span10" multiple tabindex="2" name="grupos1[]">
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = mysql_query("SELECT * FROM productos_categorias WHERE catp_grupo=1",$conexion);
-                                                while($resOp = mysql_fetch_array($conOp)){
+                                                $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_categorias WHERE catp_grupo=1");
+                                                while($resOp = mysqli_fetch_array($conOp)){
                                                 ?>
                                                     <option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
                                                 <?php
@@ -109,8 +100,8 @@ include("includes/js-formularios.php");
                                             <select data-placeholder="Escoja varias opciones..." class="chzn-select span10" multiple tabindex="2" name="grupos2[]">
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = mysql_query("SELECT * FROM productos_categorias WHERE catp_grupo=2",$conexion);
-                                                while($resOp = mysql_fetch_array($conOp)){
+                                                $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_categorias WHERE catp_grupo=2");
+                                                while($resOp = mysqli_fetch_array($conOp)){
                                                 ?>
                                                     <option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
                                                 <?php
