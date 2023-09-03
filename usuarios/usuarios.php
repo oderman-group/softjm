@@ -156,7 +156,9 @@ include("includes/head.php");
 
 												<td>
 													<h4>
-													<a href="auto-login.php?user=<?=$res['usr_id'];?>" data-toggle="tooltip" title="Auto Login"><i class="icon-retweet"></i></a>
+													<?php if(!isset($_SESSION['admin'])){?>
+														<a href="auto-login.php?user=<?=$res['usr_id'];?>" data-toggle="tooltip" title="Auto Login"><i class="icon-retweet"></i></a>
+													<?php }?>
 
 													<a href="usuarios-editar.php?id=<?=$res['usr_id'];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
 														
