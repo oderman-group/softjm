@@ -3,6 +3,10 @@ switch($_SESSION["bd"]){
 	case "odermancom_jm_crm":
 		$bdEmpresa = "JMEQUIPOS";
 	break;
+
+	case "orioncrmcom_dev_jm_crm":
+		$bdEmpresa = "JMEQUIPOS";
+	break;
 		
 	case "odermancom_orioncrm_exacta":
 		$bdEmpresa = "EXACTA ING.";
@@ -26,11 +30,11 @@ switch($_SESSION["bd"]){
 
 	case "orioncrmcom_oscar":
 		$bdEmpresa = "OSCAR B.";
-	break;	
+	break;		
 		
 		
 	default:
-		$bdEmpresa = "Desc.";
+		$bdEmpresa = "CRM.";
 	break;		
 }
 ?>
@@ -129,7 +133,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 								<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Informes</a>
 								<div class="dropdown-menu">
 									<ul>
-										<li><a href="#><i class=" icon-file-alt"></i> Informes planos</a></li>
+										<li><a href="#"><i class=" icon-file-alt"></i> Informes planos</a></li>
 										<li><a href="#"><i class=" icon-file-alt"></i> Excel</a></li>
 										<li><a href="#"><i class=" icon-file-alt"></i> Gráficos</a></li>
 										<li><a href="estadisticas.php"><i class="icon-bar-chart"></i> Estadisticas</a></li>

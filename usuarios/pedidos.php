@@ -212,7 +212,7 @@ include("includes/head.php");
 
 											<?php if($generoRemision[0]==""){?>
 											
-												<li><a href="bd_create/pedpedidos-generar-remision.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea generar remisión de este pedido?')){return false;}">Generar remisión</a></li>
+												<li><a href="bd_create/pedidos-generar-remision.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea generar remisión de este pedido?')){return false;}">Generar remisión</a></li>
 
 											<?php }?>
 											

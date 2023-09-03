@@ -38,18 +38,17 @@
 
 							if(isset($_POST["desde"]) and $_POST["desde"]!=""){$filtro .= " AND (rem_fecha_registro>='".$_POST["desde"]."')";}
 							if(isset($_POST["hasta"]) and $_POST["hasta"]!=""){$filtro .= " AND (rem_fecha_registro<='".$_POST["hasta"]."')";}
-							$consulta = mysql_query("SELECT * FROM remisiones
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
 							INNER JOIN clientes ON cli_id=rem_cliente
 							INNER JOIN usuarios ON usr_id=rem_asesor
 							WHERE rem_id=rem_id ".$filtro."
-							ORDER BY ".$_POST["orden"]." ".$_POST["formaOrden"]
-							,$conexion);
+							ORDER BY ".$_POST["orden"]." ".$_POST["formaOrden"]);
 							$no = 1;
 							$eq_nuevos = 0;
 							$eq_usados = 0;
 							$eq_nr = 0;	
-							while($res = mysql_fetch_array($consulta)){
-								$dias = mysql_fetch_array(mysql_query("SELECT DATEDIFF(rem_fecha_salida, rem_fecha_registro) FROM remisiones WHERE rem_id='".$res['rem_id']."'",$conexion));
+							while($res = mysqli_fetch_array($consulta)){
+								$dias = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT DATEDIFF(rem_fecha_salida, rem_fecha_registro) FROM remisiones WHERE rem_id='".$res['rem_id']."'"));
 								
 								switch($res['rem_tipo_equipo']){
 									case 1: $tipoE = 'Estación total'; break;
@@ -74,11 +73,11 @@
                                 <td><?=$tipoE;?></td>
 								<td>
 									<?php
-									$consultaSelect = mysql_query("SELECT * FROM servicios",$conexion);
-									while($datosSelect = mysql_fetch_array($consultaSelect)){
+									$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+									while($datosSelect = mysqli_fetch_array($consultaSelect)){
 
-										$numOpciones = mysql_num_rows(mysql_query("SELECT * FROM remisiones_servicios 
-										WHERE remxs_id_remision='".$res['rem_id']."' AND remxs_id_servicio='".$datosSelect[0]."'",$conexion));
+										$numOpciones = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios 
+										WHERE remxs_id_remision='".$res['rem_id']."' AND remxs_id_servicio='".$datosSelect[0]."'"));
 
 										if($numOpciones>0){
 											echo strtoupper($datosSelect['serv_nombre'])."<br>";	

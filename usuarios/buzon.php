@@ -146,13 +146,12 @@ $(function(){
 					if($datosUsuarioActual['usr_tipo']!=1){$filtro .=" AND buz_usuario='".$_SESSION["id"]."'";}
 					if($_GET["busqueda"]!=""){$filtro .=" AND (buz_destino LIKE '%".$_GET["busqueda"]."%' OR buz_observacion LIKE '%".$_GET["busqueda"]."%')";} 
 					  
-					$consulta = mysql_query("SELECT * FROM buzon_salida
+					$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM buzon_salida
 					INNER JOIN usuarios ON usr_id=buz_usuario
 					WHERE buz_id=buz_id $filtro
-					ORDER BY buz_id DESC
-					",$conexion);
+					ORDER BY buz_id DESC");
 					$no = 1;
-					while($res = mysql_fetch_array($consulta)){
+					while($res = mysqli_fetch_array($consulta)){
 					?> 
 					 <!-- row 1 -->
                     <li class="clearfix">
@@ -162,7 +161,7 @@ $(function(){
 						<span class="meta">Remitente: <?=$res['usr_nombre'];?></span>
                         <span class="meta">Correo destino: <?=$res['buz_destino'];?></span>
                         <p><?=$res['buz_observacion'];?></p>
-						  <span class="meta">REF: <?=$res['buz_referencia'];?></span>
+						<span class="meta">REF: <?=$res['buz_referencia'];?></span>
                       </section>
 						
                       <section class="right"> <span class="price"><?=$estadoBuzon[$res['buz_estado']];?></span> 
