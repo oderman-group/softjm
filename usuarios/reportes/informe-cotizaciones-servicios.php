@@ -63,8 +63,8 @@ $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * 
 
 			$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion 
 			INNER JOIN clientes ON cli_id=cotiz_cliente 
-			LEFT JOIN localidad_ciudades ON ciu_id=cli_ciudad
-			LEFT JOIN localidad_departamentos ON dep_id=ciu_departamento
+			LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+			LEFT JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 			INNER JOIN usuarios ON usr_id=cotiz_creador
 			WHERE cotiz_id=cotiz_id $filtro ");
 
