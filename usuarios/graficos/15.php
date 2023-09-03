@@ -27,12 +27,12 @@ $filtro2 = '';
 if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro2 .= " AND (cotiz_fecha_propuesta>='".$_GET["desde"]."')";}
 if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro2 .= " AND (cotiz_fecha_propuesta<='".$_GET["hasta"]."')";}	
 
-$clientes = mysql_query("SELECT cotiz_cliente, cli_nombre, COUNT(cotiz_cliente) AS cant FROM cotizacion
+$clientes = mysqli_query($conexionBdPrincipal,"SELECT cotiz_cliente, cli_nombre, COUNT(cotiz_cliente) AS cant FROM cotizacion
 INNER JOIN clientes ON cli_id=cotiz_cliente
 WHERE cotiz_id=cotiz_id $filtro2
 GROUP BY cotiz_cliente ORDER BY cant DESC LIMIT 0,10;
-",$conexion);
-while($cte = mysql_fetch_array($clientes)){
+");
+while($cte = mysqli_fetch_array($clientes)){
 	if($cte[2]==0) continue;
 	$cotizacionesResultados .= "['".$cte[1]."', '".$cte[2]."'],";	
 }	

@@ -4,17 +4,14 @@ header("Content-Type: application/vnd.ms-excel");
 header("Expires: 0");
 header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 header("content-disposition: attachment;filename=INFORMES_ORION_CRM_" . date("d/m/Y") . ".xls");
-include("../conexion.php");
 ?>
-<?php include("includes/head.php"); ?>
-<?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1",$conexion));?>
 </head>
 
 <body>
 		<?php
 		if (isset($_GET["exp"]) and $_GET["exp"] == 2) {
-			$consulta = mysql_query("SELECT * FROM remisiones
-INNER JOIN clientes ON cli_id=rem_cliente", $conexion);
+			$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
+INNER JOIN clientes ON cli_id=rem_cliente");
 		?>
 			<div align="center">
 				<table width="100%" border="1" rules="all">
@@ -50,9 +47,9 @@ INNER JOIN clientes ON cli_id=rem_cliente", $conexion);
 						$meses = array("", "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE");
 						$estadosCertificados = array("", "Vigente", "Vencido", "Provisional");
 						
-						while ($res = mysql_fetch_array($consulta)) {
+						while ($res = mysqli_fetch_array($consulta)) {
 							
-							$camposRemision = mysql_fetch_array(mysql_query("SELECT 
+							$camposRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT 
 							DAY(rem_fecha), 
 							MONTH(rem_fecha), 
 							YEAR(rem_fecha),
@@ -60,13 +57,13 @@ INNER JOIN clientes ON cli_id=rem_cliente", $conexion);
 							MONTH(DATE_ADD(rem_fecha, INTERVAL '" . $res['rem_tiempo_certificado'] . "' MONTH)), 
 							YEAR(DATE_ADD(rem_fecha, INTERVAL '" . $res['rem_tiempo_certificado'] . "' MONTH))
 							FROM remisiones 
-							WHERE rem_id='" . $res['rem_id'] . "'", $conexion));
+							WHERE rem_id='" . $res['rem_id'] . "'"));
 
-							$cantidadIngresos = mysql_fetch_array(mysql_query("SELECT COUNT(*), MAX(rem_id) FROM remisiones WHERE rem_serial='" . $res['rem_serial'] . "' AND rem_serial!=0", $conexion));
+							$cantidadIngresos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT COUNT(*), MAX(rem_id) FROM remisiones WHERE rem_serial='" . $res['rem_serial'] . "' AND rem_serial!=0"));
 							$cantIngresos = $cantidadIngresos[0];
 							if ($cantidadIngresos[0] == 0) $cantIngresos = 1;
 
-							$ultimoIngreso = mysql_fetch_array(mysql_query("SELECT rem_fecha FROM remisiones WHERE rem_id='" . $cantidadIngresos[1] . "'", $conexion));
+							$ultimoIngreso = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT rem_fecha FROM remisiones WHERE rem_id='" . $cantidadIngresos[1] . "'"));
 						?>
 							<tr>
 								<td align="center"><?= $conta; ?></td>
@@ -117,14 +114,12 @@ INNER JOIN clientes ON cli_id=rem_cliente", $conexion);
 					$filtro .= " AND (tik_fecha_creacion<='" . $_GET["hasta"] . "')";
 				}
 
-				$consulta = mysql_query(
+				$consulta = mysqli_query($conexionBdPrincipal,
 					"SELECT * FROM clientes_tikets
 INNER JOIN clientes ON cli_id=tik_cliente
 INNER JOIN usuarios ON usr_id=tik_usuario_responsable
 WHERE tik_id=tik_id " . $filtro . "
-ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
-					$conexion
-				);
+ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"]);
 			?>
 				<div align="center">
 					<table width="100%" border="1" rules="all">
@@ -148,8 +143,8 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
 							<?php
 							$conta = 1;
 							$canales = array("", "Facebook", "WhatsApp", "Fijo", "Celular", "Personal", "Skype", "Otro");
-							while ($res = mysql_fetch_array($consulta)) {
-								$encargado = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='" . $res['cseg_usuario_encargado'] . "'", $conexion));
+							while ($res = mysqli_fetch_array($consulta)) {
+								$encargado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $res['cseg_usuario_encargado'] . "'"));
 								switch ($res['tik_tipo_tiket']) {
 									case 1:
 										$tipoS = 'Comercial';
@@ -170,11 +165,11 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
 										break;
 								}
 
-								$seguimientos = mysql_fetch_array(mysql_query("
+								$seguimientos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 								SELECT
 								(SELECT COUNT(cseg_id) FROM cliente_seguimiento WHERE cseg_tiket='" . $res['tik_id'] . "' AND cseg_realizado=1),
 								(SELECT COUNT(cseg_id) FROM cliente_seguimiento WHERE cseg_tiket='" . $res['tik_id'] . "' AND cseg_realizado IS NULL)
-								", $conexion));
+								"));
 							?>
 								<tr>
 									<td align="center"><?= $conta; ?></td>
@@ -219,14 +214,12 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
 						$filtro .= " AND (tik_fecha_creacion<='" . $_GET["hasta"] . "')";
 					}
 
-					$consulta = mysql_query(
+					$consulta = mysqli_query($conexionBdPrincipal,
 						"SELECT * FROM clientes_tikets
 INNER JOIN clientes ON cli_id=tik_cliente
 INNER JOIN usuarios ON usr_id=tik_usuario_responsable
 WHERE tik_id=tik_id " . $filtro . "
-ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
-						$conexion
-					);
+ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"]);
 				?>
 					<div align="center">
 						<table width="100%" border="1" rules="all">
@@ -302,7 +295,7 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
 									$filtroCli .= " AND cli_tipo_documento='" . $_GET["tipoDocumento"] . "'";
 								}
 
-								$consulta = mysql_query(
+								$consulta = mysqli_query($conexionBdPrincipal,
 									"SELECT * FROM cliente_seguimiento
 							INNER JOIN clientes_tikets ON tik_id=cseg_tiket
 							INNER JOIN clientes ON cli_id=cseg_cliente $filtroCli
@@ -310,13 +303,11 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
 							INNER JOIN localidad_departamentos ON dep_id=ciu_departamento $filtro2
 							INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 							WHERE cseg_id=cseg_id " . $filtro . "
-							ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
-									$conexion
-								);
+							ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"]);
 								$opcionesSino = array("NO", "SI");
 								$conta = 1;
-								while ($res = mysql_fetch_array($consulta)) {
-									$encargado = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='" . $res['cseg_usuario_encargado'] . "'", $conexion));
+								while ($res = mysqli_fetch_array($consulta)) {
+									$encargado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $res['cseg_usuario_encargado'] . "'"));
 									switch ($res['cseg_realizado']) {
 										case 1:
 											$html = 'Completado';
@@ -356,9 +347,8 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"],
 
 					<?php
 					if (isset($_GET["exp"]) and $_GET["exp"] == 5) {
-						$consulta = mysql_query("SELECT * FROM remisiones
-INNER JOIN clientes ON cli_id=rem_cliente
-", $conexion);
+						$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
+INNER JOIN clientes ON cli_id=rem_cliente");
 					?>
 						<div align="center">
 							<table width="100%" border="1" rules="all">
@@ -394,13 +384,13 @@ INNER JOIN clientes ON cli_id=rem_cliente
 									$meses = array("", "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE");
 									$estadosCertificados = array("", "Vigente", "Vencido", "Provisional");						
 
-									while ($res = mysql_fetch_array($consulta)) {
+									while ($res = mysqli_fetch_array($consulta)) {
 
-										$camposRemision = mysql_fetch_array(mysql_query("SELECT 
+										$camposRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT 
 										DAY(rem_fecha), MONTH(rem_fecha), YEAR(rem_fecha),
 										DAY(DATE_ADD(rem_fecha, INTERVAL '" . $res['rem_tiempo_certificado'] . "' MONTH)), MONTH(DATE_ADD(rem_fecha, INTERVAL '" . $res['rem_tiempo_certificado'] . "' MONTH)), YEAR(DATE_ADD(rem_fecha, INTERVAL '" . $res['rem_tiempo_certificado'] . "' MONTH))
 										FROM remisiones 
-										WHERE rem_id='" . $res['rem_id'] . "'", $conexion));
+										WHERE rem_id='" . $res['rem_id'] . "'"));
 
 										$mesSiguiente = date("m") + 1;
 
@@ -417,12 +407,12 @@ INNER JOIN clientes ON cli_id=rem_cliente
 											continue;
 										}
 
-										$cantidadIngresos = mysql_fetch_array(mysql_query("SELECT COUNT(*), MAX(rem_id) FROM remisiones 
-											WHERE rem_serial='" . $res['rem_serial'] . "' AND rem_serial!=0", $conexion));
+										$cantidadIngresos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT COUNT(*), MAX(rem_id) FROM remisiones 
+											WHERE rem_serial='" . $res['rem_serial'] . "' AND rem_serial!=0"));
 										$cantIngresos = $cantidadIngresos[0];
 										if ($cantidadIngresos[0] == 0) $cantIngresos = 1;
 
-										$ultimoIngreso = mysql_fetch_array(mysql_query("SELECT rem_fecha FROM remisiones WHERE rem_id='" . $cantidadIngresos[1] . "'", $conexion));
+										$ultimoIngreso = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT rem_fecha FROM remisiones WHERE rem_id='" . $cantidadIngresos[1] . "'"));
 									?>
 										<tr>
 											<td align="center"><?= $conta; ?></td>
@@ -461,9 +451,8 @@ INNER JOIN clientes ON cli_id=rem_cliente
 							if(isset($_GET["desdeF"]) and $_GET["desdeF"]!=""){$filtro .= " AND (factura_fecha_propuesta>='".$_GET["desdeF"]."')";}
 							if(isset($_GET["hastaF"]) and $_GET["hastaF"]!=""){$filtro .= " AND (factura_fecha_propuesta<='".$_GET["hastaF"]."')";}
 
-							$consulta = mysql_query("SELECT * FROM remisiones
-INNER JOIN clientes ON cli_id=rem_cliente
-", $conexion);
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
+INNER JOIN clientes ON cli_id=rem_cliente");
 						?>
 							<div align="center">
 								<table width="100%" border="1" rules="all">
@@ -483,20 +472,19 @@ INNER JOIN clientes ON cli_id=rem_cliente
 									</thead>
 									<tbody>
 										<?php
-										$consulta = mysql_query("SELECT * FROM facturas
+										$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas
 									INNER JOIN clientes ON cli_id=factura_cliente
 									INNER JOIN usuarios ON usr_id=factura_creador
 									WHERE factura_id=factura_id $filtro
 									ORDER BY factura_vendedor
-									", $conexion);
+									");
 
 										$no = 1;
-										while ($res = mysql_fetch_array($consulta)) {
-											$vendedor = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='" . $res['factura_vendedor'] . "'", $conexion));
+										while ($res = mysqli_fetch_array($consulta)) {
+											$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $res['factura_vendedor'] . "'"));
 
-											$valorFactura = mysql_fetch_array(mysql_query("SELECT SUM(czpp_cantidad * czpp_valor) FROM cotizacion_productos 
-								WHERE czpp_cotizacion='" . $res['factura_id'] . "' and czpp_tipo=4
-								", $conexion));
+											$valorFactura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT SUM(czpp_cantidad * czpp_valor) FROM cotizacion_productos 
+								WHERE czpp_cotizacion='" . $res['factura_id'] . "' and czpp_tipo=4"));
 
 											$pCom = $configuracion['conf_comision_vendedores'] / 100;
 
@@ -511,12 +499,12 @@ INNER JOIN clientes ON cli_id=rem_cliente
 												<td><?= strtoupper($res['cli_nombre']); ?></td>
 												<td>
 													<?php
-													$productos = mysql_query("SELECT * FROM cotizacion_productos
+													$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
 										INNER JOIN productos ON prod_id=czpp_producto
 										WHERE czpp_cotizacion='" . $res['factura_id'] . "' AND czpp_tipo=4
-										", $conexion);
+										");
 													$i = 1;
-													while ($prod = mysql_fetch_array($productos)) {
+													while ($prod = mysqli_fetch_array($productos)) {
 														echo "<b>" . $i . ".</b> " . $prod['prod_nombre'] . ", ";
 														$i++;
 													}

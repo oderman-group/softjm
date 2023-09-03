@@ -31,11 +31,11 @@ $filtro2 = '';
 if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro2 .= " AND (cli_estado_mercadeo_fecha>='".$_GET["desde"]."')";}
 if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro2 .= " AND (cli_estado_mercadeo_fecha<='".$_GET["hasta"]."')";}	
 	
-$usuarios = mysql_query("SELECT * FROM usuarios 
+$usuarios = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios 
 WHERE usr_bloqueado=0 $filtro1
-",$conexion);
-while($usr = mysql_fetch_array($usuarios)){
-	$cte = mysql_fetch_array(mysql_query("
+");
+while($usr = mysqli_fetch_array($usuarios)){
+	$cte = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 	SELECT
 	(SELECT COUNT(cli_id) FROM clientes WHERE cli_estado_mercadeo_usuario='".$usr['usr_id']."' AND cli_estado_mercadeo=1 $filtro2),
 	(SELECT COUNT(cli_id) FROM clientes WHERE cli_estado_mercadeo_usuario='".$usr['usr_id']."' AND cli_estado_mercadeo=2 $filtro2),
@@ -43,7 +43,7 @@ while($usr = mysql_fetch_array($usuarios)){
 	(SELECT COUNT(cli_id) FROM clientes WHERE cli_estado_mercadeo_usuario='".$usr['usr_id']."' AND cli_estado_mercadeo=4 $filtro2),
 	(SELECT COUNT(cli_id) FROM clientes WHERE cli_estado_mercadeo_usuario='".$usr['usr_id']."' AND cli_estado_mercadeo=5 $filtro2),
 	(SELECT COUNT(cli_id) FROM clientes WHERE cli_estado_mercadeo_usuario='".$usr['usr_id']."' AND cli_estado_mercadeo=6 $filtro2)
-	",$conexion));
+	"));
 	
 	if($cte[0]==0 and $cte[1]==0 and $cte[2]==0 and $cte[3]==0 and $cte[4]==0 and $cte[5]==0) continue;
 	$cotizacionesResultados .= "['".strtoupper($usr[14])."', '".$cte[0]."', '".$cte[1]."', '".$cte[2]."', '".$cte[3]."', '".$cte[4]."', '".$cte[5]."'],";	

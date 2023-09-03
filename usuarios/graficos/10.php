@@ -28,12 +28,12 @@ $filtro2 = '';
 if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro2 .= " AND (hil_fecha>='".$_GET["desde"]."')";}
 if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro2 .= " AND (hil_fecha<='".$_GET["hasta"]."')";}
 
-$clientes = mysql_query("SELECT usr_seudonimo, COUNT(hil_id) AS cant FROM historial_acciones
+$clientes = mysqli_query($conexionBdPrincipal,"SELECT usr_seudonimo, COUNT(hil_id) AS cant FROM historial_acciones
 INNER JOIN usuarios ON usr_id=hil_usuario AND usr_bloqueado=0
 WHERE hil_titulo=1 $filtro2
 GROUP BY hil_usuario ORDER BY cant DESC LIMIT 0,10
-",$conexion);
-while($cte = mysql_fetch_array($clientes)){
+");
+while($cte = mysqli_fetch_array($clientes)){
 	//if($cte[3]==0) continue;
 	$cotizacionesResultados .= "['".$cte[0]."', '".$cte[1]."'],";
 }	

@@ -1,6 +1,6 @@
 <?php include("../sesion.php"); ?>
 <?php include("../../conexion.php"); ?>
-<?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1", $conexion)); ?>
+<?php $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1")); ?>
 <!DOCTYPE HTML>
 <html lang="en">
 
@@ -29,15 +29,14 @@
 		<tbody>
 			<?php
 			$no = 1;
-			$consulta = mysql_query("SELECT * FROM cotizacion_productos 
+			$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
 									LEFT JOIN usuarios ON usr_id=czpp_aprobado_usuario
 									LEFT JOIN productos ON prod_id=czpp_producto
 									LEFT JOIN combos ON combo_id=czpp_combo
 									WHERE czpp_descuento_especial>0
-									ORDER BY czpp_cotizacion
-									", $conexion);
+									ORDER BY czpp_cotizacion");
 
-			while ($res = mysql_fetch_array($consulta)) {
+			while ($res = mysqli_fetch_array($consulta)) {
 
 				$tipo = 'PRODUCTO';
 				if($res['czpp_combo']!=""){

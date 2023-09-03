@@ -28,11 +28,11 @@ if(isset($_GET["usuario"]) and $_GET["usuario"]!=""){$filtro2 .= " AND (proy_res
 if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro2 .= " AND (proy_inicio>='".$_GET["desde"]."')";}
 if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro2 .= " AND (proy_inicio<='".$_GET["hasta"]."')";}
 
-$clientes = mysql_query("SELECT proy_titulo, ROUND(AVG(ptar_avance),0) FROM proyectos_tareas
+$clientes = mysqli_query($conexionBdPrincipal,"SELECT proy_titulo, ROUND(AVG(ptar_avance),0) FROM proyectos_tareas
 INNER JOIN proyectos ON proy_id=ptar_id_proyecto $filtro2
 GROUP BY ptar_id_proyecto
-",$conexion);
-while($cte = mysql_fetch_array($clientes)){
+");
+while($cte = mysqli_fetch_array($clientes)){
 	//if($cte[3]==0) continue;
 	$cotizacionesResultados .= "{low: 0, high: ".$cte[1].", x: '".$cte[0]."'},";
 }	

@@ -1,6 +1,6 @@
 <?php include("../sesion.php"); ?>
 <?php include("../../conexion.php"); ?>
-<?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1", $conexion)); ?>
+<?php $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1")); ?>
 <!DOCTYPE HTML>
 <html lang="en">
 
@@ -28,29 +28,33 @@
 		<tbody>
 			<?php
 			$no = 1;
-			$consulta = mysql_query("SELECT * FROM combos", $conexion);
+			$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos");
 
-			while ($res = mysql_fetch_array($consulta)) {
-				$datosCombos = mysql_query("SELECT ROUND((SUM(copp_cantidad)*prod_precio),0) FROM combos
+			while ($res = mysqli_fetch_array($consulta)) {
+				$datosCombos = mysqli_query($conexionBdPrincipal,"SELECT ROUND((SUM(copp_cantidad)*prod_precio),0) FROM combos
 								INNER JOIN combos_productos ON copp_combo=combo_id
 								INNER JOIN productos ON prod_id=copp_producto
 								WHERE combo_id='" . $res['combo_id'] . "'
-								GROUP BY copp_producto
-								", $conexion);
+								GROUP BY copp_producto");
 
 				$precioCombo = 0;
-				while ($dCombos = mysql_fetch_array($datosCombos)) {
+				while ($dCombos = mysqli_fetch_array($datosCombos)) {
 					$precioCombo += $dCombos[0];
 				}
 
-				$dcto = $res['combo_descuento_dealer'] / 100;
+				$dcto = 0;
+				$comboDcto=0;
+				if(!empty($res['combo_descuento_dealer'])){
+					$comboDcto=$res['combo_descuento_dealer'];
+					$dcto = $res['combo_descuento_dealer'] / 100;
+				}
 				$precioFinal = round($precioCombo - ($precioCombo * $dcto), 0);
 			?>
 				<tr style="height: 30px; font-size: 15px; background-color: yellow;">
 					<td align="center"><?= $no; ?></td>
 					<td><?= $res['combo_nombre']; ?></td>
 					<td>$<?= number_format($precioCombo, 0, ".", "."); ?></td>
-					<td align="center"><?= $res['combo_descuento_dealer']; ?>%</td>
+					<td align="center"><?= $comboDcto; ?>%</td>
 					<td>$<?= number_format($precioFinal, 0, ".", "."); ?></td>
 					<td><?= $estadoRegistros[$res['combo_estado']]; ?></td>
 				</tr>
@@ -65,13 +69,16 @@
 
 				<?php
 				$nop = 1;
-				$productos = mysql_query("SELECT * FROM productos 
+				$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 				INNER JOIN productos_categorias ON catp_id=prod_categoria
 				INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='".$res['combo_id']."'
-				ORDER BY copp_id",$conexion);
-				while($prod = mysql_fetch_array($productos)){
+				ORDER BY copp_id");
+				while($prod = mysqli_fetch_array($productos)){
 						
-					$utilidadDealer = $prod['prod_descuento2'] / 100;
+					$utilidadDealer = 0;
+					if(!empty($prod['prod_descuento2'])){
+						$utilidadDealer = $prod['prod_descuento2'] / 100;
+					}
 					$precioDealer = $prod['prod_costo'] + ($prod['prod_costo'] * $utilidadDealer);
 
 					$subtotal = ($precioDealer * $prod['copp_cantidad']);

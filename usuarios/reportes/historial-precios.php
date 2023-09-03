@@ -1,6 +1,6 @@
 <?php include("../sesion.php"); ?>
 <?php include("../../conexion.php"); ?>
-<?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1", $conexion)); ?>
+<?php $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1")); ?>
 <!DOCTYPE HTML>
 <html lang="en">
 
@@ -49,23 +49,21 @@ $arrayMeses = array("","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio",
 			//if(isset($_POST["hasta"]) and $_POST["hasta"]!=""){$filtro .= " AND (php_fecha_cambio<='".$_POST["hasta"]."')";}
 
 			$no = 1;
-			$consulta = mysql_query("SELECT * FROM productos_historial_precios 
+			$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_historial_precios 
 							INNER JOIN productos ON prod_id=php_producto
 							INNER JOIN usuarios ON usr_id=php_usuario
 							WHERE php_id=php_id $filtro
 							GROUP BY php_producto
-							ORDER BY php_id DESC
-							", $conexion);
+							ORDER BY php_id DESC");
 
-			while ($res = mysql_fetch_array($consulta)) {
+			while ($res = mysqli_fetch_array($consulta)) {
 
-				$cambios = mysql_num_rows(mysql_query("SELECT * FROM productos_historial_precios WHERE php_producto='".$res['prod_id']."'",$conexion));
+				$cambios = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_historial_precios WHERE php_producto='".$res['prod_id']."'"));
 
-				$precios = mysql_fetch_array(mysql_query("SELECT * FROM productos_historial_precios 
+				$precios = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_historial_precios 
 					WHERE php_producto='".$res['prod_id']."'
 					ORDER BY php_id DESC
-					LIMIT 0,1
-					",$conexion));
+					LIMIT 0,1"));
 			?>
 				<tr>
 					<td align="center"><?= $no; ?></td>
@@ -97,8 +95,8 @@ $arrayMeses = array("","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio",
 if($_POST["mostrar"] == 2){?>
 
 	<?php
-	$combos = mysql_query("SELECT * FROM combos",$conexion);
-	while($combo = mysql_fetch_array($combos)){
+	$combos = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos");
+	while($combo = mysqli_fetch_array($combos)){
 	?>
 
 	<h2><?=$combo['combo_nombre'];?></h2>
@@ -119,17 +117,16 @@ if($_POST["mostrar"] == 2){?>
 			<tbody>
 				<?php
 				$no = 1;
-				$consulta = mysql_query("SELECT * FROM combos_productos 
+				$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos_productos 
 								INNER JOIN productos ON prod_id=copp_producto
 								WHERE copp_combo='".$combo['combo_id']."'
 								GROUP BY copp_producto
-								ORDER BY copp_id DESC
-								", $conexion);
+								ORDER BY copp_id DESC");
 
 				$totalOrginial = 0;
 				$totalActual = 0;
 
-				while ($res = mysql_fetch_array($consulta)) {
+				while ($res = mysqli_fetch_array($consulta)) {
 
 					$colorPrecio = '';
 					if($res['copp_precio'] != $res['prod_precio']){

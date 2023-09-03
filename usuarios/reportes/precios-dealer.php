@@ -1,6 +1,6 @@
 <?php include("../sesion.php"); ?>
 <?php include("../../conexion.php"); ?>
-<?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1", $conexion)); ?>
+<?php $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1")); ?>
 <!DOCTYPE HTML>
 <html lang="en">
 
@@ -30,14 +30,19 @@
 		<tbody>
 			<?php
 			$no = 1;
-			$consulta = mysql_query("SELECT * FROM productos 
+			$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 							LEFT JOIN productos_categorias ON catp_id=prod_categoria
-							WHERE prod_descuento2>0
-							", $conexion);
+							WHERE prod_descuento2>0 ");
 
-			while ($res = mysql_fetch_array($consulta)) {
-				$utilidadDealer = $res['prod_descuento2'] / 100;
-				$precioDealer = $res['prod_costo'] + ($res['prod_costo'] * $utilidadDealer);
+			while ($res = mysqli_fetch_array($consulta)) {
+				$utilidadDealer = 0;
+				if(!empty($res['prod_descuento2'])){
+					$utilidadDealer = $res['prod_descuento2'] / 100;
+				}
+				$precioDealer = 0;
+				if(!empty($res['prod_costo'])){
+					$precioDealer = $res['prod_costo'] + ($res['prod_costo'] * $utilidadDealer);
+				}
 			?>
 				<tr>
 					<td align="center"><?= $no; ?></td>
