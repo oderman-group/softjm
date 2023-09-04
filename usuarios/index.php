@@ -231,7 +231,7 @@ include("includes/head.php");
 
 							<div class="content-widgets gray">
 								<div class="widget-head green">
-									<h3><i class="icon-download"></i> Exportar Excell</h3>
+									<h3><i class="icon-download"></i> Exportar Excel</h3>
 								</div>
 								<div class="widget-container">
 									<ul class="sample-noty">
