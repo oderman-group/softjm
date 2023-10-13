@@ -1,7 +1,7 @@
 <?php 
 include("sesion.php");
 
-$idPagina = 19;
+$idPagina = 256;
 $tituloPagina = "Acceso a documentos";
 
 include("verificar-paginas.php");

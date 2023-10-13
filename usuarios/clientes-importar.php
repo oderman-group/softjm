@@ -1,6 +1,6 @@
 <?php include("sesion.php");?>
 <?php
-$idPagina = 4;
+$idPagina = 252;
 $paginaActual['pag_nombre'] = "Importar clientes";
 ?>
 <?php include("includes/verificar-paginas.php");?>

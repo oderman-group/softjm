@@ -1,6 +1,6 @@
 <?php
 if(!isset($idPagina)){
-	$idPagina = 1;
+	$idPagina = 251;
 }
 /*
 //PAGINAS A LAS QUE NO TIENE PERMISO EL ROL DE USUARIO

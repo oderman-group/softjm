@@ -1,6 +1,6 @@
 <?php include("sesion.php");?>
 <?php
-$idPagina = 103;
+$idPagina = 269;
 $paginaActual['pag_nombre'] = "Asuntos de tikets";
 ?>
 <?php

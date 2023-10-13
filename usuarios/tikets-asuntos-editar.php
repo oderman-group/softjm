@@ -1,6 +1,6 @@
 <?php include("sesion.php");?>
 <?php
-$idPagina = 105;
+$idPagina = 271;
 $paginaActual['pag_nombre'] = "Editar asuntos de tikets";
 ?>
 <?php include("includes/verificar-paginas.php");?>

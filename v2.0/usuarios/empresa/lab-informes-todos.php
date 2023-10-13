@@ -1,7 +1,7 @@
 <?php
 include("sesion.php"); //exit();
 include("../compartido/head.php");
-$idPagina = 1;
+$idPagina = 241;
 $tituloPagina = "Informes todos";
 include("verificar-paginas.php");
 ?>

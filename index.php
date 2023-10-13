@@ -38,7 +38,7 @@ $configuracion = mysqli_fetch_array($consultaConfiguracion, MYSQLI_BOTH);
           
             <div class="auth-form-transparent text-left p-3">
               <div class="brand-logo">
-                <img src="usuarios/files/<?= $configuracion['conf_logo']; ?>" alt="<?= $configuracion['conf_empresa']; ?>">
+                <img src="usuarios/files/orion-600.png" alt="Logo Orion">
               </div>
 
               <?php 
