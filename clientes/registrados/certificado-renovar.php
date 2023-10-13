@@ -1,7 +1,7 @@
 <?php 
 include("sesion.php");
 
-$idPagina = 19;
+$idPagina = 254;
 $tituloPagina = "Renovar certificado";
 
 include("verificar-paginas.php");

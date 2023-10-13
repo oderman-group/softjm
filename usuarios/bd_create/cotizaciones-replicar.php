@@ -1,7 +1,7 @@
 <?php   
 require_once("../sesion.php");
 
-$idPagina = 18;
+$idPagina = 253;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 $consulta= $conexionBdPrincipal->query("INSERT INTO cotizacion (cotiz_fecha_propuesta, cotiz_descripcion, cotiz_valor, cotiz_observaciones, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, cotiz_creador, cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, cotiz_fecha_creacion, cotiz_moneda) SELECT cotiz_fecha_propuesta, cotiz_descripcion, cotiz_valor, cotiz_observaciones, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, '" . $_SESSION["id"] . "', cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, now(), cotiz_moneda FROM cotizacion WHERE cotiz_id='" . $_GET["id"] . "'");
 $idInsert = mysqli_insert_id($conexionBdPrincipal);

@@ -1,6 +1,6 @@
 <?php include("sesion.php");?>
 <?php
-$idPagina = 108;
+$idPagina = 272;
 $paginaActual['pag_nombre'] = "Gestiones";
 ?>
 <?php include("includes/verificar-paginas.php");?>
