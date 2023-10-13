@@ -58,13 +58,25 @@ include("includes/js-formularios.php");
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="bd_create/usuarios-guardar.php">
-                            	
-                                <div class="control-group">
-									<label class="control-label">Usuario</label>
-									<div class="controls">
-										<input type="text" class="span4" name="usuario" required>
-									</div>
-								</div>
+							<?php
+													$clio_id = 1; // organizacion ID
+													$query = "SELECT * FROM clientes_orion WHERE clio_id = $clio_id";
+													$result = $conexionBdAdmin->query($query);
+													if ($result && $result->num_rows > 0) {
+															$row = $result->fetch_assoc();
+															$dominio = $row['clio_dominio'];
+													} else {
+															$dominio = 'Dominio no encontrado';
+													}
+
+									?>
+									<div class="control-group">
+                    <label class="control-label">Usuario</label>
+                    <div class="controls">
+                      <input type="text" class="span2" name="usuario" required>
+                      <input type="text" class="span2 mr-0" value="<?= $dominio; ?>" readonly name="dominio">
+                    </div>
+                  </div>                
                                 
                                 <div class="control-group">
 									<label class="control-label">Contraseña</label>
