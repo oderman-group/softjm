@@ -1,43 +1,3 @@
-<?php
-switch($_SESSION["bd"]){
-	case "odermancom_jm_crm":
-		$bdEmpresa = "JMEQUIPOS";
-	break;
-
-	case "orioncrmcom_dev_jm_crm":
-		$bdEmpresa = "JMEQUIPOS";
-	break;
-		
-	case "odermancom_orioncrm_exacta":
-		$bdEmpresa = "EXACTA ING.";
-	break;
-		
-	case "odermancom_orioncrm_demo":
-		$bdEmpresa = "DEMO ORIÓN";
-	break;
-		
-	case "odermancom_orioncrm_ingestore":
-		$bdEmpresa = "INGESTORE";
-	break;
-		
-	case "odermancom_orioncrm_orion":
-		$bdEmpresa = "ORIÓN COMPANY";
-	break;
-		
-	case "odermancom_orioncrm_asalliancesas":
-		$bdEmpresa = "AS ALLIANCE SAS";
-	break;	
-
-	case "orioncrmcom_oscar":
-		$bdEmpresa = "OSCAR B.";
-	break;		
-		
-		
-	default:
-		$bdEmpresa = "CRM.";
-	break;		
-}
-?>
 <div class="loader"></div>
 
 <?php if( $datosUsuarioActual['usr_tipo']==1 || isset($_SESSION['admin']) ){?>
@@ -72,7 +32,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 				<div class="nav-collapse">
 					<ul class="nav">
 
-						<li><a style="font-weight: bold; color: yellow; font-size: 14px;"><?=$bdEmpresa;?></a></li>
+						<li><a style="font-weight: bold; color: yellow; font-size: 14px;"><?=$_SESSION["dataAdicional"]["nombre_empresa"];?></a></li>
 
 						<?php if(validarAccesoModulo($configuracion['conf_id_empresa'], 1)){?>
 							<li class="dropdown"><a href="index.php"><i class="icon-dashboard"></i> Escritorio</a></li>
