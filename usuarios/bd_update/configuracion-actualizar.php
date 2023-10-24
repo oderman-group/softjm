@@ -1,7 +1,7 @@
 <?php
 require_once("../sesion.php");
 
-$idPagina = 31;
+$idPagina = 265;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 

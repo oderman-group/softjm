@@ -2,8 +2,8 @@
     require_once("../sesion.php");
     $idPagina = 51;
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
-
-    $conexionBdPrincipal->query("INSERT INTO usuarios(usr_login, usr_clave, usr_tipo, usr_nombre, usr_email, usr_bloqueado, usr_ciudad, usr_area, usr_sucursal)VALUES('" . $_POST["usuario"] . "',SHA1('" . $_POST["clave"] . "'),'" . $_POST["tipoU"] . "','" . $_POST["nombre"] . "','" . $_POST["email"] . "',0,'" . $_POST["ciudad"] . "','" . $_POST["area"] . "', '" . $_POST["sucursal"] . "')");
+    $usr_login = $_POST["usuario"] . $_POST["dominio"];
+    $conexionBdPrincipal->query("INSERT INTO usuarios(usr_login, usr_clave, usr_tipo, usr_nombre, usr_email, usr_bloqueado, usr_ciudad, usr_area, usr_sucursal)VALUES('" . $usr_login . "',SHA1('" . $_POST["clave"] . "'),'" . $_POST["tipoU"] . "','" . $_POST["nombre"] . "','" . $_POST["email"] . "',0,'" . $_POST["ciudad"] . "','" . $_POST["area"] . "', '" . $_POST["sucursal"] . "')");
 
     $idInsertU = mysqli_insert_id($conexionBdPrincipal);
     $numero = (count($_POST["zona"]));

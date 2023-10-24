@@ -1,7 +1,7 @@
 <?php
 include("sesion.php");
 
-$idPagina = 19;
+$idPagina = 257;
 $tituloPagina = "Editar Perfil";
 
 include("verificar-paginas.php");

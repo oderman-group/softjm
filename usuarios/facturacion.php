@@ -1,7 +1,7 @@
 <?php 
 include("sesion.php");
 
-$idPagina = 20;
+$idPagina = 259;
 $paginaActual['pag_nombre'] = "Productos a clientes";
 include("includes/verificar-paginas.php");
 include("includes/head.php");

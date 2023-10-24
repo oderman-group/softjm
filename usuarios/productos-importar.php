@@ -37,6 +37,7 @@ include("includes/texto-editor.php");
 	<?php include("includes/encabezado.php");?>
 	<div class="main-wrapper">
 		<div class="container-fluid">
+			<?php include("includes/notificaciones.php"); ?>
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
@@ -177,6 +178,14 @@ include("includes/texto-editor.php");
 											</div>
 										</div>
 									</div>
+                                
+									<div class="control-group">
+										<label class="control-label">Coloque el número de la última fila hasta donde quiere que el archivo sea leido</label>
+										<div class="controls">
+											<input type="number" class="span3" name="filaFinal" id="filaFinal" value="200" required><br>
+											<span style="font-size: 12px; color:#6017dc;">Fila hasta donde hay información de los estudiantes y acudientes. Esto se usa para evitar que se lean filas que no tienen información.</span>
+										</div>
+									</div> 
                                 </fieldset>   
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>

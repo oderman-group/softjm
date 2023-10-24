@@ -1,7 +1,7 @@
 <?php
 include("sesion.php");
 
-$idPagina = 127;
+$idPagina = 274;
 $tituloPagina = "Filtro de cotizaciones con servicios";
 
 include("includes/verificar-paginas.php");

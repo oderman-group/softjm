@@ -1,6 +1,6 @@
 <?php include("sesion.php");?>
 <?php
-$idPagina = 4;
+$idPagina = 15;
 $paginaActual['pag_nombre'] = "Enviar mensaje";
 ?>
 <?php include("includes/verificar-paginas.php");?>

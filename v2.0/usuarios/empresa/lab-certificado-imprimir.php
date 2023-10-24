@@ -1,7 +1,7 @@
 <?php
 include("sesion.php");
 include("../compartido/head.php");
-$idPagina = 1;
+$idPagina = 240;
 $tituloPagina = "Cotización";
 //include("verificar-paginas.php");
 

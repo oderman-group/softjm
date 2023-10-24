@@ -4,6 +4,12 @@ $idPagina = 3;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+
+if ( !empty($_SESSION["dataAdicional"]["dominio_empresa"]) ) {
+		$dominio = $_SESSION["dataAdicional"]["dominio_empresa"];
+} else {
+		$dominio = 'Dominio no encontrado';
+}
 ?>
 <!-- styles -->
 
@@ -58,13 +64,13 @@ include("includes/js-formularios.php");
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="bd_create/usuarios-guardar.php">
-                            	
-                                <div class="control-group">
+								<div class="control-group">
 									<label class="control-label">Usuario</label>
 									<div class="controls">
-										<input type="text" class="span4" name="usuario" required>
+										<input type="text" class="span2" name="usuario" required>
+										<input type="text" class="span2 mr-0" value="<?= $dominio; ?>" readonly name="dominio">
 									</div>
-								</div>
+								</div>                
                                 
                                 <div class="control-group">
 									<label class="control-label">Contraseña</label>

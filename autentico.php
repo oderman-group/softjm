@@ -30,14 +30,25 @@ if($num>0)
 	if($fila[6]==1){header("Location:".$urlRed."/index.php?error=4");exit();}
 	//INICIO SESION
 	//session_start();
-	$_SESSION["id"] = $fila[0];
+	$_SESSION["id"] = $fila['usr_id'];
 	//$_SESSION["idUsuario"] = $fila[0];
 	if(!isset($_POST["idseg"]) or !is_numeric($_POST["idseg"])){$url = 'usuarios/';}
 	else{$url = 'usuarios/clientes-seguimiento-editar.php?id='.$_POST["idseg"];}
 	
 	$conexionBdPrincipal->query("UPDATE usuarios SET usr_sesion=1, usr_ultimo_ingreso=now(), usr_intentos_fallidos=0 WHERE usr_id='".$fila[0]."'");
 	//if(mysql_errno()!=0){echo mysql_error();exit();}
-	
+
+	$consultaEmpresaSesion = $conexionBdAdmin->query("SELECT * FROM clientes_orion WHERE clio_id=".$fila['usr_id_empresa']);
+	$datosEmpresaSesion    = mysqli_fetch_array($consultaEmpresaSesion, MYSQLI_BOTH);
+
+	$_SESSION["dataAdicional"] = [
+		'id_empresa' 	       => $datosEmpresaSesion['clio_id'],
+		'nombre_empresa'       => $datosEmpresaSesion['clio_empresa'],
+		'dominio_empresa'      => $datosEmpresaSesion['clio_dominio'],
+		'usuario_acceso'       => $fila['usr_login'],
+		'datos_usuario_actual' => $fila
+	];
+
 	header("Location:".$url);	
 	exit();
 }else{

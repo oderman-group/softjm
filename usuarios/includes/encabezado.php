@@ -1,48 +1,8 @@
-<?php
-switch($_SESSION["bd"]){
-	case "odermancom_jm_crm":
-		$bdEmpresa = "JMEQUIPOS";
-	break;
-
-	case "orioncrmcom_dev_jm_crm":
-		$bdEmpresa = "JMEQUIPOS";
-	break;
-		
-	case "odermancom_orioncrm_exacta":
-		$bdEmpresa = "EXACTA ING.";
-	break;
-		
-	case "odermancom_orioncrm_demo":
-		$bdEmpresa = "DEMO ORIÓN";
-	break;
-		
-	case "odermancom_orioncrm_ingestore":
-		$bdEmpresa = "INGESTORE";
-	break;
-		
-	case "odermancom_orioncrm_orion":
-		$bdEmpresa = "ORIÓN COMPANY";
-	break;
-		
-	case "odermancom_orioncrm_asalliancesas":
-		$bdEmpresa = "AS ALLIANCE SAS";
-	break;	
-
-	case "orioncrmcom_oscar":
-		$bdEmpresa = "OSCAR B.";
-	break;		
-		
-		
-	default:
-		$bdEmpresa = "CRM.";
-	break;		
-}
-?>
 <div class="loader"></div>
 
 <?php if( $datosUsuarioActual['usr_tipo']==1 || isset($_SESSION['admin']) ){?>
 
-	<div style="height:50px; width:100%; background-color:black; padding:2px; color:#42FF00; display:flex; justify-content: center; align-items: center;">
+	<div style="height:50px; width:100%; background-color:<?=COLOR_BARRA_DEV;?>; padding:2px; color:<?=COLOR_LETRA_BARRA_DEV;?>; display:flex; justify-content: center; align-items: center; font-size:11px;">
 		<b>Sesion DB:&nbsp;</b> <?=$_SESSION["bd"]; ?>&nbsp;|&nbsp;
 		<b>ID Company:&nbsp;</b> <?=$configuracion['conf_id_empresa']; ?>&nbsp;|&nbsp;
 		<b>Current User ID:&nbsp;</b> <?=$_SESSION["id"]; ?>&nbsp;|&nbsp;
@@ -72,7 +32,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 				<div class="nav-collapse">
 					<ul class="nav">
 
-						<li><a style="font-weight: bold; color: yellow; font-size: 14px;"><?=$bdEmpresa;?></a></li>
+						<li><a style="font-weight: bold; color: yellow; font-size: 14px;"><?=$_SESSION["dataAdicional"]["nombre_empresa"];?></a></li>
 
 						<?php if(validarAccesoModulo($configuracion['conf_id_empresa'], 1)){?>
 							<li class="dropdown"><a href="index.php"><i class="icon-dashboard"></i> Escritorio</a></li>

@@ -2,7 +2,7 @@
 require_once("../sesion.php");
 require_once("../class/BaseDatos.php");
 
-$idPagina = 227;
+$idPagina = 280;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 

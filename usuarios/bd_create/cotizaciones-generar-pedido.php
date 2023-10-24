@@ -1,7 +1,7 @@
 <?php   
 require_once("../sesion.php");
 
-$idPagina = 23;
+$idPagina = 263;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 $generoPedido = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM pedidos WHERE pedid_cotizacion='" . $_GET["id"] . "'"), MYSQLI_BOTH);

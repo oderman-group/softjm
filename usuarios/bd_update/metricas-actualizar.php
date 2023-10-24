@@ -1,7 +1,7 @@
 <?php
 require_once("../sesion.php");
 
-$idPagina = 32;
+$idPagina = 266;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 $query = $conexionBdPrincipal->query("UPDATE metricas SET 

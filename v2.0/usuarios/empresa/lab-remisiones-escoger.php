@@ -1,7 +1,7 @@
 <?php
 include("sesion.php");
 include("../compartido/head.php");
-$idPagina = 1;
+$idPagina = 246;
 $tituloPagina = "Imprimir remisiones";
 include("verificar-paginas.php");
 ?>

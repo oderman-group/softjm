@@ -1,6 +1,6 @@
 <?php include("sesion.php");?>
 <?php
-$idPagina = 21;
+$idPagina = 262;
 $paginaActual['pag_nombre'] = "Imprimir remisiones";
 ?>
 <?php include("includes/verificar-paginas.php");?>

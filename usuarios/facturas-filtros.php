@@ -1,6 +1,6 @@
 <?php include("sesion.php");?>
 <?php
-$idPagina = 127;
+$idPagina = 102;
 $paginaActual['pag_nombre'] = "Filtro de cotización";
 ?>
 <?php include("includes/verificar-paginas.php");?>

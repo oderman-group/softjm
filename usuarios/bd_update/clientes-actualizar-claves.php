@@ -1,7 +1,7 @@
 <?php   
 require_once("../sesion.php");
 
-$idPagina = 17;
+$idPagina = 57;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes");

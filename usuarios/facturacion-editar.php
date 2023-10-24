@@ -1,7 +1,7 @@
 <?php 
 include("sesion.php");
 
-$idPagina = 22;
+$idPagina = 261;
 $paginaActual['pag_nombre'] = "Editar productos asignados";
 
 include("includes/verificar-paginas.php");
