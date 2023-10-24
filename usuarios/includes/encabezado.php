@@ -93,9 +93,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 								<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Informes</a>
 								<div class="dropdown-menu">
 									<ul>
-										<li><a href="#"><i class=" icon-file-alt"></i> Informes planos</a></li>
-										<li><a href="#"><i class=" icon-file-alt"></i> Excel</a></li>
-										<li><a href="#"><i class=" icon-file-alt"></i> Gráficos</a></li>
+										<li><a href="informes-todos.php"><i class=" icon-file-alt"></i> Informes</a></li>
 										<li><a href="estadisticas.php"><i class="icon-bar-chart"></i> Estadisticas</a></li>
 									</ul>
 								</div>
