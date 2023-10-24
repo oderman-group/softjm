@@ -74,7 +74,7 @@ include("includes/js-formularios.php");
                                     <div class="control-group">
                                         <label class="control-label">Usuario</label>
                                         <div class="controls">
-                                            <input type="text" class="span4" name="usuario" value="<?= $resultadoD['usr_login']; ?>" required>
+                                            <input type="text" class="span4" name="usuario" value="<?= $resultadoD['usr_login']; ?>" disabled>
                                         </div>
                                     </div>
 
