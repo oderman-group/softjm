@@ -58,7 +58,7 @@ $(function() {
         });
       });
 	  
-$(function(){
+//$(function(){
 		// global setting override
         /*
 		$.extend($.gritter.options, {
@@ -277,7 +277,10 @@ FLOT PIE CHART
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			
-			<?php if(isset($_GET["p"])){if($_GET["p"]==1){?>
+			<?php 
+		if(isset($_GET["p"])) {
+				if($_GET["p"]==1){
+			?>
 			<h2>CRM</h2>		
 			
 			<?php
@@ -527,7 +530,10 @@ FLOT PIE CHART
               </div>
 			
 			
-			<?php }}?>
+			<?php 
+			}
+		}
+		?>
 			
                 </div>
 			</div>
