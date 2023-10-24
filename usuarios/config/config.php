@@ -1,6 +1,6 @@
 <?php
-$consultaConfig2 = $conexionBdPrincipal->query("SELECT * FROM configuracion WHERE conf_id=1");
-$configuracion = mysqli_fetch_array($consultaConfig2, MYSQLI_BOTH);
+$consultaConfig2 = $conexionBdPrincipal->query("SELECT * FROM configuracion WHERE conf_id_empresa=".$_SESSION["dataAdicional"]["id_empresa"]);
+$configuracion   = mysqli_fetch_array($consultaConfig2, MYSQLI_BOTH);
 
 //CONFIGURACIÓN DE VARIABLES DEL PROGRAMA
 $monedas = array("","COP","USD");
