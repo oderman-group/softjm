@@ -42,7 +42,7 @@ switch($_SESSION["bd"]){
 
 <?php if( $datosUsuarioActual['usr_tipo']==1 || isset($_SESSION['admin']) ){?>
 
-	<div style="height:50px; width:100%; background-color:black; padding:2px; color:#42FF00; display:flex; justify-content: center; align-items: center;">
+	<div style="height:50px; width:100%; background-color:<?=COLOR_BARRA_DEV;?>; padding:2px; color:<?=COLOR_LETRA_BARRA_DEV;?>; display:flex; justify-content: center; align-items: center; font-size:11px;">
 		<b>Sesion DB:&nbsp;</b> <?=$_SESSION["bd"]; ?>&nbsp;|&nbsp;
 		<b>ID Company:&nbsp;</b> <?=$configuracion['conf_id_empresa']; ?>&nbsp;|&nbsp;
 		<b>Current User ID:&nbsp;</b> <?=$_SESSION["id"]; ?>&nbsp;|&nbsp;
