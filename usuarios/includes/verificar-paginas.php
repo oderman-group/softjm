@@ -13,6 +13,11 @@ if(!isset($idPagina)){
 		$mensaje= "La empresa NO tiene permiso a este modulo.";
 		$paso=false;
 	}
+	if($paso==true && !Modulos::validarRol([$idPagina], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+		$rutaSalida= "index.php";
+		$mensaje= "No tienes permiso para acceder a este pagina. Serás redireccionado al inicio.";
+		$paso=false;
+	}
 }
 if ($paso!=true) {
 ?>
