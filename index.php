@@ -25,6 +25,7 @@ $configuracion = mysqli_fetch_array($consultaConfiguracion, MYSQLI_BOTH);
 
 
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="https://kit.fontawesome.com/e84fa1cf78.js" crossorigin="anonymous"></script>
 
 
 </head>
@@ -108,9 +109,30 @@ $configuracion = mysqli_fetch_array($consultaConfiguracion, MYSQLI_BOTH);
                         <i class="fa fa-lock text-primary"></i>
                       </span>
                     </div>
-                    <input type="password" class="form-control form-control-lg border-left-0" placeholder="Contraseña" name="Clave">
+                    <input type="password" class="form-control form-control-lg border-left-0" placeholder="Contraseña" name="Clave" id="passwordInput">
+                    <div class="input-group-prepend bg-transparent" onclick="mostrarClave()">
+                      <span class="input-group-text bg-transparent border-left-0">
+                      <i class="fa-solid fa-eye" id="icoVer"></i>
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <script>
+                    function mostrarClave() {
+                        var campo = document.getElementById("passwordInput");
+                        var icoVer = document.getElementById("icoVer");
+
+                        if (campo.type === "password") {
+                            campo.type = "text";
+                            icoVer.classList.remove("fa-eye");
+                            icoVer.classList.add("fa-eye-slash");
+                        } else {
+                            campo.type = "password";
+                            icoVer.classList.remove("fa-eye-slash");
+                            icoVer.classList.add("fa-eye");
+                        }
+                    }
+                </script>
 
                 <?php
                 if (isset($_GET["error"]) and $_GET["error"] == 3) {
@@ -124,35 +146,14 @@ $configuracion = mysqli_fetch_array($consultaConfiguracion, MYSQLI_BOTH);
                   <input type="text" class="form-control form-control-lg border-left-0" name="suma" placeholder="Cuánto es <?= $numA1 . "+" . $numA2; ?>?" required autocomplete="off" style="font-weight: bold;" />
                 <?php } ?>
 
-                 
                 <div class="my-2 d-flex justify-content-between align-items-center">
                   
                   <a href="#" class="auth-link text-black">Olvidaste tu clave?</a>
                 </div>
-				
-                <!--
-        <div class="g-recaptcha" data-sitekey="6LcAsMUZAAAAAPoMH8oNDtCdYkF35qG5PZu8Xy2T"></div>
-        <br>-->
+
                 <div class="my-3">
                   <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">ENTRAR</button>
-                  <!--<a class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" href="../../index-2.html">ENTRAR</a>-->
                 </div>
-
-                <!-- 
-                <div class="mb-2 d-flex">
-                  <button type="button" class="btn btn-facebook auth-form-btn flex-grow mr-1">
-                    <i class="fab fa-facebook-f mr-2"></i>Facebook
-                  </button>
-                  <button type="button" class="btn btn-google auth-form-btn flex-grow ml-1">
-                    <i class="fab fa-google mr-2"></i>Google
-                  </button>
-                </div>
-				  
-                <div class="text-center mt-4 font-weight-light">
-                  Don't have an account? <a href="register-2.html" class="text-primary">Create</a>
-                </div>
-				-->
-
               </form>
             </div>
           </div>
