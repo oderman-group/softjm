@@ -8,7 +8,7 @@ if(!isset($idPagina)){
 	$consultaPaginaActual = $conexionBdAdmin->query("SELECT * FROM paginas WHERE pag_id='".$idPagina."'");
 	$paginaActual = mysqli_fetch_array($consultaPaginaActual, MYSQLI_BOTH);
 
-	if(!validarAccesoModulo($configuracion['conf_id_empresa'], $paginaActual['pag_id_modulo'])){
+	if(!Modulos::validarAccesoModulo($configuracion['conf_id_empresa'], $paginaActual['pag_id_modulo'], $conexionBdAdmin, $datosUsuarioActual)){
 		$rutaSalida= "index.php";
 		$mensaje= "La empresa NO tiene permiso a este modulo.";
 		$paso=false;

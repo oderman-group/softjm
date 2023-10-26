@@ -34,15 +34,15 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 
 						<li><a style="font-weight: bold; color: yellow; font-size: 14px;"><?=$_SESSION["dataAdicional"]["nombre_empresa"];?></a></li>
 
-						<?php if(validarAccesoModulo($configuracion['conf_id_empresa'], 1)){?>
+						<?php if(Modulos::validarAccesoModulo($configuracion['conf_id_empresa'], 1, $conexionBdAdmin, $datosUsuarioActual)){?>
 							<li class="dropdown"><a href="index.php"><i class="icon-dashboard"></i> Escritorio</a></li>
 						<?php }?>
 
-						<?php if(validarAccesoModulo($configuracion['conf_id_empresa'], 2)){?>
+						<?php if(Modulos::validarAccesoModulo($configuracion['conf_id_empresa'], 2, $conexionBdAdmin, $datosUsuarioActual)){?>
 							<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Sistema <b class="icon-angle-down"></b></a>
 							<div class="dropdown-menu">
 								<ul>
-								<?php if(validarAccesoModulo($configuracion['conf_id_empresa'], 8)){?>
+								<?php if(Modulos::validarAccesoModulo($configuracion['conf_id_empresa'], 8, $conexionBdAdmin, $datosUsuarioActual)){?>
 									<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Parametrización</a>
 										<div class="dropdown-menu">
 											<ul>
