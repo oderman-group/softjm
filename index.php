@@ -147,8 +147,7 @@ $configuracion = mysqli_fetch_array($consultaConfiguracion, MYSQLI_BOTH);
                 <?php } ?>
 
                 <div class="my-2 d-flex justify-content-between align-items-center">
-                  
-                  <a href="#" class="auth-link text-black">Olvidaste tu clave?</a>
+                  <a href="recuperar-clave.php" class="auth-link text-black">Olvidaste tu clave?</a>
                 </div>
 
                 <div class="my-3">
