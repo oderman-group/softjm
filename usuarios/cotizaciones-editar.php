@@ -22,7 +22,7 @@ if(isset($_GET["cte"])){
 ?>
 
 <link href="css/chosen.css" rel="stylesheet">
-
+<link href="../assets-login/plugins/select2/css/select2.css" rel="stylesheet" />
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -38,6 +38,7 @@ if(isset($_GET["cte"])){
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+<script src="../assets-login/plugins/select2/js/select2.js"></script>
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
@@ -422,34 +423,51 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 										<label class="control-label">Productos</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="producto[]" multiple>
-												<option value=""></option>
-												<?php
-												$filtroProd = '';
-												if(is_numeric($resultadoD['cotiz_proveedor']) and $resultadoD['cotiz_proveedor']!='0' and $resultadoD['cotiz_proveedor']!=''){ $filtroProd .=" AND prod_proveedor='".$resultadoD['cotiz_proveedor']."'";}
+											<select data-placeholder="Escoja una opción1..." class="span10" tabindex="2" name="producto[]" multiple id="product-select">
+											<?php
+            						$consultaProductos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, 
+																																			czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad
+                                                            FROM productos
+                                                            INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "'
+                                                            ORDER BY czpp_orden");
 
-												$conOp = $conexionBdPrincipal->query("SELECT prod_id, prod_referencia, prod_nombre, prod_existencias, prod_categoria FROM productos 
-												WHERE prod_id=prod_id $filtroProd
-												ORDER BY prod_nombre");
-												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-
-													if($resOp['prod_categoria'] == 28 and ($datosUsuarioActual[3]!=1 and $datosUsuarioActual[3]!=9) ){
-														continue;
-													}
-													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_producto, czpp_cotizacion 
-														FROM cotizacion_productos 
-														WHERE czpp_producto='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."'");
-													$productoN = $consultaCotizacionP->num_rows;
-
+												while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
+														$productoN = !empty($resProducto['czpp_id']) ? 1 : 0;
 												?>
-													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_id'].". ".$resOp['prod_referencia']." ".strtoupper($resOp['prod_nombre'])." - [HAY ".$resOp['prod_existencias']."]";?></option>
+													<option <?php if ($productoN > 0) {
+														echo "selected";
+												} ?>
+													value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
 												<?php
-												}
+													}
 												?>
 											</select>
 										</div>
-								   </div>
-								
+									</div>
+									<script>
+										$(document).ready(function () {
+												let productSelect = $("#product-select").select2({
+														placeholder: "Escoja una opción...",
+														multiple: true,
+														minimumInputLength: 3,
+														ajax: {
+																type: "GET",
+																url: "../usuarios/ajax/ajax-buscar-productos.php",
+																dataType: "json",
+																processResults: function (items) {
+																		return {
+																				results: items.map(function (item) {
+																						return {
+																								id: item.id,
+																								text: item.text,
+																						};
+																				})
+																		};
+																}
+														}
+												});
+										});
+									</script>
 								
 									<div class="control-group">
 										<label class="control-label">Servicios</label>
