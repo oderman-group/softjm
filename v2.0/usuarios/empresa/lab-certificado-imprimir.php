@@ -45,7 +45,7 @@ switch ($remision['rem_tipo_equipo']) {
 	case 3:
 		$pixeles1 = 20;
 		$pixeles2 = 1;
-		$hojas1 = 'Hoja 1 de 1';
+		$hojas1 = 'Hoja 1 de 2';
 		break;
 }
 ?>
@@ -191,6 +191,43 @@ switch ($remision['rem_tipo_equipo']) {
 	<?php
 	//PARA NIVELES
 	if ($remision['rem_tipo_equipo'] == 3 or $remision['rem_tipo_equipo'] == 5) { ?>
+		<table style="width:100%; font-size: 20px;" border="1" rules="all" align="center">
+			<tr>
+				<td align="center" width="50%">
+					<table style="width:100%; padding: 10px; font-size: 18px; height: 200px;" border="0" rules="groups" align="center">
+						<tr align="center">
+							<td align="center" colspan="2">
+								<h4 style="color: midnightblue;" align="center">DATOS DE TRAZABILIDAD EQUIPO PATRON UTILAZADO PARA REALIZAR EL AJUSTE</h4>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<h4 style="color: midnightblue;">PATRON N°1:</h4>
+								<p>LABORATORIO DE CALIBRACION DE EQUIPOS TOPOGRAFICOS- LACET DEL CDHC-SENA EXPIDE CERTIFICADO DE CALIBRACION  N° CAL-2023-0006 PARA NIVEL TOPOGRAFICO MARCA GEOMAX REFERENCIA ZOOM ZAL232 SERIAL:  214232213376.</p>
+								<h4 style="color: midnightblue;">PATRON N°2:</h4>
+								<p>LABORATORIO DE METROLOGIA ICONTEC EXPIDE CERTIFICADO N°56959 PARA CINTA METRICA MARCA STRAPPING REFERENCIA QK-5022.</p>
+							</td>
+						</tr>
+					</table>
+				</td>
+	
+				<td align="center" width="50%">
+					<table style="width:100%; padding: 10px; font-size: 18px; height: 200px;" border="0" rules="groups" align="center">
+						<tr align="center">
+							<td align="center" colspan="2">
+								<h4 style="color: midnightblue;" align="center">METODO DE AJUSTE UTILIZADO</h4>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<p>SUSTITUCION O (TRANSFERENCIA) MEDIANTE EL CUAL SE ESTABLECE CON PATRON DE TRABAJO LAS MEDIDAS MATERIALIZADAS DE REFERENCIA, LAS CUALES SERAN COMPARADAS CON LOS VALORES DEL EQUIPO A REALIZAR EL AJUSTE  PARA POSTERIORMENTE APLICAR LA CORRECCION DE ACUERDO CON LOS PARAMENTROS DE  TOLERANCIA ESTABLECIDOS POR EL FABRICANTE.</p>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+
 		<table style="width:100%; padding: 10px; font-size: 18px; height: 200px;" border="1" rules="groups" align="center">
 			<tr align="center">
 				<td align="center" colspan="2">
@@ -463,56 +500,75 @@ switch ($remision['rem_tipo_equipo']) {
 	<?php
 	//PARA NIVELES
 	if ($remision['rem_tipo_equipo'] == 3 OR $remision['rem_tipo_equipo'] == 5) { ?>
-
-		<h4 style="color: darkblue; margin-top: 10px;">LECTURAS</h4>
-		<table style="width:100%; padding: 20px; height: 80px;" border="0">
+		<table style="width:100%; padding: 10px; font-size: 18px; height: 180px;" border="1" rules="groups" align="center">
+			<tr align="center">
+				<td align="center" colspan="2">
+					<h4 style="color: midnightblue;" align="center">INSPECCION DEL SISTEMA DIFERENCIA DE ALTURA</h4>
+				</td>
+			</tr>
 			<tr>
-				<td width="30%">
-					<table style="width:100%;" border="0">
+				<td>
+					<table style="width:100%; padding: 20px; height: 80px;" border="0">
 						<tr>
-							<td><strong>L1:</strong></td>
-						</tr>
-						<tr>
-							<td style="border: thin; border-style: solid;" align="center"><?= $remision['rem_l1a']; ?></td>
-							<td> m</td>
-						</tr>
-						<tr>
-							<td style="border: thin; border-style: solid;" align="center"><?= $remision['rem_l1b']; ?></td>
-							<td> m</td>
-						</tr>
-						<tr>
-							<td style="border: thin; border-style: solid;" align="center"><?= $remision['rem_l1c']; ?></td>
-							<td> mm</td>
-						</tr>
-					</table>
-				</td>
+							<td width="50%">
+								<table style="width:50%;" align="center" border="0">
+									<tr>
+										<td colspan="3">
+											<h4 style="color: midnightblue;">INSPECCIÓN DE ENTRADA</h4>
+										</td>
+									</tr>
+									<tr>
+										<td style="width:60%; border: thin; border-style: solid;" align="center">LECTURA DE PUNTO A</td>
+										<td style="width:30%; border: thin; border-style: solid;" align="center"><?= $remision['rem_l1a']; ?></td>
+										<td style="width:10%;"> m</td>
+									</tr>
+									<tr>
+										<td style="width:60%; border: thin; border-style: solid;" align="center">LECTURA DE PUNTO B</td>
+										<td style="width:30%; border: thin; border-style: solid;" align="center"><?= $remision['rem_l1b']; ?></td>
+										<td style="width:10%;"> m</td>
+									</tr>
+									<tr>
+										<td style="width:60%; border: thin; border-style: solid;" align="center">DIFERENCIAL DE ALTURA</td>
+										<td style="width:30%; border: thin; border-style: solid;" align="center"><?= $remision['rem_l1c']; ?></td>
+										<td style="width:10%;"> mm</td>
+									</tr>
+								</table>
+							</td>
 
-				<td width="30%">
-					<table style="width:100%;" border="0">
-						<tr>
-							<td><strong>L2:</strong></td>
-						</tr>
-						<tr>
-							<td style="border: thin; border-style: solid;" align="center"><?= $remision['rem_l2a']; ?></td>
-							<td> m</td>
-						</tr>
-						<tr>
-							<td style="border: thin; border-style: solid;" align="center"><?= $remision['rem_l2b']; ?></td>
-							<td> m</td>
-						</tr>
-						<tr>
-							<td style="border: thin; border-style: solid;" align="center"><?= $remision['rem_l2c']; ?></td>
-							<td> mm</td>
-						</tr>
-					</table>
-				</td>
+							<td width="50%">
+								<table style="width:50%;" align="center" border="0">
+									<tr>
+										<td colspan="3">
+											<h4 style="color: midnightblue;">INSPECCIÓN DE SALIDA</h4>
+										</td>
+									</tr>
+									<tr>
+										<td style="width:60%; border: thin; border-style: solid;" align="center">LECTURA DE PUNTO A</td>
+										<td style="width:30%; border: thin; border-style: solid;" align="center"><?= $remision['rem_l2a']; ?></td>
+										<td style="width:10%;"> m</td>
+									</tr>
+									<tr>
+										<td style="width:60%; border: thin; border-style: solid;" align="center">LECTURA DE PUNTO B</td>
+										<td style="width:30%; border: thin; border-style: solid;" align="center"><?= $remision['rem_l2b']; ?></td>
+										<td style="width:10%;"> m</td>
+									</tr>
+									<tr>
+										<td style="width:60%; border: thin; border-style: solid;" align="center">DIFERENCIAL DE ALTURA</td>
+										<td style="width:30%; border: thin; border-style: solid;" align="center"><?= $remision['rem_l2c']; ?></td>
+										<td style="width:10%;"> mm</td>
+									</tr>
+								</table>
+							</td>
 
-				<td width="40%">
-					<table style="width:100%;" border="0">
-						<tr>
-							<td>ERROR DETECTADO</td>
-							<td style="border: thin; border-style: solid;" align="center"><?= $remision['rem_error_detectado']; ?></td>
-							<td> mm</td>
+							<!-- <td width="40%">
+								<table style="width:100%;" border="0">
+									<tr>
+										<td>ERROR DETECTADO</td>
+										<td style="border: thin; border-style: solid;" align="center"><?= $remision['rem_error_detectado']; ?></td>
+										<td> mm</td>
+									</tr>
+								</table>
+							</td> -->
 						</tr>
 					</table>
 				</td>
@@ -557,7 +613,7 @@ switch ($remision['rem_tipo_equipo']) {
 
 	<?php
 	//PARA ESTACIÓN Y TEODOLITO
-	if ($remision['rem_tipo_equipo'] == 1 or $remision['rem_tipo_equipo'] == 2) { ?>
+	if ($remision['rem_tipo_equipo'] == 1 or $remision['rem_tipo_equipo'] == 2 or $remision['rem_tipo_equipo'] == 3) { ?>
 
 
 		<div style="margin-top: <?= $pixeles2; ?>px;">
@@ -650,47 +706,76 @@ switch ($remision['rem_tipo_equipo']) {
 			</tr>
 		</table>
 
-		<table style="width:100%; height:250px; font-size: 18px;" border="1" rules="groups" align="center">
-			<tr align="center">
-				<td align="center" colspan="2">
-					<h4 style="color: midnightblue;" align="center">INSPECCIÓN DEL SISTEMA DE MEDIDA ANGULAR, COLIMADOR DE CUATRO TUBOS<br>
-						MODELO F420-4TA</h4>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					COMPENSADOR OPTICOMECÁNICO<br>
-					COMPENSADOR ELECTRÓNICO<br>
-					<strong>AJUSTE Y VERIFICACIÓN</strong>
-				</td>
-
-				<td align="center">
-					AJUSTE Y VERIFICACIÓN<br>
-					GENERAL DE FUNCIONES
-					<h3 style="color: midnightblue;"><?= $estadosCertificados[$remision['rem_estado_certificado']]; ?></h3>
-
-				</td>
-			</tr>
-		</table>
-
 		<?php
-		//sólo para estación total
-		if ($remision['rem_tipo_equipo'] == 1) { ?>
+		//PARA ESTACIÓN Y TEODOLITO
+		if ($remision['rem_tipo_equipo'] == 1 or $remision['rem_tipo_equipo'] == 2) { ?>
 			<table style="width:100%; height:250px; font-size: 18px;" border="1" rules="groups" align="center">
 				<tr align="center">
 					<td align="center" colspan="2">
-						<h4 style="color: midnightblue;" align="center">INSPECCIÓN EDM SOBRE LÍNEA BASE 320.162 m<br>
-							(DISTANCIOMETRO) CONDICIONES: TEMPERATURA 25°C, PRESIÓN ATMOSFERICA 640mmhg,<br>
-							CONSTANTE DEL PRISMA -30</h4>
+						<h4 style="color: midnightblue;" align="center">INSPECCIÓN DEL SISTEMA DE MEDIDA ANGULAR, COLIMADOR DE CUATRO TUBOS<br>
+							MODELO F420-4TA</h4>
 					</td>
 				</tr>
 				<tr>
 					<td>
+						COMPENSADOR OPTICOMECÁNICO<br>
+						COMPENSADOR ELECTRÓNICO<br>
+						<strong>AJUSTE Y VERIFICACIÓN</strong>
+					</td>
 
-						PRISMAS<br>
-						MEDIDA DISTANCIA<br>
-						CONSTANTE DEL PRISMA<br>
-						CONSTANTE PPM
+					<td align="center">
+						AJUSTE Y VERIFICACIÓN<br>
+						GENERAL DE FUNCIONES
+						<h3 style="color: midnightblue;"><?= $estadosCertificados[$remision['rem_estado_certificado']]; ?></h3>
+
+					</td>
+				</tr>
+			</table>
+
+			<?php
+			//sólo para estación total
+			if ($remision['rem_tipo_equipo'] == 1) { ?>
+				<table style="width:100%; height:250px; font-size: 18px;" border="1" rules="groups" align="center">
+					<tr align="center">
+						<td align="center" colspan="2">
+							<h4 style="color: midnightblue;" align="center">INSPECCIÓN EDM SOBRE LÍNEA BASE 320.162 m<br>
+								(DISTANCIOMETRO) CONDICIONES: TEMPERATURA 25°C, PRESIÓN ATMOSFERICA 640mmhg,<br>
+								CONSTANTE DEL PRISMA -30</h4>
+						</td>
+					</tr>
+					<tr>
+						<td>
+
+							PRISMAS<br>
+							MEDIDA DISTANCIA<br>
+							CONSTANTE DEL PRISMA<br>
+							CONSTANTE PPM
+						</td>
+
+						<td align="center">
+							AJUSTE Y VERIFICACIÓN<br>
+							GENERAL DE FUNCIONES
+							<h3 style="color: midnightblue;"><?= $estadosCertificados[$remision['rem_estado_certificado']]; ?></h3>
+
+						</td>
+					</tr>
+				</table>
+			<?php } ?>
+
+			<table style="width:100%; height:250px; font-size: 18px;" border="1" rules="groups" align="center">
+				<tr align="center">
+					<td align="center" colspan="2">
+						<h4 style="color: midnightblue;" align="center">CONTROLES Y VISUALIZACIÓN ELECTRÓNICA</h4>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						TECLADO<br>
+						DISPLAY<br>
+						ACCESO MEMORIA<br>
+						BATERÍA<br>
+						COMUNICACIÓN DISPOSITIVO EXTERNO
 					</td>
 
 					<td align="center">
@@ -703,30 +788,29 @@ switch ($remision['rem_tipo_equipo']) {
 			</table>
 		<?php } ?>
 
-		<table style="width:100%; height:250px; font-size: 18px;" border="1" rules="groups" align="center">
-			<tr align="center">
-				<td align="center" colspan="2">
-					<h4 style="color: midnightblue;" align="center">CONTROLES Y VISUALIZACIÓN ELECTRÓNICA</h4>
-				</td>
-			</tr>
-
-			<tr>
-				<td>
-					TECLADO<br>
-					DISPLAY<br>
-					ACCESO MEMORIA<br>
-					BATERÍA<br>
-					COMUNICACIÓN DISPOSITIVO EXTERNO
-				</td>
-
-				<td align="center">
-					AJUSTE Y VERIFICACIÓN<br>
-					GENERAL DE FUNCIONES
-					<h3 style="color: midnightblue;"><?= $estadosCertificados[$remision['rem_estado_certificado']]; ?></h3>
-
-				</td>
-			</tr>
-		</table>
+		<?php
+		//PARA ESTACIÓN Y TEODOLITO
+		if ($remision['rem_tipo_equipo'] == 3) { ?>
+			<table style="width:100%; padding: 10px; height: 250px; font-size: 18px;" border="1" rules="groups" align="center">
+				<tr align="center">
+					<td align="center" colspan="2">
+						<h4 style="color: midnightblue;" align="center">CONDICIONES PRESENTES EN EL LABORATORIO EN EL PROCESO DE AJUSTE</h4>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						TEMPERATURA AMBIENTE MINIMA:  22°C<br>
+						HUMEDAD RELATIVA MINIMA: 63%<br>
+						PRESION ATMOSFERICA: 760 mmHg
+					</td>
+	
+					<td align="center">
+						TEMPERATURA MAXIMA: 25°C<br>
+						HUMEDAD RELATIVA MAXIMA 69%
+					</td>
+				</tr>
+			</table>
+		<?php } ?>
 	<?php } ?>
 
 	
@@ -735,6 +819,17 @@ switch ($remision['rem_tipo_equipo']) {
 	<?php
 	//sólo para teodolito. Unos espacios más.
 	if ($remision['rem_tipo_equipo'] == 2) { ?>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+	<?php } 
+	//sólo para teodolito. Unos espacios más.
+	if ($remision['rem_tipo_equipo'] == 3) { ?>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
