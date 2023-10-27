@@ -172,6 +172,10 @@ switch ($remision['rem_tipo_equipo']) {
 						<td><?= $remision['cli_usuario']; ?></td>
 					</tr>
 					<tr>
+						<td><strong>DIRECCIÓN</strong>:</td>
+						<td><?= $remision['cli_direccion']; ?></td>
+					</tr>
+					<tr>
 						<td><strong>CIUDAD</strong>:</td>
 						<td><?= $remision['ciu_nombre'] . ", " . $remision['dep_nombre']; ?></td>
 					</tr>
