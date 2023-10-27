@@ -32,19 +32,8 @@ $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * 
 //EDITAR FACTURAS
 
 //AGREGAR DOCUMENTOS
-if ($_POST["idSql"] == 13) {
-	if ($_FILES['archivo']['name'] != "") {
-		$archivo = $_FILES['archivo']['name'];
-		$destino = "files/documentos";
-		move_uploaded_file($_FILES['archivo']['tmp_name'], $destino . "/" . $archivo);
-	}
-	mysqli_query($conexionBdPrincipal,"INSERT INTO documentos(doc_nombre, doc_documento, doc_cliente)VALUES('" . $_POST["nombre"] . "','" . $archivo . "','" . $_POST["cliente"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-	echo '<script type="text/javascript">window.location.href="documentos-editar.php?id=' . $idInsertU . '&msg=1&cte=' . $_POST["cte"] . '";</script>';
-	exit();
-}
-//EDITAR DOCUMENTOS
+
+//EDITAR DOCUMENTOS No tiene interfaz grafica
 if ($_POST["idSql"] == 14) {
 	if ($_FILES['archivo']['name'] != "") {
 		$archivo = $_FILES['archivo']['name'];
@@ -91,71 +80,13 @@ if ($_POST["idSql"] == 16) {
 //EDITAR CONTACTOS
 
 //AGREGAR ZONAS
-if ($_POST["idSql"] == 26) {
-	mysqli_query($conexionBdPrincipal,"INSERT INTO zonas(zon_nombre, zon_observaciones)VALUES('" . $_POST["nombre"] . "','" . $_POST["observaciones"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-	echo '<script type="text/javascript">window.location.href="zonas-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
-//EDITAR ZONAS
-if ($_POST["idSql"] == 27) {
-	mysqli_query($conexionBdPrincipal,"UPDATE zonas SET zon_nombre='" . $_POST["nombre"] . "', zon_observaciones='" . $_POST["observaciones"] . "' WHERE zon_id='" . $_POST["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="zonas-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
-//AGREGAR ENCUESTAS
-if ($_POST["idSql"] == 28) {
-	mysqli_query($conexionBdPrincipal,"INSERT INTO encuesta_satisfaccion(encs_fecha, encs_cliente, encs_atendido, encs_producto, encs_contacto)VALUES(now(),'" . $_POST["cliente"] . "','" . $_POST["usuario"] . "','" . $_POST["producto"] . "','" . $_POST["contacto"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
-	$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='" . $_POST["contacto"] . "'"));
-	$fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
-	$fin .= '
-				<center>
-					<p align="center"><img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="350"></p>
-					<div style="font-family:arial; background:' . $configuracion["conf_fondo_mensaje"] . '; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
-						
-						<p style="color:' . $configuracion["conf_color_letra"] . ';">' . strtoupper($contacto['cont_nombre']) . ',<br>
-						Agradecemos se tome 3 minutos para responder una escuesta sobre la atención brindada por nuestra empresa.<br>
-						Haga click en el siguiente enlace para responder la encuesta.</p>
-						
-						<p align="center"><a href="' . $configuracion["conf_url_encuestas"] . '/formato-encuesta.php?id=' . $idInsertU . '" target="_blank" style="color:' . $configuracion["conf_color_link"] . ';">RESPONDER ENCUESTA</a></p>
-						
-						<p align="center" style="color:' . $configuracion["conf_color_letra"] . ';">
-							<img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="80"><br>
-							' . $configuracion["conf_mensaje_pie"] . '<br>
-							<a href="' . $configuracion["conf_web"] . '" style="color:' . $configuracion["conf_color_link"] . ';">' . $configuracion["conf_web"] . '</a>
-						</p>
-						
-					</div>
-				</center>
-				<p>&nbsp;</p>
-			';
-	$fin .= '';
-	$fin .=  '<html><body>';
-	$sfrom = $configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
-	$sdestinatario = $contacto['cont_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-	$ssubject = "Encuesta de satisfaccion"; //ASUNTO DEL MENSAJE 				
-	$shtml = $fin; //MENSAJE EN SI			
-	$sheader = "From:" . $sfrom . "\nReply-To:" . $sfrom . "\n";
-	$sheader = $sheader . "X-Mailer:PHP/" . phpversion() . "\n";
-	$sheader = $sheader . "Mime-Version: 1.0\n";
-	$sheader = $sheader . "Content-Type: text/html; charset=UTF-8\r\n";
-	@mail($sdestinatario, $ssubject, $shtml, $sheader);
-	echo '<script type="text/javascript">window.open("../formato-encuesta.php?id=' . $idInsertU . '");</script>';
-	echo '<script type="text/javascript">window.location.href="encuesta-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
+//EDITAR ZONAS
+
+//AGREGAR ENCUESTAS
+
 //EDITAR ENCUESTAS
-if ($_POST["idSql"] == 29) {
-	mysqli_query($conexionBdPrincipal,"UPDATE encuesta_satisfaccion SET encs_cliente='" . $_POST["cliente"] . "', encs_atendido='" . $_POST["usuario"] . "', encs_producto='" . $_POST["producto"] . "' WHERE encs_id='" . $_POST["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="encuesta-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
+
 //AGREGAR MATERIALES A PRODUCTOS
 
 //EDITAR MATERIALES A PRODUCTOS
@@ -341,97 +272,18 @@ if ($_POST["idSql"] == 34) {
 
 //EDITAR TIKETS CLIENTES
 
-//AGREGAR ABONO A FACTURAS
-if ($_POST["idSql"] == 41) {
-	if ($_FILES['archivo']['name'] != "") {
-		$archivo = $_FILES['archivo']['name'];
-		$destino = "files/comprobantes";
-		move_uploaded_file($_FILES['archivo']['tmp_name'], $destino . "/" . $archivo);
-	}
-	mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion_abonos(fpab_factura, fpab_fecha_abono, fpab_valor, fpab_fecha_registro, fpab_observaciones, fpab_medio_pago, fpab_responsable_registro, fpab_comprobante)VALUES('" . $_POST["fact"] . "','" . $_POST["fecha"] . "','" . $_POST["valor"] . "',now(),'" . $_POST["observaciones"] . "','" . $_POST["medio"] . "','" . $_SESSION["id"] . "','" . $archivo . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-	//Calculamos el saldo
-	$abonos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT sum(fpab_valor), fact_valor, fact_id FROM facturacion_abonos, facturacion
-	WHERE fpab_factura='" . $_POST["fact"] . "' AND fact_id='" . $_POST["fact"] . "'"));
-	$saldoFinal = $abonos[1] - $abonos[0];
-	if ($saldoFinal <= 0) {
-		mysqli_query($conexionBdPrincipal,"UPDATE facturacion SET fact_estado=1 WHERE fact_id='" . $_POST["fact"] . "' AND fact_estado!=3");
-		
-	} else {
-		mysqli_query($conexionBdPrincipal,"UPDATE facturacion SET fact_estado=2 WHERE fact_id='" . $_POST["fact"] . "' AND fact_estado!=3");
-		
-	}
+//AGREGAR ABONO A FACTURAS  
 
-	echo '<script type="text/javascript">window.location.href="facturacion-abonos-editar.php?id=' . $idInsertU . '&msg=1&fact=' . $_POST["fact"] . '";</script>';
-	exit();
-}
 //EDITAR ABONO A FACTURAS
-if ($_POST["idSql"] == 42) {
-	if ($_FILES['archivo']['name'] != "") {
-		$archivo = $_FILES['archivo']['name'];
-		$destino = "files/comprobantes";
-		move_uploaded_file($_FILES['archivo']['tmp_name'], $destino . "/" . $archivo);
-		mysqli_query($conexionBdPrincipal,"UPDATE facturacion_abonos SET fpab_comprobante='" . $archivo . "' WHERE fpab_id='" . $_POST["id"] . "'");
-	}
-	mysqli_query($conexionBdPrincipal,"UPDATE facturacion_abonos SET fpab_fecha_abono='" . $_POST["fecha"] . "', fpab_valor='" . $_POST["valor"] . "', fpab_observaciones='" . $_POST["observaciones"] . "', fpab_medio_pago='" . $_POST["medio"] . "', fpab_responsable_modificacion='" . $_SESSION["id"] . "', fpab_fecha_ultima_modificacion=now() WHERE fpab_id='" . $_POST["id"] . "'");
-	
-	//Calculamos el saldo
-	$abonos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT sum(fpab_valor), fact_valor, fact_id FROM facturacion_abonos, facturacion
-	WHERE fpab_factura='" . $_POST["fact"] . "' AND fact_id='" . $_POST["fact"] . "'"));
-	$saldoFinal = $abonos[1] - $abonos[0];
-	if ($saldoFinal <= 0) {
-		mysqli_query($conexionBdPrincipal,"UPDATE facturacion SET fact_estado=1 WHERE fact_id='" . $_POST["fact"] . "' AND fact_estado!=3");
-		
-	} else {
-		mysqli_query($conexionBdPrincipal,"UPDATE facturacion SET fact_estado=2 WHERE fact_id='" . $_POST["fact"] . "' AND fact_estado!=3");
-		
-	}
 
-	echo '<script type="text/javascript">window.location.href="facturacion-abonos-editar.php?id=' . $_POST["id"] . '&msg=2&fact=' . $_POST["fact"] . '";</script>';
-	exit();
-}
-//AGREGAR SOPORTE PRODUCTOS
-if ($_POST["idSql"] == 43) {
-	if ($_FILES['imagen']['name'] != "") {
-		$imagen = $_FILES['imagen']['name'];
-		$destino = "files/soporte";
-		move_uploaded_file($_FILES['imagen']['tmp_name'], $destino . "/" . $imagen);
-	}
-	mysqli_query($conexionBdPrincipal,"INSERT INTO soporte_productos(sop_nombre, sop_descripcion, sop_imagen, sop_video, sop_nivel, sop_padre)VALUES('" . $_POST["nombre"] . "','" . $_POST["descripcion"] . "','" . $imagen . "','" . $_POST["video"] . "','" . $_POST["nivel"] . "','" . $_POST["padre"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-	echo '<script type="text/javascript">window.location.href="soporte-productos-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
-//EDITAR SOPORTE PRODUCTOS
-if ($_POST["idSql"] == 44) {
-	if ($_FILES['imagen']['name'] != "") {
-		$imagen = $_FILES['imagen']['name'];
-		$destino = "files/soporte";
-		move_uploaded_file($_FILES['imagen']['tmp_name'], $destino . "/" . $imagen);
-		mysqli_query($conexionBdPrincipal,"UPDATE soporte_productos SET sop_imagen='" . $imagen . "' WHERE sop_id='" . $_POST["id"] . "'");
-	}
-	mysqli_query($conexionBdPrincipal,"UPDATE soporte_productos SET sop_nombre='" . $_POST["nombre"] . "', sop_descripcion='" . $_POST["descripcion"] . "', sop_nivel='" . $_POST["nivel"] . "', sop_video='" . $_POST["video"] . "', sop_padre='" . $_POST["padre"] . "' WHERE sop_id='" . $_POST["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="soporte-productos-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
-//AGREGAR ASUNTOS DE TIKETS
-if ($_POST["idSql"] == 45) {
-	mysqli_query($conexionBdPrincipal,"INSERT INTO tikets_asuntos(tkpas_nombre)VALUES('" . $_POST["nombre"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-	echo '<script type="text/javascript">window.location.href="tikets-asuntos-editar.php?id=' . $idInsertU . '&msg=1";</script>';
-	exit();
-}
-//EDITAR ASUNTOS DE TIKETS
-if ($_POST["idSql"] == 46) {
-	mysqli_query($conexionBdPrincipal,"UPDATE tikets_asuntos SET tkpas_nombre='" . $_POST["nombre"] . "' WHERE tkpas_id='" . $_POST["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="tikets-asuntos-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	exit();
-}
+//AGREGAR SOPORTE PRODUCTOS  (ARCHIVO CREADO, EN PAGINA NO FUNCIONA LA OPCION AGREGAR--VERIFICAR)
+
+//EDITAR SOPORTE PRODUCTOS (ARCHIVO CREADO, EN PAGINA NO FUNCIONA LA OPCION AGREGAR--VERIFICAR)
+
+//AGREGAR ASUNTOS DE TIKETS (ARCHIVO CREADO, EN PAGINA No se encuentra la opcion a probar)
+
+//EDITAR ASUNTOS DE TIKETS (ARCHIVO CREADO, EN PAGINA No se encuentra la opcion a probar)
+
 //ENVIAR PORTAFOLIOS
 
 //AGREGAR PROYECTOS
@@ -443,133 +295,9 @@ if ($_POST["idSql"] == 46) {
 //EDITAR TAREAS-PROYECTOS
 
 //AGREGAR EVENTOS AL CALENDARIO
-if ($_POST["idSql"] == 52) {
-	mysqli_query($conexionBdPrincipal,"INSERT INTO agenda(age_evento, age_fecha, age_usuario, age_inicio, age_fin, age_lugar, age_notas, age_cliente)VALUES('" . $_POST["evento"] . "','" . $_POST["fecha"] . "','" . $_SESSION["id"] . "','" . $_POST["inicio"] . "','" . $_POST["fin"] . "','" . $_POST["lugar"] . "','" . $_POST["notas"] . "','" . $_POST["cliente"] . "')");
-	
-	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
-	if ($_POST["cliente"] != '0') {
-
-
-		$hora = 1;
-		$minuto = 0;
-		$i = 0;
-		while ($hora < 24) {
-			if ($i % 2 == 0) {
-				$minuto = 0;
-				if ($i > 0) {
-					$hora++;
-				}
-			} else {
-				$minuto = 30;
-			}
-			if ($i == $_POST["inicio"]) {
-				$inicioHora = $hora . ":" . $minuto;
-			}
-
-
-			$i++;
-		}
-
-
-		$hora = 1;
-		$minuto = 0;
-		$i = 0;
-		while ($hora < 24) {
-			if ($i % 2 == 0) {
-				$minuto = 0;
-				if ($i > 0) {
-					$hora++;
-				}
-			} else {
-				$minuto = 30;
-			}
-			if ($i == $_POST["fin"]) {
-				$finHora = $hora . ":" . $minuto;
-			}
-
-
-			$i++;
-		}
-
-
-		$resultado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='" . $_POST["cliente"] . "'"));
-
-		$fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
-		$fin .= '
-				<center>
-					<p align="center"><img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="350"></p>
-					<div style="font-family:arial; background:' . $configuracion["conf_fondo_mensaje"] . '; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
-						
-						<p style="color:' . $configuracion["conf_color_letra"] . ';">
-						Hola <b>' . $resultado['cli_nombre'] . '</b>.<br>
-						Te notificamos que <b>' . $datosUsuarioActual['usr_nombre'] . '</b> te está haciendo una invitación para un evento. A continuación los detalles:<br><br>
-						<b>Evento:</b> ' . $_POST["evento"] . '<br>
-						<b>Fecha:</b> ' . $_POST["fecha"] . '<br>
-						<b>Hora inicio:</b> ' . $inicioHora . '<br>
-						<b>Hora fin:</b> ' . $finHora . '<br>
-						<b>Nota:</b> ' . $_POST["notas"] . '<br>
-						</p>
-						
-						<p align="center"><a href="' . $configuracion["conf_url_encuestas"] . '/usuarios/reportes/formato-cotizacion-1.php?cte=1&id=' . base64_encode($_POST["id"]) . '" target="_blank" 
-						
-						<p align="center" style="color:' . $configuracion["conf_color_letra"] . ';">
-							<img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="80"><br>
-							' . $configuracion["conf_mensaje_pie"] . '<br>
-							<a href="' . $configuracion["conf_web"] . '" style="color:' . $configuracion["conf_color_link"] . ';">' . $configuracion["conf_web"] . '</a>
-						</p>
-						
-					</div>
-				</center>
-				<p>&nbsp;</p>
-			';
-		$fin .= '';
-		$fin .=  '<html><body>';
-
-
-		// Instantiation and passing `true` enables exceptions
-		$mail = new PHPMailer(true);
-
-		try {
-			//Server settings
-			$mail->SMTPDebug = 0;                                       // Enable verbose debug output
-			$mail->isSMTP();                                            // Set mailer to use SMTP
-			$mail->Host       = 'mail.orioncrm.com.co';  // Specify main and backup SMTP servers
-			$mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-			$mail->Username   = $configuracion['conf_email'];                     // SMTP username
-			$mail->Password   = $configuracion['conf_clave_correo'];                              // SMTP password
-			$mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
-			$mail->Port       = 465;                                    // TCP port to connect to
-
-			//Recipients
-			$mail->setFrom($configuracion['conf_email'], '');
-
-			$mail->addAddress($resultado['cli_email'], $resultado['cli_nombre']);     // Add a recipient
-
-
-			// Content
-			$mail->isHTML(true);                                  // Set email format to HTML
-			$mail->Subject = "Te invitaron a un evento - " . $_POST["evento"];
-			$mail->Body = $fin;
-			$mail->CharSet = 'UTF-8';
-
-			$mail->send();
-			echo 'Enviada cotización al cliente.';
-		} catch (Exception $e) {
-			echo "Error: {$mail->ErrorInfo}";
-		}
-	}
-
-	echo '<script type="text/javascript">window.location.href="calendario.php?id=' . $_SESSION["id"] . '";</script>';
-	exit();
-}
 //EDITAR EVENTOS AL CALENDARIO
-if ($_POST["idSql"] == 53) {
-	mysqli_query($conexionBdPrincipal,"UPDATE agenda SET age_evento='" . $_POST["evento"] . "', age_fecha='" . $_POST["fecha"] . "', age_lugar='" . $_POST["lugar"] . "', age_notas='" . $_POST["notas"] . "', age_inicio='" . $_POST["inicio"] . "', age_fin='" . $_POST["fin"] . "' WHERE age_id='" . $_POST["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="calendario.php?id=' . $_SESSION["id"] . '";</script>';
-	exit();
-}
+
 //EDITAR PUBLICIDAD DE CONFIGURACIÓN
 
 //AGREGAR CUPONES
@@ -598,7 +326,7 @@ if ($_POST["idSql"] == 53) {
 
 //GESTIONAR PRODUCTOS CON PRECIO PREDETERMINADO
 
-//REGISTRAR GASTOS
+//REGISTRAR GASTOS (no se encuentra el archivo de registrar gastos)
 if ($_POST["idSql"] == 69) {
 	mysqli_query($conexionBdPrincipal,"INSERT INTO gastos(gasv_fecha, gasv_registro, gasv_concepto, gasv_valor, gasv_responsable)
 	VALUES('" . $_POST["fecha"] . "', now(), '" . $_POST["concepto"] . "', '" . $_POST["valor"] . "', '" . $_SESSION["id"] . "')");
@@ -621,22 +349,7 @@ if ($_POST["idSql"] == 69) {
 //EDITAR CLAVE DE USUARIOS
 
 //EDITAR CONTRASEÑA
-/*
-if ($_POST["idSql"] == 76) {
-	$rst_usr = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $_SESSION["id"] . "' AND usr_clave=SHA1('" . $_POST["claveActual"] . "')");
-	$fila = mysqli_fetch_array($rst_usr);
-	$num = mysql_num_rows($rst_usr);
-	if ($num > 0) {
-		mysqli_query($conexionBdPrincipal,"UPDATE usuarios SET  usr_clave=SHA1('" . $_POST["clave"] . "') WHERE usr_id='" . $_SESSION["id"] . "'");
-		
 
-		echo '<script type="text/javascript">window.location.href="perfil-editar.php?msg=2";</script>';
-		exit();
-	} else {
-		echo '<script type="text/javascript">window.location.href="perfil-editar.php?error=1";</script>';
-		exit();
-	}
-}*/
 //AGREGAR IMPORTACIONES
 
 //AGREGAR BODEGAS
@@ -650,275 +363,12 @@ if ($_POST["idSql"] == 76) {
 //TRASNFERIR PRODUCTOS ENTRE BODEGAS
 
 //AGREGAR FACTURAS DE VENTA
-if ($_POST["idSql"] == 83) {
 
-	mysqli_query($conexionBdPrincipal,"INSERT INTO facturas(factura_fecha_propuesta, factura_cliente, factura_fecha_vencimiento, factura_vendedor, factura_creador, factura_sucursal, factura_contacto, factura_forma_pago, factura_fecha_creacion, factura_moneda, factura_estado, factura_tipo)VALUES('" . $_POST["fechaPropuesta"] . "','" . $_POST["cliente"] . "','" . $_POST["fechaVencimiento"] . "','" . $_POST["influyente"] . "','" . $_SESSION["id"] . "','" . $_POST["sucursal"] . "','" . $_POST["contacto"] . "','" . $_POST["formaPago"] . "',now(),'" . $_POST["moneda"] . "', 1, 1)");
-	
-	$idInsert = mysqli_insert_id($conexionBdPrincipal);
-
-	//Productos
-	$numero = (count($_POST["producto"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-			$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='" . $_POST["producto"][$contador] . "'"));
-			
-
-			$valorProducto = $productoDatos['prod_precio'];
-			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['prod_precio'] / $configuracion['conf_trm_compra']), 0);
-			}
-
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["producto"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 4)");
-			
-			$contador++;
-		}
-	}
-
-	//COMBOS
-	$numero = (count($_POST["combo"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-
-			$datosCombos = mysqli_query($conexionBdPrincipal,"SELECT ROUND((SUM(copp_cantidad)*prod_precio),0), combo_descuento FROM combos
-			INNER JOIN combos_productos ON copp_combo=combo_id
-			INNER JOIN productos ON prod_id=copp_producto
-			WHERE combo_id='" . $_POST["combo"][$contador] . "'
-			GROUP BY copp_producto
-			");
-			$precioCombo = 0;
-			$dctoCombo = 0;
-			while ($dCombos = mysqli_fetch_array($datosCombos)) {
-				$precioCombo += $dCombos[0];
-				$dctoCombo = $dCombos[1];
-			}
-			if ($dctoCombo > 0) {
-				$precioCombo = round($precioCombo - ($precioCombo * ($dctoCombo / 100)), 0);
-			}
-
-
-			$productoNum = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_combo='" . $_POST["combo"][$contador] . "'"));
-			
-
-
-			if ($productoNum['czpp_id'] == '') {
-				$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM combos WHERE combo_id='" . $_POST["combo"][$contador] . "'"));
-				
-
-				$valorProducto = $precioCombo;
-				if ($_POST["moneda"] == 2) {
-					$valorProducto = round(($precioCombo / $configuracion['conf_trm_compra']), 0);
-				}
-
-				mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["combo"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 4)");
-				
-			}
-
-			$contador++;
-		}
-	}
-
-	//Servicios
-	$numero = (count($_POST["servicio"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-			$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id='" . $_POST["servicio"][$contador] . "'"));
-			
-
-			$valorProducto = $productoDatos['serv_precio'];
-			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['serv_precio'] / $configuracion['conf_trm_compra']), 0);
-			}
-
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_servicio, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo)VALUES('" . $idInsert . "','" . $_POST["servicio"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 4)");
-			
-			$contador++;
-		}
-	}
-
-	echo '<script type="text/javascript">window.location.href="facturas.php?id=' . $idInsert . '&msg=1";</script>';
-	exit();
-}
 
 //AGREGAR FACTURAS DE COMPRA
-if ($_POST["idSql"] == 84) {
 
-	mysqli_query($conexionBdPrincipal,"INSERT INTO facturas(factura_fecha_propuesta, factura_proveedor, factura_fecha_vencimiento, factura_creador, factura_forma_pago, factura_fecha_creacion, factura_moneda, factura_estado, factura_tipo, factura_concepto, factura_extranjera, factura_preferencia)VALUES('" . $_POST["fechaPropuesta"] . "','" . $_POST["proveedor"] . "','" . $_POST["fechaVencimiento"] . "','" . $_SESSION["id"] . "','" . $_POST["formaPago"] . "',now(),'" . $_POST["moneda"] . "', 1, 2, '" . $_POST["concepto"] . "', '" . $_POST["fce"] . "', '" . $_POST["preferencia"] . "')");
-	
-	$idInsert = mysqli_insert_id($conexionBdPrincipal);
-
-	//Productos
-	$numero = (count($_POST["producto"]));
-	if ($numero > 0) {
-		$contador = 0;
-		while ($contador < $numero) {
-			$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='" . $_POST["producto"][$contador] . "'"));
-			
-
-			$valorProducto = $productoDatos['prod_precio'];
-			if ($_POST["moneda"] == 2) {
-				$valorProducto = round(($productoDatos['prod_precio'] / $configuracion['conf_trm_compra']), 0);
-			}
-
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega)VALUES('" . $idInsert . "','" . $_POST["producto"][$contador] . "', '" . $valorProducto . "', '" . $contador . "', 1, 19, 4, 1)");
-			
-			$contador++;
-		}
-	}
-
-	if ($_POST["fce"] == 1) {
-
-		echo '<script type="text/javascript">window.location.href="fce-editar.php?id=' . $idInsert . '&msg=1";</script>';
-	} else {
-		echo '<script type="text/javascript">window.location.href="facturas-compra-editar.php?id=' . $idInsert . '&msg=1";</script>';
-	}
-
-
-	exit();
-}
 //EDITAR FACTURAS
-if ($_POST["idSql"] == 85) {
 
-	if ($_POST["fce"] == 1) {
-
-		mysqli_query($conexionBdPrincipal,"UPDATE facturas SET factura_fecha_propuesta='" . $_POST["fechaPropuesta"] . "', factura_proveedor='" . $_POST["proveedor"] . "', factura_fecha_vencimiento='" . $_POST["fechaVencimiento"] . "', factura_forma_pago='" . $_POST["formaPago"] . "', factura_moneda='" . $_POST["moneda"] . "', factura_ultima_modificacion=now(), factura_usuario_modificacion='" . $_SESSION["id"] . "', factura_observaciones='" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["notas"]) . "', factura_concepto='" . $_POST["concepto"] . "', factura_trm_usd='" . $_POST["trmUsd"] . "', factura_trm_euro='" . $_POST["trmEuro"] . "', factura_trm_usd_flete='" . $_POST["trmUsdFlete"] . "', factura_trm_euro_flete='" . $_POST["trmEuroFlete"] . "', factura_preferencia='" . $_POST["preferencia"] . "' WHERE factura_id='" . $_POST["id"] . "'");
-		
-
-		//PRODUCTOS
-		$numero = (count($_POST["producto"]));
-		if ($numero > 0) {
-			$contador = 0;
-			while ($contador < $numero) {
-
-				$productoNum = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
-				WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_producto='" . $_POST["producto"][$contador] . "' AND czpp_tipo=4"));
-				
-
-
-				if ($productoNum['czpp_id'] == '') {
-					$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='" . $_POST["producto"][$contador] . "'"));
-					
-
-					
-
-					mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_orden, czpp_tipo, czpp_bodega)VALUES('" . $_POST["id"] . "','" . $_POST["producto"][$contador] . "', 1, 19, 0, '" . $numero . "', 4, 1)");
-					
-				} 
-
-				$contador++;
-			}
-
-
-			//ELIMINAR LOS QUE YA NO ESTÁN EN LA FACTURACIÓN.
-			$productosWeb = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=4");
-			while ($pWeb = mysqli_fetch_array($productosWeb)) {
-
-				$encontrado = 0;
-				$contador = 0;
-				while ($contador < $numero) {
-
-					if ($pWeb['czpp_producto'] == $_POST["producto"][$contador]) {
-						$encontrado = 1;
-						break;
-					}
-
-					$contador++;
-				}
-
-				if ($encontrado == 0) {
-					mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_producto='" . $pWeb['czpp_producto'] . "' AND czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=4");
-					
-				}
-			}
-		} else {
-			mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_servicio IS NULL AND czpp_combo IS NULL AND czpp_tipo=4");
-			
-		}
-
-
-
-		echo '<script type="text/javascript">window.location.href="fce-editar.php?id=' . $_POST["id"] . '&msg=1";</script>';
-	} else {
-
-		mysqli_query($conexionBdPrincipal,"UPDATE facturas SET factura_fecha_propuesta='" . $_POST["fechaPropuesta"] . "', factura_proveedor='" . $_POST["proveedor"] . "', factura_fecha_vencimiento='" . $_POST["fechaVencimiento"] . "', factura_forma_pago='" . $_POST["formaPago"] . "', factura_moneda='" . $_POST["moneda"] . "', factura_ultima_modificacion=now(), factura_usuario_modificacion='" . $_SESSION["id"] . "', factura_observaciones='" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["notas"]) . "', factura_concepto='" . $_POST["concepto"] . "', factura_valor='" . $_POST["valor"] . "', factura_preferencia='" . $_POST["preferencia"] . "' WHERE factura_id='" . $_POST["id"] . "'");
-		
-
-		//PRODUCTOS
-		$numero = (count($_POST["producto"]));
-		if ($numero > 0) {
-			$contador = 0;
-			while ($contador < $numero) {
-
-				$productoNum = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
-				WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_producto='" . $_POST["producto"][$contador] . "' AND czpp_tipo=4"));
-				
-
-
-				if ($productoNum['czpp_id'] == '') {
-					$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='" . $_POST["producto"][$contador] . "'"));
-					
-
-					$valorProducto = $productoDatos['prod_precio'];
-					if ($_POST["moneda"] == 2) {
-						$valorProducto = round(($productoDatos['prod_precio'] / $configuracion['conf_trm_compra']), 0);
-					}
-
-					mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo, czpp_bodega)VALUES('" . $_POST["id"] . "','" . $_POST["producto"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 4, 1)");
-					
-				} else {
-					if ($_POST["monedaActual"] != $_POST["moneda"]) {
-						//Si cambió a pesos colombianos
-						if ($_POST["moneda"] == 1) {
-							$valorProducto = round(($productoNum['czpp_valor'] * $configuracion['conf_trm_venta']), 0);
-						}
-						//Si cambió a Dolares
-						else {
-							$valorProducto = round(($productoNum['czpp_valor'] / $configuracion['conf_trm_compra']), 0);
-						}
-
-						mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET czpp_valor='" . $valorProducto . "' WHERE czpp_id='" . $productoNum['czpp_id'] . "'");
-						
-					}
-				}
-
-				$contador++;
-			}
-
-
-			//ELIMINAR LOS QUE YA NO ESTÁN EN LA FACTURACIÓN.
-			$productosWeb = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=4");
-			while ($pWeb = mysqli_fetch_array($productosWeb)) {
-
-				$encontrado = 0;
-				$contador = 0;
-				while ($contador < $numero) {
-
-					if ($pWeb['czpp_producto'] == $_POST["producto"][$contador]) {
-						$encontrado = 1;
-						break;
-					}
-
-					$contador++;
-				}
-
-				if ($encontrado == 0) {
-					mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_producto='" . $pWeb['czpp_producto'] . "' AND czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=4");
-					
-				}
-			}
-		} else {
-			mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_servicio IS NULL AND czpp_combo IS NULL AND czpp_tipo=4");
-			
-		}
-
-
-
-		echo '<script type="text/javascript">window.location.href="facturas-compra-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
-	}
-	exit();
-}
 //EDITAR IMPORTACIÓN
 
 //aquí iba la parte de actualizar las métricas.
@@ -957,15 +407,8 @@ if ($_GET["get"] == 5) {
 }
 //ELIMINAR FACTURAS
 
-//ELIMINAR DOCUMENTOS
-if ($_GET["get"] == 7) {
-	$idPagina = 59;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM documentos WHERE doc_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="documentos.php?msg=3";</script>';
-	exit();
-}
+//ELIMINAR DOCUMENTOS (buscar para probar)
+
 //OCULTAR CLIENTES
 if ($_GET["get"] == 8) {
 	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_ocultar=1 WHERE cli_id='" . $_GET["id"] . "'");
@@ -994,23 +437,9 @@ if ($_GET["get"] == 10) {
 //ELIMINAR CATEGORÍA DE PRODUCTOS
 
 //ELIMINAR ZONAS
-if ($_GET["get"] == 14) {
-	$idPagina = 63;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM zonas WHERE zon_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //ELIMINAR ENCUESTAS
-if ($_GET["get"] == 15) {
-	$idPagina = 64;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM encuesta_satisfaccion WHERE encs_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //ELIMINAR NOTIFICACIONES
 if ($_GET["get"] == 16) {
 	//$idPagina = 65; include("includes/verificar-paginas.php");

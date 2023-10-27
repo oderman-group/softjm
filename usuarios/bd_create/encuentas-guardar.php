@@ -45,7 +45,7 @@ mysqli_query($conexionBdPrincipal,"INSERT INTO encuesta_satisfaccion(encs_fecha,
 	@mail($sdestinatario, $ssubject, $shtml, $sheader);
 	
 	
-
+	
 echo '<script type="text/javascript">window.open("../../formato-encuesta.php?id=' . $idInsertU . '");</script>';
 echo '<script type="text/javascript">window.location.href="../encuesta-editar.php?id=' . $idInsertU . '&msg=1";</script>';
 exit();
