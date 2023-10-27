@@ -86,7 +86,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
+							<form class="form-horizontal" method="post" action="bd_update/soporte-producto-actualizar.php" enctype="multipart/form-data">
                             <input type="hidden" name="idSql" value="44">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
 
