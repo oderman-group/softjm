@@ -760,7 +760,10 @@ switch ($remision['rem_tipo_equipo']) {
 				<!--<p>&nbsp;</p><br><br>
 				GEINER CUERVO MENDOZA<br>-->
 				TÉCNICO JMEQUIPOS SAS
-				<br><span style="color: red;">Este certificado no es válido sin el simbolo de aceptación.</span>
+				<p style="text-align: left;">CERTIFICADO POR:<br>
+				<?=strtoupper($remision['rem_supervisor'])?><br>
+				SUPERVISOR DE LABORATORIO &emsp;&emsp;&emsp;&emsp;&emsp;FIRMA:<span style="border-top: 1px solid #000; width: 200px; display: inline-block;"></span></p>
+				<p style="color: red; text-align: left;">Este certificado no es válido sin el simbolo de aceptación, no puede ser<br>reproducido parcialmente, excepto en su totalidad, con autorización<br>previa por escrito del servicio técnico  de JMEQUIPOS.</p>
 				<br><br><span style="color: darkblue;">Verifique la validez de este certificado en<br>
 					<a href="https://jmequipos.com/consultar-certificados.php" target="_blank">www.jmequipos.com/consultar-certificados.php</a></span>
 			</td>
