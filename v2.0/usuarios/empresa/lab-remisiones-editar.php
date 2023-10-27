@@ -15,7 +15,6 @@ $numAnulado=mysqli_num_rows($consultaAnulado);
 $version="";
 if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 	$version='
-	<div class="row">
 		<div class="col-sm-12 col-lg-6">
 			<div class="form-group row">
 				<label for="fname" class="col-sm-3 text-right control-label col-form-label">Versión del certificado</label>
@@ -24,7 +23,6 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 				</div>
 			</div>
 		</div>
-	</div>
 	';
 }
 ?>
@@ -352,7 +350,18 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 										</div>
 									</div>
 									
-									<?=$version;?>
+									<div class="row">
+										<?=$version;?>
+
+										<div class="col-sm-12 col-lg-6">
+											<div class="form-group row">
+												<label for="fname" class="col-sm-3 text-right control-label col-form-label">Supervisor de Laboratorio</label>
+												<div class="col-sm-9">
+													<input type="text" class="form-control" id="fname" name="supervisor" value="<?=$resultadoD['rem_supervisor'];?>" <?=$disabled;?>>
+												</div>
+											</div>
+										</div>
+									</div>
 									
 									
 									
