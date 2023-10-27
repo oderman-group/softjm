@@ -4,7 +4,8 @@ class Modulos {
     /**
      * Este metodo sirve para validar el acceso a los modulos
      * 
-     * @param array     $paginas
+     * @param int       $empresa
+     * @param int       $modulo
      * @param mysqli    $conexionBdAdmin
      * @param array     $datosUsuarioActual
      * 
@@ -12,7 +13,7 @@ class Modulos {
     **/
     public static function validarAccesoModulo($empresa, $modulo, $conexionBdAdmin, $datosUsuarioActual){
 
-        if($datosUsuarioActual[3]==1){
+        if($datosUsuarioActual['usr_tipo']==1){
             return true;
         }
 
