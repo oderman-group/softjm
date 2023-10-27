@@ -89,7 +89,97 @@ include("includes/js-formularios.php");
 	}	
 	</script>
 <?php }?>
+<?php
+function generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas) {
+								$htmlTabla = ''; // Inicializa una cadena vacía
+						
+								$productos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,
+										prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad
+										FROM productos
+										INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "'
+										ORDER BY czpp_orden");
+						
+								$no = 1;
+								$totalIva = 0;
+								$subtotal = 0;
+								$totalDescuento = 0;
+								$totalCantidad = 0;
+								$sumaUtilidad = 0;
+						
+								while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
+										$dcto = 0;
+										$valorTotal = 0;
+						
+										$valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
+						
+										if ($prod['czpp_cantidad'] > 0 && $prod['czpp_descuento'] > 0) {
+												$dcto = ($valorTotal * ($prod['czpp_descuento'] / 100));
+												$totalDescuento += $dcto;
+										}
+						
+										$valorConDcto = $valorTotal - $dcto;
+						
+										$totalIva += ($valorConDcto * ($prod['czpp_impuesto'] / 100));
+						
+										$subtotal += $valorTotal;
+										$totalCantidad += $prod['czpp_cantidad'];
+						
+										$utilidadDealer = $prod['prod_descuento2'] / 100;
+										$precioDealer = $prod['prod_costo'] + ($prod['prod_costo'] * $utilidadDealer);
+						
+										$sumaUtilidad += ($prod['czpp_valor'] - $prod['prod_costo']);
+						
+										$htmlTabla .= '<tr class="producto">';
+										$htmlTabla .= '<td>' . $no . '</td>';
+										$htmlTabla .= '<td><input type="number" title="czpp_orden" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_orden'] . '" onChange="productos(this)" style="width: 50px; text-align: center;"></td>';
+										$htmlTabla .= '<td>';
+										$htmlTabla .= '<a href="#" class="delete-product" data-id="'. $prod['prod_id'].'"><i class="icon-trash"></i></a>';
+										$htmlTabla .= '<a href="productos-editar.php?id=' . $prod['prod_id'] . '" target="_blank">' . $prod['prod_nombre'] . '</a><br>';
+										$htmlTabla .= '<span style="font-size: 9px; color: darkblue;">' . $prod['prod_descripcion_corta'] . '</span><br>';
+										$htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4">' . $prod['czpp_observacion'] . '</textarea></p>';
+										$htmlTabla .= '</td>';
+										$htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;"></td>';
+										$htmlTabla .= '<td>';
+										if ($resultadoD['cli_categoria'] == 3 && $datosUsuarioActual['usr_tipo'] == 1) {
+												$htmlTabla .= '<b>Precio Dealer: $' . number_format($precioDealer, 0, ",", ".") . '</b><br>';
+										}
+										$htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;"><br>';
+										if ($datosUsuarioActual['usr_tipo'] == 1) {
+												$htmlTabla .= '<b>Costo: $' . number_format($prod['prod_costo'], 0, ",", ".") . '</b><br>';
+												$htmlTabla .= '<b>Utilidad: ' . $prod['prod_utilidad'] . '%</b><br>';
+												$htmlTabla .= '<b>Valor Utilidad: $' . number_format(($prod['czpp_valor'] - $prod['prod_costo']), 0, ",", ".") . '</b><br>';
+										}
+										$htmlTabla .= '</td>';
+										$htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;"></td>';
+										$htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="productos(this)" style="width: 50px; text-align: center;"></td>';
+										if ($resultadoD['cotiz_descuentos_especiales'] == 1) {
+												$htmlTabla .= '<td>';
+												$htmlTabla .= '<input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;">';
+												if ($datosUsuarioActual['usr_tipo'] == 1 && $prod['czpp_aprobado_usuario'] == "" && $prod['czpp_descuento_especial'] > 0) {
+														$htmlTabla .= '<br><a href="sql.php?get=70&idItem=' . $prod['czpp_id'] . '" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>';
+												}
+												$consultaDctoEspecial = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='" . $prod['czpp_aprobado_usuario'] . "'");
+												$usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
+												$htmlTabla .= '<br><span style="font-size:10px; color:gray;">' . $prod['czpp_aprobado_fecha'] . '<br>' . $usuarioDctoEspecialAprobar['usr_nombre'] . '</span>';
+												$htmlTabla .= '</td>';
+										}
+										$htmlTabla .= '<td>'. '<span class="moneda-simbolo">' . $simbolosMonedas[$resultadoD['cotiz_moneda']].'</span>'. '	<span class="valor-numerico">'. number_format($valorTotal, 0, ",", ".") . '</span>'.'</td>';
+										$htmlTabla .= '</tr>';
+	
+										$no++;
+								}
+						
+								return "<body>$htmlTabla</body>"; // Devuelve el HTML de la tabla
+						}
 
+													// Verifica si se envió una solicitud AJAX
+							if (isset($_POST['action']) && $_POST['action'] === 'generarTablaProductos') {
+								// Ejecuta la función PHP
+								$htmlTablaProductos = generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas);
+								echo $htmlTablaProductos;
+								exit; 
+							}
+						?>
 </head>
 <body>
 <div class="layout">
@@ -466,6 +556,45 @@ include("includes/js-formularios.php");
 																}
 														}
 												});
+												
+												productSelect.on("change", function (e) {
+														const producto = productSelect.val() || [];
+														const url = new URL(window.location.href);
+														const id = url.searchParams.get("id");
+														$.ajax({
+																type: "POST",
+																url: "../usuarios/ajax/ajax-actualizar-productos-cotizacion.php",
+																data: {
+																	producto,
+																	id
+																},
+																success: function (response) {
+																		actulizarTablaProductos()	
+																}
+														});
+												});
+
+												productSelect.on("select2:clear", function (e) {
+														console.log("clear")
+												});
+
+											function actulizarTablaProductos(){
+												$.ajax({
+														type: "POST",
+														url: "", 
+														data: {
+																action: "generarTablaProductos"
+                    					},
+														success: function(response) {
+															let bodyStart = response.indexOf('<body>');
+															let bodyEnd = response.indexOf('</body>');
+															let bodyContent = response.slice(bodyStart + 6, bodyEnd);
+															$('#tableBody .producto').remove();
+															$('#tableBody').append(bodyContent);
+                    				}
+                					});
+											}
+											actulizarTablaProductos()	
 										});
 									</script>
 								
@@ -579,7 +708,7 @@ include("includes/js-formularios.php");
                                 <th>SUBTOTAL</th>
 							</tr>
 							</thead>
-							<tbody>
+							<tbody id="tableBody">
 								
 							<!-- COMBOS -->
 							<?php
@@ -712,114 +841,11 @@ include("includes/js-formularios.php");
 									</td>
 								<?php }?>
 
-                                <td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($valorTotal,0,",",".");?></td>
-							</tr>
-							<?php 
-								$no ++;
-							}
-							?>
-								
-							<!-- PRODUCTOS -->	
-                            <?php
-							$productos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,
-								prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad
-								FROM productos
-							INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='".$_GET["id"]."'
-							ORDER BY czpp_orden");
-							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
-								$dcto = 0;
-								$valorTotal = 0;
-
-								$valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
-
-								if($prod['czpp_cantidad']>0 and $prod['czpp_descuento']>0){
-									$dcto = ($valorTotal * ($prod['czpp_descuento']/100));
-									$totalDescuento += $dcto;	
-								}
-
-								$valorConDcto = $valorTotal - $dcto;
-
-								$totalIva += ($valorConDcto * ($prod['czpp_impuesto']/100));
-
-								$subtotal +=$valorTotal;
-								
-								
-								$totalCantidad += $prod['czpp_cantidad'];
-
-
-
-								$utilidadDealer = $prod['prod_descuento2'] / 100;
-								$precioDealer = $prod['prod_costo'] + ($prod['prod_costo'] * $utilidadDealer);
-
-								$sumaUtilidad += ($prod['czpp_valor'] - $prod['prod_costo']);
-							?>
-							<tr>
-								<td><?=$no;?></td>
-								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-                                <td>
-									<a href="bd_delete/cotizaciones-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
-									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_nombre'];?></a><br>
-									
-									<span style="font-size: 9px; color: darkblue;"><?=$prod['prod_descripcion_corta'];?></span><br>
-										
-									<p><textarea title="czpp_observacion" name="<?=$prod['czpp_id'];?>" onChange="productos(this)" style="width: 300px;" rows="4"><?=$prod['czpp_observacion'];?></textarea></p>
-								</td>
-                                <td><input type="number" title="czpp_cantidad" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-                                <td>
-									<?php
-									if($resultadoD['cli_categoria']==3 and $datosUsuarioActual['usr_tipo']==1){
-										echo "<b>Precio Dealer: $".number_format($precioDealer, 0, ",", ".")."</b><br>";
-									}
-									?>
-
-									<input type="text" alt="<?=$resultadoD['cli_categoria'];?>" title="czpp_valor" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_valor'];?>" onChange="productos(this)" style="width: 200px;"><br>
-									<?php
-									if($datosUsuarioActual['usr_tipo']==1){
-										echo "
-										<b>Costo: $".number_format($prod['prod_costo'], 0, ",", ".")."</b><br>
-										<b>Utilidad: ".$prod['prod_utilidad']."%</b><br>
-										<b>Valor Utilidad: $".number_format(($prod['czpp_valor'] - $prod['prod_costo']), 0, ",", ".")."</b><br>
-										";
-									}
-									?>
-								</td>
-                                <td><input type="text" title="czpp_impuesto" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_impuesto'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
 								<td>
-									<input type="text" title="czpp_descuento" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"><br>
-										<?php 
-										if($dcto>0)
-											echo "$".number_format($dcto,0,".",".");
-										?>
+										<span class="moneda-simbolo"><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?></span>
+										<span class="valor-numerico"><?=number_format($valorTotal, 0, ",", ".");?></span>
 								</td>
 
-								<?php if($resultadoD['cotiz_descuentos_especiales'] == 1){?>
-									<td><input type="text" title="czpp_descuento_especial" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento_especial'];?>" onChange="combos(this)" style="width: 50px; text-align: center;">
-
-										<?php
-									if($datosUsuarioActual['usr_tipo']==1 and $prod['czpp_aprobado_usuario']=="" and $prod['czpp_descuento_especial']>0){
-										
-										?>
-
-										<br><a href="sql.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
-
-
-									<?php }
-									$consultaDctoEspecial=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']."'");
-									$usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
-									?>
-
-									<br><span style="font-size:10px; color:gray;">
-
-										<?=$prod['czpp_aprobado_fecha'];?><br>
-										<?=$usuarioDctoEspecialAprobar['usr_nombre'];?>
-											
-										</span>
-
-									</td>
-									
-
-								<?php }?>
-                                <td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($valorTotal,0,",",".");?></td>
 							</tr>
 							<?php 
 								$no ++;
@@ -867,7 +893,10 @@ include("includes/js-formularios.php");
 								<?php if($resultadoD['cotiz_descuentos_especiales'] == 1){?>
 									<td><input type="text" title="czpp_descuento_especial" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento_especial'];?>" onChange="combos(this)" style="width: 50px; text-align: center;"></td>
 								<?php }?>
-                                <td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($valorTotal,0,",",".");?></td>
+									<td>
+											<span class="moneda-simbolo"><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?></span>
+											<span class="valor-numerico"><?=number_format($valorTotal, 0, ",", ".");?></span>
+									</td>
 							</tr>
 							<?php 
 								$no ++;
@@ -882,23 +911,38 @@ include("includes/js-formularios.php");
 							<tfoot>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">SUBTOTAL</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($subtotal,0,",",".");?></td>
+									<td id="subtotal">
+									<span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=number_format($subtotal,0,",",".");?>
+										</span>
+									</td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">DESCUENTO</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($totalDescuento,0,",",".");?></td>
+									<td id="totalDiscount"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=number_format($totalDescuento,0,",",".");?>
+										</span></td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">IVA</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($totalIva,0,",",".");?></td>
+									<td id="totalIva"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=number_format($totalIva,0,",",".");?>
+										</span></td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">ENVÍO</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($envio,0,",",".");?></td>
+									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($envio,0,",",".");?>
+										</td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">TOTAL NETO</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($total,0,",",".");?></td>
+									<td id="total"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=number_format($subtotal,0,",",".");?>
+										</span></td>
 								</tr>
 							</tfoot>	
 								
@@ -933,6 +977,102 @@ include("includes/js-formularios.php");
 		</div>
 	</div>
 	<?php include("includes/pie.php");?>
+	<script>
+  // Función para recalcular totales
+  function recalculate() {
+    let subtotal = 0;
+    let totalDiscount = 0;
+    let totalIva = 0;
+
+    $("#data-table tbody tr").each(function () {
+      let quantity = parseInt($(this).find("input[title='czpp_cantidad']").val()) || 0;
+      let value = parseFloat($(this).find("input[title='czpp_valor']").val()) || 0;
+      let discount = parseFloat($(this).find("input[title='czpp_descuento']").val()) || 0;
+      let subtotalRow = quantity * value;
+      let discountAmount = (subtotalRow * discount) / 100;
+      let rowTotal = subtotalRow - discountAmount;
+      let rowIva = (rowTotal * parseFloat($(this).find("input[title='czpp_impuesto']").val())) / 100;
+
+      subtotal += subtotalRow;
+      totalDiscount += discountAmount;
+      totalIva += rowIva;
+    });
+
+    $("#subtotal .valor-numerico").text(subtotal.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+    $("#totalDiscount .valor-numerico").text(totalDiscount.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+    $("#totalIva .valor-numerico" ).text(totalIva.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+
+    let envio = parseFloat($("input[name='envio']").val()) || 0;
+    let total = subtotal - totalDiscount + totalIva + envio;
+    $("#total .valor-numerico").text(total.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+  }
+
+  $("#data-table tbody").on("input", "input[title='czpp_cantidad'], input[title='czpp_valor'], input[title='czpp_descuento'], input[title='czpp_impuesto']", recalculate);
+
+  $("input[name='envio']").on("input", recalculate);
+
+  let observer = new MutationObserver(function (mutations) {
+    recalculate();
+  });
+
+  let tbody = document.getElementById("data-table").getElementsByTagName("tbody")[0];
+
+  let config = { childList: true };
+
+  observer.observe(tbody, config);
+
+  recalculate();
+</script>
+
+<script>
+    // Función para actualizar una subtotal parcial específica
+    function updatePartialSubtotal(row) {
+        let cantidad = parseFloat(row.find("input[title='czpp_cantidad']").val()) || 0;
+        let valor = parseFloat(row.find("input[title='czpp_valor']").val()) || 0;
+        let descuento = parseFloat(row.find("input[title='czpp_descuento']").val()) || 0;
+        let iva = parseFloat(row.find("input[title='czpp_iva']").val()) || 0;
+
+        let subtotalParcial = cantidad * valor;
+        // let subtotalParcial = cantidad * valor - (cantidad * valor * descuento / 100);
+        let ivaAmount = (subtotalParcial * iva / 100);
+        subtotalParcial += ivaAmount;
+        let valorNumeric = row.find('.valor-numerico');
+        valorNumeric.text(subtotalParcial.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+    }
+
+
+    function recalculatePartialSubtotals() {
+        $('#data-table tbody tr').each(function () {
+            let row = $(this);
+            updatePartialSubtotal(row);
+        });
+    }
+    $('#data-table tbody').on('input', 'input[title^="czpp_"]', function () {
+        let row = $(this).closest('tr');
+        updatePartialSubtotal(row);
+    });
+    recalculatePartialSubtotals();
+</script>
+
+<script>
+	// Controlador de eventos para hacer clic en los enlaces de eliminación
+	$(document).on("click", ".delete-product", function (e) {
+	    e.preventDefault(); 
+	    if (!confirm('¿Desea eliminar este registro?')) {
+	        return;
+	    }
+	  const idItem = $(this).data("id"); 
+
+	  const select2Element = $("#product-select"); 
+		
+		const currentSelectedValues = select2Element.val();
+
+		const newSelectedValues = currentSelectedValues.filter(value => value != idItem);
+
+		select2Element.val(newSelectedValues|| []);
+		select2Element.trigger("change");
+	});
+</script>
 </div>
 </body>
 </html>
