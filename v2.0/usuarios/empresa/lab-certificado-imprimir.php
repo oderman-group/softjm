@@ -33,12 +33,12 @@ $meses = array("", "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO
 
 switch ($remision['rem_tipo_equipo']) {
 	case 1:
-		$pixeles1 = 30;
+		$pixeles1 = 0;
 		$pixeles2 = 1;
 		$hojas1 = 'Hoja 1 de 2';
 		break;
 	case 2:
-		$pixeles1 = 40;
+		$pixeles1 = 0;
 		$pixeles2 = 10;
 		$hojas1 = 'Hoja 1 de 2';
 		break;
@@ -109,7 +109,7 @@ switch ($remision['rem_tipo_equipo']) {
 	<table style="width:100%; font-size: 20px;" border="1" rules="all" align="center">
 		<tr>
 			<td align="center" width="50%">
-				<table style="width:100%; height: 300px;" border="0" align="center">
+				<table style="width:100%;" border="0" align="center">
 					<tr>
 						<td><strong>INSTRUMENTO</strong>:</td>
 						<td><?= $remision['rem_equipo']; ?></td>
@@ -154,7 +154,7 @@ switch ($remision['rem_tipo_equipo']) {
 			</td>
 
 			<td align="center" width="50%">
-				<table style="width:100%; height: 300px;" border="0" align="center">
+				<table style="width:100%;" border="0" align="center">
 					<tr>
 						<td><strong>FECHA DE REVISIÓN</strong>:</td>
 						<td><?= $camposRemision[0] . " DE " . $meses[$camposRemision[1]] . " DE " . $camposRemision[2]; ?></td>
@@ -194,7 +194,7 @@ switch ($remision['rem_tipo_equipo']) {
 		<table style="width:100%; font-size: 20px;" border="1" rules="all" align="center">
 			<tr>
 				<td align="center" width="50%">
-					<table style="width:100%; padding: 10px; font-size: 18px; height: 200px;" border="0" rules="groups" align="center">
+					<table style="width:100%; padding: 10px; font-size: 18px;" border="0" rules="groups" align="center">
 						<tr align="center">
 							<td align="center" colspan="2">
 								<h4 style="color: midnightblue;" align="center">DATOS DE TRAZABILIDAD EQUIPO PATRON UTILAZADO PARA REALIZAR EL AJUSTE</h4>
@@ -212,7 +212,7 @@ switch ($remision['rem_tipo_equipo']) {
 				</td>
 	
 				<td align="center" width="50%">
-					<table style="width:100%; padding: 10px; font-size: 18px; height: 200px;" border="0" rules="groups" align="center">
+					<table style="width:100%; padding: 10px; font-size: 18px;" border="0" rules="groups" align="center">
 						<tr align="center">
 							<td align="center" colspan="2">
 								<h4 style="color: midnightblue;" align="center">METODO DE AJUSTE UTILIZADO</h4>
@@ -228,7 +228,7 @@ switch ($remision['rem_tipo_equipo']) {
 			</tr>
 		</table>
 
-		<table style="width:100%; padding: 10px; font-size: 18px; height: 200px;" border="1" rules="groups" align="center">
+		<table style="width:100%; padding: 10px; font-size: 18px;" border="1" rules="groups" align="center">
 			<tr align="center">
 				<td align="center" colspan="2">
 					<h4 style="color: midnightblue;" align="center">INSPECCIÓN OPTICOMECÁNICA</h4>
@@ -253,7 +253,7 @@ switch ($remision['rem_tipo_equipo']) {
 			</tr>
 		</table>
 
-		<table style="width:100%; padding: 10px; font-size: 18px; height: 180px;" border="1" rules="groups" align="center">
+		<table style="width:100%; padding: 10px; font-size: 18px;" border="1" rules="groups" align="center">
 			<tr align="center">
 				<td align="center" colspan="2">
 					<h4 style="color: midnightblue;" align="center">INSPECCIÓN DE CONTROL DE COLIMADOR DE<br>CUATRO TUBOS MODELO F420-4TA</h4>
@@ -279,7 +279,41 @@ switch ($remision['rem_tipo_equipo']) {
 	<?php
 	//PARA ESTACIÓN Y TEODOLITO
 	if ($remision['rem_tipo_equipo'] == 1 or $remision['rem_tipo_equipo'] == 2) { ?>
-		<table style="width:100%; padding: 10px; height: 250px; font-size: 18px;" border="1" rules="groups" align="center">
+		<table style="width:100%; font-size: 20px;" border="1" rules="all" align="center">
+			<tr>
+				<td align="center" width="50%">
+					<table style="width:100%; padding: 10px; font-size: 18px;" border="0" rules="groups" align="center">
+						<tr align="center">
+							<td align="center" colspan="2">
+								<h4 style="color: midnightblue;" align="center">DATOS DE TRAZABILIDAD EQUIPO PATRON UTILAZADO PARA REALIZAR EL AJUSTE</h4>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<p>SURVEY RENTAL & SALES SAC EXPIDE CERTIFICADO DE CALIBRACION  N° 25583-23 PARA ESTACION TOTAL MARCA GEOMAX REFERENCIA ZOOM 25 1” SERIAL:  2839480.</p>
+							</td>
+						</tr>
+					</table>
+				</td>
+	
+				<td align="center" width="50%">
+					<table style="width:100%; padding: 10px; font-size: 18px;" border="0" rules="groups" align="center">
+						<tr align="center">
+							<td align="center" colspan="2">
+								<h4 style="color: midnightblue;" align="center">METODO DE AJUSTE UTILIZADO</h4>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<p>SUSTITUCION O (TRANSFERENCIA) MEDIANTE EL CUAL SE ESTABLECE CON PATRON DE TRABAJO LAS MEDIDAS MATERIALIZADAS DE REFERENCIA, LAS CUALES SERAN COMPARADAS CON LOS VALORES DEL EQUIPO A REALIZAR EL AJUSTE PARA POSTERIORMENTE APLICAR LA CORRECCION DE ACUERDO CON LOS PARAMENTROS DE  TOLERANCIA ESTABLECIDOS POR EL FABRICANTE.</p>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+
+		<table style="width:100%; padding: 10px; font-size: 18px;" border="1" rules="groups" align="center">
 			<tr align="center">
 				<td align="center" colspan="2">
 					<h4 style="color: midnightblue;" align="center">INSPECCIÓN OPTICOMECÁNICA</h4>
@@ -305,191 +339,197 @@ switch ($remision['rem_tipo_equipo']) {
 			</tr>
 		</table>
 
-		<p>&nbsp;</p>
-		<h3 style="color: darkblue;">INSPECCIÓN Y AJUSTE SISTEMA ANGULAR</h3>
-		<table align="center" style="width:90%; padding: 10px; margin-top: 30px; height: 225px; font-size: 20px;" border="0">
+		<table style="width:100%; padding: 10px; font-size: 18px;" border="1" rules="groups" align="center">
+			<tr align="center">
+				<td align="center" colspan="2">
+					<h4 style="color: midnightblue;" align="center">INSPECCIÓN Y AJUSTE SISTEMA ANGULAR</h4>
+				</td>
+			</tr>
 			<tr>
-				<td align="center" width="30%">
-
-					<table style="width:100%; padding: 20px;" border="0">
-						<tr align="center">
-							<td rowspan="6" style="color: midnightblue;">INSPECCIÓN<br>DE<br>ENTRADA</td>
-						</tr>
-					</table>
-				</td>
-
-				<td width="30%">
-					<table style="width:100%; padding: 10px;" border="0">
+				<td>
+					<table style="width:100%; padding: 20px; height: 80px;" border="0">
 						<tr>
-							<td>POSICIÓN 1 (VERTICAL D)</td>
-						</tr>
-						<tr>
-							<td>POSICIÓN 1 (HORIZONTAL D)</td>
-						</tr>
-						<tr>
-							<td>POSICIÓN 1 (VERTICAL I)</td>
-						</tr>
-						<tr>
-							<td>POSICIÓN 1 (HORIZONTAL I)</td>
-						</tr>
-						<tr>
-							<td>ERROR OBSERVADO V</td>
-						</tr>
-						<tr>
-							<td>ERROR OBSERVADO H</td>
-						</tr>
-					</table>
-				</td>
+							<td width="50%">
+								<table style="width:70%;" align="center" border="0">
+									<tr>
+										<td colspan="4">
+											<h4 style="color: midnightblue;">INSPECCIÓN DE ENTRADA</h4>
+										</td>
+									</tr>
+									<tr>
+										<td style="width:52%;">POSICIÓN 1 (VERTICAL D)</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1vd_grados']; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1vd_minutos']; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1vd_segundos']; ?>"</td>
+									</tr>
+									<tr>
+										<td style="width:52%;">POSICIÓN 1 (HORIZONTAL D)</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1hd_grados']; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1hd_minutos']; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1hd_segundos']; ?>"</td>
+									</tr>
+									<tr>
+										<td style="width:52%;">POSICIÓN 1 (VERTICAL I)</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1vi_grados']; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1vi_minutos']; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1vi_segundos']; ?>"</td>
+									</tr>
+									<tr>
+										<td style="width:52%;">POSICIÓN 1 (HORIZONTAL I)</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1hi_grados']; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1hi_minutos']; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p1hi_segundos']; ?>"</td>
+									</tr>
 
-				<td width="40%">
-					<table style="width:100%; padding: 10px;" border="1" rules="all">
-						<tr align="center">
-							<td><?= $remision['rem_p1vd_grados']; ?>°</td>
-							<td><?= $remision['rem_p1vd_minutos']; ?>'</td>
-							<td><?= $remision['rem_p1vd_segundos']; ?>"</td>
-						</tr>
-						<tr align="center">
-							<td><?= $remision['rem_p1hd_grados']; ?>°</td>
-							<td><?= $remision['rem_p1hd_minutos']; ?>'</td>
-							<td><?= $remision['rem_p1hd_segundos']; ?>"</td>
-						</tr>
-						<tr align="center">
-							<td><?= $remision['rem_p1vi_grados']; ?>°</td>
-							<td><?= $remision['rem_p1vi_minutos']; ?>'</td>
-							<td><?= $remision['rem_p1vi_segundos']; ?>"</td>
-						</tr>
-						<tr align="center">
-							<td><?= $remision['rem_p1hi_grados']; ?>°</td>
-							<td><?= $remision['rem_p1hi_minutos']; ?>'</td>
-							<td><?= $remision['rem_p1hi_segundos']; ?>"</td>
-						</tr>
+									<?php
+										$sumaGradosV1 = ($remision['rem_p1vd_grados'] + $remision['rem_p1vi_grados']);
+										$sumaMinutosV1 = ($remision['rem_p1vd_minutos'] + $remision['rem_p1vi_minutos']);
+										$sumaSegundosV1 = ($remision['rem_p1vd_segundos'] + $remision['rem_p1vi_segundos']);
 
-						<?php
-						$sumaGradosV1 = ($remision['rem_p1vd_grados'] + $remision['rem_p1vi_grados']);
-						$sumaMinutosV1 = ($remision['rem_p1vd_minutos'] + $remision['rem_p1vi_minutos']);
-						$sumaSegundosV1 = ($remision['rem_p1vd_segundos'] + $remision['rem_p1vi_segundos']);
+										$gradosV1 = (359 - $sumaGradosV1);
+										$minutosV1 = (59 - $sumaMinutosV1);
+										$segundosV1 = (60 - $sumaSegundosV1);
 
-						$gradosV1 = (359 - $sumaGradosV1);
-						$minutosV1 = (59 - $sumaMinutosV1);
-						$segundosV1 = (60 - $sumaSegundosV1);
+										$sumaGradosH1 = ($remision['rem_p1hd_grados'] + $remision['rem_p1hi_grados']);
+										$sumaMinutosH1 = ($remision['rem_p1hd_minutos'] + $remision['rem_p1hi_minutos']);
+										$sumaSegundosH1 = ($remision['rem_p1hd_segundos'] + $remision['rem_p1hi_segundos']);
 
-						$sumaGradosH1 = ($remision['rem_p1hd_grados'] + $remision['rem_p1hi_grados']);
-						$sumaMinutosH1 = ($remision['rem_p1hd_minutos'] + $remision['rem_p1hi_minutos']);
-						$sumaSegundosH1 = ($remision['rem_p1hd_segundos'] + $remision['rem_p1hi_segundos']);
+										$gradosH1 = (179 - $sumaGradosH1);
+										$minutosH1 = (59 - $sumaMinutosH1);
+										$segundosH1 = (60 - $sumaSegundosH1);
+									?>
 
-						$gradosH1 = (179 - $sumaGradosH1);
-						$minutosH1 = (59 - $sumaMinutosH1);
-						$segundosH1 = (60 - $sumaSegundosH1);
-						?>
+									<tr>
+										<td style="width:52%;">ERROR OBSERVADO V</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?php if ($gradosV1 > 0 and $gradosV1 != 360) echo $gradosV1;
+											else echo "00"; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?php if ($minutosV1 > 0 and $minutosV1 != 59) echo $minutosV1;
+											else echo "00"; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $segundosV1; ?>"</td>
+									</tr>
+									<tr>
+										<td style="width:52%;">ERROR OBSERVADO H</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?php if ($gradosH1 > 0 and $gradosH1 != 180) echo $gradosH1;
+											else echo "00"; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?php if ($minutosH1 > 0 and $minutosH1 != 59) echo $minutosH1;
+											else echo "00"; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $sumaSegundosH1; ?>"</td>
+									</tr>
+								</table>
+							</td>
 
-						<tr align="center">
-							<td><?php if ($gradosV1 > 0 and $gradosV1 != 360) echo $gradosV1;
-								else echo "00"; ?>°</td>
-							<td><?php if ($minutosV1 > 0 and $minutosV1 != 59) echo $minutosV1;
-								else echo "00"; ?>'</td>
-							<td><?= $segundosV1; ?>"</td>
-						</tr>
-						<tr align="center">
-							<td><?php if ($gradosH1 > 0 and $gradosH1 != 180) echo $gradosH1;
-								else echo "00"; ?>°</td>
-							<td><?php if ($minutosH1 > 0 and $minutosH1 != 59) echo $minutosH1;
-								else echo "00"; ?>'</td>
-							<td><?= $sumaSegundosH1; ?>"</td>
+							<td width="50%">
+								<table style="width:70%;" align="center" border="0">
+									<tr>
+										<td colspan="4">
+											<h4 style="color: midnightblue;">INSPECCIÓN DE SALIDA</h4>
+										</td>
+									</tr>
+									<tr>
+										<td style="width:52%;">POSICIÓN 1 (VERTICAL D)</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2vd_grados']; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2vd_minutos']; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2vd_segundos']; ?>"</td>
+									</tr>
+									<tr>
+										<td style="width:52%;">POSICIÓN 1 (HORIZONTAL D)</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2hd_grados']; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2hd_minutos']; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2hd_segundos']; ?>"</td>
+									</tr>
+									<tr>
+										<td style="width:52%;">POSICIÓN 1 (VERTICAL I)</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2vi_grados']; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2vi_minutos']; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2vi_segundos']; ?>"</td>
+									</tr>
+									<tr>
+										<td style="width:52%;">POSICIÓN 1 (HORIZONTAL I)</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2hi_grados']; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2hi_minutos']; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $remision['rem_p2hi_segundos']; ?>"</td>
+									</tr>
+
+									<?php
+										$sumaGradosV2 = ($remision['rem_p2vd_grados'] + $remision['rem_p2vi_grados']);
+										$sumaMinutosV2 = ($remision['rem_p2vd_minutos'] + $remision['rem_p2vi_minutos']);
+										$sumaSegundosV2 = ($remision['rem_p2vd_segundos'] + $remision['rem_p2vi_segundos']);
+
+										$gradosV2 = (359 - $sumaGradosV2);
+										$minutosV2 = (59 - $sumaMinutosV2);
+										$segundosV2 = (60 - $sumaSegundosV2);
+
+										$sumaGradosH2 = ($remision['rem_p2hd_grados'] + $remision['rem_p2hi_grados']);
+										$sumaMinutosH2 = ($remision['rem_p2hd_minutos'] + $remision['rem_p2hi_minutos']);
+										$sumaSegundosH2 = ($remision['rem_p2hd_segundos'] + $remision['rem_p2hi_segundos']);
+
+										$gradosH2 = (179 - $sumaGradosH2);
+										$minutosH2 = (59 - $sumaMinutosH2);
+										$segundosH2 = (60 - $sumaSegundosH2);
+									?>
+
+									<tr>
+										<td style="width:52%;">ERROR OBSERVADO V</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?php if ($gradosV2 > 0 and $gradosV2 != 360) echo $gradosV2;
+											else echo "00"; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?php if ($minutosV2 > 0 and $minutosV2 != 59) echo $minutosV2;
+											else echo "00"; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $segundosV2; ?>"</td>
+									</tr>
+									<tr>
+										<td style="width:52%;">ERROR OBSERVADO H</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?php if ($gradosH2 > 0 and $gradosH2 != 180) echo $gradosH2;
+											else echo "00"; ?>°</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?php if ($minutosH2 > 0 and $minutosH2 != 59) echo $minutosH2;
+											else echo "00"; ?>'</td>
+										<td style="width:16%; border: thin; border-style: solid;" align="center"><?= $sumaSegundosH2; ?>"</td>
+									</tr>
+								</table>
+							</td>
 						</tr>
 					</table>
 				</td>
 			</tr>
 		</table>
-		<p>&nbsp;</p>
 
-
-		<table align="center" style="width:90%; padding: 10px; height: 225px; font-size: 20px;" border="0">
+		<table style="width:100%; padding: 10px; font-size: 18px;" border="0" rules="groups" align="center">
+			<tr align="center">
+				<td align="center" colspan="2">
+					<h4 style="color: midnightblue;" align="center">MENSURADO<br>N°1 PRISMA; N°2 LASERA; N°3 DIANA</h4>
+				</td>
+			</tr>
 			<tr>
-				<td align="center" width="30%">
-
-					<table style="width:100%; padding: 10px;" border="0">
-						<tr align="center">
-							<td rowspan="6" style="color: midnightblue;">AJUSTE<br>EN<br>LABORATORIO</td>
-						</tr>
-					</table>
-				</td>
-
-				<td width="30%">
-					<table style="width:100%; padding: 10px;" border="0">
+				<td>
+					<table style="width:100%; padding: 20px; height: 80px;" border="0">
 						<tr>
-							<td>POSICIÓN 1 (VERTICAL D)</td>
-						</tr>
-						<tr>
-							<td>POSICIÓN 1 (HORIZONTAL D)</td>
-						</tr>
-						<tr>
-							<td>POSICIÓN 1 (VERTICAL I)</td>
-						</tr>
-						<tr>
-							<td>POSICIÓN 1 (HORIZONTAL I)</td>
-						</tr>
-						<tr>
-							<td>ERROR OBSERVADO V</td>
-						</tr>
-						<tr>
-							<td>ERROR OBSERVADO H</td>
-						</tr>
-					</table>
-				</td>
-
-				<td width="40%">
-					<table style="width:100%; padding: 10px;" border="1" rules="all">
-						<tr align="center">
-							<td><?= $remision['rem_p2vd_grados']; ?>°</td>
-							<td><?= $remision['rem_p2vd_minutos']; ?>'</td>
-							<td><?= $remision['rem_p2vd_segundos']; ?>"</td>
-						</tr>
-						<tr align="center">
-							<td><?= $remision['rem_p2hd_grados']; ?>°</td>
-							<td><?= $remision['rem_p2hd_minutos']; ?>'</td>
-							<td><?= $remision['rem_p2hd_segundos']; ?>"</td>
-						</tr>
-						<tr align="center">
-							<td><?= $remision['rem_p2vi_grados']; ?>°</td>
-							<td><?= $remision['rem_p2vi_minutos']; ?>'</td>
-							<td><?= $remision['rem_p2vi_segundos']; ?>"</td>
-						</tr>
-						<tr align="center">
-							<td><?= $remision['rem_p2hi_grados']; ?>°</td>
-							<td><?= $remision['rem_p2hi_minutos']; ?>'</td>
-							<td><?= $remision['rem_p2hi_segundos']; ?>"</td>
-						</tr>
-						<?php
-						$sumaGradosV2 = ($remision['rem_p2vd_grados'] + $remision['rem_p2vi_grados']);
-						$sumaMinutosV2 = ($remision['rem_p2vd_minutos'] + $remision['rem_p2vi_minutos']);
-						$sumaSegundosV2 = ($remision['rem_p2vd_segundos'] + $remision['rem_p2vi_segundos']);
-
-						$gradosV2 = (359 - $sumaGradosV2);
-						$minutosV2 = (59 - $sumaMinutosV2);
-						$segundosV2 = (60 - $sumaSegundosV2);
-
-						$sumaGradosH2 = ($remision['rem_p2hd_grados'] + $remision['rem_p2hi_grados']);
-						$sumaMinutosH2 = ($remision['rem_p2hd_minutos'] + $remision['rem_p2hi_minutos']);
-						$sumaSegundosH2 = ($remision['rem_p2hd_segundos'] + $remision['rem_p2hi_segundos']);
-
-						$gradosH2 = (179 - $sumaGradosH2);
-						$minutosH2 = (59 - $sumaMinutosH2);
-						$segundosH2 = (60 - $sumaSegundosH2);
-						?>
-
-						<tr align="center">
-							<td><?php if ($gradosV2 > 0 and $gradosV2 != 360) echo $gradosV2;
-								else echo "00"; ?>°</td>
-							<td><?php if ($minutosV2 > 0 and $minutosV2 != 59) echo $minutosV2;
-								else echo "00"; ?>'</td>
-							<td><?= $segundosV2; ?>"</td>
-						</tr>
-						<tr align="center">
-							<td><?php if ($gradosH2 > 0 and $gradosH2 != 180) echo $gradosH2;
-								else echo "00"; ?>°</td>
-							<td><?php if ($minutosH2 > 0 and $minutosH2 != 59) echo $minutosH2;
-								else echo "00"; ?>'</td>
-							<td><?= $sumaSegundosH2; ?>"</td>
+							<td width="50%">
+								<table style="width:70%;" align="center" border="1">
+									<tr>
+										<td style="width:25%;" align="center">MENSURANDO</td>
+										<td style="width:25%;" align="center">PATRON</td>
+										<td style="width:25%;" align="center">EQUIPO AJUSTADO</td>
+										<td style="width:25%;" align="center">DIFERENCIA</td>
+									</tr>
+									<tr>
+										<td align="center">N°1</td>
+										<td align="center"><?= $remision['rem_n1_patron']; ?></td>
+										<td align="center"><?= $remision['rem_n1_equipo']; ?></td>
+										<td align="center"><?= $remision['rem_n1_diferencia']; ?></td>
+									</tr>
+									<tr>
+										<td align="center">N°2</td>
+										<td align="center"><?= $remision['rem_n2_patron']; ?></td>
+										<td align="center"><?= $remision['rem_n2_equipo']; ?></td>
+										<td align="center"><?= $remision['rem_n2_diferencia']; ?></td>
+									</tr>
+									<tr>
+										<td align="center">N°3</td>
+										<td align="center"><?= $remision['rem_n3_patron']; ?></td>
+										<td align="center"><?= $remision['rem_n3_equipo']; ?></td>
+										<td align="center"><?= $remision['rem_n3_diferencia']; ?></td>
+									</tr>
+								</table>
+							</td>
 						</tr>
 					</table>
 				</td>
@@ -500,7 +540,7 @@ switch ($remision['rem_tipo_equipo']) {
 	<?php
 	//PARA NIVELES
 	if ($remision['rem_tipo_equipo'] == 3 OR $remision['rem_tipo_equipo'] == 5) { ?>
-		<table style="width:100%; padding: 10px; font-size: 18px; height: 180px;" border="1" rules="groups" align="center">
+		<table style="width:100%; padding: 10px; font-size: 18px;" border="1" rules="groups" align="center">
 			<tr align="center">
 				<td align="center" colspan="2">
 					<h4 style="color: midnightblue;" align="center">INSPECCION DEL SISTEMA DIFERENCIA DE ALTURA</h4>
@@ -706,14 +746,34 @@ switch ($remision['rem_tipo_equipo']) {
 			</tr>
 		</table>
 
+		<table style="width:100%; padding: 10px; font-size: 18px;" border="1" rules="groups" align="center">
+			<tr align="center">
+				<td align="center" colspan="2">
+					<h4 style="color: midnightblue;" align="center">CONDICIONES PRESENTES EN EL LABORATORIO EN EL PROCESO DE AJUSTE</h4>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					TEMPERATURA AMBIENTE MINIMA:  22°C<br>
+					HUMEDAD RELATIVA MINIMA: 63%<br>
+					PRESION ATMOSFERICA: 760 mmHg
+				</td>
+
+				<td align="center">
+					TEMPERATURA MAXIMA: 25°C<br>
+					HUMEDAD RELATIVA MAXIMA 69%
+				</td>
+			</tr>
+		</table>
+
 		<?php
 		//PARA ESTACIÓN Y TEODOLITO
 		if ($remision['rem_tipo_equipo'] == 1 or $remision['rem_tipo_equipo'] == 2) { ?>
-			<table style="width:100%; height:250px; font-size: 18px;" border="1" rules="groups" align="center">
+			<table style="width:100%; font-size: 18px;" border="1" rules="groups" align="center">
 				<tr align="center">
 					<td align="center" colspan="2">
 						<h4 style="color: midnightblue;" align="center">INSPECCIÓN DEL SISTEMA DE MEDIDA ANGULAR, COLIMADOR DE CUATRO TUBOS<br>
-							MODELO F420-4TA</h4>
+							MODELO S/N:12-0663</h4>
 					</td>
 				</tr>
 				<tr>
@@ -732,37 +792,33 @@ switch ($remision['rem_tipo_equipo']) {
 				</tr>
 			</table>
 
-			<?php
-			//sólo para estación total
-			if ($remision['rem_tipo_equipo'] == 1) { ?>
-				<table style="width:100%; height:250px; font-size: 18px;" border="1" rules="groups" align="center">
-					<tr align="center">
-						<td align="center" colspan="2">
-							<h4 style="color: midnightblue;" align="center">INSPECCIÓN EDM SOBRE LÍNEA BASE 320.162 m<br>
-								(DISTANCIOMETRO) CONDICIONES: TEMPERATURA 25°C, PRESIÓN ATMOSFERICA 640mmhg,<br>
-								CONSTANTE DEL PRISMA -30</h4>
-						</td>
-					</tr>
-					<tr>
-						<td>
+			<table style="width:100%; font-size: 18px;" border="1" rules="groups" align="center">
+				<tr align="center">
+					<td align="center" colspan="2">
+						<h4 style="color: midnightblue;" align="center">INSPECCIÓN EDM SOBRE LÍNEA BASE 17.006 m<br>
+							(DISTANCIOMETRO) CONDICIONES: TEMPERATURA 25°C, PRESIÓN ATMOSFERICA 760mmhg,<br>
+							CONSTANTE DEL PRISMA -30</h4>
+					</td>
+				</tr>
+				<tr>
+					<td>
 
-							PRISMAS<br>
-							MEDIDA DISTANCIA<br>
-							CONSTANTE DEL PRISMA<br>
-							CONSTANTE PPM
-						</td>
+						PRISMAS<br>
+						MEDIDA DISTANCIA<br>
+						CONSTANTE DEL PRISMA<br>
+						CONSTANTE PPM
+					</td>
 
-						<td align="center">
-							AJUSTE Y VERIFICACIÓN<br>
-							GENERAL DE FUNCIONES
-							<h3 style="color: midnightblue;"><?= $estadosCertificados[$remision['rem_estado_certificado']]; ?></h3>
+					<td align="center">
+						AJUSTE Y VERIFICACIÓN<br>
+						GENERAL DE FUNCIONES
+						<h3 style="color: midnightblue;"><?= $estadosCertificados[$remision['rem_estado_certificado']]; ?></h3>
 
-						</td>
-					</tr>
-				</table>
-			<?php } ?>
+					</td>
+				</tr>
+			</table>
 
-			<table style="width:100%; height:250px; font-size: 18px;" border="1" rules="groups" align="center">
+			<table style="width:100%; font-size: 18px;" border="1" rules="groups" align="center">
 				<tr align="center">
 					<td align="center" colspan="2">
 						<h4 style="color: midnightblue;" align="center">CONTROLES Y VISUALIZACIÓN ELECTRÓNICA</h4>
@@ -787,45 +843,15 @@ switch ($remision['rem_tipo_equipo']) {
 				</tr>
 			</table>
 		<?php } ?>
-
-		<?php
-		//PARA ESTACIÓN Y TEODOLITO
-		if ($remision['rem_tipo_equipo'] == 3) { ?>
-			<table style="width:100%; padding: 10px; height: 250px; font-size: 18px;" border="1" rules="groups" align="center">
-				<tr align="center">
-					<td align="center" colspan="2">
-						<h4 style="color: midnightblue;" align="center">CONDICIONES PRESENTES EN EL LABORATORIO EN EL PROCESO DE AJUSTE</h4>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						TEMPERATURA AMBIENTE MINIMA:  22°C<br>
-						HUMEDAD RELATIVA MINIMA: 63%<br>
-						PRESION ATMOSFERICA: 760 mmHg
-					</td>
-	
-					<td align="center">
-						TEMPERATURA MAXIMA: 25°C<br>
-						HUMEDAD RELATIVA MAXIMA 69%
-					</td>
-				</tr>
-			</table>
-		<?php } ?>
 	<?php } ?>
 
 	
 	<p>&nbsp;</p>
-
 	<?php
 	//sólo para teodolito. Unos espacios más.
-	if ($remision['rem_tipo_equipo'] == 2) { ?>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-	<?php } 
-	//sólo para teodolito. Unos espacios más.
 	if ($remision['rem_tipo_equipo'] == 3) { ?>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
