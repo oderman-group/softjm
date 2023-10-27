@@ -14,8 +14,6 @@ $numDatos=mysqli_num_rows($consultaUsuario);
 $msg=2;
 if ($numDatos>0) {
 
-  $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"), MYSQLI_BOTH);
-
   $datosUsuario = mysqli_fetch_array($consultaUsuario, MYSQLI_BOTH);
 
   $nuevaClave = generarClaves(8);
@@ -51,24 +49,23 @@ if ($numDatos>0) {
 
   // Instantiation and passing `true` enables exceptions
   $mail = new PHPMailer(true);
-  echo '<div style="display:none;">';
   try {
-    $mail->SMTPDebug = 2;                                       // Enable verbose debug output
-    $mail->isSMTP();                                            // Set mailer to use SMTP
-    $mail->Host       = 'mail.orioncrm.com.co';  // Specify main and backup SMTP servers
-    $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-    $mail->Username   = $configuracion['conf_email'];                     // SMTP username
-    $mail->Password   = $configuracion['conf_clave_correo'];                              // SMTP password
-    $mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
-    $mail->Port       = 465;                                    // TCP port to connect to
+    $mail->SMTPDebug = 0;                                                           // Enable verbose debug output
+    $mail->isSMTP();                                                                // Set mailer to use SMTP
+    $mail->Host       = EMAIL_SERVER;                                               // Specify main and backup SMTP servers
+    $mail->SMTPAuth   = true;                                                       // Enable SMTP authentication
+    $mail->Username   = EMAIL_USER;                                                 // SMTP username
+    $mail->Password   = EMAIL_PASSWORD;                                             // SMTP password
+    $mail->SMTPSecure = 'ssl';                                                      // Enable TLS encryption, `ssl` also accepted
+    $mail->Port       = 465;                                                        // TCP port to connect to
 
     //Recipients
-    $mail->setFrom($configuracion['conf_email'], 'JMEQUIPOS');
+    $mail->setFrom(EMAIL_SENDER, NAME_SENDER);
     $mail->addAddress($datosUsuario['usr_email'], $datosUsuario['usr_nombre']);     // Add a recipient
 
 
     // Content
-    $mail->isHTML(true);                                  // Set email format to HTML
+    $mail->isHTML(true);                                                            // Set email format to HTML
     $mail->Subject = 'CRM ORIÓN - Credenciales de acceso';
     $mail->Body = $fin;
     $mail->CharSet = 'UTF-8';
@@ -77,7 +74,6 @@ if ($numDatos>0) {
   } catch (Exception $e) {
     echo "Error: {$mail->ErrorInfo}";
   }
-  echo '</div>';
 
   $msg=1;
 }
