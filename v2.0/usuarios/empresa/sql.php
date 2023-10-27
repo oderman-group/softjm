@@ -1036,6 +1036,16 @@ if($_POST["idSql"]==48){
 	rem_p2hi_minutos='".$_POST["p2hi_minutos"]."',
 	rem_p2hi_segundos='".$_POST["p2hi_segundos"]."',
 	
+	rem_n1_patron='".$_POST["n1_patron"]."',
+	rem_n1_equipo='".$_POST["n1_equipo"]."',
+	rem_n1_diferencia='".$_POST["n1_diferencia"]."',
+	rem_n2_patron='".$_POST["n2_patron"]."',
+	rem_n2_equipo='".$_POST["n2_equipo"]."',
+	rem_n2_diferencia='".$_POST["n2_diferencia"]."',
+	rem_n3_patron='".$_POST["n3_patron"]."',
+	rem_n3_equipo='".$_POST["n3_equipo"]."',
+	rem_n3_diferencia='".$_POST["n3_diferencia"]."',
+	
 	rem_l1a='".$_POST["l1a"]."',
 	rem_l1b='".$_POST["l1b"]."',
 	rem_l1c='".$_POST["l1c"]."',
