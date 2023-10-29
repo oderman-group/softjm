@@ -15,7 +15,6 @@ $numAnulado=mysqli_num_rows($consultaAnulado);
 $version="";
 if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 	$version='
-	<div class="row">
 		<div class="col-sm-12 col-lg-6">
 			<div class="form-group row">
 				<label for="fname" class="col-sm-3 text-right control-label col-form-label">Versión del certificado</label>
@@ -24,7 +23,6 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 				</div>
 			</div>
 		</div>
-	</div>
 	';
 }
 ?>
@@ -352,7 +350,18 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 										</div>
 									</div>
 									
-									<?=$version;?>
+									<div class="row">
+										<?=$version;?>
+
+										<div class="col-sm-12 col-lg-6">
+											<div class="form-group row">
+												<label for="fname" class="col-sm-3 text-right control-label col-form-label">Supervisor de Laboratorio</label>
+												<div class="col-sm-9">
+													<input type="text" class="form-control" id="fname" name="supervisor" value="<?=$resultadoD['rem_supervisor'];?>" <?=$disabled;?>>
+												</div>
+											</div>
+										</div>
+									</div>
 									
 									
 									
@@ -464,7 +473,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 													<tr align="center">
 														<td><input value="<?=$resultadoD['rem_p2vd_grados'];?>" name="p2vd_grados" style="text-align: center;" <?=$disabled;?>></td>
 														<td><input value="<?=$resultadoD['rem_p2vd_minutos'];?>" name="p2vd_minutos" style="text-align: center;" <?=$disabled;?>></td>
-														<td><input value="<?=$resultadoD['rem_p2vd_segundos'];?>" name="p2vd_segundos" style="text-align: center;"></td>
+														<td><input value="<?=$resultadoD['rem_p2vd_segundos'];?>" name="p2vd_segundos" style="text-align: center;" <?=$disabled;?>></td>
 													</tr>
 													<tr align="center">
 														<td><input value="<?=$resultadoD['rem_p2hd_grados'];?>" name="p2hd_grados" style="text-align: center;" <?=$disabled;?>></td>
@@ -515,6 +524,42 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 											</td>
 										</tr>
 									</table>
+									<p>&nbsp;</p>
+
+									<h4 style="color: darkblue;">MENSURADO<br>N°1 PRISMA; N°2 LASERA; N°3 DIANA</h4>
+									<table style="width:100%; padding: 10px; margin-top: 30px;" border="0">
+										<tr>
+											<td>
+												<table style="width:100%; padding: 10px;" border="1" rules="all">
+													<tr style="color: darkblue;" align="center">
+														<td>MENSURADO</td>
+														<td>PATRON</td>
+														<td>EQUIPO AJUSTADO</td>
+														<td>DIFERENCIA</td>
+													</tr>
+													<tr align="center">
+														<td>Nº1</td>
+														<td><input value="<?=$resultadoD['rem_n1_patron'];?>" name="n1_patron" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_n1_equipo'];?>" name="n1_equipo" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_n1_diferencia'];?>" name="n1_diferencia" style="text-align: center;" <?=$disabled;?>></td>
+													</tr>
+													<tr align="center">
+														<td>Nº2</td>
+														<td><input value="<?=$resultadoD['rem_n2_patron'];?>" name="n2_patron" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_n2_equipo'];?>" name="n2_equipo" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_n2_diferencia'];?>" name="n2_diferencia" style="text-align: center;" <?=$disabled;?>></td>
+													</tr>
+													<tr align="center">
+														<td>Nº3</td>
+														<td><input value="<?=$resultadoD['rem_n3_patron'];?>" name="n3_patron" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_n3_equipo'];?>" name="n3_equipo" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input value="<?=$resultadoD['rem_n3_diferencia'];?>" name="n3_diferencia" style="text-align: center;" <?=$disabled;?>></td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+									</table>
+									<p>&nbsp;</p>
 									
 									<?php }?>
 									

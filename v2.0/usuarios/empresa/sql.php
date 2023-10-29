@@ -1008,7 +1008,7 @@ if($_POST["idSql"]==48){
 		case 16: $_POST["equipo"] = 'Estuche'; break;	
 	}
 	
-	mysqli_query($conexionBdPrincipal,"UPDATE remisiones SET rem_tipo_equipo='".$_POST["tipoEquipo"]."', rem_equipo='".$_POST["equipo"]."', rem_referencia='".$_POST["referencia"]."', rem_serial='".$_POST["serial"]."', rem_descripcion='".$_POST["descripcion"]."', rem_detalles='".$_POST["detalles"]."', rem_dias_entrega='".$_POST["tiempoEntrega"]."', rem_dias_reclamar='".$_POST["tiempoReclamar"]."', rem_precision_angular='".$_POST["pAngular"]."', rem_precision_distancia='".$_POST["pDistancia"]."', rem_observacion_salida='".$_POST["obsSalida"]."', rem_marca='".$_POST["marca"]."', rem_fecha='".$_POST["fecha"]."', rem_tiempo_certificado='".$_POST["vigenciaCerificado"]."', rem_tipos_equipos='".$_POST["tiposEquipos"]."',
+	mysqli_query($conexionBdPrincipal,"UPDATE remisiones SET rem_tipo_equipo='".$_POST["tipoEquipo"]."', rem_equipo='".$_POST["equipo"]."', rem_referencia='".$_POST["referencia"]."', rem_serial='".$_POST["serial"]."', rem_descripcion='".$_POST["descripcion"]."', rem_detalles='".$_POST["detalles"]."', rem_dias_entrega='".$_POST["tiempoEntrega"]."', rem_dias_reclamar='".$_POST["tiempoReclamar"]."', rem_precision_angular='".$_POST["pAngular"]."', rem_precision_distancia='".$_POST["pDistancia"]."', rem_observacion_salida='".$_POST["obsSalida"]."', rem_marca='".$_POST["marca"]."', rem_fecha='".$_POST["fecha"]."', rem_tiempo_certificado='".$_POST["vigenciaCerificado"]."', rem_tipos_equipos='".$_POST["tiposEquipos"]."', rem_supervisor='".$_POST["supervisor"]."',
 	
 	rem_p1vd_grados='".$_POST["p1vd_grados"]."',
 	rem_p1vd_minutos='".$_POST["p1vd_minutos"]."',
@@ -1035,6 +1035,16 @@ if($_POST["idSql"]==48){
 	rem_p2hi_grados='".$_POST["p2hi_grados"]."',
 	rem_p2hi_minutos='".$_POST["p2hi_minutos"]."',
 	rem_p2hi_segundos='".$_POST["p2hi_segundos"]."',
+	
+	rem_n1_patron='".$_POST["n1_patron"]."',
+	rem_n1_equipo='".$_POST["n1_equipo"]."',
+	rem_n1_diferencia='".$_POST["n1_diferencia"]."',
+	rem_n2_patron='".$_POST["n2_patron"]."',
+	rem_n2_equipo='".$_POST["n2_equipo"]."',
+	rem_n2_diferencia='".$_POST["n2_diferencia"]."',
+	rem_n3_patron='".$_POST["n3_patron"]."',
+	rem_n3_equipo='".$_POST["n3_equipo"]."',
+	rem_n3_diferencia='".$_POST["n3_diferencia"]."',
 	
 	rem_l1a='".$_POST["l1a"]."',
 	rem_l1b='".$_POST["l1b"]."',
