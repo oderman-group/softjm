@@ -773,7 +773,7 @@ include("includes/js-formularios.php");
 										
 										?>
 
-										<br><a href="descuentos-cotizaciones-actualizar.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
+										<br><a href="bd_update/descuentos-cotizaciones-actualizar.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
 
 
 									<?php }
