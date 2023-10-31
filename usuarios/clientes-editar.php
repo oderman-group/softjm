@@ -877,7 +877,7 @@ include("includes/js-formularios.php");
                                     <a href="reportes/formato-factura-1.php?id=<?=$res['fact_id'];?>" data-toggle="tooltip" title="Imprimir factura" target="_blank"><i class="icon-print"></i></a>&nbsp;
                                     <a href="sql.php?get=19&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea replicar este registro?')){return false;}" title="Replicar factura"><i class="icon-repeat"></i></a>&nbsp;
                                     <?php if($saldoFinal>0){?>
-                                    <a href="sql.php?get=26&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea generar un abono automático por el saldo pendiente de esta factura?')){return false;}" title="Abono automático y saldar factura"><i class="icon-retweet"></i></a>
+                                    <a href="abono-automatico-agregar.php?get=26&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea generar un abono automático por el saldo pendiente de esta factura?')){return false;}" title="Abono automático y saldar factura"><i class="icon-retweet"></i></a>
                                     <?php }?>
                                 </h4></td>
 															</tr>

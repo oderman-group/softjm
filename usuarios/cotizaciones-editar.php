@@ -742,7 +742,7 @@ include("includes/js-formularios.php");
 										
 										?>
 
-										<br><a href="sql.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
+										<br><a href="descuentos-cotizaciones-actualizar.php.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
 
 
 									<?php }
@@ -765,6 +765,34 @@ include("includes/js-formularios.php");
 										<span class="valor-numerico"><?=number_format($valorTotal, 0, ",", ".");?></span>
 								</td>
 
+								<?php if($resultadoD['cotiz_descuentos_especiales'] == 1){?>
+									<td><input type="text" title="czpp_descuento_especial" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento_especial'];?>" onChange="combos(this)" style="width: 50px; text-align: center;">
+
+										<?php
+									if($datosUsuarioActual['usr_tipo']==1 and $prod['czpp_aprobado_usuario']=="" and $prod['czpp_descuento_especial']>0){
+										
+										?>
+
+										<br><a href="descuentos-cotizaciones-actualizar.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
+
+
+									<?php }
+									$consultaDctoEspecial=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']."'");
+									$usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
+									?>
+
+									<br><span style="font-size:10px; color:gray;">
+
+										<?=$prod['czpp_aprobado_fecha'];?><br>
+										<?=$usuarioDctoEspecialAprobar['usr_nombre'];?>
+											
+										</span>
+
+									</td>
+									
+
+								<?php }?>
+                                <td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($valorTotal,0,",",".");?></td>
 							</tr>
 							<?php 
 								$no ++;

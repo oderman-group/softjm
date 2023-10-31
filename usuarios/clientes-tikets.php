@@ -237,8 +237,8 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 												</td>
 												<td><?= $sucursal['sucu_nombre']; ?></td>
 												<td><?= $res['tik_asunto_principal']; ?></td>
-												<td><?= $res['usr_nombre']; ?></td>
-												<td><a href="sql.php?get=29&id=<?= $res[0]; ?>" onClick="if(!confirm('Recuerde completar todos los seguimientos pendientes, en caso de tenerlos, antes de cerrar el ticket. Desea continuar con el cierre del ticket?')){return false;}"><span class="label label-<?= $etiquetaE; ?>"><?= $estado; ?></span></a></td>
+												<td><?= $res['usr_nombre'];?></td>
+												<td><a href="clientes-tikets-actualizar-estado.php?get=29&id=<?= $res[0]; ?>" onClick="if(!confirm('Recuerde completar todos los seguimientos pendientes, en caso de tenerlos, antes de cerrar el ticket. Desea continuar con el cierre del ticket?')){return false;}"><span class="label label-<?= $etiquetaE; ?>"><?= $estado; ?></span></a></td>
 												<td><span class="label label-<?= $etiquetaP; ?>"><?= $prioridad; ?></span></td>
 												<td align="center" style="background:<?= $color2; ?>;"><a href="clientes-seguimiento.php?idTK=<?= $res[0]; ?>" target="_blank"><?= $numeros[0]; ?></a></td>
 												<td>

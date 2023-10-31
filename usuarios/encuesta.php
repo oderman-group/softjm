@@ -59,7 +59,7 @@ $idPagina = 229;
                     var id = e.id;
 					var cont = e.name;
 					if(result == true){
-						window.location.href="sql.php?get=18&id="+id+"&cont="+cont;
+						window.location.href="encuesta-enviar-correo.php?get=298&id="+id+"&cont="+cont;
 					}
             })
 			};
