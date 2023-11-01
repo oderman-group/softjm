@@ -78,7 +78,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="bd_create/encuentas-guardar.php">
+							<form class="form-horizontal" method="post" action="bd_create/encuestas-guardar.php">
                             <input type="hidden" name="idSql" value="28">  
                                <script type="text/javascript">
 							   	function clientes(cliente){

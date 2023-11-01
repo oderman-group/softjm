@@ -668,7 +668,7 @@ include("includes/js-formularios.php");
 
 																switch($res['cseg_realizado']){
 																	case 1: $html = '<span class="label label-success">Completado</span>'; break;
-																	default: $html = '<a href="sql.php?id='.$res['cseg_id'].'&get=28" class="label label-important">Pendiente</a>'; break;
+																	default: $html = '<a href="bd_update/cliente-seguimiento-estado-update.php?id='.$res['cseg_id'].'&get=28" class="label label-important">Pendiente</a>'; break;
 																}
 															?>
 															<tr>

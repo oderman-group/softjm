@@ -208,7 +208,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
                                 <td><?=$res['not_asunto'];?></td>
                                 <td><?=$res['cli_nombre'];?></td>
                                 <td><?=$res['cli_telefono'];?></td>
-                                <td><a href="sql.php?get=20&id=<?=$res['not_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Cambiar de estado"><span class="label label-<?=$etiquetaE;?>"><?=$estado;?></span></a></td>
+                                <td><a href="notificaciones-estado-actualizar.php?get=20&id=<?=$res['not_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Cambiar de estado"><span class="label label-<?=$etiquetaE;?>"><?=$estado;?></span></a></td>
                                 <td>	
 								<h4>
                                 	<a href="clientes-seguimiento.php?cte=<?=$res['cli_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Seguimiento del cliente" target="new"><i class="icon-list-ol"></i></a>

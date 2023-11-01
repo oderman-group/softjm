@@ -197,7 +197,7 @@ $valorReal = ($factura['fact_valor'] + $impuestos) - ($retencion + $descuento);
                                 <td><?=$res['fpab_fecha_ultima_modificacion'];?></td>
                                 <td><h4>
                                 	<a href="facturacion-abonos-editar.php?id=<?=$res['fpab_id'];?>&fact=<?=$_GET["fact"];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-                                    <a href="sql.php?id=<?=$res['fpab_id'];?>&get=25&fact=<?=$_GET["fact"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                    <a href="facturacion-bonos-eliminar.php?id=<?=$res['fpab_id'];?>&get=25&fact=<?=$_GET["fact"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>
