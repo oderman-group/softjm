@@ -350,7 +350,6 @@ if ($_GET["get"] == 31) { //no apunta a ninguna parte
 
 
 
-
 //ENVIAR COTIZACIÓN AL CORREO
 
 //Eliminar marcas
