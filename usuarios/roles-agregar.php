@@ -5,7 +5,7 @@ $idPagina = 6;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
-<link href="css/chosen.css" rel="stylesheet">
+<link href="css/tablecloth.css" rel="stylesheet">
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -22,6 +22,10 @@ include("includes/head.php");
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+<script src="js/jquery.tablecloth.js"></script>
+<script src="js/jquery.dataTables.js"></script>
+<script src="js/dataTables.bootstrap.js"></script>
+<script src="js/TableTools.js"></script>
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
@@ -113,7 +117,7 @@ include("includes/js-formularios.php");
 								</div>
 
                             -->
-                               
+								<select id="paginasSeleccionadas"  name="paginasP[]" multiple  style="display: none;"></select>                               
 								<div class="form-actions">
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									<button type="button" class="btn btn-danger">Cancelar</button>
@@ -129,5 +133,42 @@ include("includes/js-formularios.php");
 	<?php include("includes/pie.php");?>
 </div>
 </body>
+<script type="text/javascript">
+	let dataTable = $('#data-table').DataTable()
+	    function actualizarPaginasSeleccionadas(dataTable) {
+        let paginasSeleccionadas = [];
+				dataTable.$('.selectCheckbox').each(function() {
+            if ($(this).prop('checked')) {
+                paginasSeleccionadas.push($(this).val());
+            }
+        });
 
+				$('#selectAll').change(function() {
+				let isChecked = $(this).prop('checked');	
+				dataTable.$('.selectCheckbox').each(function() {
+								$(this).prop('checked',isChecked)
+                paginasSeleccionadas.push($(this).val());
+        });
+			});
+			
+				let selectElement = $('#paginasSeleccionadas');
+        selectElement.find('option').remove(); 
+				for (let i = 0; i < paginasSeleccionadas.length; i++) {
+						selectElement.append($('<option>', {
+								value: paginasSeleccionadas[i]
+						}));
+				}
+				selectElement.val(paginasSeleccionadas);
+
+    }
+
+    $(document).ready(function() {
+        actualizarPaginasSeleccionadas(dataTable);
+
+        $(document).on('change', 'input[type="checkbox"]', function() {
+            actualizarPaginasSeleccionadas(dataTable);
+        });
+    });
+		
+</script>
 </html>
