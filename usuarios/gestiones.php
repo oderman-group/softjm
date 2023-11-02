@@ -239,7 +239,7 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 										
 										<a href="proyectos-editar.php?id=<?=$res['proy_id'];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
 										
-                                        <a href="sql.php?get=35&id=<?=$res['proy_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                        <a href="proyecto-tareas-eliminar.php?get=35&id=<?=$res['proy_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 										
 										<?php }?>
 										

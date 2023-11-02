@@ -62,7 +62,7 @@ include("includes/head.php");
                     var id = e.id;
 					var cont = e.name;
 					if(result == true){
-						window.location.href="sql.php?get=44&id="+id+"&cont="+cont;
+						window.location.href="enviar-cotizacion-correo.php?get=44&id="+id+"&cont="+cont;
 					}
             })
 			};

@@ -62,7 +62,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 			var id = e.id;
 			var cont = e.name;
 			if (result == true) {
-				window.location.href = "sql.php?get=44&id=" + id + "&cont=" + cont;
+				window.location.href = "enviar-cotizaciones-correo.php?get=44&id=" + id + "&cont=" + cont;
 			}
 		})
 	};
@@ -223,7 +223,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 													$descuento = is_numeric($datos['czpp_descuento']) ? $datos['czpp_descuento'] : 0;
 													$VlrDcto = ($total * ($descuento/100));
 													$SumaDcto += $VlrDcto;
-
+													
 													$totalConDcto = ($total - $VlrDcto);
 													$sumaTotalConDcto += $totalConDcto;
 
@@ -337,9 +337,9 @@ $paginaActual['pag_nombre'] = "Facturas";
 
 															<li><a href="#sql.php?get=46&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>-->
 
-															<li><a href="sql.php?get=66&id=<?= $res['factura_id']; ?>" onClick="if(!confirm('Desea redimir este saldo para el cliente?')){return false;}">Redimir saldo</a></li>
+															<li><a href="redimir-factura-clientes-actualizar.php?get=66&id=<?= $res['factura_id']; ?>" onClick="if(!confirm('Desea redimir este saldo para el cliente?')){return false;}">Redimir saldo</a></li>
 
-															<li><a href="sql.php?get=67&id=<?= $res['factura_id']; ?>" onClick="if(!confirm('Desea saldar esta comisión para el vendedor?')){return false;}">Saldar comisión</a></li>
+															<li><a href="redimir-factura-vendedor-actualizar.php?get=67&id=<?= $res['factura_id']; ?>" onClick="if(!confirm('Desea saldar esta comisión para el vendedor?')){return false;}">Saldar comisión</a></li>
 
 															<!--
 											<li><a href="sql.php?get=48&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>

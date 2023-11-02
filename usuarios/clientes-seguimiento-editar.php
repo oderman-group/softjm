@@ -294,7 +294,7 @@ include("includes/js-formularios.php");
 								</div>
 								
 								<?php if($resultadoD['cseg_archivo']!=""){?>
-									<a href="sql.php?get=32&id=<?=$resultadoD['cseg_id'];?>" onClick="if(!confirm('Desea eliminar este archivo?')){return false;}"><i class="icon-trash"></i></a>&nbsp;&nbsp;
+									<a href="cliente-seguimiento-actualizar.php?get=32&id=<?=$resultadoD['cseg_id'];?>" onClick="if(!confirm('Desea eliminar este archivo?')){return false;}"><i class="icon-trash"></i></a>&nbsp;&nbsp;
 									<a href="files/adjuntos/<?=$resultadoD['cseg_archivo'];?>" target="_blank"><?=$resultadoD['cseg_archivo'];?></a>
 								<?php }?>
                                 

@@ -114,15 +114,15 @@
 										</button>
 										<ul class="dropdown-menu">
 											
-											<li><a href="../sql.php?get=34&idR=<?=$res['cli_id'];?>&em=5" onClick="if(!confirm('El cliente pasará al listado de clientes que ya están actualizados. Desea continuar?')){return false;}">Actualizado</a></li>
+											<li><a href="../cliente-terminado-actualizar.php?get=34&idR=<?=$res['cli_id'];?>&em=5" onClick="if(!confirm('El cliente pasará al listado de clientes que ya están actualizados. Desea continuar?')){return false;}">Actualizado</a></li>
 											
-											<li><a href="../sql.php?get=42&idR=<?=$res['cli_id'];?>&em=1">No contestó. Mantener en la lista.</a></li>
-											<li><a href="../sql.php?get=42&idR=<?=$res['cli_id'];?>&em=7">No contestó. Quitar de la lista.</a></li>
-											<li><a href="../sql.php?get=42&idR=<?=$res['cli_id'];?>&em=2">Número equivocado</a></li>
+											<li><a href="../cliente-estado-mercadeo-update.php?get=42&idR=<?=$res['cli_id'];?>&em=1">No contestó. Mantener en la lista.</a></li>
+											<li><a href="../cliente-estado-mercadeo-update.php?get=42&idR=<?=$res['cli_id'];?>&em=7">No contestó. Quitar de la lista.</a></li>
+											<li><a href="../cliente-estado-mercadeo-update.php?get=42&idR=<?=$res['cli_id'];?>&em=2">Número equivocado</a></li>
 											<li><a href="../enviar-portafolios.php?cte=<?=$res['cli_id'];?>&em=3" target="_blank">Enviar portafolio</a></li>
 											<li><a href="../clientes-tikets-agregar.php?cte=<?=$res['cli_id'];?>&origenNegocio=1&em=4" target="_blank">Iniciar negociación</a></li>
 											
-											<li><a href="../sql.php?get=33&idR=<?=$res['cli_id'];?>&em=6" onClick="if(!confirm('Este cliente pasará a una papelera de reciclaje y podrá ser recuperado después. Desea continuar?')){return false;}">Enviar a papelera</a></li>
+											<li><a href="../cliente-papelera-actualizar.php?get=33&idR=<?=$res['cli_id'];?>&em=6" onClick="if(!confirm('Este cliente pasará a una papelera de reciclaje y podrá ser recuperado después. Desea continuar?')){return false;}">Enviar a papelera</a></li>
 											
 										</ul>
 									</div>

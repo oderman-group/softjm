@@ -408,7 +408,7 @@ FLOT PIE CHART
 								<span style='color:gray; font-size:10px;'>Creado en: ".$tkResI['tik_fecha_creacion']."</span>";?>
 								</li>
 								
-								<p><a href="sql.php?get=29&id=<?=$tkResI['tik_id'];?>" onClick="if(!confirm('Desea cerrar este ticket?')){return false;}" style="text-decoration: underline;">Cerrar Ticket</a></p>
+								<p><a href="clientes-tikets-actualizar-estado.php?get=29&id=<?=$tkResI['tik_id'];?>" onClick="if(!confirm('Desea cerrar este ticket?')){return false;}" style="text-decoration: underline;">Cerrar Ticket</a></p>
 							</ul>
                             <?php $i++;}?>
                             

@@ -100,8 +100,9 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
+						
 							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-                            <input type="hidden" name="idSql" value="62">
+                            <input type="hidden" name="idSql" value="62"> <?php //el codigo 62 no se encontro en el archivo sql ?> 
 								<input type="hidden" name="id" value="<?=$_GET["id"];?>">
                                 
                                 <div class="control-group">
