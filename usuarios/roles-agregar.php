@@ -62,21 +62,40 @@ include("includes/js-formularios.php");
 									</div>
 								</div>
                                 
-                                <div class="control-group">
-									<label class="control-label">Paginas permitidas</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción" class="chzn-select span6" multiple tabindex="4" name="paginasP[]">
-											<option value=""></option>
-                                            <?php
-											$conOp = $conexionBdAdmin->query("SELECT * FROM ".$bdAdmin.".paginas");
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-											?>
-                                            	<option value="<?=$resOp[0];?>"><?="[".$resOp[0]."] ".$resOp[1];?></option>
-                                            <?php }?>
-										</select>
-									</div>
-								</div>
-
+								<table class="table table-striped table-bordered" id="data-table">
+										<thead>
+												<tr>
+														<th>ID</th>
+														<th>Nombre</th>
+														<th>Seleccionar <input type="checkbox" id="selectAll"></th>
+												</tr>
+										</thead>
+										<tbody>
+												<?php
+												$dataBase = $_SESSION["bd"];
+												$query = "SELECT p.pag_id, p.pag_nombre, pp.pper_id 
+														FROM paginas p 
+														LEFT JOIN $dataBase.paginas_perfiles pp 
+														ON p.pag_id = pp.pper_pagina 
+														AND pp.pper_tipo_usuario = '" . $resultadoD['utipo_id'] . "'";
+												$result = $conexionBdAdmin->query($query);
+												$no=1;
+												while ($row = $result->fetch_assoc()) {
+														?>
+														<tr>
+																<td><?= $row['pag_id'];?></td>
+																<td><?= $row['pag_nombre']; ?></td>
+																<td>
+																		<input class="selectCheckbox" type="checkbox" value="<?= $row['pag_id']; ?>">
+																		<span style="display: none;"> <?= $isChecked; ?> </span>
+																</td>
+														</tr>
+												<?php
+												$no++;
+												}
+												?>
+										</tbody>
+								</table>
                                 <!--
                                 
                                 <span style="color:#F00;">Utiliza la siguiente opción (<b>Acciones NO permitidas</b>) sólo si NO utilizaste la opción anterior (<b>Paginas NO permitidas</b>) y viceversa.</span>
@@ -110,4 +129,5 @@ include("includes/js-formularios.php");
 	<?php include("includes/pie.php");?>
 </div>
 </body>
+
 </html>
