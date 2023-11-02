@@ -115,7 +115,7 @@ include("includes/js-formularios.php");
 										</tbody>
 									</table>  
                                 
-                                
+								<select id="paginasSeleccionadas"  name="paginasP[]" multiple  style="display: none;"></select>                 
                                
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
@@ -135,5 +135,40 @@ include("includes/js-formularios.php");
 </body>
 <script type="text/javascript">
 	let dataTable = $('#data-table').DataTable()
+	    function actualizarPaginasSeleccionadas(dataTable) {
+        let paginasSeleccionadas = [];
+				dataTable.$('.selectCheckbox').each(function() {
+            if ($(this).prop('checked')) {
+                paginasSeleccionadas.push($(this).val());
+            }
+        });
+
+				$('#selectAll').change(function() {
+				let isChecked = $(this).prop('checked');	
+				dataTable.$('.selectCheckbox').each(function() {
+								$(this).prop('checked',isChecked)
+                paginasSeleccionadas.push($(this).val());
+        });
+			});
+			
+				let selectElement = $('#paginasSeleccionadas');
+        selectElement.find('option').remove(); 
+				for (let i = 0; i < paginasSeleccionadas.length; i++) {
+						selectElement.append($('<option>', {
+								value: paginasSeleccionadas[i]
+						}));
+				}
+				selectElement.val(paginasSeleccionadas);
+
+    }
+
+    $(document).ready(function() {
+        actualizarPaginasSeleccionadas(dataTable);
+
+        $(document).on('change', 'input[type="checkbox"]', function() {
+            actualizarPaginasSeleccionadas(dataTable);
+        });
+    });
+		
 </script>
 </html>
