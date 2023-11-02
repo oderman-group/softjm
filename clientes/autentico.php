@@ -8,8 +8,8 @@ $fila = mysqli_fetch_array($rst_usr, MYSQLI_BOTH);
 if($num>0)
 {
 	//INICIO SESION
-	//session_start();
-	$_SESSION["id"] = $fila[0];
+	$_SESSION["id"] = $fila['cli_id'];
+	$_SESSION["id_empresa"] = $fila['cli_id_empresa'];
 	
 	switch($_POST["refe"]){
 		case 1:	$url = 'registrados/'; break;
