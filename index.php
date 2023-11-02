@@ -1,7 +1,5 @@
 <?php
 include("conexion.php");
-$consultaConfiguracion = $conexionBdPrincipal->query("SELECT * FROM configuracion WHERE conf_id=1");
-$configuracion = mysqli_fetch_array($consultaConfiguracion, MYSQLI_BOTH);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,7 +8,7 @@ $configuracion = mysqli_fetch_array($consultaConfiguracion, MYSQLI_BOTH);
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>ORIÓN - <?= $configuracion['conf_empresa']; ?></title>
+  <title>ORIÓN</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="assets-login/vendors/iconfonts/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="assets-login/vendors/css/vendor.bundle.base.css">
