@@ -123,11 +123,14 @@ include("includes/head.php");
 												$filtro = " AND usr_bloqueado='0'";
 												if(isset($_GET['bloq']) AND $_GET['bloq']==1){$filtro =" AND usr_bloqueado='1'";}
 
-												$consulta = $conexionBdPrincipal->query("SELECT * FROM usuarios
-												INNER JOIN usuarios_tipos ON utipo_id=usr_tipo
-												INNER JOIN areas ON ar_id=usr_area
-												WHERE usr_id!='".$_SESSION["id"]."' $filtro
-												");
+												$consulta = $conexionBdAdmin->query("SELECT u.*, GROUP_CONCAT(r.utipo_id) AS roles_id,
+												GROUP_CONCAT(r.utipo_nombre) AS roles_nombre
+												FROM orioncrmcom_dev_jm_crm.usuarios AS u
+												LEFT JOIN usuarios_roles AS ru ON u.usr_id = ru.upr_id_usuario
+												LEFT JOIN orioncrmcom_dev_jm_crm.usuarios_tipos AS r ON ru.upr_id_rol = r.utipo_id
+												INNER JOIN orioncrmcom_dev_jm_crm.areas ON ar_id = u.usr_area
+												WHERE u.usr_id != '" . $_SESSION["id"] . "' $filtro
+												GROUP BY u.usr_id");
 												$no = 1;
 												$bloq = array("NO","SI");	
 												while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
@@ -141,7 +144,20 @@ include("includes/head.php");
 													<?=$res['usr_nombre'];?><br>
 													<span style="text-decoration: underline; color:blue; font-style: italic;"><?=$res['usr_email'];?></span>
 												</td>
-												<td><a href="roles-editar.php?id=<?=$res['usr_tipo'];?>"><?=$res['utipo_nombre'];?></a></td>
+												<td>   
+													<?php
+															if (!empty($res['roles_id'])) {
+																	$roles_id = explode(',', $res['roles_id']); 
+																	$roles_nombre = explode(',', $res['roles_nombre']);
+																	for ($i = 0; $i < count($roles_id); $i++) {
+										
+																		echo '<a href="roles-editar.php?id=' . $roles_id[$i] . '">' . $roles_nombre[$i] . '</a><br>';
+																}
+															} else {
+																	echo 'Sin roles asignados';
+															}
+															?>
+												</td>
 												<td><a href="#areas-editar.php?id=<?=$res['usr_area'];?>"><?=$res['ar_nombre'];?></a></td>
 												<td><?=$res['usr_login'];?></td>
 												<td><?=$bloq[$res['usr_bloqueado']];?></td>
