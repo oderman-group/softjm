@@ -75,28 +75,41 @@ include("includes/js-formularios.php");
 									</div>
 								</div> 
                                 
-                                <div class="control-group">
-									<label class="control-label">Paginas permitidas</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción" class="chzn-select span6" multiple tabindex="4" name="paginasP[]">
-											<option value=""></option>
-                                            <?php
-																						$query = "SELECT p.pag_id, p.pag_nombre, pp.pper_id 
-																												FROM paginas p 
-																												LEFT JOIN orioncrmcom_dev_jm_crm.paginas_perfiles pp 
-																												ON p.pag_id = pp.pper_pagina 
-																												AND pp.pper_tipo_usuario = '" . $resultadoD['utipo_id'] . "'";
-											$conOp = $conexionBdAdmin->query($query);
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-
-                                                $consultaPagPerfiles=$conexionBdPrincipal->query("SELECT * FROM paginas_perfiles WHERE pper_pagina='".$resOp[0]."' AND pper_tipo_usuario='".$resultadoD['utipo_id']."'");
-												$paginasP = $consultaPagPerfiles->num_rows;
-											?>
-                                            	<option <?php if($paginasP>0){echo "selected";}?> value="<?=$resOp[0];?>"><?="[".$resOp[0]."] ".$resOp[1];?></option>
-                                            <?php }?>
-										</select>
-									</div>
-								</div>
+								<table class="table table-striped table-bordered" id="data-table">
+										<thead>
+												<tr>
+														<th>ID</th>
+														<th>Nombre</th>
+														<th>Seleccionar <input type="checkbox" id="selectAll"> </th>
+														
+												</tr>
+										</thead>
+										<tbody>
+												<?php
+												$query = "SELECT p.pag_id, p.pag_nombre, pp.pper_id 
+																	FROM paginas p 
+																	LEFT JOIN orioncrmcom_dev_jm_crm.paginas_perfiles pp 
+																	ON p.pag_id = pp.pper_pagina 
+																	AND pp.pper_tipo_usuario = '" . $resultadoD['utipo_id'] . "'";
+												$result = $conexionBdAdmin->query($query);
+												$no=1;
+												while ($row = $result->fetch_assoc()) {
+														$isChecked = $row['pper_id'] ? "checked" : "";
+												?>
+														<tr>
+																<td><?= $row['pag_id'];?></td>
+																<td><?= $row['pag_nombre']; ?></td>
+																<td>
+																	<input class="selectCheckbox" type="checkbox" value="<?= $row['pag_id']; ?>" <?= $isChecked; ?>>
+																	<span style="display: none;"> <?= $isChecked; ?> </span>
+																</td>
+														</tr>
+												<?php
+												$no++;
+												}
+												?>
+										</tbody>
+									</table>  
                                 
                                 
                                
