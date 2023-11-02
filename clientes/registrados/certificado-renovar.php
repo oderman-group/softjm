@@ -197,7 +197,7 @@ $equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM re
 										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="servicio" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$_SESSION["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['serv_nombre']." ($".number_format($resOp['serv_precio'],0,",",".").")";?></option>

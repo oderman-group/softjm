@@ -13,6 +13,5 @@ $consultaUsuarioActual = mysqli_query($conexionBdPrincipal,"SELECT * FROM client
 $numUsuarioActual = mysqli_num_rows($consultaUsuarioActual);
 $datosUsuarioActual = mysqli_fetch_array($consultaUsuarioActual, MYSQLI_BOTH);
 
-$consultaConfiguracion=mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1");
+$consultaConfiguracion=mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id_empresa='".$_SESSION["id_empresa"]."'");
 $configu = mysqli_fetch_array($consultaConfiguracion, MYSQLI_BOTH);
-?>
