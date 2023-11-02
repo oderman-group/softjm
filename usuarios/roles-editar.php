@@ -81,7 +81,12 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción" class="chzn-select span6" multiple tabindex="4" name="paginasP[]">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdAdmin->query("SELECT * FROM ".$bdAdmin.".paginas");
+																						$query = "SELECT p.pag_id, p.pag_nombre, pp.pper_id 
+																												FROM paginas p 
+																												LEFT JOIN orioncrmcom_dev_jm_crm.paginas_perfiles pp 
+																												ON p.pag_id = pp.pper_pagina 
+																												AND pp.pper_tipo_usuario = '" . $resultadoD['utipo_id'] . "'";
+											$conOp = $conexionBdAdmin->query($query);
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
                                                 $consultaPagPerfiles=$conexionBdPrincipal->query("SELECT * FROM paginas_perfiles WHERE pper_pagina='".$resOp[0]."' AND pper_tipo_usuario='".$resultadoD['utipo_id']."'");
