@@ -8,7 +8,7 @@ $consulta=$conexionBdPrincipal->query("SELECT * FROM usuarios_tipos WHERE utipo_
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
-<link href="css/chosen.css" rel="stylesheet">
+<link href="css/tablecloth.css" rel="stylesheet">
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -24,6 +24,10 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+<script src="js/jquery.tablecloth.js"></script>
+<script src="js/jquery.dataTables.js"></script>
+<script src="js/dataTables.bootstrap.js"></script>
+<script src="js/TableTools.js"></script>
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
@@ -129,4 +133,7 @@ include("includes/js-formularios.php");
 	<?php include("includes/pie.php");?>
 </div>
 </body>
+<script type="text/javascript">
+	let dataTable = $('#data-table').DataTable()
+</script>
 </html>
