@@ -8,9 +8,10 @@ include("verificar-paginas.php");
 include("head.php");
 
 $resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes 
-WHERE cli_id='".$_SESSION["id"]."'"), MYSQLI_BOTH);
+WHERE cli_id='".$_SESSION["id_cliente"]."'"), MYSQLI_BOTH);
 
-$equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_GET["id"]."'"), MYSQLI_BOTH);
+$equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_GET["id"]."' 
+AND rem_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <link href="css/styles.css" rel="stylesheet">
@@ -199,8 +200,9 @@ $equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM re
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$_SESSION["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+                                                $precio = !empty($resOp['serv_precio']) ? $resOp['serv_precio'] : 0;
 											?>
-                                            	<option value="<?=$resOp[0];?>"><?=$resOp['serv_nombre']." ($".number_format($resOp['serv_precio'],0,",",".").")";?></option>
+                                            	<option value="<?=$resOp[0];?>"><?=$resOp['serv_nombre']." ($".number_format($precio,0,",",".").")";?></option>
                                             <?php
 											}
 											?>
