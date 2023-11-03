@@ -102,7 +102,7 @@ include("head.php");
 							INNER JOIN facturacion_productos ON fpp_factura=fact_id
 							INNER JOIN productos_materiales ON ppmt_producto=fpp_producto AND ppmt_activo=1
 							INNER JOIN productos_soptec ON prod_id=fpp_producto
-							WHERE fact_cliente='".$_SESSION["id"]."' AND fact_estado=1
+							WHERE fact_cliente='".$_SESSION["id_cliente"]."' AND fact_estado=1 AND fact_id_empresa={$_SESSION['id_empresa']}
 							GROUP BY fpp_producto
 							");
 							$no = 1;

@@ -107,7 +107,7 @@ include("head.php");
 							<tbody>
                             <?php
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_seguimiento
-							INNER JOIN remisiones ON rem_id=remseg_id_remisiones AND rem_cliente='".$_SESSION["id"]."'
+							INNER JOIN remisiones ON rem_id=remseg_id_remisiones AND rem_cliente='".$_SESSION["id_cliente"]."'
 							WHERE remseg_notificar_cliente=1
 							ORDER BY remseg_id DESC
 							");
