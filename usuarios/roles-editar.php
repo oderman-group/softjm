@@ -6,7 +6,6 @@ include("includes/head.php");
 
 $consulta=$conexionBdPrincipal->query("SELECT * FROM usuarios_tipos WHERE utipo_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
-$dataBase = $_SESSION["bd"];
 ?>
 <!-- styles -->
 <link href="css/tablecloth.css" rel="stylesheet">
@@ -93,7 +92,7 @@ include("includes/js-formularios.php");
 												<?php
 												$query = "SELECT p.pag_id, p.pag_nombre, pp.pper_id 
 																	FROM paginas p 
-																	LEFT JOIN $dataBase.paginas_perfiles pp 
+																	LEFT JOIN ".MAINBD.".paginas_perfiles pp 
 																	ON p.pag_id = pp.pper_pagina 
 																	AND pp.pper_tipo_usuario = '" . $resultadoD['utipo_id'] . "'";
 												$result = $conexionBdAdmin->query($query);
