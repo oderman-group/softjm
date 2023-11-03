@@ -123,7 +123,7 @@ include("includes/js-formularios.php");
 												
 												if($infoTicket['tik_etapa']==$i) {echo '<span style="color:green; font-weight:bold; font-size:13px;">'.$opciones[$i].'</span><br>';}
 												
-												else {echo '<a href="cliente-tikets-actualizar.php?get=41&idtk='.$infoTicket['tik_id'].'&etapa='.$i.'">'.$opciones[$i].'</a><br>';}
+												else {echo '<a href="bd_update/cliente-tikets-actualizar.php?get=41&idtk='.$infoTicket['tik_id'].'&etapa='.$i.'">'.$opciones[$i].'</a><br>';}
 											}
 											?>
                                     </div>
@@ -294,7 +294,7 @@ include("includes/js-formularios.php");
 								</div>
 								
 								<?php if($resultadoD['cseg_archivo']!=""){?>
-									<a href="cliente-seguimiento-actualizar.php?get=32&id=<?=$resultadoD['cseg_id'];?>" onClick="if(!confirm('Desea eliminar este archivo?')){return false;}"><i class="icon-trash"></i></a>&nbsp;&nbsp;
+									<a href="bd_update/cliente-seguimiento-actualizar.php?get=32&id=<?=$resultadoD['cseg_id'];?>" onClick="if(!confirm('Desea eliminar este archivo?')){return false;}"><i class="icon-trash"></i></a>&nbsp;&nbsp;
 									<a href="files/adjuntos/<?=$resultadoD['cseg_archivo'];?>" target="_blank"><?=$resultadoD['cseg_archivo'];?></a>
 								<?php }?>
                                 

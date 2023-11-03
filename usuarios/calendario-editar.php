@@ -77,7 +77,7 @@ include("includes/js-formularios.php");
 				</div>
 			</div>
 			
-			<p><a href="calendario-evento-eliminar.php?get=37&id=<?=$_GET["id"];?>" class="btn btn-danger" onClick="if(!confirm('Desea eliminar el registro?')){return false;}"><i class="icon-trash"></i> Eliminar</a></p>
+			<p><a href="bd_delete/calendario-evento-eliminar.php?get=37&id=<?=$_GET["id"];?>" class="btn btn-danger" onClick="if(!confirm('Desea eliminar el registro?')){return false;}"><i class="icon-trash"></i> Eliminar</a></p>
 			
 			<div class="row-fluid">
 				<div class="span12">
