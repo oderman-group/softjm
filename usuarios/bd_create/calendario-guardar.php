@@ -1,15 +1,24 @@
 <?php
 require_once("../sesion.php");
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require RUTA_PROYECTO.'/librerias/phpmailer/Exception.php';
+require RUTA_PROYECTO.'/librerias/phpmailer/PHPMailer.php';
+require RUTA_PROYECTO.'/librerias/phpmailer/SMTP.php';
+
 $idPagina = 288;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-mysqli_query($conexionBdPrincipal,"INSERT INTO agenda(age_evento, age_fecha, age_usuario, age_inicio, age_fin, age_lugar, age_notas, age_cliente)VALUES('" . $_POST["evento"] . "','" . $_POST["fecha"] . "','" . $_SESSION["id"] . "','" . $_POST["inicio"] . "','" . $_POST["fin"] . "','" . $_POST["lugar"] . "','" . $_POST["notas"] . "','" . $_POST["cliente"] . "')");
+mysqli_query($conexionBdPrincipal,"INSERT INTO agenda(age_evento, age_fecha, age_usuario, age_inicio, age_fin, age_lugar, age_notas, age_cliente, age_id_empresa)VALUES('" . $_POST["evento"] . "','" . $_POST["fecha"] . "','" . $_SESSION["id"] . "','" . $_POST["inicio"] . "','" . $_POST["fin"] . "','" . $_POST["lugar"] . "','" . $_POST["notas"] . "','" . $_POST["cliente"] . "', '".$_SESSION['dataAdicional']['id_empresa']."')");
 	
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
-	if ($_POST["cliente"] != '0') {
+	/*Esta bandera es mientras se define un campo que me permita
+	determinar si envio o no correo.*/
+	if ($_POST["cliente"] != '0' && false) {
 
 
 		$hora = 1;
@@ -72,7 +81,7 @@ mysqli_query($conexionBdPrincipal,"INSERT INTO agenda(age_evento, age_fecha, age
 						<b>Nota:</b> ' . $_POST["notas"] . '<br>
 						</p>
 						
-						<p align="center"><a href="' . $configuracion["conf_url_encuestas"] . '/usuarios/reportes/formato-cotizacion-1.php?cte=1&id=' . base64_encode($_POST["id"]) . '" target="_blank" 
+						<p align="center"><a href="' . $configuracion["conf_url_encuestas"] . '/usuarios/reportes/formato-cotizacion-1.php?cte=1&id=' . base64_encode($idInsertU) . '" target="_blank" 
 						
 						<p align="center" style="color:' . $configuracion["conf_color_letra"] . ';">
 							<img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="80"><br>
@@ -115,7 +124,7 @@ mysqli_query($conexionBdPrincipal,"INSERT INTO agenda(age_evento, age_fecha, age
 			$mail->CharSet = 'UTF-8';
 
 			$mail->send();
-			echo 'Enviada cotización al cliente.';
+			echo 'Correo Enviado';
 		} catch (Exception $e) {
 			echo "Error: {$mail->ErrorInfo}";
 		}
