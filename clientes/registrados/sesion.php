@@ -1,6 +1,6 @@
 <?php
 session_start();
-if($_SESSION["id"]=="" || !is_numeric($_SESSION["id"]) ){
+if($_SESSION["id_cliente"]=="" || !is_numeric($_SESSION["id_cliente"]) ){
 	header("Location:../salir.php");
 	exit();
 }
@@ -9,7 +9,7 @@ $tiempo_inicial = microtime(true);
 
 include("../../conexion.php");
 //USUARIO ACTUAL
-$consultaUsuarioActual = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_SESSION["id"]."'");
+$consultaUsuarioActual = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_SESSION["id_cliente"]."'");
 $numUsuarioActual = mysqli_num_rows($consultaUsuarioActual);
 $datosUsuarioActual = mysqli_fetch_array($consultaUsuarioActual, MYSQLI_BOTH);
 

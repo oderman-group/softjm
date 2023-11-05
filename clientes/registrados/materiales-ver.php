@@ -5,7 +5,7 @@ $tituloPagina = "Ver Productos";
 
 include("head.php");
 
-$producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_GET["pdto"]."'"), MYSQLI_BOTH);
+$producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_GET["pdto"]."' AND prod_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
 ?>
 <link href="css/styles.css" rel="stylesheet">
 <link href="css/theme-wooden.css" rel="stylesheet">
@@ -108,7 +108,9 @@ $producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM 
                             </p>
 							
                             <?php
-							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_materiales WHERE ppmt_producto='".$_GET["pdto"]."'");
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_materiales
+							INNER JOIN productos ON prod_id=ppmt_producto AND prod_id_empresa={$_SESSION['id_empresa']} 
+							WHERE ppmt_producto='".$_GET["pdto"]."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								switch($res[2]){

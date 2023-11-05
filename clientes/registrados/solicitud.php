@@ -8,7 +8,7 @@ include("verificar-paginas.php");
 include("head.php");
 
 $resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes 
-WHERE cli_id='".$_SESSION["id"]."'"), MYSQLI_BOTH);
+WHERE cli_id='".$_SESSION["id_cliente"]."'"), MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <link href="css/styles.css" rel="stylesheet">

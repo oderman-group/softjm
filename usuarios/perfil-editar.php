@@ -4,8 +4,7 @@ $idPagina = 19;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consulta = $conexionBdPrincipal->query("SELECT * FROM usuarios 
-INNER JOIN usuarios_tipos ON utipo_id=usr_tipo
+$consulta = $conexionBdPrincipal->query("SELECT * FROM usuarios
 WHERE usr_id='" . $_SESSION["id"] . "'");
 
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
@@ -91,19 +90,15 @@ include("includes/js-formularios.php");
                                             <input type="email" class="span4" name="email" value="<?= $resultadoD['usr_email']; ?>">
                                         </div>
                                     </div>
-
                                     <div class="control-group">
-                                        <label class="control-label">Tipo de usuario</label>
+                                        <label class="control-label">Roles</label>
                                         <div class="controls">
-                                            <select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoU">
+                                            <select data-placeholder="Escoja una opción..." class="chzn-select span4" multiple tabindex="2" name="tipoU" disabled>
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos");
-                                                
-                                                while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
-                                                    ?>
-                                                    <option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['usr_tipo'] == $resOp[0]) echo "selected";
-                                                                                    else echo "disabled"; ?>><?= $resOp[1]; ?></option>
+                                                foreach ($_SESSION['dataAdicional']['roles_nombre'] as $roles) {
+                                                ?>
+                                                    <option value="" selected><?=$roles;?></option>
                                                 <?php
                                                 }
                                                 ?>

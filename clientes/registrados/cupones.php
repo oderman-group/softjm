@@ -101,7 +101,7 @@ include("head.php");
 							<tbody>
                             <?php
 							$opcionesSINO = array("NO","SI");
-							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones WHERE cupo_cliente='".$_SESSION["id"]."'");
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones WHERE cupo_cliente='".$_SESSION["id_cliente"]."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta)){
 							?>
