@@ -161,8 +161,8 @@ include("includes/head.php");
                         
 						<?php
 								$SQL = "SELECT * FROM proyectos
-									INNER JOIN usuarios ON usr_id=proy_responsable_principal
-								";
+									INNER JOIN usuarios ON usr_id=proy_responsable_principal where proy_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'"
+								;
 						?>
 						
 						<div class="widget-container">
@@ -199,7 +199,7 @@ include("includes/head.php");
                             <?php
 							
 								$consulta = $conexionBdPrincipal->query("SELECT * FROM proyectos
-								INNER JOIN usuarios ON usr_id=proy_responsable_principal
+								INNER JOIN usuarios ON usr_id=proy_responsable_principal where proy_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'
 								LIMIT $inicio, $limite
 								");
 							

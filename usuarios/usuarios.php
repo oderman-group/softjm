@@ -129,7 +129,8 @@ include("includes/head.php");
 												LEFT JOIN usuarios_roles AS ru ON u.usr_id = ru.upr_id_usuario
 												LEFT JOIN orioncrmcom_dev_jm_crm.usuarios_tipos AS r ON ru.upr_id_rol = r.utipo_id
 												INNER JOIN orioncrmcom_dev_jm_crm.areas ON ar_id = u.usr_area
-												WHERE u.usr_id != '" . $_SESSION["id"] . "' $filtro
+												WHERE u.usr_id != '" . $_SESSION["id"] . "' $filtro and
+												usr_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'
 												GROUP BY u.usr_id");
 												$no = 1;
 												$bloq = array("NO","SI");	
