@@ -5,6 +5,7 @@ $idPagina = 10;
 $paginaActual['pag_nombre'] = "Agegar clientes";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <!--============ javascript ===========-->
@@ -335,7 +336,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" multiple tabindex="2" name="grupos[]">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM dealer");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>

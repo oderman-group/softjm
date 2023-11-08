@@ -3,6 +3,7 @@ include("sesion.php");
 $idPagina = 9; 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <!-- styles -->
 
@@ -201,7 +202,7 @@ include("includes/head.php");
 							<ul class="dropdown-menu">
 								<li><a href="clientes.php">Todos</a></li>
 								<?php
-								$grupos = $conexionBdPrincipal->query("SELECT * FROM dealer");
+								$grupos = $conexionBdPrincipal->query("SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
 								while($grupo = mysqli_fetch_array($grupos, MYSQLI_BOTH)){
 									
 									$color = 'white';
@@ -211,7 +212,7 @@ include("includes/head.php");
 					
 									$consultaContarClientes = $conexionBdPrincipal->query("SELECT COUNT(*) FROM clientes_categorias
 									INNER JOIN clientes ON cli_id=cpcat_cliente AND (cli_papelera=0 OR  cli_papelera IS NULL)
-									WHERE cpcat_categoria='".$grupo[0]."'
+									WHERE cpcat_categoria='".$grupo[0]."' AND cli_id_empresa='".$idEmpresa."'
 									");
 									$contarClientes = mysqli_fetch_array($consultaContarClientes, MYSQLI_BOTH);
 								?>
@@ -305,7 +306,7 @@ include("includes/head.php");
 								$consulta = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".clientes
 								LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$_GET["dpto"]."'
-								WHERE cli_id=cli_id ".$filtro."
+								WHERE cli_id=cli_id ".$filtro." AND cli_id_empresa='".$idEmpresa."'
 								LIMIT $inicio, $limite
 								");
 							}else{
@@ -313,7 +314,7 @@ include("includes/head.php");
 								LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 								$filtroGrupos
-								WHERE cli_id=cli_id ".$filtro."
+								WHERE cli_id=cli_id ".$filtro." AND cli_id_empresa='".$idEmpresa."'
 								LIMIT $inicio, $limite
 								");
 							}
