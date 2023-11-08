@@ -2,7 +2,7 @@
 include("sesion.php");
 
 $idPagina = 77;
-
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -160,6 +160,7 @@ include("includes/head.php");
 											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cli_id, cli_nombre, cli_zona
 												FROM cotizacion
 								INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='" . $_GET["cte"] . "'
+								WHERE cotiz_id_empresa='".$idEmpresa."'
 								ORDER BY cotiz_id DESC
 								LIMIT $inicio, $limite
 								");
@@ -170,7 +171,7 @@ include("includes/head.php");
 												FROM cotizacion
 								INNER JOIN clientes ON cli_id=cotiz_cliente
 								INNER JOIN usuarios ON usr_id=cotiz_creador
-								WHERE cotiz_id=cotiz_id $filtro
+								WHERE cotiz_id=cotiz_id AND cotiz_id_empresa='".$idEmpresa."' $filtro
 								ORDER BY cotiz_id DESC
 								LIMIT $inicio, $limite
 								");
@@ -190,7 +191,7 @@ include("includes/head.php");
 											}
 
 											$consultaVendedor=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios 
-											WHERE usr_id='" . $res['cotiz_vendedor'] . "'");
+											WHERE usr_id='" . $res['cotiz_vendedor'] . "' AND usr_id_empresa='".$idEmpresa."'");
 											$vendedor = mysqli_fetch_array($consultaVendedor, MYSQLI_BOTH);
 
 											$fondoCotiz = '';
@@ -199,7 +200,7 @@ include("includes/head.php");
 											}
 
 											$consultaGpedido=$conexionBdPrincipal->query("SELECT pedid_id, pedid_fecha_creacion FROM pedidos 
-											WHERE pedid_cotizacion='" . $res['cotiz_id'] . "'");
+											WHERE pedid_cotizacion='" . $res['cotiz_id'] . "' AND pedid_id_empresa='".$idEmpresa."'");
 											$generoPedido = mysqli_fetch_array($consultaGpedido, MYSQLI_BOTH);
 
 											$IdGeneroPedido = '';
