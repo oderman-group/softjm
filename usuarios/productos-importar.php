@@ -2,7 +2,7 @@
 include("sesion.php");
 
 $idPagina = 21;
-
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -65,7 +65,7 @@ include("includes/texto-editor.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="grupo1">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
 												<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
@@ -82,7 +82,7 @@ include("includes/texto-editor.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="grupo2">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2  AND catp_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
@@ -99,7 +99,7 @@ include("includes/texto-editor.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="marca">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM marcas");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
