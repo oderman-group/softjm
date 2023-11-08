@@ -5,7 +5,7 @@ $idPagina = 36;
 
 $tabla = 'productos';
 $pk = 'prod_id';
-
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -247,7 +247,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 						</button>
 						<ul class="dropdown-menu">
 							<?php
-							$grupos1 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1");
+							$grupos1 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_id_empresa='".$idEmpresa."'");
 							while ($grupo1 = mysqli_fetch_array($grupos1, MYSQLI_BOTH)) {
 							?>
 								<li><a href="productos.php?grupo1=<?= $grupo1[0]; ?>" style="color:<?= $color; ?>"><?= $grupo1['catp_nombre']; ?></a></li>
@@ -261,7 +261,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 						</button>
 						<ul class="dropdown-menu">
 							<?php
-							$grupos2 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2");
+							$grupos2 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2 AND catp_id_empresa='".$idEmpresa."'");
 							while ($grupo2 = mysqli_fetch_array($grupos2, MYSQLI_BOTH)) {
 							?>
 								<li><a href="productos.php?grupo2=<?= $grupo2[0]; ?>" style="color:<?= $color; ?>"><?= $grupo2['catp_nombre']; ?></a></li>
@@ -275,7 +275,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 						</button>
 						<ul class="dropdown-menu">
 							<?php
-							$marcas = $conexionBdPrincipal->query("SELECT * FROM marcas");
+							$marcas = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."'");
 							while ($marca = mysqli_fetch_array($marcas, MYSQLI_BOTH)) {
 							?>
 								<li><a href="productos.php?marca=<?= $marca[0]; ?>" style="color:<?= $color; ?>"><?= $marca[1]; ?></a></li>
@@ -416,7 +416,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 											}
 										}
 
-										$consulta = $conexionBdPrincipal->query("SELECT * FROM productos LEFT JOIN productos_categorias ON catp_id=prod_categoria WHERE prod_id=prod_id $filtro LIMIT 0, $limite");
+										$consulta = $conexionBdPrincipal->query("SELECT * FROM productos LEFT JOIN productos_categorias ON catp_id=prod_categoria WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' $filtro LIMIT 0, $limite");
 										$no = 1;
 										$visible = array("SI", "SI", "NO");
 										$estadoVisible = array(2, 2, 1);
@@ -425,10 +425,10 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 										$precioWeb=0;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
-											$consultaGrupo1=$conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_id='" . $res['prod_grupo1'] . "'");
+											$consultaGrupo1=$conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_id='" . $res['prod_grupo1'] . "' AND catp_id_empresa='".$idEmpresa."'");
 											$grupo1 = mysqli_fetch_array($consultaGrupo1, MYSQLI_BOTH);
 
-											$consultaMarca=$conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id='" . $res['prod_marca'] . "'");
+											$consultaMarca=$conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id='" . $res['prod_marca'] . "' AND mar_id_empresa='".$idEmpresa."' ");
 											$marca = mysqli_fetch_array($consultaMarca, MYSQLI_BOTH);
 
 											/*$dcto1 = $res['prod_descuento1']/100;

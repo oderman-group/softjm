@@ -2,7 +2,7 @@
 include("sesion.php");
 
 $idPagina = 37;
-
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -101,7 +101,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 											<option value=""></option>
 											<?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM proveedores");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM proveedores WHERE prov_id_empresa='".$idEmpresa."'");
 											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 											?>
 												<option value="<?= $resOp[0]; ?>"><?= $resOp['prov_nombre']; ?></option>
@@ -123,7 +123,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="grupo1" id="grupo1" required>
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
@@ -140,7 +140,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="categoria" id="categoria" required>
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2  AND catp_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
@@ -157,7 +157,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="marca" id="marca" required>
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM marcas");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
