@@ -85,7 +85,7 @@ include("includes/head.php");
 							</thead>
 							<tbody>
                             <?php
-							$consulta = $conexionBdPrincipal->query("SELECT * FROM sucursales_propias");
+							$consulta = $conexionBdPrincipal->query("SELECT * FROM sucursales_propias WHERE sucp_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 							?>
