@@ -12,16 +12,25 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
         $numeroA =0;
     }
 	if ($numeroA == 0) {
-		if(!empty($_POST["paginasP"])){
-			$numero = (count($_POST["paginasP"]));
-			$contador = 0;
-			$conexionBdPrincipal->query("DELETE FROM paginas_perfiles WHERE pper_tipo_usuario='" . $_POST["id"] . "'");
+		$idUsuario = $_POST["id"];
+		$consultaPaginasUsuario = $conexionBdPrincipal->query("SELECT pper_pagina FROM paginas_perfiles WHERE pper_tipo_usuario = '$idUsuario'");
+		$paginasExistentes = [];
+		while ($fila = $consultaPaginasUsuario->fetch_assoc()) {
+				$paginasExistentes[] = $fila['pper_pagina'];
+		}
 
-			while ($contador < $numero) {
-				$conexionBdPrincipal->query("INSERT INTO paginas_perfiles(pper_pagina, pper_tipo_usuario)VALUES(" . $_POST["paginasP"][$contador] . ",'" . $_POST["id"] . "')");
+		$paginasAEliminar = array_diff($paginasExistentes, $_POST["paginasP"]);
+		$paginasAInsertar = array_diff($_POST["paginasP"], $paginasExistentes);
 
-				$contador++;
-			}
+		if (!empty($paginasAEliminar)) {
+				$paginasAEliminarStr = implode("','", $paginasAEliminar);
+				$conexionBdPrincipal->query("DELETE FROM paginas_perfiles WHERE pper_tipo_usuario = '$idUsuario' AND pper_pagina IN ('$paginasAEliminarStr')");
+		}
+
+		if (!empty($paginasAInsertar)) {
+				foreach ($paginasAInsertar as $pagina) {
+						$conexionBdPrincipal->query("INSERT INTO paginas_perfiles (pper_pagina, pper_tipo_usuario) VALUES ('$pagina', '$idUsuario')");
+				}
 		}
 	} else {
 		$conexionBdPrincipal->query("DELETE FROM paginas_perfiles WHERE pper_tipo_usuario='" . $_POST["id"] . "'");

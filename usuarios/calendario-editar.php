@@ -6,7 +6,7 @@ $paginaActual['pag_nombre'] = "Editar evento";
 <?php include("includes/verificar-paginas.php");?>
 <?php
 include("includes/head.php");
-$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM agenda WHERE age_id='".$_GET["id"]."'");
+$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM agenda WHERE age_id='".$_GET["id"]."' AND age_id_empresa={$_SESSION['dataAdicional']['id_empresa']}");
 $resultadoD = mysqli_fetch_array($consulta);
 ?>
 <!-- styles -->
@@ -177,7 +177,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente">
 											<option value="0"></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$resultadoD["age_cliente"]."'");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$resultadoD["age_cliente"]."' AND cli_id_empresa={$_SESSION['dataAdicional']['id_empresa']}");
 											while($resOp = mysqli_fetch_array($conOp)){
 												if($datosUsuarioActual[3]!=1){
 													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");

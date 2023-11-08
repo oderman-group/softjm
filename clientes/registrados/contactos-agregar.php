@@ -167,7 +167,7 @@ include("head.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="sucursal">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_SESSION["id"]."'");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_SESSION["id_cliente"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[7];?></option>

@@ -99,6 +99,7 @@ include("head.php");
 							<tbody>
                             <?php
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_seguimiento
+							INNER JOIN remisiones ON rem_id=remseg_id_remisiones AND rem_id_empresa={$_SESSION['id_empresa']} 
 							WHERE remseg_id_remisiones='".$_GET["id"]."'
 							");
 							$no = 1;

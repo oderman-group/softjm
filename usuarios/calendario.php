@@ -40,7 +40,7 @@ $eventos = substr($eventos,0,-1);
 
 
 $proyectos = mysqli_query($conexionBdPrincipal, "SELECT proy_id, proy_titulo, proy_descripcion, proy_inicio, proy_fin, proy_responsable_principal, proy_estado, DAY(proy_fin) as dia, MONTH(proy_fin) as mes, YEAR(proy_fin) as agno FROM proyectos 
-WHERE proy_responsable_principal='".$usuarioID."' AND YEAR(proy_fin)>='".date("Y")."' AND MONTH(proy_fin)>='".date("m")."'
+WHERE proy_responsable_principal='".$usuarioID."' AND YEAR(proy_fin)>='".date("Y")."' AND MONTH(proy_fin)>='".date("m")."' AND proy_id_empresa={$_SESSION['dataAdicional']['id_empresa']}
 LIMIT 0,8
 ");
 

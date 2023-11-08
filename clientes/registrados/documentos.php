@@ -128,22 +128,22 @@ include("head.php");
 								
 							
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion
-							INNER JOIN clientes ON cli_id=cotiz_cliente
-							INNER JOIN usuarios ON usr_id=cotiz_creador
-							WHERE cotiz_cliente='".$_SESSION["id"]."'
+							INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id_empresa={$_SESSION['id_empresa']}
+							INNER JOIN usuarios ON usr_id=cotiz_creador AND usr_id_empresa={$_SESSION['id_empresa']}
+							WHERE cotiz_cliente='".$_SESSION["id_cliente"]."'
 							");
 							
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
-								$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."'"), MYSQLI_BOTH);
+								$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."' AND usr_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
 								
 								$fondoCotiz = '';
 								if($res['cotiz_vendida']==1){
 									$fondoCotiz = 'aquamarine';
 								}
 								
-								$vencimiento = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT DATEDIFF(cotiz_fecha_vencimiento, now()) FROM cotizacion WHERE cotiz_id='".$res['cotiz_id']."'"), MYSQLI_BOTH);
+								$vencimiento = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT DATEDIFF(cotiz_fecha_vencimiento, now()) FROM cotizacion WHERE cotiz_id='".$res['cotiz_id']."' AND cotiz_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
 								
 								if($vencimiento[0]<0){continue;}
 							?>
@@ -154,7 +154,7 @@ include("head.php");
 								<td>
 									<?php
 										$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
-										INNER JOIN productos ON prod_id=czpp_producto
+										INNER JOIN productos ON prod_id=czpp_producto AND prod_id_empresa={$_SESSION['id_empresa']}
 										WHERE czpp_cotizacion='".$res['cotiz_id']."'
 										");
 										$i = 1;
@@ -201,7 +201,7 @@ include("head.php");
 							
                             <?php
 							$consultaC = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
-							WHERE rem_cliente='".$_SESSION["id"]."' AND rem_fecha_certificado!=''
+							WHERE rem_cliente='".$_SESSION["id_cliente"]."' AND rem_fecha_certificado!=''
 							ORDER BY rem_id DESC
 							");
 							$no = 1;

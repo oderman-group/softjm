@@ -5,7 +5,7 @@ $tituloPagina = "Editar Contactos";
 
 include("head.php");
 
-$resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$_GET["id"]."'"), MYSQLI_BOTH);
+$resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$_GET["id"]."' AND cont_cliente_principal={$_SESSION["id_cliente"]}"), MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
@@ -172,7 +172,7 @@ $resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FRO
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="sucursal">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_SESSION["id"]."'");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_SESSION["id_cliente"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['cont_sucursal']==$resOp[0]) echo "selected";?>><?=$resOp[7];?></option>

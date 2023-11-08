@@ -107,10 +107,10 @@ $cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM c
 							<tbody>
                             <?php
 							$roles = array("","Topógrafo", "Administrativo", "Otro");
-							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$_SESSION["id"]."'");
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$_SESSION["id_cliente"]."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-								$sucursal = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_id='".$res['cont_sucursal']."'"), MYSQLI_BOTH);
+								$sucursal = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_id='".$res['cont_sucursal']."' AND sucu_cliente_principal={$_SESSION["id_cliente"]}"), MYSQLI_BOTH);
 							?>
 							<tr>
 								<td><?=$no;?></td>

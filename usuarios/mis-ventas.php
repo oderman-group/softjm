@@ -358,7 +358,8 @@ include("includes/head.php");
 				</div>
 
 				<?php
-				$consultaMejorVendedor = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_mejor_vendedor=1 LIMIT 0,1");
+				$consultaMejorVendedor = $conexionBdPrincipal->query("SELECT * FROM usuarios 
+				WHERE usr_mejor_vendedor=1 AND usr_id_empresa={$_SESSION['dataAdicional']['id_empresa']} LIMIT 0,1");
 				$mejorVendedor = mysqli_fetch_array($consultaMejorVendedor, MYSQLI_BOTH);	
 				?>
 
@@ -378,7 +379,6 @@ include("includes/head.php");
 										</div>
 										<div class="modal-footer">
 											<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-											<button type="button" class="btn btn-primary">Enviar felicitación</button>
 										</div>
 									</div>
 								</div>

@@ -8,7 +8,7 @@ $fila = mysqli_fetch_array($rst_usr, MYSQLI_BOTH);
 if($num>0)
 {
 	//INICIO SESION
-	$_SESSION["id"] = $fila['cli_id'];
+	$_SESSION["id_cliente"] = $fila['cli_id'];
 	$_SESSION["id_empresa"] = $fila['cli_id_empresa'];
 	
 	switch($_POST["refe"]){

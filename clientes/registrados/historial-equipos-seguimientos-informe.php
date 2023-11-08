@@ -1,4 +1,5 @@
-<?php 
+<?php
+session_start();
 include("../../conexion.php");
 
 $equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM remisiones WHERE rem_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
@@ -31,7 +32,9 @@ $equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM r
 		</thead>
 		<tbody>
 			<?php
-			$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM remisiones_seguimiento WHERE remseg_id_remisiones='" . $_GET["id"] . "'");
+			$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM remisiones_seguimiento
+			INNER JOIN remisiones ON rem_id=remseg_id_remisiones AND rem_id_empresa={$_SESSION['id_empresa']} 
+			WHERE remseg_id_remisiones='" . $_GET["id"] . "'");
 			$no = 1;
 			while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 			?>

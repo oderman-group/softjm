@@ -5,7 +5,7 @@ $idPagina = 6;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
-<link href="css/chosen.css" rel="stylesheet">
+<link href="css/tablecloth.css" rel="stylesheet">
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -22,6 +22,10 @@ include("includes/head.php");
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+<script src="js/jquery.tablecloth.js"></script>
+<script src="js/jquery.dataTables.js"></script>
+<script src="js/dataTables.bootstrap.js"></script>
+<script src="js/TableTools.js"></script>
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
@@ -62,21 +66,39 @@ include("includes/js-formularios.php");
 									</div>
 								</div>
                                 
-                                <div class="control-group">
-									<label class="control-label">Paginas permitidas</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción" class="chzn-select span6" multiple tabindex="4" name="paginasP[]">
-											<option value=""></option>
-                                            <?php
-											$conOp = $conexionBdAdmin->query("SELECT * FROM ".$bdAdmin.".paginas");
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-											?>
-                                            	<option value="<?=$resOp[0];?>"><?="[".$resOp[0]."] ".$resOp[1];?></option>
-                                            <?php }?>
-										</select>
-									</div>
-								</div>
-
+								<table class="table table-striped table-bordered" id="data-table">
+										<thead>
+												<tr>
+														<th>ID</th>
+														<th>Nombre</th>
+														<th>Seleccionar <input type="checkbox" id="selectAll"></th>
+												</tr>
+										</thead>
+										<tbody>
+												<?php
+												$query = "SELECT p.pag_id, p.pag_nombre, pp.pper_id 
+														FROM paginas p 
+														LEFT JOIN ".MAINBD.".paginas_perfiles pp 
+														ON p.pag_id = pp.pper_pagina 
+														AND pp.pper_tipo_usuario = '" . $resultadoD['utipo_id'] . "'";
+												$result = $conexionBdAdmin->query($query);
+												$no=1;
+												while ($row = $result->fetch_assoc()) {
+														?>
+														<tr>
+																<td><?= $row['pag_id'];?></td>
+																<td><?= $row['pag_nombre']; ?></td>
+																<td>
+																		<input class="selectCheckbox" type="checkbox" value="<?= $row['pag_id']; ?>">
+																		<span style="display: none;"> <?= $isChecked; ?> </span>
+																</td>
+														</tr>
+												<?php
+												$no++;
+												}
+												?>
+										</tbody>
+								</table>
                                 <!--
                                 
                                 <span style="color:#F00;">Utiliza la siguiente opción (<b>Acciones NO permitidas</b>) sólo si NO utilizaste la opción anterior (<b>Paginas NO permitidas</b>) y viceversa.</span>
@@ -94,7 +116,7 @@ include("includes/js-formularios.php");
 								</div>
 
                             -->
-                               
+								<select id="paginasSeleccionadas"  name="paginasP[]" multiple  style="display: none;"></select>                               
 								<div class="form-actions">
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									<button type="button" class="btn btn-danger">Cancelar</button>
@@ -110,4 +132,42 @@ include("includes/js-formularios.php");
 	<?php include("includes/pie.php");?>
 </div>
 </body>
+<script type="text/javascript">
+	let dataTable = $('#data-table').DataTable()
+	    function actualizarPaginasSeleccionadas(dataTable) {
+        let paginasSeleccionadas = [];
+				dataTable.$('.selectCheckbox').each(function() {
+            if ($(this).prop('checked')) {
+                paginasSeleccionadas.push($(this).val());
+            }
+        });
+
+				$('#selectAll').change(function() {
+				let isChecked = $(this).prop('checked');	
+				dataTable.$('.selectCheckbox').each(function() {
+								$(this).prop('checked',isChecked)
+                paginasSeleccionadas.push($(this).val());
+        });
+			});
+			
+				let selectElement = $('#paginasSeleccionadas');
+        selectElement.find('option').remove(); 
+				for (let i = 0; i < paginasSeleccionadas.length; i++) {
+						selectElement.append($('<option>', {
+								value: paginasSeleccionadas[i]
+						}));
+				}
+				selectElement.val(paginasSeleccionadas);
+
+    }
+
+    $(document).ready(function() {
+        actualizarPaginasSeleccionadas(dataTable);
+
+        $(document).on('change', 'input[type="checkbox"]', function() {
+            actualizarPaginasSeleccionadas(dataTable);
+        });
+    });
+		
+</script>
 </html>
