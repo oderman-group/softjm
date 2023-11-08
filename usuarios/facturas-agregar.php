@@ -2,6 +2,7 @@
 <?php
 $idPagina = 128;
 $paginaActual['pag_nombre'] = "Agregar factura de venta";
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
@@ -100,7 +101,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" onChange="clientes(this)" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												if($datosUsuarioActual[3]!=1){
 													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
@@ -141,7 +142,7 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" onChange="provee(this)" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores");
+											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores WHERE prov_id_empresa='".$idEmpresa."'");
 											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>" <?php if(isset($_GET["prov"]) and $_GET["prov"]!="" and $_GET["prov"]==$resOp[0]) echo "selected";?>><?=$resOp['prov_nombre'];?></option>
@@ -164,7 +165,7 @@ include("includes/js-formularios.php");
 								
 								<?php
 								$consultaInfo=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes 
-								WHERE cli_id='".$_GET['cte']."'");
+								WHERE cli_id='".$_GET['cte']."' AND cli_id_empresa='".$idEmpresa."'");
 								$clienteInfo = mysqli_fetch_array($consultaInfo, MYSQLI_BOTH);
 								?>
 								<div class="control-group">
@@ -227,7 +228,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=strtoupper($resOp[4])." (".$resOp[5].")";?></option>
@@ -302,7 +303,7 @@ include("includes/js-formularios.php");
 
 												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria
-												WHERE prod_id=prod_id $filtroProd
+												WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' $filtroProd
 												ORDER BY prod_nombre
 												");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
@@ -321,7 +322,7 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="combo[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos 
+												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos WHERE combo_id_empresa='".$idEmpresa."'
 												ORDER BY combo_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												?>
@@ -339,7 +340,7 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="servicio[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios 
+												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$idEmpresa."'
 												ORDER BY serv_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												?>

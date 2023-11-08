@@ -2,6 +2,7 @@
 <?php
 $idPagina = 126;
 $paginaActual['pag_nombre'] = "Facturas";
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <?php include("includes/verificar-paginas.php"); ?>
 <?php include("includes/head.php"); ?>
@@ -161,6 +162,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 										if (isset($_GET["cte"]) and $_GET["cte"] != "") {
 											$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
 											LEFT JOIN clientes ON cli_id=factura_cliente AND cli_id='" . $_GET["cte"] . "'
+											WHERE factura_id_empresa='".$idEmpresa."'
 											ORDER BY factura_id DESC
 											LIMIT $inicio, $limite
 											");
@@ -169,7 +171,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 											LEFT JOIN clientes ON cli_id=factura_cliente
 											LEFT JOIN proveedores ON prov_id=factura_proveedor
 											INNER JOIN usuarios ON usr_id=factura_creador
-											WHERE factura_id=factura_id $filtro
+											WHERE factura_id=factura_id AND factura_id_empresa='".$idEmpresa."' $filtro
 											ORDER BY factura_id DESC
 											LIMIT $inicio, $limite
 											");
@@ -194,7 +196,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 												continue;
 											}
 
-											$consultaVendedor=mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='" . $res['factura_vendedor'] . "'");
+											$consultaVendedor=mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='" . $res['factura_vendedor'] . "' AND usr_id_empresa='".$idEmpresa."'");
 											$vendedor = mysqli_fetch_array($consultaVendedor, MYSQLI_BOTH);
 
 
