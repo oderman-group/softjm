@@ -5,8 +5,8 @@ $idPagina = 267;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-
-$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1");
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
+$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1 AND conf_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
