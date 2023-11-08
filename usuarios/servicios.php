@@ -2,7 +2,7 @@
 include("sesion.php");
 
 $idPagina = 154;
-
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -117,7 +117,7 @@ include("includes/head.php");
 									</thead>
 									<tbody>
 										<?php
-										$consulta = $conexionBdPrincipal->query("SELECT * FROM servicios");
+										$consulta = $conexionBdPrincipal->query("SELECT * FROM servicios WHERE serv_id_empresa='".$idEmpresa."'");
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 										?>
