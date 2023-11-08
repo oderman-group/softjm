@@ -6,8 +6,8 @@ $idPagina = 125;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-
-$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores WHERE prov_id='" . $_GET["id"] . "'");
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
+$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores WHERE prov_id='" . $_GET["id"] . "' AND prov_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 
