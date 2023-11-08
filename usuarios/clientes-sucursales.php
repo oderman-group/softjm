@@ -5,7 +5,8 @@ $idPagina = 83;
 $paginaActual['pag_nombre'] = "Sucursales";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'");
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
+$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."' AND cli_id_empresa='".$idEmpresa."'");
 $cliente = mysqli_fetch_array($consultaClientes, MYSQLI_BOTH);
 ?>
 <!-- styles -->
@@ -114,7 +115,7 @@ $cliente = mysqli_fetch_array($consultaClientes, MYSQLI_BOTH);
 							INNER JOIN clientes ON cli_id=sucu_cliente_principal 
 							INNER JOIN orioncrmcom_dev_crm_admin.localidad_ciudades ON ciu_id=sucu_ciudad 
 							INNER JOIN orioncrmcom_dev_crm_admin.localidad_departamentos ON dep_id=ciu_departamento
-							WHERE sucu_cliente_principal='".$_GET["cte"]."'");
+							WHERE sucu_cliente_principal='".$_GET["cte"]."' AND cli_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 							?>
