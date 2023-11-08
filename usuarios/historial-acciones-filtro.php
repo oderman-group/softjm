@@ -72,7 +72,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="usuario">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios where usr_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['usr_nombre'];?></option>
