@@ -2,7 +2,7 @@
 include("sesion.php");
 
 $idPagina = 166;
-
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -64,7 +64,7 @@ include("includes/js-formularios.php");
 						$i = 1;
 						while($i==1){
 							$codigoAuto = rand(10000,9999999);
-							$consultaCodigo=mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones WHERE cupo_codigo='".$codigoAuto."'");
+							$consultaCodigo=mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones WHERE cupo_codigo='".$codigoAuto."' AND cupo_id_empresa='".$idEmpresa."'");
 							$numCodigo = mysqli_num_rows($consultaCodigo);
 							if($numCodigo==0){$i=0;}
 						}
@@ -109,7 +109,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												if($datosUsuarioActual[3]!=1){
 													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");

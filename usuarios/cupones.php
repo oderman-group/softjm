@@ -2,7 +2,7 @@
 include("sesion.php");
 
 $idPagina = 165;
-
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -104,10 +104,10 @@ include("includes/head.php");
 							<tbody>
                             <?php
 							$opcionesSINO = array("NO","SI");
-							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones");
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones WHERE cupo_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-								$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$res['cupo_cliente']."'");
+								$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$res['cupo_cliente']."' AND cli_id_empresa='".$idEmpresa."'");
 								$cliente = mysqli_fetch_array($consultaClientes, MYSQLI_BOTH);
 							?>
 							<tr>
