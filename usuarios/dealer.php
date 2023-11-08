@@ -2,7 +2,7 @@
 include("sesion.php");
 
 $idPagina = 232;
-
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -98,7 +98,7 @@ include("includes/head.php");
 							</thead>
 							<tbody>
                             <?php
-							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM dealer");
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_categorias WHERE cpcat_categoria='".$res['deal_id']."'");
