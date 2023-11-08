@@ -460,9 +460,9 @@ include("includes/js-formularios.php");
                             <?php
 							$consulta = $conexionBdPrincipal->query("SELECT * FROM sucursales
 							INNER JOIN clientes ON cli_id=sucu_cliente_principal 
-							INNER JOIN localidad_ciudades ON ciu_id=sucu_ciudad 
-							INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
-							WHERE sucu_cliente_principal='".$_GET["id"]."'");
+							INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=sucu_ciudad 
+							INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
+							WHERE sucu_cliente_principal='".$_GET["id"]."' AND cli_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 							?>
@@ -827,9 +827,9 @@ include("includes/js-formularios.php");
 															<?php
 															$consulta = $conexionBdPrincipal->query("SELECT * FROM facturacion
 															INNER JOIN clientes ON cli_id=fact_cliente
-															INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-															INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
-															WHERE fact_cliente='".$_GET["id"]."'");
+															INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+															INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
+															WHERE fact_cliente='".$_GET["id"]."' AND fact_id_empresa='".$idEmpresa."'");
 															$no = 1;
 															while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 																$consultaAbonos = $conexionBdPrincipal->query("SELECT sum(fpab_valor) FROM facturacion_abonos WHERE fpab_factura='".$res['fact_id']."'");
