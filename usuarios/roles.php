@@ -77,7 +77,7 @@ include("includes/head.php");
 										</thead>
 										<tbody>
 											<?php
-											$consulta = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos where utipo_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
+											$consulta = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos WHERE utipo_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											$no = 1;
 											while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 											?>
