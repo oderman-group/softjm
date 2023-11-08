@@ -2,7 +2,7 @@
 include("sesion.php");
 
 $idPagina = 151;
-
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -141,6 +141,7 @@ include("includes/head.php");
 							if(isset($_GET["cte"]) and $_GET["cte"]!=""){
 								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos
 								INNER JOIN clientes ON cli_id=pedid_cliente AND cli_id='".$_GET["cte"]."'
+								WHERE pedid_id_empresa='".$idEmpresa."'
 								ORDER BY pedid_id DESC
 								LIMIT $inicio, $limite
 								");
@@ -148,7 +149,7 @@ include("includes/head.php");
 								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos
 								INNER JOIN clientes ON cli_id=pedid_cliente
 								INNER JOIN usuarios ON usr_id=pedid_creador
-								WHERE pedid_id=pedid_id $filtro
+								WHERE pedid_id=pedid_id AND pedid_id_empresa='".$idEmpresa."' $filtro
 								ORDER BY pedid_id DESC
 								LIMIT $inicio, $limite
 								");
@@ -160,9 +161,9 @@ include("includes/head.php");
 									if($numZ==0) continue;
 								}
 								
-								$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['pedid_vendedor']."'"), MYSQLI_BOTH);
+								$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['pedid_vendedor']."' AND usr_id_empresa='".$idEmpresa."'"), MYSQLI_BOTH);
 
-								$generoRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg WHERE remi_pedido='" . $res['pedid_id'] . "'"), MYSQLI_BOTH);
+								$generoRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg WHERE remi_pedido='" . $res['pedid_id'] . "' AND remi_id_empresa='".$idEmpresa."'"), MYSQLI_BOTH);
 
 
 											$infoRem = '';
