@@ -219,8 +219,8 @@ $paginaActual['pag_nombre'] = "Facturas";
 
 													$total = ($datos['czpp_valor'] * $datos['czpp_cantidad']);
 													$sumaTotal += $total;
-
-													$VlrDcto = ($total * ($datos['czpp_descuento']/100));
+													$descuento = is_numeric($datos['czpp_descuento']) ? $datos['czpp_descuento'] : 0;
+													$VlrDcto = ($total * ($descuento/100));
 													$SumaDcto += $VlrDcto;
 
 													$totalConDcto = ($total - $VlrDcto);
