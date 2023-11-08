@@ -2,6 +2,7 @@
 <?php
 $idPagina = 129;
 $paginaActual['pag_nombre'] = "Agregar factura de compra";
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
@@ -101,7 +102,7 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores");
+											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores WHERE prov_id_empresa='".$idEmpresa."'");
 											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>"><?=$resOp['prov_nombre'];?></option>
@@ -174,7 +175,7 @@ include("includes/js-formularios.php");
 
 												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria
-												WHERE prod_id=prod_id $filtroProd
+												WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' $filtroProd
 												ORDER BY prod_nombre
 												");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
