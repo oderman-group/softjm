@@ -125,7 +125,7 @@ include("includes/head.php");
 										$consulta = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".bodegas 
 										INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=bod_ciudad
 										INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
-										where bod_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
+										WHERE bod_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 											$consultaProductosBodegas=$conexionBdPrincipal->query("SELECT * FROM productos_bodegas WHERE prodb_bodega='".$res[0]."'");
