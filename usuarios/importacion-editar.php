@@ -2,14 +2,15 @@
 include("sesion.php");
 
 $idPagina = 135;
-
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
 $consultaResultadoD = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones 
 INNER JOIN proveedores ON prov_id=imp_proveedor
 LEFT JOIN facturas ON factura_id=imp_fce
-WHERE imp_id='" . $_GET["id"] . "'");
+WHERE imp_id='" . $_GET["id"] . "'
+AND imp_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consultaResultadoD, MYSQLI_BOTH);
 
 //Moneda a multiplicar
@@ -299,7 +300,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 											<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="fce" required>
 												<option value=""></option>
 												<?php
-												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas WHERE factura_extranjera=1 AND factura_proveedor='" . $resultadoD['imp_proveedor'] . "'");
+												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas WHERE factura_extranjera=1 AND factura_proveedor='" . $resultadoD['imp_proveedor'] . "' AND factura_id_empresa='".$idEmpresa."'");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['imp_fce'] == $resOp[0]) echo "selected"; ?>>#<?= $resOp['factura_id'] . " - " . $resOp['factura_concepto']; ?></option>
@@ -372,7 +373,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="facturas[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas WHERE factura_tipo=2 AND factura_preferencia='0'
+												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas WHERE factura_tipo=2 AND factura_preferencia='0' AND factura_id_empresa='".$idEmpresa."'
 												");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 													$facturasNConsulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones_facturas 
@@ -398,7 +399,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 												<?php
 												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
 												LEFT JOIN proveedores ON prov_id=factura_proveedor  
-												WHERE factura_tipo=2 AND factura_preferencia=1
+												WHERE factura_tipo=2 AND factura_preferencia=1 AND factura_id_empresa='".$idEmpresa."'
 												");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 													$facturasNConsulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones_facturas 
@@ -479,6 +480,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 										$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM productos 
 										INNER JOIN productos_categorias ON catp_id=prod_categoria
 										INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $resultadoD['imp_fce'] . "' AND czpp_tipo=4
+										WHERE prod_id_empresa='".$idEmpresa."'
 										ORDER BY prod_no_inventariable DESC, czpp_orden");
 										while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 											$dcto = 0;

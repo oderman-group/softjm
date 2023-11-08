@@ -2,7 +2,7 @@
 include("sesion.php");
 
 $idPagina = 133;
-
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -128,7 +128,7 @@ include("includes/head.php");
 								$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones
 								INNER JOIN proveedores ON prov_id=imp_proveedor
 								INNER JOIN usuarios ON usr_id=imp_responsable
-								WHERE imp_id=imp_id $filtro
+								WHERE imp_id=imp_id AND imp_id_empresa='".$idEmpresa."' $filtro
 								");
 							
 							$no = 1;
