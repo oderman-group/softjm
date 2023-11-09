@@ -7,7 +7,7 @@ include("includes/head.php");
 $validarGet = validarVariableGet($_GET['id']);
 
 if($validarGet){
-    $consulta = $conexionBdPrincipal->query("SELECT * FROM metricas WHERE met_id='".$_GET['id']."'");
+    $consulta = $conexionBdPrincipal->query("SELECT * FROM metricas WHERE met_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
     $numRegistros = $consulta->num_rows;
     if($numRegistros == 0){
         echo "No hay información para mostrar.";
