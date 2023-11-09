@@ -337,9 +337,9 @@ $paginaActual['pag_nombre'] = "Facturas";
 
 															<li><a href="#sql.php?get=46&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>-->
 
-															<li><a href="redimir-factura-clientes-actualizar.php?get=66&id=<?= $res['factura_id']; ?>" onClick="if(!confirm('Desea redimir este saldo para el cliente?')){return false;}">Redimir saldo</a></li>
+															<li><a href="bd_update/redimir-factura-clientes-actualizar.php?get=66&id=<?= $res['factura_id']; ?>" onClick="if(!confirm('Desea redimir este saldo para el cliente?')){return false;}">Redimir saldo</a></li>
 
-															<li><a href="redimir-factura-vendedor-actualizar.php?get=67&id=<?= $res['factura_id']; ?>" onClick="if(!confirm('Desea saldar esta comisión para el vendedor?')){return false;}">Saldar comisión</a></li>
+															<li><a href="bd_update/redimir-factura-vendedor-actualizar.php?get=67&id=<?= $res['factura_id']; ?>" onClick="if(!confirm('Desea saldar esta comisión para el vendedor?')){return false;}">Saldar comisión</a></li>
 
 															<!--
 											<li><a href="sql.php?get=48&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>

@@ -246,7 +246,7 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
                                     <h4 style="margin-top:5px;">
                                         <a href="proyectos-tareas-editar.php?id=<?=$res['ptar_id'];?>&proy=<?=$_GET["proy"];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
 										
-                                        <a href="proyectos-avances-eliminar.php?get=36&id=<?=$res['ptar_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                        <a href="bd_delete/proyectos-avances-eliminar.php?get=36&id=<?=$res['ptar_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
                                 	</h4>
                                 </td>
 								

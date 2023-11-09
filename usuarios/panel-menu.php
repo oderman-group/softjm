@@ -322,7 +322,7 @@ FLOT PIE CHART
 								if($pahoy[0]<>0) continue;
 								?>
 									<li>
-										<a href="bd_update/cliente-seguiimento-estado-update.php?get=28&id=<?=$llamada['cseg_id'];?>" title="Completar tarea"><i class="icon-ok-sign"></i></a>
+										<a href="bd_update/cliente-seguimiento-estado-update.php?get=28&id=<?=$llamada['cseg_id'];?>" title="Completar tarea"><i class="icon-ok-sign"></i></a>
 										<a href="clientes-seguimiento-editar.php?id=<?=$llamada['cseg_id'];?>&idTK=<?=$llamada['cseg_tiket'];?>" title="Ver detalles" target="_blank"><i class="icon-reorder"></i></a>
 										
 										LLamar a <a href="clientes-editar.php?id=<?=$llamada['cli_id'];?>" id="add-regular"><?=$llamada['cli_nombre']." (".$llamada['cli_telefono']." - ".$llamada['cli_celular'].")";?></a> 
@@ -408,7 +408,7 @@ FLOT PIE CHART
 								<span style='color:gray; font-size:10px;'>Creado en: ".$tkResI['tik_fecha_creacion']."</span>";?>
 								</li>
 								
-								<p><a href="clientes-tikets-actualizar-estado.php?get=29&id=<?=$tkResI['tik_id'];?>" onClick="if(!confirm('Desea cerrar este ticket?')){return false;}" style="text-decoration: underline;">Cerrar Ticket</a></p>
+								<p><a href="bd_update/clientes-tikets-actualizar-estado.php?get=29&id=<?=$tkResI['tik_id'];?>" onClick="if(!confirm('Desea cerrar este ticket?')){return false;}" style="text-decoration: underline;">Cerrar Ticket</a></p>
 							</ul>
                             <?php $i++;}?>
                             
