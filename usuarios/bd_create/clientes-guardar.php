@@ -1,6 +1,5 @@
 <?php
 require_once("../sesion.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 
 if ($_POST["fechaIngreso"] == "") $_POST["fechaIngreso"] = '0000-00-00';
 $consultaZona=mysqli_query($conexionBdAdmin,"SELECT * FROM localidad_ciudades WHERE ciu_id='" . $_POST["ciudad"] . "'");

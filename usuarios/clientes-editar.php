@@ -4,7 +4,6 @@ $idPagina = 11;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET["id"]."' AND cli_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>

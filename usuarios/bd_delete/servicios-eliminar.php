@@ -2,7 +2,7 @@
     require_once("../sesion.php");
 
 	$idPagina = 225;
-    $idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
+    
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     
     $conexionBdPrincipal->query("DELETE FROM servicios WHERE serv_id='" . $_GET["id"] . "' AND serv_id_empresa='".$idEmpresa."'");

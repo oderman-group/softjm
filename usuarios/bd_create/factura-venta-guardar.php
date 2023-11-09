@@ -4,7 +4,6 @@ require_once("../sesion.php");
 $idPagina = 291;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 mysqli_query($conexionBdPrincipal,"INSERT INTO facturas(factura_fecha_propuesta, factura_cliente, factura_fecha_vencimiento, factura_vendedor, factura_creador, factura_sucursal, factura_contacto, factura_forma_pago, factura_fecha_creacion, factura_moneda, factura_estado, factura_tipo, factura_id_empresa)VALUES('" . $_POST["fechaPropuesta"] . "','" . $_POST["cliente"] . "','" . $_POST["fechaVencimiento"] . "','" . $_POST["influyente"] . "','" . $_SESSION["id"] . "','" . $_POST["sucursal"] . "','" . $_POST["contacto"] . "','" . $_POST["formaPago"] . "',now(),'" . $_POST["moneda"] . "', 1, 1, '".$idEmpresa."')");
 	
 	$idInsert = mysqli_insert_id($conexionBdPrincipal);

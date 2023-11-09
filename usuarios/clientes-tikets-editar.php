@@ -6,7 +6,6 @@ $paginaActual['pag_nombre'] = "Editar Tickets de clientes";
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 

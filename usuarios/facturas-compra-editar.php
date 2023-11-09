@@ -2,7 +2,6 @@
 <?php
 $idPagina = 130;
 $paginaActual['pag_nombre'] = "FACTURA #".$_GET["id"];
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php

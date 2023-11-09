@@ -2,7 +2,6 @@
 <?php
 $idPagina = 131;
 $paginaActual['pag_nombre'] = "Agregar factura compra extranjera";
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>

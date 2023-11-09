@@ -8,7 +8,6 @@ include("includes/head.php");
 
 $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <!-- styles -->
 

@@ -2,7 +2,6 @@
     require_once("../sesion.php");
 
     $idPagina = 215;
-    $idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 

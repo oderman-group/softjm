@@ -3,7 +3,6 @@ include("sesion.php");
 
 $idPagina = 110;
 $paginaActual['pag_nombre'] = "Enviar portafolios";
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 

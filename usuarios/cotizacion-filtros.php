@@ -2,7 +2,6 @@
 <?php
 $idPagina = 127;
 $paginaActual['pag_nombre'] = "Filtro de cotización";
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>

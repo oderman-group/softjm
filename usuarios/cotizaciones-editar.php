@@ -5,7 +5,6 @@ $idPagina = 79;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 $consultaCliente=$conexionBdPrincipal->query("SELECT * FROM cotizacion 
 INNER JOIN clientes ON cli_id=cotiz_cliente
 INNER JOIN contactos ON cont_id=cotiz_contacto

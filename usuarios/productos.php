@@ -5,7 +5,6 @@ $idPagina = 36;
 
 $tabla = 'productos';
 $pk = 'prod_id';
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>

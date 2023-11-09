@@ -12,7 +12,6 @@ if(!empty($_GET["cte"]) AND $_GET["cte"] == 1){
 //CONFIGURACIÓN DEL PROGRAMA
 $monedas = array("","COP","USD");
 $simbolosMonedas = array("","$","USD");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 
 $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"), MYSQLI_BOTH);
 

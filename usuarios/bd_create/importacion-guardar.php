@@ -1,6 +1,5 @@
 <?php
 require_once("../sesion.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 mysqli_query($conexionBdPrincipal,"INSERT INTO importaciones(imp_fecha, imp_proveedor, imp_concepto, imp_liquidada, imp_responsable,imp_id_empresa)VALUES('" . $_POST["fecha"] . "','" . $_POST["proveedor"] . "', '" . $_POST["concepto"] . "', 0, '" . $_SESSION["id"] . "', '" . $idEmpresa . "')");
 
 $idInsert = mysqli_insert_id($conexionBdPrincipal);

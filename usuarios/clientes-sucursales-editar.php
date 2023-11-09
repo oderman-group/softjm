@@ -5,7 +5,6 @@ $idPagina = 85;
 $paginaActual['pag_nombre'] = "Editar sucursales";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 $consultaD=mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consultaD, MYSQLI_BOTH);
 ?>

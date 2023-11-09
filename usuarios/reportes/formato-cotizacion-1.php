@@ -2,7 +2,6 @@
 include("../sesion.php");
 
 $idPagina = 50;
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 require_once("logica-cotizacion.php");
 ?>
 

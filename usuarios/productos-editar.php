@@ -5,7 +5,6 @@ $idPagina = 38;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 $consulta=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='" . $_GET["id"] . "' AND prod_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resultadoD['prod_costo_dolar']);

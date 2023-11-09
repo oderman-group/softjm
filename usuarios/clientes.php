@@ -3,7 +3,6 @@ include("sesion.php");
 $idPagina = 9; 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <!-- styles -->
 

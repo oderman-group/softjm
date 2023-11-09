@@ -1,6 +1,5 @@
 <?php
 require_once("../sesion.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 mysqli_query($conexionBdPrincipal,"UPDATE proveedores SET prov_eliminado=1, prov_fecha_eliminado=now(), prov_responsable_elimacion='" . $_SESSION["id"] . "' WHERE prov_id='" . $_GET["id"] . "' AND prov_id_empresa='".$idEmpresa."'");
 	
 

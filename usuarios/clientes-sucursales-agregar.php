@@ -5,7 +5,6 @@ $idPagina = 84;
 $paginaActual['pag_nombre'] = "Agegar sucursales";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <!-- styles -->
 

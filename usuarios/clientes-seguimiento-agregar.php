@@ -3,7 +3,7 @@ include("sesion.php");
 
 $idPagina = 13;
 $paginaActual['pag_nombre'] = "Agregar Seguimiento de clientes";
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
+
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 

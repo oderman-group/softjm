@@ -5,7 +5,6 @@ $idPagina = 10;
 $paginaActual['pag_nombre'] = "Agegar clientes";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <!--============ javascript ===========-->

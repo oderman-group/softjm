@@ -5,7 +5,6 @@ $idPagina = 83;
 $paginaActual['pag_nombre'] = "Sucursales";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 $consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."' AND cli_id_empresa='".$idEmpresa."'");
 $cliente = mysqli_fetch_array($consultaClientes, MYSQLI_BOTH);
 ?>

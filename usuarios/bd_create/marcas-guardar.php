@@ -3,7 +3,6 @@
 
     $idPagina = 192;
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
-    $idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
     $conexionBdPrincipal->query("INSERT INTO marcas(mar_nombre,mar_id_empresa)VALUES('" . $_POST["nombre"] . "' , '". $idEmpresa ."')");
 
     $idInsertU = mysqli_insert_id($conexionBdPrincipal);

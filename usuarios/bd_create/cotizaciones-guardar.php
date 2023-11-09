@@ -2,7 +2,6 @@
 require_once("../sesion.php");
 
 $idPagina = 29;
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 if(isset($_POST["envio"])){
     $envio=$_POST["envio"];
 }else{

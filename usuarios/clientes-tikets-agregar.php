@@ -5,7 +5,6 @@ $idPagina = 89;
 $paginaActual['pag_nombre'] = "Agregar Tikets de clientes";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 if($_GET["em"]==4){
 	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_estado_mercadeo=4, cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='".$_SESSION["id"]."' WHERE cli_id='".$_GET["cte"]."' AND cli_id_empresa='".$idEmpresa."'");
 }

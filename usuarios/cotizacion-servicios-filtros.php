@@ -3,7 +3,6 @@ include("sesion.php");
 
 $idPagina = 274;
 $tituloPagina = "Filtro de cotizaciones con servicios";
-$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
