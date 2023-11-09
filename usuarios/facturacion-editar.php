@@ -9,9 +9,9 @@ include("includes/head.php");
 
 $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM facturacion 
 INNER JOIN usuarios ON usr_id=fact_usuario_responsable
-WHERE fact_id='".$_GET["id"]."'");
+WHERE fact_id='".$_GET["id"]."' AND fact_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
-$consultaUsuariosMod=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$resultadoD[9]."'");
+$consultaUsuariosMod=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$resultadoD[9]."' AND usr_id_empresa='".$idEmpresa."'");
 $usuarioMod = mysqli_fetch_array($consultaUsuariosMod, MYSQLI_BOTH);
 ?>
 <!-- styles -->
@@ -93,7 +93,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												if($datosUsuarioActual[3]!=1){
 													$consultaNumZona=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
@@ -116,7 +116,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="producto[]" multiple>
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec INNER JOIN productos_categorias ON catp_id=prod_categoria ORDER BY prod_nombre");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec INNER JOIN productos_categorias ON catp_id=prod_categoria  WHERE prod_id_empresa='".$idEmpresa."'ORDER BY prod_nombre");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												$consultaProductos=mysqli_query($conexionBdPrincipal,"SELECT * FROM facturacion_productos WHERE fpp_producto='".$resOp[0]."' AND fpp_factura='".$resultadoD['fact_id']."'");
 												$productoN = mysqli_num_rows($consultaProductos);

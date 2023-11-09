@@ -94,12 +94,13 @@ include("includes/head.php");
 								INNER JOIN clientes ON cli_id=fact_cliente
 								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
-								WHERE fact_cliente='".$_GET["cte"]."'");
+								WHERE fact_cliente='".$_GET["cte"]."' AND fact_id_empresa='".$idEmpresa."'");
 							}else{
 								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM facturacion
 								INNER JOIN clientes ON cli_id=fact_cliente
 								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
+								WHERE  fact_id_empresa='".$idEmpresa."'
 								");
 							}
 							$no = 1;

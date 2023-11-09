@@ -81,7 +81,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												if($datosUsuarioActual[3]!=1){
 													$consultaNumZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
@@ -106,6 +106,7 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec 
 											LEFT JOIN productos_categorias ON catp_id=prod_categoria
+											WHERE prod_id_empresa='".$idEmpresa."'
 											ORDER BY prod_nombre");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												$consultaMaterial=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_materiales 
