@@ -161,15 +161,15 @@
 										</button>
 										<ul class="dropdown-menu">
 											
-											<li><a href="#../sql.php?get=34&idR=<?=$res['cli_id'];?>&em=5" name="<?=$res['cli_id'];?>" title="5" onClick="mercadeo(this)">Actualizado</a></li>
+											<li><a href="#../bd_update/cliente-terminado-actualizar.php?get=34&idR=<?=$res['cli_id'];?>&em=5" name="<?=$res['cli_id'];?>" title="5" onClick="mercadeo(this)">Actualizado</a></li>
 											
-											<li><a href="#../sql.php?get=42&idR=<?=$res['cli_id'];?>&em=1" name="<?=$res['cli_id'];?>"  title="1" onClick="mercadeo(this)">No contestó. Mantener en la lista.</a></li>
-											<li><a href="#../sql.php?get=42&idR=<?=$res['cli_id'];?>&em=7" name="<?=$res['cli_id'];?>" title="7" onClick="mercadeo(this)">No contestó. Quitar de la lista.</a></li>
-											<li><a href="#../sql.php?get=42&idR=<?=$res['cli_id'];?>&em=2" name="<?=$res['cli_id'];?>" title="2" onClick="mercadeo(this)">Número equivocado</a></li>
+											<li><a href="#../bd_update/cliente-estado-mercadeo-update.php?get=42&idR=<?=$res['cli_id'];?>&em=1" name="<?=$res['cli_id'];?>"  title="1" onClick="mercadeo(this)">No contestó. Mantener en la lista.</a></li>
+											<li><a href="#../bd_update/cliente-estado-mercadeo-update?get=42&idR=<?=$res['cli_id'];?>&em=7" name="<?=$res['cli_id'];?>" title="7" onClick="mercadeo(this)">No contestó. Quitar de la lista.</a></li>
+											<li><a href="#../bd_update/cliente-estado-mercadeo-update?get=42&idR=<?=$res['cli_id'];?>&em=2" name="<?=$res['cli_id'];?>" title="2" onClick="mercadeo(this)">Número equivocado</a></li>
 											<li><a href="#" name="<?=$res['cli_id'];?>" title="3" onClick="mercadeo(this)">Enviar portafolio</a></li>
 											<li><a href="#" name="<?=$res['cli_id'];?>" title="4" onClick="mercadeo(this)">Iniciar negociación</a></li>
 											
-											<li><a href="#../sql.php?get=33&idR=<?=$res['cli_id'];?>&em=6" name="<?=$res['cli_id'];?>" title="6" onClick="mercadeo(this)">Enviar a papelera</a></li>
+											<li><a href="#../bd_update/cliente-papelera-actualizar.php?get=33&idR=<?=$res['cli_id'];?>&em=6" name="<?=$res['cli_id'];?>" title="6" onClick="mercadeo(this)">Enviar a papelera</a></li>
 											
 										</ul>
 									</div>

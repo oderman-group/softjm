@@ -138,7 +138,7 @@ include("includes/js-formularios.php");
 												
 												if($infoTicket['tik_etapa']==$i) {echo '<span style="color:green; font-weight:bold; font-size:13px;">'.$opciones[$i].'</span><br>';}
 												
-												else {echo '<a href="sql.php?get=41&idtk='.$infoTicket['tik_id'].'&etapa='.$i.'">'.$opciones[$i].'</a><br>';}
+												else {echo '<a href="bd_update/cliente-tikets-actualizar.php?get=41&idtk='.$infoTicket['tik_id'].'&etapa='.$i.'">'.$opciones[$i].'</a><br>';}
 											}
 											?>
                                     </div>

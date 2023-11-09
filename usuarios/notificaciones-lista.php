@@ -208,12 +208,12 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
                                 <td><?=$res['not_asunto'];?></td>
                                 <td><?=$res['cli_nombre'];?></td>
                                 <td><?=$res['cli_telefono'];?></td>
-                                <td><a href="sql.php?get=20&id=<?=$res['not_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Cambiar de estado"><span class="label label-<?=$etiquetaE;?>"><?=$estado;?></span></a></td>
+                                <td><a href="bd_update/notificaciones-estado-actualizar.php?get=20&id=<?=$res['not_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Cambiar de estado"><span class="label label-<?=$etiquetaE;?>"><?=$estado;?></span></a></td>
                                 <td>	
 								<h4>
                                 	<a href="clientes-seguimiento.php?cte=<?=$res['cli_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Seguimiento del cliente" target="new"><i class="icon-list-ol"></i></a>
                                     <a href="clientes-contactos.php?cte=<?=$res['cli_id'];?>&emg=1" data-toggle="tooltip" title="Contactos del cliente" target="new"><i class="icon-group"></i></a>
-                                    <a href="sql.php?id=<?=$res['not_id'];?>&get=16" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar notificación"><i class="icon-remove-sign"></i></a>
+                                    <a href="bd_delete/notificaciones-eliminar.php?id=<?=$res['not_id'];?>&get=16" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar notificación"><i class="icon-remove-sign"></i></a>
                                 </h4>	
 								</td>
 								

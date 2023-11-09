@@ -84,7 +84,7 @@ include("includes/js-formularios.php");
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-                            <input type="hidden" name="idSql" value="11">
+                            <input type="hidden" name="idSql" value="11"> <?php //el codigo 11 no se encontro en el archivo sql ?> 
                             <input type="hidden" name="observacion" value="">
                             <input type="hidden" name="influyente" value="0">
                             <input type="hidden" name="descuento" value="0">
