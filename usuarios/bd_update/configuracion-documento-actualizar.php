@@ -1,7 +1,7 @@
 <?php
 require_once("../sesion.php");
 
-$idPagina = 87;
+$idPagina = 326;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 $consulta = $conexionBdAdmin->query("SELECT * FROM documentos_configuracion WHERE dconf_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' AND  dconf_id_documento ='" . $_POST["id"]."'");
