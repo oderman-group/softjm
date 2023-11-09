@@ -5,8 +5,7 @@ $idPagina = 38;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-
-$consulta=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='" . $_GET["id"] . "'");
+$consulta=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='" . $_GET["id"] . "' AND prod_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resultadoD['prod_costo_dolar']);
 ?>
@@ -258,7 +257,7 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 												<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 													<option value=""></option>
 													<?php
-													$conOp = $conexionBdPrincipal->query("SELECT * FROM proveedores");
+													$conOp = $conexionBdPrincipal->query("SELECT * FROM proveedores WHERE prov_id_empresa='".$idEmpresa."'");
 													while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 													?>
 														<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['prod_proveedor'] == $resOp[0]) echo "selected"; ?>><?= $resOp['prov_nombre']; ?></option>
@@ -284,7 +283,7 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="grupo1" required>
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1");
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_id_empresa='".$idEmpresa."'");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['prod_grupo1'] == $resOp[0]) {
@@ -304,7 +303,7 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="categoria" required>
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2");
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2 AND catp_id_empresa='".$idEmpresa."' AND catp_id_empresa='".$idEmpresa."'");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['prod_categoria'] == $resOp[0]) {
@@ -324,7 +323,7 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="marca" required>
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM marcas");
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."'");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['prod_marca'] == $resOp[0]) {

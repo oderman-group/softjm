@@ -148,7 +148,7 @@ $(function(){
 					  
 					$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM buzon_salida
 					INNER JOIN usuarios ON usr_id=buz_usuario
-					WHERE buz_id=buz_id $filtro
+					WHERE buz_id=buz_id $filtro AND buz_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'
 					ORDER BY buz_id DESC");
 					$no = 1;
 					while($res = mysqli_fetch_array($consulta)){

@@ -104,7 +104,7 @@ $idPagina = 229;
 								INNER JOIN clientes ON cli_id=encs_cliente
 								INNER JOIN usuarios ON usr_id=encs_atendido
 								INNER JOIN contactos ON cont_id=encs_contacto
-								WHERE encs_cliente='".$_GET["cte"]."'
+								WHERE encs_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."' AND encs_cliente='".$_GET["cte"]."' 
 								");
 							}else{
 								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM encuesta_satisfaccion

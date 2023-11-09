@@ -2,7 +2,6 @@
 include("sesion.php");
 
 $idPagina = 39;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -201,17 +200,17 @@ include("includes/head.php");
 							</thead>
 							<tbody>
                             <?php
-							$consulta2 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 ");
+							$consulta2 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1  AND catp_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							$totalP2=0;
 							while($res2 = mysqli_fetch_array($consulta2, MYSQLI_BOTH)){
-								$consultaNumProductos=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_grupo1='".$res2[0]."'");
+								$consultaNumProductos=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_grupo1='".$res2[0]."' AND prod_id_empresa='".$idEmpresa."'");
 								$numProductos2 = $consultaNumProductos->num_rows;
 								
 								//if($numProductos2==0) continue;
 								
 								$totalP2 += $numProductos2;
-								$consultaUsuarios=$conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res2['catp_usuario']."'");
+								$consultaUsuarios=$conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res2['catp_usuario']."' AND usr_id_empresa='".$idEmpresa."'");
 								$usuario2 = mysqli_fetch_array($consultaUsuarios, MYSQLI_BOTH);
 							?>
 							<tr>
@@ -305,17 +304,17 @@ include("includes/head.php");
 							</thead>
 							<tbody>
                             <?php
-							$consulta = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2");
+							$consulta = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2 AND catp_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							$totalP=0;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-								$consultaNumProductos=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_categoria='".$res[0]."'");
+								$consultaNumProductos=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_categoria='".$res[0]."' AND prod_id_empresa='".$idEmpresa."'");
 								$numProductos = $consultaNumProductos->num_rows;
 								
 								//if($numProductos==0) continue;
 								
 								$totalP += $numProductos;
-								$consultaUsuarios2=$conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['catp_usuario']."'");
+								$consultaUsuarios2=$conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['catp_usuario']."' AND usr_id_empresa='".$idEmpresa."'");
 								$usuario = mysqli_fetch_array($consultaUsuarios2, MYSQLI_BOTH);
 							?>
 							<tr>
@@ -408,11 +407,11 @@ include("includes/head.php");
 							</thead>
 							<tbody>
                             <?php
-							$consulta3 = $conexionBdPrincipal->query("SELECT * FROM marcas");
+							$consulta3 = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							$totalP3=0;
 							while($res3 = mysqli_fetch_array($consulta3, MYSQLI_BOTH)){
-								$consultaNumProductos3=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_marca='".$res3[0]."'");
+								$consultaNumProductos3=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_marca='".$res3[0]."' AND prod_id_empresa='".$idEmpresa."'");
 								$numProductos3 = $consultaNumProductos3->num_rows;
 								
 								//if($numProductos3==0) continue;

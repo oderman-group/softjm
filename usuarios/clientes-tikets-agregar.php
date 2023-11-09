@@ -5,9 +5,8 @@ $idPagina = 89;
 $paginaActual['pag_nombre'] = "Agregar Tikets de clientes";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-
 if($_GET["em"]==4){
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_estado_mercadeo=4, cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='".$_SESSION["id"]."' WHERE cli_id='".$_GET["cte"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_estado_mercadeo=4, cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='".$_SESSION["id"]."' WHERE cli_id='".$_GET["cte"]."' AND cli_id_empresa='".$idEmpresa."'");
 }
 
 $tiket = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["idTK"]."'"), MYSQLI_BOTH);
@@ -90,9 +89,9 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" onChange="clientes(this)" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_ciudad!='1122'");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_ciudad!='1122' AND cli_id_empresa='".$idEmpresa."'");
 											if($datosUsuarioActual['usr_tipo']==1){
-												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											}
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												if($datosUsuarioActual[3]!=1){
@@ -112,7 +111,7 @@ include("includes/js-formularios.php");
                                </div>
 								
 								<?php if(is_numeric($_GET['cte'])){
-								$clienteInfo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET['cte']."'"), MYSQLI_BOTH);
+								$clienteInfo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET['cte']."' AND cli_id_empresa='".$idEmpresa."'"), MYSQLI_BOTH);
 								?>
 								<div class="control-group">
 									<label class="control-label">Sucursal (*)</label>

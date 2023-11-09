@@ -4,8 +4,7 @@ require_once("../sesion.php");
 $idPagina = 291;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
-
-mysqli_query($conexionBdPrincipal,"INSERT INTO facturas(factura_fecha_propuesta, factura_cliente, factura_fecha_vencimiento, factura_vendedor, factura_creador, factura_sucursal, factura_contacto, factura_forma_pago, factura_fecha_creacion, factura_moneda, factura_estado, factura_tipo)VALUES('" . $_POST["fechaPropuesta"] . "','" . $_POST["cliente"] . "','" . $_POST["fechaVencimiento"] . "','" . $_POST["influyente"] . "','" . $_SESSION["id"] . "','" . $_POST["sucursal"] . "','" . $_POST["contacto"] . "','" . $_POST["formaPago"] . "',now(),'" . $_POST["moneda"] . "', 1, 1)");
+mysqli_query($conexionBdPrincipal,"INSERT INTO facturas(factura_fecha_propuesta, factura_cliente, factura_fecha_vencimiento, factura_vendedor, factura_creador, factura_sucursal, factura_contacto, factura_forma_pago, factura_fecha_creacion, factura_moneda, factura_estado, factura_tipo, factura_id_empresa)VALUES('" . $_POST["fechaPropuesta"] . "','" . $_POST["cliente"] . "','" . $_POST["fechaVencimiento"] . "','" . $_POST["influyente"] . "','" . $_SESSION["id"] . "','" . $_POST["sucursal"] . "','" . $_POST["contacto"] . "','" . $_POST["formaPago"] . "',now(),'" . $_POST["moneda"] . "', 1, 1, '".$idEmpresa."')");
 	
 	$idInsert = mysqli_insert_id($conexionBdPrincipal);
 
@@ -37,7 +36,7 @@ mysqli_query($conexionBdPrincipal,"INSERT INTO facturas(factura_fecha_propuesta,
 			$datosCombos = mysqli_query($conexionBdPrincipal,"SELECT ROUND((SUM(copp_cantidad)*prod_precio),0), combo_descuento FROM combos
 			INNER JOIN combos_productos ON copp_combo=combo_id
 			INNER JOIN productos ON prod_id=copp_producto
-			WHERE combo_id='" . $_POST["combo"][$contador] . "'
+			WHERE combo_id='" . $_POST["combo"][$contador] . "' AND combo_id_empresa='".$idEmpresa."'
 			GROUP BY copp_producto
 			");
 			$precioCombo = 0;
@@ -56,7 +55,7 @@ mysqli_query($conexionBdPrincipal,"INSERT INTO facturas(factura_fecha_propuesta,
 
 
 			if ($productoNum['czpp_id'] == '') {
-				$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM combos WHERE combo_id='" . $_POST["combo"][$contador] . "'"));
+				$productoDatos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM combos WHERE combo_id='" . $_POST["combo"][$contador] . "'  AND combo_id_empresa='".$idEmpresa."'"));
 				
 
 				$valorProducto = $precioCombo;

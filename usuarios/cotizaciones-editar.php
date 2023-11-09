@@ -5,11 +5,10 @@ $idPagina = 79;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-
 $consultaCliente=$conexionBdPrincipal->query("SELECT * FROM cotizacion 
 INNER JOIN clientes ON cli_id=cotiz_cliente
 INNER JOIN contactos ON cont_id=cotiz_contacto
-WHERE cotiz_id='".$_GET["id"]."'");
+WHERE cotiz_id='".$_GET["id"]."' AND cotiz_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 
 if(isset($_GET["cte"])){
@@ -216,7 +215,7 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" onChange="provee(this)" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = $conexionBdPrincipal->query("SELECT prov_id, prov_nombre FROM proveedores");
+											 $conOp = $conexionBdPrincipal->query("SELECT prov_id, prov_nombre FROM proveedores WHERE prov_id_empresa='".$idEmpresa."'");
 											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_proveedor']==$resOp[0]) echo "selected";?>><?=$resOp['prov_nombre'];?></option>
@@ -249,7 +248,7 @@ include("includes/js-formularios.php");
 													WHEN cli_categoria = 3 THEN '(DEALER)'
 													ELSE ''
 												END AS 'categoria'	
-												FROM clientes");
+												FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
 												$disabled = '';
@@ -331,7 +330,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre");
+											$conOp = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['usr_id'];?>" <?php if($resultadoD['cotiz_vendedor']==$resOp['usr_id']){echo "selected";}?>><?=strtoupper($resOp['usr_nombre'])." (".$resOp['usr_email'].")";?></option>
@@ -412,7 +411,7 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="combo[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT combo_id, combo_nombre FROM combos 
+												$conOp = $conexionBdPrincipal->query("SELECT combo_id, combo_nombre FROM combos WHERE combo_id_empresa='".$idEmpresa."'
 												ORDER BY combo_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
@@ -436,6 +435,7 @@ include("includes/js-formularios.php");
 																																			czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad
                                                             FROM productos
                                                             INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "'
+																														WHERE prod_id_empresa='".$idEmpresa."'
                                                             ORDER BY czpp_orden");
 
 												while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
@@ -521,7 +521,7 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="servicio[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT serv_id, serv_nombre FROM servicios 
+												$conOp = $conexionBdPrincipal->query("SELECT serv_id, serv_nombre FROM servicios WHERE serv_id_empresa='".$idEmpresa."'
 												ORDER BY serv_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 													
@@ -632,6 +632,7 @@ include("includes/js-formularios.php");
 							$no = 1;
 							$productos = $conexionBdPrincipal->query("SELECT * FROM combos
 							INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='".$_GET["id"]."'
+							WHERE combo_id_empresa='".$idEmpresa."'
 							ORDER BY czpp_orden");
 							$sumaUtilidad = 0;
 							$totalIva = 0;
@@ -702,6 +703,7 @@ include("includes/js-formularios.php");
 										prod_id, prod_nombre
 									   FROM productos
 									INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='".$prod['combo_id']."'
+									WHERE prod_id_empresa='".$idEmpresa."'
 									ORDER BY copp_id");
 									while($prodCombo = mysqli_fetch_array($productosCombo, MYSQLI_BOTH)){
 										echo $prodCombo['prod_nombre']." (".$prodCombo['copp_cantidad']." Unds.).<br>";
@@ -744,7 +746,7 @@ include("includes/js-formularios.php");
 
 
 									<?php }
-									$consultaDctoEspecial=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']."'");
+									$consultaDctoEspecial=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']." AND usr_id_empresa='".$idEmpresa."''");
 									$usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
 									?>
 
@@ -773,6 +775,7 @@ include("includes/js-formularios.php");
 							<?php
 							$productos = $conexionBdPrincipal->query("SELECT * FROM servicios
 							INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='".$_GET["id"]."'
+							WHERE serv_id_empresa='".$idEmpresa."'
 							ORDER BY czpp_orden");
 							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 								$dcto = 0;

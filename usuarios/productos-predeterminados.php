@@ -2,7 +2,6 @@
 include("sesion.php");
 
 $idPagina = 121;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -71,9 +70,9 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span12" multiple tabindex="2" name="producto[]">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos ORDER BY prod_nombre");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id_empresa='".$idEmpresa."' ORDER BY prod_nombre");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-												$consultaNumPro=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_precio_predeterminado=1 AND prod_id='".$resOp[0]."'");
+												$consultaNumPro=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_precio_predeterminado=1 AND prod_id='".$resOp[0]."' AND prod_id_empresa='".$idEmpresa."'");
 												$numD = $consultaNumPro->num_rows;
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($numD>0){echo "selected";}?>><?=$resOp[1];?></option>

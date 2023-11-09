@@ -8,7 +8,7 @@ $paginaActual['pag_nombre'] = "FACTURA #".$_GET["id"];
 include("includes/head.php");
 $consultaD=mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas 
 INNER JOIN proveedores ON prov_id=factura_proveedor
-WHERE factura_id='".$_GET["id"]."'");
+WHERE factura_id='".$_GET["id"]."' AND factura_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consultaD, MYSQLI_BOTH);
 ?>
 
@@ -161,7 +161,7 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores");
+											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores WHERE prov_id_empresa='".$idEmpresa."'");
 											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>" <?php if($resultadoD['factura_proveedor']==$resOp[0]) echo "selected";?>><?=$resOp['prov_nombre'];?></option>
@@ -241,7 +241,7 @@ include("includes/js-formularios.php");
 
 												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria 
-												WHERE prod_id=prod_id
+												WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."'
 												ORDER BY prod_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 													$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
@@ -313,6 +313,7 @@ include("includes/js-formularios.php");
 							$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 							INNER JOIN productos_categorias ON catp_id=prod_categoria
 							INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='".$_GET["id"]."' AND czpp_tipo=4
+							WHERE prod_id_empresa='".$idEmpresa."'
 							ORDER BY czpp_orden");
 							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 								$dcto = 0;
@@ -350,7 +351,7 @@ include("includes/js-formularios.php");
 									<select data-placeholder="Escoja una opción..." class="chzn-select" tabindex="2" title="czpp_bodega" name="<?=$prod['czpp_id'];?>" onChange="productos(this)">
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM bodegas", $conexion);
+                                                $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM bodegas WHERE bod_id_empresa='".$idEmpresa."'", $conexion);
                                                 while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 													$consultaPpb=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_bodegas WHERE prodb_producto='".$prod['prod_id']."' AND prodb_bodega='".$resOp[0]."'");
 													$numPpb = mysqli_fetch_array($consultaPpb, MYSQLI_BOTH);

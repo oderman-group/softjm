@@ -4,7 +4,7 @@ $idPagina = 11;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET["id"]."'");
+$consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET["id"]."' AND cli_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
@@ -239,7 +239,7 @@ include("includes/js-formularios.php");
 															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="zona" disabled>
 																<option value=""></option>
 																<?php
-																$conOp = $conexionBdPrincipal->query("SELECT * FROM zonas");
+																$conOp = $conexionBdPrincipal->query("SELECT * FROM zonas WHERE zon_id_empresa='".$idEmpresa."'");
 																while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 																?>
 																	<option value="<?=$resOp['zon_id'];?>" <?php if($resultadoD['cli_zona']==$resOp['zon_id']){echo "selected";}?>><?=$resOp['zon_nombre'];?></option>
@@ -347,7 +347,7 @@ include("includes/js-formularios.php");
 															<select data-placeholder="Escoja una opción..." class="chzn-select span8" multiple tabindex="2" name="grupos[]">
 																<option value=""></option>
 																<?php
-																$conOp = $conexionBdPrincipal->query("SELECT * FROM dealer");
+																$conOp = $conexionBdPrincipal->query("SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
 																while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 																	$consulta = $conexionBdPrincipal->query("SELECT * FROM clientes_categorias WHERE cpcat_cliente='".$resultadoD['cli_id']."' AND cpcat_categoria='".$resOp[0]."'");
 																	$numD = $consulta->num_rows;
@@ -378,7 +378,7 @@ include("includes/js-formularios.php");
 															<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="asesor">
 																<option value=""></option>
 																<?php
-																$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre");
+																$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre AND usr_id_empresa='".$idEmpresa."'");
 																while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 																	$conultaAsociacion = $conexionBdPrincipal->query("SELECT * FROM clientes_usuarios WHERE cliu_usuario='".$resOp[0]."' AND cliu_cliente='".$_GET["id"]."'");
 																	$asociacion = $conultaAsociacion->num_rows;
@@ -460,9 +460,9 @@ include("includes/js-formularios.php");
                             <?php
 							$consulta = $conexionBdPrincipal->query("SELECT * FROM sucursales
 							INNER JOIN clientes ON cli_id=sucu_cliente_principal 
-							INNER JOIN localidad_ciudades ON ciu_id=sucu_ciudad 
-							INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
-							WHERE sucu_cliente_principal='".$_GET["id"]."'");
+							INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=sucu_ciudad 
+							INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
+							WHERE sucu_cliente_principal='".$_GET["id"]."' AND cli_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 							?>
@@ -648,7 +648,7 @@ include("includes/js-formularios.php");
 															WHERE cseg_cliente='".$_GET["id"]."'");
 															$no = 1;
 															while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-																$consultaEncargado = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['cseg_usuario_encargado']."'");
+																$consultaEncargado = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['cseg_usuario_encargado']."' AND usr_id_empresa='".$idEmpresa."'");
 																$encargado = mysqli_fetch_array($consultaEncargado, MYSQLI_BOTH);
 
 																$consultaContacto = $conexionBdPrincipal->query("SELECT * FROM contactos WHERE cont_id='".$res['cseg_contacto']."'");
@@ -740,10 +740,11 @@ include("includes/js-formularios.php");
 															$consulta = $conexionBdPrincipal->query("SELECT * FROM cotizacion
 															INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='".$_GET["id"]."'
 															INNER JOIN usuarios ON usr_id=cotiz_creador
+															WHERE cotiz_id_empresa='".$idEmpresa."'
 															");
 															$no = 1;
 															while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-																$consultaVendedor = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."'");
+																$consultaVendedor = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."' AND usr_id_empresa='".$idEmpresa."'");
 																$vendedor = mysqli_fetch_array($consultaVendedor, MYSQLI_BOTH);
 																
 																$fondoCotiz = '';
@@ -827,9 +828,9 @@ include("includes/js-formularios.php");
 															<?php
 															$consulta = $conexionBdPrincipal->query("SELECT * FROM facturacion
 															INNER JOIN clientes ON cli_id=fact_cliente
-															INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-															INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
-															WHERE fact_cliente='".$_GET["id"]."'");
+															INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+															INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
+															WHERE fact_cliente='".$_GET["id"]."' AND fact_id_empresa='".$idEmpresa."'");
 															$no = 1;
 															while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 																$consultaAbonos = $conexionBdPrincipal->query("SELECT sum(fpab_valor) FROM facturacion_abonos WHERE fpab_factura='".$res['fact_id']."'");

@@ -5,7 +5,6 @@ $idPagina = 85;
 $paginaActual['pag_nombre'] = "Editar sucursales";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-
 $consultaD=mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consultaD, MYSQLI_BOTH);
 ?>
@@ -95,7 +94,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="cliente">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['sucu_cliente_principal']==$resOp[0]) echo "selected";?>><?=$resOp[1];?></option>

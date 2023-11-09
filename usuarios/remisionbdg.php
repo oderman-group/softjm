@@ -2,7 +2,6 @@
 include("sesion.php");
 
 $idPagina = 148;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -155,6 +154,7 @@ include("includes/head.php");
 							if(isset($_GET["cte"]) and $_GET["cte"]!=""){
 								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg
 								INNER JOIN clientes ON cli_id=remi_cliente AND cli_id='".$_GET["cte"]."'
+								WHERE remi_id_empresa='".$idEmpresa."'
 								ORDER BY remi_id DESC
 								LIMIT $inicio, $limite
 								");
@@ -162,7 +162,7 @@ include("includes/head.php");
 								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg
 								INNER JOIN clientes ON cli_id=remi_cliente
 								INNER JOIN usuarios ON usr_id=remi_creador
-								WHERE remi_id=remi_id $filtro
+								WHERE remi_id=remi_id AND remi_id_empresa='".$idEmpresa."' $filtro
 								ORDER BY remi_id DESC
 								LIMIT $inicio, $limite
 								");
@@ -175,11 +175,11 @@ include("includes/head.php");
 									if($numZ==0) continue;
 								}
 								
-								$consultaVendedor=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['remi_vendedor']."'");
+								$consultaVendedor=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['remi_vendedor']."' AND usr_id_empresa='".$idEmpresa."'");
 								$vendedor = mysqli_fetch_array($consultaVendedor, MYSQLI_BOTH);
 
 
-								$consultaFactura=mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas WHERE factura_remision='" . $res['remi_id'] . "'");
+								$consultaFactura=mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas WHERE factura_remision='" . $res['remi_id'] . "' AND factura_id_empresa='".$idEmpresa."'");
 								$generoFactura = mysqli_fetch_array($consultaFactura, MYSQLI_BOTH);
 
 											$infoFac = '';

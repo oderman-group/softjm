@@ -96,7 +96,7 @@ include("includes/head.php");
 							$consulta = $conexionBdPrincipal->query("SELECT * FROM ".BDADMIN.".historial_acciones
 							INNER JOIN ".MAINBD.".usuarios ON usr_id=hil_usuario
 							INNER JOIN ".BDADMIN.".paginas ON pag_id=hil_id_pagina
-							ORDER BY hil_id DESC
+							WHERE hil_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'ORDER BY hil_id DESC
 							LIMIT 0,300
 							");
 							$no = 1;
