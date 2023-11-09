@@ -1,14 +1,11 @@
 <?php
 require_once("../sesion.php");
 
-$idPagina = 324;
+$idPagina = 325;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-mysqli_query($conexionBdAdmin,"INSERT INTO documentos(doc_nombre, doc_id_empresa)VALUES('" . $_POST["nombre"] . "','" . $_SESSION["dataAdicional"]["id_empresa"]."')");
-
-$idInsertU = mysqli_insert_id($conexionBdPrincipal);
-
+$conexionBdAdmin->query("UPDATE documentos SET doc_nombre='". $_POST["nombre"]."' WHERE doc_id='". $_POST["id"] . "'");
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
