@@ -7,7 +7,7 @@ $paginaActual['pag_nombre'] = "Materiales";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec WHERE prod_id='".$_GET["pdto"]."'");
+$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec WHERE prod_id='".$_GET["pdto"]."' AND prod_id_empresa='".$idEmpresa."'");
 $producto = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
 ?>
 <!-- styles -->

@@ -184,16 +184,16 @@ include("includes/head.php");
 								
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec 
 							LEFT JOIN productos_categorias ON catp_id=prod_categoria
-							WHERE prod_id=prod_id $filtro");
+							WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' $filtro");
 							$no = 1;
 							$visible = array("SI","SI","NO");
 							$estadoVisible = array(2,2,1);	
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
-								$consultaGrupo=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'");
+								$consultaGrupo=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'  AND catp_id_empresa='".$idEmpresa."'");
 								$grupo1 = mysqli_fetch_array($consultaGrupo, MYSQLI_BOTH);
 								
-								$consultaMarca=mysqli_query($conexionBdPrincipal,"SELECT * FROM marcas WHERE mar_id='".$res['prod_marca']."'");
+								$consultaMarca=mysqli_query($conexionBdPrincipal,"SELECT * FROM marcas WHERE mar_id='".$res['prod_marca']."'  AND mar_id_empresa='".$idEmpresa."'");
 								$marca = mysqli_fetch_array($consultaMarca, MYSQLI_BOTH);
 
 							?>
