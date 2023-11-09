@@ -2,7 +2,7 @@
 require_once("../sesion.php");
 
 //Ingresar la factura
-mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion(fact_cliente, fact_fecha,  fact_usuario_responsable, fact_fecha_real, fact_tipo, fact_estado )VALUES('" . $_POST["cliente"] . "', now(), '" . $_SESSION["id"] . "', '" . $_POST["fechaFactura"] . "', 1, 1)");
+mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion(fact_cliente, fact_fecha,  fact_usuario_responsable, fact_fecha_real, fact_tipo, fact_estado, fact_id_empresa)VALUES('" . $_POST["cliente"] . "', now(), '" . $_SESSION["id"] . "', '" . $_POST["fechaFactura"] . "', 1, 1, '".$idEmpresa."')");
 
 $idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
