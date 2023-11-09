@@ -2,7 +2,7 @@
 <?php
  include("sesion.php");?>
 <?php
-$idPagina = 298;
+$idPagina = 318;
 ?>
 <?php include("includes/verificar-paginas.php");
 

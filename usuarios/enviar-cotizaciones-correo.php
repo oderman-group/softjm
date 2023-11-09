@@ -1,7 +1,7 @@
 <?php
 include("sesion.php");
 
-$idPagina = 143;
+$idPagina = 317;
 
 include("includes/verificar-paginas.php");
 $resultado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion
