@@ -3,7 +3,7 @@
     $idPagina = 199;
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     
-	$conexionBdPrincipal->query("INSERT INTO zonas(zon_nombre, zon_observaciones)VALUES('" . $_POST["nombre"] . "','" . $_POST["observaciones"] . "')");
+	$conexionBdPrincipal->query("INSERT INTO zonas(zon_nombre, zon_observaciones, zon_id_empresa)VALUES('" . $_POST["nombre"] . "','" . $_POST["observaciones"] . "', '".$_SESSION["dataAdicional"]["id_empresa"]."')");
 	$idInsertU = $conexionBdPrincipal->insert_id;
 
 	include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");

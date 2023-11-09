@@ -99,7 +99,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoU[]" multiple>
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos WHERE utipo_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
@@ -116,7 +116,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="sucursal">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM sucursales_propias");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM sucursales_propias WHERE sucp_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
@@ -134,7 +134,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="area">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM areas");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM areas WHERE ar_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
@@ -168,7 +168,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" multiple tabindex="2" name="zona[]">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM zonas");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM zonas WHERE zon_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['zon_id'];?>"><?=$resOp['zon_nombre'];?></option>

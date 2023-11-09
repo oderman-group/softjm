@@ -121,7 +121,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoU[]" multiple>
 											<?php
 													$roles = explode(',', $resultadoD['roles']);
-													$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos");
+													$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos  WHERE utipo_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 													while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 														$selected = (is_array($roles) && in_array($resOp[0], $roles)) ? 'selected' : '';
 
@@ -140,7 +140,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="sucursal">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM sucursales_propias");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM sucursales_propias WHERE sucp_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['usr_sucursal']==$resOp[0]) echo "selected";?>><?=$resOp[1];?></option>
@@ -169,7 +169,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="area">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM areas");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM areas WHERE ar_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['usr_area']==$resOp[0]) echo "selected";?>><?=$resOp[1];?></option>
