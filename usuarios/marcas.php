@@ -2,7 +2,6 @@
 include("sesion.php");
 
 $idPagina = 33;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -86,7 +85,7 @@ include("includes/head.php");
 							</thead>
 							<tbody>
                             <?php
-							$consulta = $conexionBdPrincipal->query("SELECT * FROM marcas");
+							$consulta = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 							?>

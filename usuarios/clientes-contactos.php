@@ -6,7 +6,7 @@ $paginaActual['pag_nombre'] = "Contactos";
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'");
+$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."' AND cli_id_empresa='".$idEmpresa."'");
 $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 ?>
 <!-- styles -->

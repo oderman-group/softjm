@@ -3,7 +3,6 @@ include("sesion.php");
 
 $idPagina = 14;
 $paginaActual['pag_nombre'] = "Editar Seguimiento de clientes";
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
@@ -11,7 +10,7 @@ $consultaTiket=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets 
 $tiket = mysqli_fetch_array($consultaTiket, MYSQLI_BOTH);
 $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM cliente_seguimiento WHERE cseg_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
-$consultaCliente=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$resultadoD["cseg_cliente"]."'");
+$consultaCliente=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$resultadoD["cseg_cliente"]."' AND cli_id_empresa='".$idEmpresa."'");
 $cliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 ?>
 <!-- styles -->
@@ -320,7 +319,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="encargado">
 											<option value="0"></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['cseg_usuario_encargado']==$resOp[0]) echo "selected";?>><?=$resOp[4];?></option>

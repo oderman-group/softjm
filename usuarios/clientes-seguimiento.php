@@ -3,13 +3,12 @@ include("sesion.php");
 
 $idPagina = 12;
 $paginaActual['pag_nombre'] = "Seguimiento de clientes";
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
 $nombreCliente="";
 if(!empty($_GET["cte"])){
-	$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'");
+	$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."' AND cli_id_empresa='".$idEmpresa."'");
 	$cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 	$nombreCliente=" de <b>".$cliente['cli_nombre']."</b>";
 
@@ -272,7 +271,7 @@ if(!empty($_GET["idTK"])){
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
-											$consultaEncargado=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $res['cseg_usuario_encargado'] . "'");
+											$consultaEncargado=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $res['cseg_usuario_encargado'] . "'  AND usr_id_empresa='".$idEmpresa."'");
 											$encargado = mysqli_fetch_array($consultaEncargado, MYSQLI_BOTH);
 
 											$consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos 

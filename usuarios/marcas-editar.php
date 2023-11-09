@@ -5,8 +5,7 @@ $idPagina = 35;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-
-$consulta=$conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id='".$_GET["id"]."'");
+$consulta=$conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id='".$_GET["id"]."' AND mar_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->

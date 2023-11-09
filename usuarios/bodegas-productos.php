@@ -2,7 +2,6 @@
 include("sesion.php");
 
 $idPagina = 145;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -147,7 +146,7 @@ include("includes/head.php");
 										}
 
 
-										$consulta = $conexionBdPrincipal->query("SELECT * FROM productos_bodegas INNER JOIN productos ON prod_id=prodb_producto INNER JOIN bodegas ON bod_id=prodb_bodega LEFT JOIN usuarios ON usr_id=prodb_usuario_actualizacion WHERE prodb_id=prodb_id $filtro");
+										$consulta = $conexionBdPrincipal->query("SELECT * FROM productos_bodegas INNER JOIN productos ON prod_id=prodb_producto INNER JOIN bodegas ON bod_id=prodb_bodega LEFT JOIN usuarios ON usr_id=prodb_usuario_actualizacion WHERE prodb_id=prodb_id AND prod_id_empresa='".$idEmpresa."' AND bod_id_empresa='".$idEmpresa."' $filtro");
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 										?>

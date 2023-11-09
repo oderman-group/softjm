@@ -1,7 +1,6 @@
 <?php include("sesion.php");
 
 $idPagina = 123;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -160,7 +159,8 @@ include("includes/head.php");
 					
                     $consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores 
 					INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=prov_ciudad
-					INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$deptos[0]."'");
+					INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$deptos[0]."'
+                    WHERE  prov_id_empresa='".$idEmpresa."'");
 					$contarClientes = mysqli_num_rows($consultaClientes);
                 ?>
                     <a href="proveedores.php?dpto=<?=$deptos[0];?>" style="margin-bottom:10px; color:<?=$color;?>"><?=$deptos[1]." (".$contarClientes.")";?></a><br>
@@ -227,7 +227,7 @@ include("includes/head.php");
                                 LEFT JOIN ".BDADMIN.".localidad_paises ON pais_id=prov_pais
 								LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=prov_ciudad
 								LEFT JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento $filtroDepto
-								WHERE prov_eliminado='0' ".$filtro."
+								WHERE prov_eliminado='0'  AND prov_id_empresa='".$idEmpresa."' ".$filtro."
 								LIMIT $inicio, $limite
 								");
 							$no = 1;

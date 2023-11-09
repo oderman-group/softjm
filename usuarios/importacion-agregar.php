@@ -2,7 +2,6 @@
 include("sesion.php");
 
 $idPagina = 134;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -77,7 +76,7 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM proveedores");
+											 $conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM proveedores WHERE prov_id_empresa='".$idEmpresa."'");
 											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>"><?=$resOp['prov_nombre'];?></option>

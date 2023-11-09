@@ -2,7 +2,6 @@
 include("sesion.php");
 
 $idPagina = 146;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -180,7 +179,7 @@ include("includes/head.php");
                                             <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="producto" required>
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = $conexionBdPrincipal->query("SELECT * FROM productos");
+                                                $conOp = $conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id_empresa='".$idEmpresa."'");
                                                 while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
                                                 ?>
                                                     <option value="<?= $resOp[0]; ?>" <?php if(isset($_GET["prod"])){if($resOp[0] == $_GET["prod"]){echo "selected";}} ?> ><?= $resOp[1]; ?></option>
@@ -197,7 +196,7 @@ include("includes/head.php");
                                             <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="bodega" required>
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = $conexionBdPrincipal->query("SELECT * FROM bodegas", $conexion);
+                                                $conOp = $conexionBdPrincipal->query("SELECT * FROM bodegas WHERE bod_id_empresa='".$idEmpresa."'", $conexion);
                                                 while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
                                                 ?>
                                                     <option value="<?= $resOp[0]; ?>" <?php if(isset($_GET["bod"])){if($resOp[0] == $_GET["bod"]){echo "selected";}} ?> ><?= $resOp[1]; ?></option>

@@ -28,3 +28,4 @@ $nacionFactura = array("Nacional", "Extrajera");
 $nacionEtiqueta = array("success", "warning");
 
 $origenPrecioProducto = array("N/A", "Costo", "Utilidad", "Costo y utilidad", "Guardado de precios");
+$idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
