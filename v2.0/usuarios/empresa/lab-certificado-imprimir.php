@@ -10,7 +10,7 @@ INNER JOIN clientes ON cli_id=rem_cliente
 INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='" . $_GET["id"] . "'");
+WHERE rem_id='" . $_GET["id"] . "' AND rem_id_empresa='".$idEmpresa."'");
 $remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 
 $consultaAnulado = mysqli_query($conexionBdPrincipal,"SELECT * FROM certificados_anulados WHERE certanu_id_certificado='".$_GET["id"]."'");
@@ -24,7 +24,7 @@ $ConsultaCampoRemision=mysqli_query($conexionBdPrincipal,"SELECT
 DAY(rem_fecha), MONTH(rem_fecha), YEAR(rem_fecha),
 DAY(DATE_ADD(rem_fecha, INTERVAL '" . $remision['rem_tiempo_certificado'] . "' MONTH)), MONTH(DATE_ADD(rem_fecha, INTERVAL '" . $remision['rem_tiempo_certificado'] . "' MONTH)), YEAR(DATE_ADD(rem_fecha, INTERVAL '" . $remision['rem_tiempo_certificado'] . "' MONTH))
 FROM remisiones 
-WHERE rem_id='" . $_GET["id"] . "'");
+WHERE rem_id='" . $_GET["id"] . "' AND rem_id_empresa='".$idEmpresa."'");
 $camposRemision = mysqli_fetch_array($ConsultaCampoRemision, MYSQLI_BOTH);
 
 $estadosCertificados = array("", "ACEPTABLE", "VENCIDO", "PROVICIONAL");

@@ -906,7 +906,7 @@ if($_POST["idSql"]==47){
 	
 	if(trim($_POST["nombreCliente"])!="" and trim($_POST["usuarioCliente"])!="" and trim($_POST["ciudadCliente"])!=""){
 		
-		$clienteV = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_usuario='".trim($_POST["usuarioCliente"])."'"));
+		$clienteV = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_usuario='".trim($_POST["usuarioCliente"])."' AND cli_id_empresa='".$idEmpresa."'"));
 		if($clienteV>0){
 			echo "<div style='font-family:arial; text-align:center'>Ya existe un cliente con este n&uacute;mero de NIT. Verifique para que no lo registre nuevamente.<br><br>
 			<a href='javascript:history.go(-1);'>[P&aacute;gina anterior]</a></span> | <a href='clientes.php'>[Ir a clientes]</a></div>";
@@ -915,7 +915,7 @@ if($_POST["idSql"]==47){
 		
 		$zona = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM ".BDADMIN.".localidad_ciudades WHERE ciu_id='".$_POST["ciudadCliente"]."'"));
 		
-		mysqli_query($conexionBdPrincipal,"INSERT INTO clientes(cli_nombre, cli_categoria, cli_email, cli_ciudad, cli_usuario, cli_clave, cli_zona, cli_fecha_registro, cli_fecha_ingreso, cli_celular, cli_responsable)VALUES('".$_POST["nombreCliente"]."',2,'".$_POST["emailCliente"]."','".$_POST["ciudadCliente"]."','".trim($_POST["usuarioCliente"])."','".$_POST["usuarioCliente"]."','".$zona[2]."',now(),now(),'".$_POST["celularCliente"]."','".$_SESSION["id"]."')");
+		mysqli_query($conexionBdPrincipal,"INSERT INTO clientes(cli_nombre, cli_categoria, cli_email, cli_ciudad, cli_usuario, cli_clave, cli_zona, cli_fecha_registro, cli_fecha_ingreso, cli_celular, cli_responsable, cli_id_empresa)VALUES('".$_POST["nombreCliente"]."',2,'".$_POST["emailCliente"]."','".$_POST["ciudadCliente"]."','".trim($_POST["usuarioCliente"])."','".$_POST["usuarioCliente"]."','".$zona[2]."',now(),now(),'".$_POST["celularCliente"]."','".$_SESSION["id"]."', '".$idEmpresa."')");
 		
 		$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 		
@@ -969,7 +969,7 @@ if($_POST["idSql"]==47){
 		move_uploaded_file($_FILES['imagen']['tmp_name'], $destino ."/".$archivo);
 	}
 	
-	mysqli_query($conexionBdPrincipal,"INSERT INTO remisiones(rem_fecha, rem_cliente, rem_equipo, rem_referencia, rem_serial, rem_descripcion, rem_estado, rem_asesor, rem_detalles, rem_dias_entrega, rem_dias_reclamar, rem_marca, rem_tipo_equipo, rem_precision_angular, rem_precision_distancia, rem_observacion_salida, rem_contacto, rem_fecha_registro, rem_tiempo_certificado, rem_archivo, rem_tipos_equipos)VALUES(now(), '".$_POST["cliente"]."', '".$_POST["equipo"]."', '".$_POST["referencia"]."', '".$_POST["serial"]."', '".$_POST["descripcion"]."', 1, '".$_SESSION["id"]."', '".$_POST["detalles"]."', '".$_POST["tiempoEntrega"]."', '".$_POST["tiempoReclamar"]."', '".$_POST["marca"]."', '".$_POST["tipoEquipo"]."', '".$_POST["pAngular"]."', '".$_POST["pDistancia"]."', '".$_POST["obsSalida"]."', '".$_POST["contacto"]."', now(), '".$_POST["vigenciaCerificado"]."', '".$archivo."', '".$_POST["tiposEquipos"]."')");
+	mysqli_query($conexionBdPrincipal,"INSERT INTO remisiones(rem_fecha, rem_cliente, rem_equipo, rem_referencia, rem_serial, rem_descripcion, rem_estado, rem_asesor, rem_detalles, rem_dias_entrega, rem_dias_reclamar, rem_marca, rem_tipo_equipo, rem_precision_angular, rem_precision_distancia, rem_observacion_salida, rem_contacto, rem_fecha_registro, rem_tiempo_certificado, rem_archivo, rem_tipos_equipos, rem_id_empresa)VALUES(now(), '".$_POST["cliente"]."', '".$_POST["equipo"]."', '".$_POST["referencia"]."', '".$_POST["serial"]."', '".$_POST["descripcion"]."', 1, '".$_SESSION["id"]."', '".$_POST["detalles"]."', '".$_POST["tiempoEntrega"]."', '".$_POST["tiempoReclamar"]."', '".$_POST["marca"]."', '".$_POST["tipoEquipo"]."', '".$_POST["pAngular"]."', '".$_POST["pDistancia"]."', '".$_POST["obsSalida"]."', '".$_POST["contacto"]."', now(), '".$_POST["vigenciaCerificado"]."', '".$archivo."', '".$_POST["tiposEquipos"]."', '".$idEmpresa."')");
 	
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 	$numero =(count($_POST["servicios"]));

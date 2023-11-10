@@ -125,7 +125,7 @@ if(is_numeric($_GET["idRem"])){
 								while($m<=12){
 									$consultaRemisiones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 									INNER JOIN clientes ON cli_id=rem_cliente
-									WHERE rem_estado=1 AND MONTH(rem_fecha_registro)='".$m."'");
+									WHERE rem_estado=1 AND MONTH(rem_fecha_registro)='".$m."' AND rem_id_empresa='".$idEmpresa."'");
 									$numRem = mysqli_num_rows($consultaRemisiones);
 									if($m==$_GET["m"])
 										echo '<a style="font-weight:bold;">'.$meses[$m].'('.$numRem.')</a>&nbsp;&nbsp;&nbsp;';
@@ -188,7 +188,7 @@ if(is_numeric($_GET["idRem"])){
 												LEFT JOIN clientes ON cli_id=rem_cliente
 												LEFT JOIN usuarios ON usr_id=rem_asesor
 												LEFT JOIN sucursales_propias ON sucp_id=usr_sucursal
-												WHERE rem_id=rem_id $filtro
+												WHERE rem_id=rem_id AND rem_id_empresa='".$idEmpresa."' $filtro
 												ORDER BY rem_id DESC
 												");
 												
@@ -198,7 +198,7 @@ if(is_numeric($_GET["idRem"])){
 												LEFT JOIN clientes ON cli_id=rem_cliente
 												LEFT JOIN usuarios ON usr_id=rem_asesor
 												LEFT JOIN sucursales_propias ON sucp_id=usr_sucursal
-												WHERE rem_id=rem_id $filtro
+												WHERE rem_id=rem_id AND rem_id_empresa='".$idEmpresa."' $filtro
 												ORDER BY rem_id DESC
 												LIMIT 0, 100
 												");
@@ -216,7 +216,7 @@ if(is_numeric($_GET["idRem"])){
 												}
 												
 												$consultaRemisionesEnt=mysqli_query($conexionBdPrincipal,"SELECT DATEDIFF(now(), rem_fecha_registro), rem_id FROM remisiones 
-												WHERE rem_id='".$resultado['rem_id']."'");
+												WHERE rem_id='".$resultado['rem_id']."' AND rem_id_empresa='".$idEmpresa."'");
 												$remisionesEnt = mysqli_fetch_array($consultaRemisionesEnt, MYSQLI_BOTH);
 												
 												$consultaRemisioneSeg=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_seguimiento 

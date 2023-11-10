@@ -10,7 +10,7 @@ INNER JOIN clientes ON cli_id=rem_cliente
 INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_GET["id"]."'");
+WHERE rem_id='".$_GET["id"]."' AND rem_id_empresa='".$idEmpresa."'");
 $remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 
 $consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$remision['rem_contacto']."'");
@@ -151,7 +151,7 @@ switch($_GET['estado']){
 			<td width="65%">
 				<div style="padding-bottom: 100px; padding-left:10px;  position: inherit;">
 					<?php
-					$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+					$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$idEmpresa."'");
 					while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 						
 						$consultaOpciones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios 
