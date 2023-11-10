@@ -95,10 +95,10 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="remisiones[]" multiple>
 											<option value=""></option>
                                             <?php
-                                                                    $consultaSelect = mysql_query("SELECT * FROM remisiones
-                                                                    INNER JOIN clientes ON cli_id=rem_cliente
-                                                                    ",$conexion);
-                                                                    while($datosSelect = mysql_fetch_array($consultaSelect)){
+																																		$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
+																																		INNER JOIN clientes ON cli_id=rem_cliente 
+																																		");
+                                                                    while($datosSelect = mysqli_fetch_array($consultaSelect)){
                                                                     ?>
                                                                     <option value="<?=$datosSelect[0];?>"><?=strtoupper($datosSelect['rem_id']." - ".$datosSelect['rem_equipo']." - ".$datosSelect['cli_nombre']);?></option>
                                                                     <?php }?>
