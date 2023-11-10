@@ -606,6 +606,7 @@ include("includes/js-formularios.php");
 																<td><a href="clientes-seguimiento.php?idTK=<?=$res[0];?>" target="_blank"><span class="label label-info"><?=$numSeg;?></span><b></b></td>
 																<td><h4>
 																	<a href="clientes-tikets-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>
+																	<!– codigo 24 no se encontro en el archivo sql.php–>
 																	<a href="sql.php?id=<?=$res[0];?>&get=24" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 																</h4></td>
 															</tr>
@@ -668,7 +669,7 @@ include("includes/js-formularios.php");
 
 																switch($res['cseg_realizado']){
 																	case 1: $html = '<span class="label label-success">Completado</span>'; break;
-																	default: $html = '<a href="sql.php?id='.$res['cseg_id'].'&get=28" class="label label-important">Pendiente</a>'; break;
+																	default: $html = '<a href="bd_update/cliente-seguimiento-estado-update.php?id='.$res['cseg_id'].'&get=28" class="label label-important">Pendiente</a>'; break;
 																}
 															?>
 															<tr>
@@ -688,6 +689,7 @@ include("includes/js-formularios.php");
 																	<h4 style="margin-top:10px;">
 																			<a href="clientes-seguimiento-editar.php?id=<?=$res[0];?>&cte=<?=$_GET["id"];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
 																			<a href="sql.php?id=<?=$res[0];?>&get=4" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																			<?php // codigo 4 no se encontro en el archivo sql.php ?>
 																	</h4>
 																</td>
 																<td <?=$fondoColor;?>>
@@ -780,14 +782,14 @@ include("includes/js-formularios.php");
 																			<li><a href="cotizaciones-editar.php?id=<?=$res['cotiz_id'];?>#productos"> Editar</a></li>
 
 																			<li><a href="sql.php?id=<?=$res['cotiz_id'];?>&get=22" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
-																			<?php }?>
+																			<?php } //el codigo 22 no se encontro en el archivo sql?>
 
 																			<li><a href="reportes/formato-cotizacion-1.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
 
 																			<li><a href="sql.php?get=46&id=<?=$res['cotiz_id'];?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
-
+																			<?php //el codigo 46 no se encontro en el archivo sql ?> 
 																			<li><a href="sql.php?get=48&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
-
+																			<?php //el codigo 48 no se encontro en el archivo sql ?> 
 																		</ul>
 																	</div>
 																</td>
@@ -872,12 +874,13 @@ include("includes/js-formularios.php");
 																</td>
 																<td><h4 style="margin-top:10px;">
                                 	<a href="facturacion-editar.php?id=<?=$res['fact_id'];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
-                                    <a href="sql.php?id=<?=$res['fact_id'];?>&get=6" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;
+                                    <?php //el codigo 6 no se encontro en el archivo sql ?> 
+									<a href="sql.php?id=<?=$res['fact_id'];?>&get=6" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;
                                     <a href="#" onClick='window.open("facturacion-abonos.php?fact=<?=$res['fact_id'];?>","abonos","width=1200,height=800,menubar=no")' data-toggle="tooltip" title="Abonos"><i class="icon-money"></i></a>&nbsp;
                                     <a href="reportes/formato-factura-1.php?id=<?=$res['fact_id'];?>" data-toggle="tooltip" title="Imprimir factura" target="_blank"><i class="icon-print"></i></a>&nbsp;
-                                    <a href="sql.php?get=19&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea replicar este registro?')){return false;}" title="Replicar factura"><i class="icon-repeat"></i></a>&nbsp;
+                                    <a href="bd_create/replicar-factura-guardar.php?get=19&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea replicar este registro?')){return false;}" title="Replicar factura"><i class="icon-repeat"></i></a>&nbsp;
                                     <?php if($saldoFinal>0){?>
-                                    <a href="sql.php?get=26&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea generar un abono automático por el saldo pendiente de esta factura?')){return false;}" title="Abono automático y saldar factura"><i class="icon-retweet"></i></a>
+                                    <a href="bd_create/abono-automatico-agregar.php?get=26&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea generar un abono automático por el saldo pendiente de esta factura?')){return false;}" title="Abono automático y saldar factura"><i class="icon-retweet"></i></a>
                                     <?php }?>
                                 </h4></td>
 															</tr>

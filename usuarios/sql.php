@@ -92,151 +92,7 @@ if ($_POST["idSql"] == 16) {
 //EDITAR MATERIALES A PRODUCTOS
 
 //ENVIAR BOLETIN  DE MENSAJES
-if ($_POST["idSql"] == 32) {
 
-	$tituloMsj = $_POST["asunto"];
-	$bgTitulo = "#4086f4";
-	$contenidoMsj = '
-			<p>
-				Hola!<br>
-				<b>' . strtoupper($cumple["uss_nombre"]) . '</b>, Este mensaje es para ti.
-			</p>
-			
-			<p>' . $_POST["mensaje"] . '</p>
-		';
-
-	$fin =  '<html><body style="background-color:#FFF;">';
-	$fin .= '
-					<center>
-						<div style="width:600px; text-align:justify; padding:15px;">
-							<img src="http://plataformasintia.com/images/logo.png" width="40">
-						</div>
-
-						<div style="font-family:arial; background:' . $bgTitulo . '; width:600px; color:#FFF; text-align:center; padding:15px;">
-							<h3>' . $tituloMsj . '</h3>
-						</div>
-
-						<div style="font-family:arial; background:#FAFAFA; width:600px; color:#000; text-align:justify; padding:15px;">
-							' . $contenidoMsj . '
-						</div>
-
-						<div align="center" style="width:600px; color:#000; text-align:center; padding:15px;">
-								<img src="http://plataformasintia.com/images/logo.png" width="30"><br>
-								¡Que tengas un excelente d&iacute;a!<br>
-								<a href="https://plataformasintia.com/">www.plataformasintia.com</a>
-						</div>
-					</center>
-					<p>&nbsp;</p>
-				';
-	$fin .= '';
-	$fin .=  '<html><body>';
-
-
-	// Instantiation and passing `true` enables exceptions
-	$mail = new PHPMailer(true);
-
-	try {
-		//Server settings
-		$mail->SMTPDebug = 2;                                       // Enable verbose debug output
-		$mail->isSMTP();                                            // Set mailer to use SMTP
-		$mail->Host       = 'mail.orioncrm.com.co';  // Specify main and backup SMTP servers
-		$mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-		$mail->Username   = $configuracion['conf_email'];                     // SMTP username
-		$mail->Password   = $configuracion['conf_clave_correo'];                          // SMTP password
-		$mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
-		$mail->Port       = 465;                                   // TCP port to connect to
-
-		//Recipients
-		$mail->setFrom($configuracion['conf_email'], '');
-		//$mail->addAddress('noreply@softjm.com');   // Add a recipient
-
-		$numero = (count($_POST["zonas"]));
-		if ($numero > 0) {
-			$contador = 0;
-			while ($contador < $numero) {
-				$clientes = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes
-					INNER JOIN localidad_ciudades ON ciu_departamento='" . $_POST["zonas"][$contador] . "' AND ciu_id=cli_ciudad");
-				
-				while ($ctes = mysqli_fetch_array($clientes)) {
-					if ($ctes['cli_email'] != "" and !is_null($ctes['cli_email']))
-						$mail->addBCC($ctes['cli_email'], $ctes['cli_nombre']);
-				}
-				$contador++;
-			}
-		}
-
-		$numero = (count($_POST["tipos"]));
-		if ($numero > 0) {
-			$contador = 0;
-			while ($contador < $numero) {
-				$clientes = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_categoria='" . $_POST["tipos"][$contador] . "'");
-				
-				while ($ctes = mysqli_fetch_array($clientes)) {
-					if ($ctes['cli_email'] != "" and !is_null($ctes['cli_email']))
-						$mail->addBCC($ctes['cli_email'], $ctes['cli_nombre']);
-				}
-				$contador++;
-			}
-		}
-
-		$numero = (count($_POST["grupos"]));
-		if ($numero > 0) {
-			$contador = 0;
-			while ($contador < $numero) {
-				$clientes = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes
-					INNER JOIN clientes_categorias ON cpcat_categoria='" . $_POST["grupos"][$contador] . "' AND cpcat_cliente=cli_id
-					GROUP BY cli_id");
-				
-				while ($ctes = mysqli_fetch_array($clientes)) {
-					if ($ctes['cli_email'] != "" and !is_null($ctes['cli_email']))
-						$mail->addBCC($ctes['cli_email'], $ctes['cli_nombre']);
-				}
-				$contador++;
-			}
-		}
-
-		$numero = (count($_POST["clientes"]));
-		if ($numero > 0) {
-			$contador = 0;
-			while ($contador < $numero) {
-				$clientes = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes
-					WHERE cli_id='" . $_POST["clientes"][$contador] . "'");
-				
-				while ($ctes = mysqli_fetch_array($clientes)) {
-					if ($ctes['cli_email'] != "" and !is_null($ctes['cli_email']))
-						$mail->addBCC($ctes['cli_email'], $ctes['cli_nombre']);
-				}
-				$contador++;
-			}
-		}
-
-		if ($_FILES['boletin']['name'] != "") {
-			$archivo = $_FILES['boletin']['name'];
-			$destino = "files/adjuntos";
-			move_uploaded_file($_FILES['boletin']['tmp_name'], $destino . "/" . $archivo);
-
-			// Attachments
-			$mail->addAttachment('files/adjuntos/' . $archivo);    // Optional name
-		}
-
-
-
-		// Content
-		$mail->isHTML(true);                                  // Set email format to HTML
-		$mail->Subject = $_POST["asunto"];
-		$mail->Body = $fin;
-		$mail->CharSet = 'UTF-8';
-
-		$mail->send();
-		echo 'Enviado mensaje masivo.';
-	} catch (Exception $e) {
-		echo "Error: {$mail->ErrorInfo}";
-		exit();
-	}
-
-	echo '<script type="text/javascript">window.location.href="enviar-mensaje.php?envd=1";</script>';
-	exit();
-}
 //AGREGAR ORDENES DE SERVICIO
 if ($_POST["idSql"] == 33) {
 	if ($_POST["fechaFin"] == "") $_POST["fechaFin"] = '0000-00-00';
@@ -396,7 +252,7 @@ if ($_POST["idSql"] == 69) {
 
 //ELIMINAR SEGUIMIENTO CLIENTES
 
-//ELIMINAR AUDITORES
+//ELIMINAR AUDITORES (no se encuentra)
 if ($_GET["get"] == 5) {
 	$idPagina = 57;
 	include("includes/verificar-paginas.php");
@@ -441,78 +297,16 @@ if ($_GET["get"] == 10) {
 //ELIMINAR ENCUESTAS
 
 //ELIMINAR NOTIFICACIONES
-if ($_GET["get"] == 16) {
-	//$idPagina = 65; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM notificaciones WHERE not_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //ELIMINAR MATERIALES DE PRODUCTOS
 
 //ENVIAR ENCUESTA AL CORREO
-if ($_GET["get"] == 18) {
-	$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='" . $_GET["cont"] . "'"));
-	$fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
-	$fin .= '
-				<center>
-					<p align="center"><img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="350"></p>
-					<div style="font-family:arial; background:' . $configuracion["conf_fondo_mensaje"] . '; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
-						
-						<p style="color:' . $configuracion["conf_color_letra"] . ';">' . strtoupper($contacto['cont_nombre']) . ',<br>
-						Agradecemos se tome 3 minutos para responder una escuesta sobre la atención brindada por nuestra empresa.<br>
-						Haga click en el siguiente enlace para responder la encuesta.</p>
-						
-						<p align="center"><a href="' . $configuracion["conf_url_encuestas"] . '/formato-encuesta.php?id=' . $_GET["id"] . '" target="_blank" style="color:' . $configuracion["conf_color_link"] . ';">RESPONDER ENCUESTA</a></p>
-						
-						<p align="center" style="color:' . $configuracion["conf_color_letra"] . ';">
-							<img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="80"><br>
-							' . $configuracion["conf_mensaje_pie"] . '<br>
-							<a href="' . $configuracion["conf_web"] . '" style="color:' . $configuracion["conf_color_link"] . ';">' . $configuracion["conf_web"] . '</a>
-						</p>
-						
-					</div>
-				</center>
-				<p>&nbsp;</p>
-			';
-	$fin .= '';
-	$fin .=  '<html><body>';
-	$sfrom = $configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
-	$sdestinatario = $contacto['cont_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-	$ssubject = "Encuesta de satisfaccion"; //ASUNTO DEL MENSAJE 				
-	$shtml = $fin; //MENSAJE EN SI			
-	$sheader = "From:" . $sfrom . "\nReply-To:" . $sfrom . "\n";
-	$sheader = $sheader . "X-Mailer:PHP/" . phpversion() . "\n";
-	$sheader = $sheader . "Mime-Version: 1.0\n";
-	$sheader = $sheader . "Content-Type: text/html; charset=UTF-8\r\n";
-	@mail($sdestinatario, $ssubject, $shtml, $sheader);
-	
-	echo '<script type="text/javascript">window.location.href="encuesta.php?msg=4";</script>';
-	exit();
-}
+
 //REPLICAR FACTURA
-if ($_GET["get"] == 19) {
-	$idPagina = 72;
-	include("includes/verificar-paginas.php");
-	//$factura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM facturacion",$conexion));
-	mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion (fact_cliente, fact_fecha, fact_valor, fact_estado, fact_usuario_responsable, fact_descripcion, fact_observacion, fact_descuento, fact_producto, fact_numero_fisica, fact_usuario_influyente, fact_fecha_real, fact_fecha_vencimiento) SELECT fact_cliente, now(), fact_valor, fact_estado, fact_usuario_responsable, fact_descripcion, fact_observacion, fact_descuento, fact_producto, fact_numero_fisica, fact_usuario_influyente, now(), fact_fecha_vencimiento FROM facturacion WHERE fact_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //CAMBIAR DE ESTADO LAS NOTIFICACIONES
-if ($_GET["get"] == 20) {
-	$not = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM notificaciones WHERE not_id='" . $_GET["id"] . "'"));
-	if ($not[5] == 1) $estadoN = 2;
-	else $estadoN = 1;
-	mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_estado='" . $estadoN . "' WHERE not_id='" . $_GET["id"] . "'");
-	
-	mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_realizado='" . $estadoN . "' WHERE cseg_id='" . $_GET["seg"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-//ELIMINAR ORDENES DE SERVICIO
+
+//ELIMINAR ORDENES DE SERVICIO // no se encuentra 
 if ($_GET["get"] == 21) {
 	$idPagina = 76;
 	include("includes/verificar-paginas.php");
@@ -521,64 +315,11 @@ if ($_GET["get"] == 21) {
 	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
 	exit();
 }
-//ELIMINAR SUCURSALES
+//ELIMINAR SUCURSALES (facturacion-abonos no funciona)
 
-if ($_GET["get"] == 25) {
-	$idPagina = 95;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM facturacion_abonos WHERE fpab_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-//AGREGAR ABONO AUTOMÁTICO POR EL VALOR PENDIENTE
-if ($_GET["get"] == 26) {
-	$nmsg = 8;
-	$abonos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT sum(fpab_valor), fact_valor, fact_id, fact_fecha_real, fact_impuestos, fact_retencion, fact_descuento FROM facturacion_abonos, facturacion
-	WHERE fpab_factura='" . $_GET["id"] . "' AND fact_id='" . $_GET["id"] . "'"));
-	$impuestos = $abonos['fact_valor'] * $abonos['fact_impuestos'] / 100;
-	$retencion = $abonos['fact_valor'] * $abonos['fact_retencion'] / 100;
-	$descuento = $res['fact_valor'] * $abonos['fact_descuento'] / 100;
-	$valorReal = ($abonos['fact_valor'] + $impuestos) - ($retencion + $descuento);
-	$saldoFinal = $valorReal - $abonos[0];
-	if ($saldoFinal > 0) {
-		mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion_abonos(fpab_factura, fpab_fecha_abono, fpab_valor, fpab_fecha_registro, fpab_observaciones, fpab_medio_pago, fpab_responsable_registro)VALUES('" . $_GET["id"] . "','" . $abonos[3] . "','" . $saldoFinal . "',now(),'Abono automático por el saldo pendiente',8,'" . $_SESSION["id"] . "')");
-		
-		$idInsertU = mysqli_insert_id($conexionBdPrincipal);
+//AGREGAR ABONO AUTOMÁTICO POR EL VALOR PENDIENTE // verificar en tikets-asuntos.php
 
-		mysqli_query($conexionBdPrincipal,"UPDATE facturacion SET fact_estado=1, fact_observacion=CONCAT(fact_observacion, ' <br>-- ', now(), ' Abono automático por el saldo pendiente y cambió a estado pagada') WHERE fact_id='" . $_GET["id"] . "' AND fact_estado!=3");
-		
-		$nmsg = 7;
-	}
-
-	echo '<script type="text/javascript">window.location.href="facturacion.php?msg=' . $nmsg . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 27) {
-	$idPagina = 100;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM soporte_productos WHERE sop_padre='" . $_GET["id"] . "'");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM soporte_productos WHERE sop_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 28) {
-	//$idPagina = 100; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_realizado=1 WHERE cseg_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 29) {
-	//$idPagina = 100; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado=2 WHERE tik_id='" . $_GET["id"] . "'");
-	mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_realizado=1 WHERE cseg_tiket='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 30) {
+if ($_GET["get"] == 30) { //(no existe interfaz grafica)
 	//$idPagina = 100; include("includes/verificar-paginas.php");
 	$producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='" . $_GET["id"] . "'"));
 	
@@ -598,162 +339,19 @@ if ($_GET["get"] == 30) {
 	exit();
 }
 //Cambiar de estado a los productos
-if ($_GET["get"] == 31) {
+if ($_GET["get"] == 31) { //no apunta a ninguna parte
 	//$idPagina = 100; include("includes/verificar-paginas.php");
 	mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_visible='" . $_GET["estado"] . "' WHERE prod_id='" . $_GET["id"] . "'");
 	
 	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
 	exit();
 }
-if ($_GET["get"] == 32) {
-	//$idPagina = 100; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_archivo='' WHERE cseg_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 33) {
-	//$idPagina = 100; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_papelera=1, cli_papelera_por='" . $_SESSION["id"] . "', cli_papelera_fecha=now() WHERE cli_id='" . $_GET["idR"] . "'");
-	
 
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_estado_mercadeo='" . $_GET["em"] . "', cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='" . $_SESSION["id"] . "' WHERE cli_id='" . $_GET["idR"] . "'");
-	
 
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 34) {
-	//$idPagina = 100; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_terminado=1, cli_terminado_por='" . $_SESSION["id"] . "', cli_terminado_fecha=now() WHERE cli_id='" . $_GET["idR"] . "'");
-	
 
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_estado_mercadeo='" . $_GET["em"] . "', cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='" . $_SESSION["id"] . "' WHERE cli_id='" . $_GET["idR"] . "'");
-	
 
-	if ($_GET["em"] != 6) {
-		mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_papelera=0 WHERE cli_id='" . $_GET["idR"] . "'");
-		
-	}
-
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 35) {
-	$idPagina = 114;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM proyectos_tareas WHERE ptar_id_proyecto='" . $_GET["id"] . "'");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM proyectos WHERE proy_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 36) {
-	$idPagina = 115;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM proyectos_tareas WHERE ptar_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 37) {
-	$idPagina = 118;
-	include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM agenda WHERE age_id='" . $_GET["id"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="calendario.php?id=' . $_SESSION["id"] . '";</script>';
-	exit();
-}
-
-if ($_GET["get"] == 40) {
-}
-if ($_GET["get"] == 41) {
-	//$idPagina = 100; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_etapa='" . $_GET["etapa"] . "' WHERE tik_id='" . $_GET["idtk"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
-if ($_GET["get"] == 42) {
-	//$idPagina = 100; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_estado_mercadeo='" . $_GET["em"] . "', cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='" . $_SESSION["id"] . "' WHERE cli_id='" . $_GET["idR"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 //ENVIAR COTIZACIÓN AL CORREO
-if ($_GET["get"] == 44) {
 
-	$resultado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion
-	INNER JOIN clientes ON cli_id=cotiz_cliente
-	INNER JOIN sucursales ON sucu_id=cotiz_sucursal
-	INNER JOIN contactos ON cont_id=cotiz_contacto
-	INNER JOIN usuarios ON usr_id=cotiz_vendedor
-	WHERE cotiz_id='" . $_GET["id"] . "'"));
-
-	$fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
-	$fin .= '
-				<center>
-					<p align="center"><img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="350"></p>
-					<div style="font-family:arial; background:' . $configuracion["conf_fondo_mensaje"] . '; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
-						
-						<p style="color:' . $configuracion["conf_color_letra"] . ';">' . strtoupper($resultado['cont_nombre']) . ',<br>
-						Estamos enviando la cotización por este medio para que la revise y la pueda imprimir según su necesidad.<br>
-						Haga click en el siguiente enlace para revisar la cotización.</p>
-						
-						<p align="center"><a href="' . $configuracion["conf_url_encuestas"] . '/usuarios/reportes/formato-cotizacion-1.php?cte=1&id=' . base64_encode($_GET["id"]) . '" target="_blank" style="color:' . $configuracion["conf_color_link"] . ';">REVISAR COTIZACIÓN</a></p>
-						
-						<p align="center" style="color:' . $configuracion["conf_color_letra"] . ';">
-							<img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="80"><br>
-							' . $configuracion["conf_mensaje_pie"] . '<br>
-							<a href="' . $configuracion["conf_web"] . '" style="color:' . $configuracion["conf_color_link"] . ';">' . $configuracion["conf_web"] . '</a>
-						</p>
-						
-					</div>
-				</center>
-				<p>&nbsp;</p>
-			';
-	$fin .= '';
-	$fin .=  '<html><body>';
-
-
-	// Instantiation and passing `true` enables exceptions
-	$mail = new PHPMailer(true);
-
-	try {
-		//Server settings
-		$mail->SMTPDebug = 2;                                       // Enable verbose debug output
-		$mail->isSMTP();                                            // Set mailer to use SMTP
-		$mail->Host       = 'mail.orioncrm.com.co';  // Specify main and backup SMTP servers
-		$mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-		$mail->Username   = $configuracion['conf_email'];                     // SMTP username
-		$mail->Password   = $configuracion['conf_clave_correo'];                              // SMTP password
-		$mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
-		$mail->Port       = 465;                                    // TCP port to connect to
-
-		//Recipients
-		$mail->setFrom($configuracion['conf_email'], '');
-		$mail->addAddress($resultado['cont_email'], $contacto['cont_nombre']);     // Add a recipient
-		$mail->addAddress($resultado['cli_email'], $contacto['cli_nombre']);     // Add a recipient
-		$mail->addAddress($resultado['usr_email'], $contacto['usr_nombre']);     // Add a recipient
-
-
-		// Content
-		$mail->isHTML(true);                                  // Set email format to HTML
-		$mail->Subject = 'Cotización #' . $_GET["id"];
-		$mail->Body = $fin;
-		$mail->CharSet = 'UTF-8';
-
-		$mail->send();
-		echo 'Enviada cotización al cliente.';
-	} catch (Exception $e) {
-		echo "Error: {$mail->ErrorInfo}";
-	}
-
-
-	echo '<script type="text/javascript">window.location.href="cotizaciones.php?msg=6";</script>';
-	exit();
-}
 //Eliminar marcas
 
 //ELIMINAR SERVICIOS
@@ -766,13 +364,7 @@ if ($_GET["get"] == 44) {
 
 //ELIMINAR COMBO
 
-if ($_GET["get"] == 55) {
-	//$idPagina = 118; include("includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM combos_productos WHERE copp_id='" . $_GET["idItem"] . "'");
-	
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
+
 //GENERAR FACTURA A PARTIR DE COTIZACIÓN (VIEJA)
 if ($_GET["get"] == 56) {
 	//$idPagina = 72; include("includes/verificar-paginas.php");
@@ -830,54 +422,18 @@ if ($_GET["get"] == 60) {
 //ELIMINAR BODEGAS POR PRODUCTOS
 
 //OTRO
-if ($_GET["get"] == 64) {
-	$prod = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
-	WHERE czpp_id='" . $_GET["idItem"] . "'"));
-	
 
-
-	mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega)VALUES('" . $prod['czpp_cotizacion'] . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', 1, 0, '" . $prod['czpp_impuesto'] . "', 3, 1)");
-	
-
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 //GENERAR FACTURA DE VENTA A PARTIR DE REMISIÓN
 
 //COLOCAR REDIMIDA UNA FACTURA, PUNTOS DEL CLIENTE
-if ($_GET["get"] == 66) {
-	mysqli_query($conexionBdPrincipal,"UPDATE facturas SET factura_redimido_cliente=1 WHERE factura_id='" . $_GET["id"] . "'");
-	
 
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 //SALDAR COMISIÓN A VENDEDORES
-if ($_GET["get"] == 67) {
-	mysqli_query($conexionBdPrincipal,"UPDATE facturas SET factura_redimido_vendedor=1 WHERE factura_id='" . $_GET["id"] . "'");
-	
 
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 //ELIMINAR SUCURSALES
-if ($_GET["get"] == 68) {
-	mysqli_query($conexionBdPrincipal,"DELETE FROM sucursales_propias WHERE sucp_id='" . $_GET["id"] . "'");
-	
-
-	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
-	exit();
-}
 
 //AGREGAR PRODUCTOS
 
 //APROBAR DESCUENTOS ESPECIALES EN COTIZACIONES
-if ($_GET["get"] == 70) {
 
-	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET czpp_descuento=czpp_descuento_especial, czpp_aprobado_usuario='".$_SESSION['id']."', czpp_aprobado_fecha=now() WHERE czpp_id='" . $_GET["idItem"] . "'");
-
-	echo '<script type="text/javascript">window.location.href="'.$_SERVER['HTTP_REFERER'].'";</script>';
-	exit();
-}
 
 ?>
