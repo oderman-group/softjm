@@ -58,6 +58,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 								<?php }?>
 									<li><a href="modulos.php"><i class=" icon-unlock"></i>Módulos</a></li>
 									<li><a href="paginas.php"><i class="icon-file"></i> Páginas</a></li>
+									<li><a href="documentos.php"><i class="icon-file-alt"></i> Documentos</a></li>
 									<li><a href="buzon.php"><i class="icon-envelope"></i> Buzón de salida </a></li>
 
 									<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Documentación</a>

@@ -89,7 +89,7 @@ include("includes/head.php");
 												
 												<td><h4>
 													<a href="documento-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-													<a href="documento-configuracion.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+													<a href="documento-configuracion.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><span class="widget-icon icon-cogs"></span></a>
 													</h4></td>
 											</tr>
 											<?php $no++;}?>
