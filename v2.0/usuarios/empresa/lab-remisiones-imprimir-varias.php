@@ -10,7 +10,7 @@ INNER JOIN clientes ON cli_id=rem_cliente
 INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_POST["remisiones"][0]."'");
+WHERE rem_id='".$_POST["remisiones"][0]."' AND rem_id_empresa='".$idEmpresa."'");
 $remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 
 $consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$remision['rem_contacto']."'");
@@ -126,7 +126,7 @@ switch($_POST['estado']){
 				$numero =(count($_POST["remisiones"]));
 				$contador=0;
 				while($contador<$numero){
-					$consultaRemi=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."'");
+					$consultaRemi=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."' AND rem_id_empresa='".$idEmpresa."'");
 					$remi = mysqli_fetch_array($consultaRemi, MYSQLI_BOTH);
 					
 					if($_POST['estado']==2){
@@ -159,7 +159,7 @@ switch($_POST['estado']){
 				$numero =(count($_POST["remisiones"]));
 				$contador=0;
 				while($contador<$numero){
-					$consultaRemi=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."'");
+					$consultaRemi=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."' AND rem_id_empresa='".$idEmpresa."'");
 					$remi = mysqli_fetch_array($consultaRemi, MYSQLI_BOTH);
 				?>
 				
@@ -194,10 +194,10 @@ switch($_POST['estado']){
 				$numero =(count($_POST["remisiones"]));
 				$contador=0;
 				while($contador<$numero){
-					$consultaRemi=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."'");
+					$consultaRemi=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["remisiones"][$contador]."' AND rem_id_empresa='".$idEmpresa."'");
 					$remis = mysqli_fetch_array($consultaRemi, MYSQLI_BOTH);
 					
-					$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+					$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$idEmpresa."'");
 					while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 						
 						$consultaOpciones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios 

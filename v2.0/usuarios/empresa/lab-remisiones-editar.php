@@ -7,7 +7,7 @@ include("verificar-paginas.php");
 
 $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_GET["id"]."'");
+WHERE rem_id='".$_GET["id"]."' AND rem_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 $consultaAnulado = mysqli_query($conexionBdPrincipal,"SELECT * FROM certificados_anulados WHERE certanu_id_certificado='".$_GET["id"]."'");
@@ -645,7 +645,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 													<div class="col-sm-9">	
 														<select class="select2 form-control custom-select" multiple="multiple" style="width: 100%; height:36px;" name="servicios[]" <?=$disabled;?>>
 																	<?php
-																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$idEmpresa."'");
 																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																		
 																		$consultaOpciones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios WHERE remxs_id_remision='".$_GET["id"]."' AND remxs_id_servicio='".$datosSelect[0]."'");
@@ -665,7 +665,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="cliente" <?=$disabled;?>>
 															<option>Cliente</option>
 																	<?php
-																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																		
 																		//Solo Vendedores externos

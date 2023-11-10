@@ -96,6 +96,7 @@ include("verificar-paginas.php");
 																	<?php
 																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
 																	INNER JOIN clientes ON cli_id=rem_cliente
+                                                                    WHERE rem_id_empresa='".$idEmpresa."'
 																	");
 																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																	?>

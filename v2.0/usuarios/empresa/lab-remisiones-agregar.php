@@ -102,7 +102,7 @@ include("verificar-paginas.php");
 														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="cliente" onChange="clientes(this)">
 															<option value="">Cliente</option>
 																	<?php
-																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 
 
@@ -427,7 +427,7 @@ include("verificar-paginas.php");
 													<div class="col-sm-9">	
 														<select class="select2 form-control" multiple="multiple" style="width: 100%; height:36px;" name="servicios[]">
 																	<?php
-																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$idEmpresa."'");
 																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																	?>
 																	<option value="<?=$datosSelect[0];?>"><?=strtoupper($datosSelect['serv_nombre']);?></option>
