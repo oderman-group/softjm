@@ -1,7 +1,7 @@
 <?php
 include("../sesion.php");
 
-$configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"));
+$configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1 AND conf_id_empresa='".$idEmpresa."'"));
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
@@ -39,7 +39,7 @@ $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * 
             LEFT JOIN clientes ON cli_id=rem_cliente
             LEFT JOIN usuarios ON usr_id=rem_asesor
             LEFT JOIN sucursales_propias ON sucp_id=usr_sucursal
-            WHERE rem_id=rem_id 
+            WHERE rem_id=rem_id AND rem_id_empresa='".$idEmpresa."'
             GROUP BY rem_id");
 
             $no = 1;
