@@ -9,5 +9,5 @@ $conexionBdAdmin->query("UPDATE documentos SET doc_nombre='". $_POST["nombre"]."
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
-echo '<script type="text/javascript">window.location.href="../documentos.php";</script>';
+echo '<script type="text/javascript">window.location.href="../documentos.php?msg=2";</script>';
 exit();

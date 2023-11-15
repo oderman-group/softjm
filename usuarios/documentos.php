@@ -58,6 +58,7 @@ include("includes/head.php");
 			<div class="container-fluid">
 				<div class="row-fluid ">
 					<p><a href="documentos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+					<?php include("includes/notificaciones.php");?>
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="content-widgets light-gray">
@@ -89,7 +90,8 @@ include("includes/head.php");
 												
 												<td><h4>
 													<a href="documento-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-													<a href="documento-configuracion.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><span class="widget-icon icon-cogs"></span></a>
+													<a href="documento-configuracion.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Configuración"><span class="widget-icon icon-cogs"></span></a>
+													<a href="bd_delete/documento-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 													</h4></td>
 											</tr>
 											<?php $no++;}?>

@@ -12,5 +12,5 @@ $idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
-echo '<script type="text/javascript">window.location.href="../documentos.php";</script>';
+echo '<script type="text/javascript">window.location.href="../documentos.php?id=&msg=1";</script>';
 exit();
