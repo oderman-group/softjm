@@ -190,6 +190,16 @@ include("includes/js-formularios.php");
                                     </div>
                                </div>
                                
+							   <div class="control-group">
+									<label class="control-label">Desea enviar un correo al cliente?</label>
+									<div class="controls">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="enviarCorreo">
+											<option value="">Escoje una opción</option>
+											<option value="1">Si</option>
+											<option value="0">No</option>
+                                    	</select>
+                                    </div>
+                               </div>
 
                               
 								<div class="form-actions">
