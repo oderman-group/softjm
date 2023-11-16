@@ -415,6 +415,14 @@ include("includes/js-formularios.php");
                                             </div>
                                         </div>
 
+                                        <div class="control-group">
+                                            <label class="control-label">Terminos y condiciones</label>
+                                            <div class="controls">
+                                            <textarea rows="10" cols="70" style="width: 50%" name="terminos">
+                                               <?php echo $resultadoD['conf_terminos_condiciones'] ?>
+                                            </textarea>
+                                            </div>
+                                        </div>
 
 
                                     </fieldset>
