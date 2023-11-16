@@ -16,9 +16,8 @@ mysqli_query($conexionBdPrincipal,"INSERT INTO agenda(age_evento, age_fecha, age
 	
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
-	/*Esta bandera es mientras se define un campo que me permita
-	determinar si envio o no correo.*/
-	if ($_POST["cliente"] != '0' && false) {
+
+	if ($_POST["cliente"] != '0' && $_POST["enviarCorreo"] == 1 ) {
 
 
 		$hora = 1;
@@ -102,7 +101,7 @@ mysqli_query($conexionBdPrincipal,"INSERT INTO agenda(age_evento, age_fecha, age
 
 		try {
 			//Server settings
-			$mail->SMTPDebug = 0;                                       // Enable verbose debug output
+			$mail->SMTPDebug = 2;                                       // Enable verbose debug output
 			$mail->isSMTP();                                            // Set mailer to use SMTP
 			$mail->Host       = 'mail.orioncrm.com.co';  // Specify main and backup SMTP servers
 			$mail->SMTPAuth   = true;                                   // Enable SMTP authentication
