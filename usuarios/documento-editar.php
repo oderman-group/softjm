@@ -69,7 +69,7 @@ include("includes/js-formularios.php");
                                     
                                     <div class="form-actions">
                                         <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-                                        <button type="button" class="btn btn-danger">Cancelar</button>
+                                        <a href="documentos.php" class="btn btn-danger">Cancelar</a>dd
                                     </div>
                                 </form>
                             </div>
