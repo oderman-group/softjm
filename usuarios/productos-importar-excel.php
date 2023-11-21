@@ -35,9 +35,9 @@ if($extension == 'xlsx'){
 
 			$sql = "INSERT INTO productos(prod_id, prod_referencia, prod_nombre, prod_grupo1, prod_categoria, prod_marca, prod_costo, prod_visible, prod_ultima_actualizacion, prod_ultima_actualizacion_usuario) VALUES ";
 
-			if($_SESSION["id"]==7){
+			// Check_id 7 y
 				$sql = "INSERT INTO productos(prod_id, prod_referencia, prod_nombre, prod_grupo1, prod_categoria, prod_marca, prod_costo, prod_descuento1, prod_descuento2, prod_utilidad, prod_precio_fabrica, prod_flete, prod_aduana, prod_costo_dolar, prod_visible, prod_ultima_actualizacion, prod_ultima_actualizacion_usuario) VALUES ";
-			}
+			// endif-check_id 	
 			
 			$productosCreados      = array();
 			$productosActualizados = array();
@@ -60,7 +60,7 @@ if($extension == 'xlsx'){
 					'prod_costo' 							 => $hojaActual->getCell('L'.$f)->getValue(),
 				];
 
-				if($_SESSION["id"]==7){
+				// Check_id 7 
 					$arrayIndividual = [
 						'prod_id'		   						 => $hojaActual->getCell('B'.$f)->getValue(),
 						'prod_referencia'   					 => $hojaActual->getCell('C'.$f)->getValue(),
@@ -78,7 +78,7 @@ if($extension == 'xlsx'){
 						'prod_aduana'           				 => $hojaActual->getCell('R'.$f)->getValue(),
 						'prod_costo_dolar'          			 => $hojaActual->getCell('S'.$f)->getValue(),
 					];
-				}
+				// endif-check_id 
 
 				//Validamos que los campos más importantes no vengan vacios
 				foreach ($claves_validar as $clave) {
