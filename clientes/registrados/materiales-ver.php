@@ -1,8 +1,6 @@
 <?php 
 include("sesion.php");
 
-$tituloPagina = "Ver Productos";
-
 include("head.php");
 
 $producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_GET["pdto"]."' AND prod_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
@@ -91,7 +89,7 @@ $producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM 
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
                         <li><a href="materiales.php">Materiales</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?> de <b><?=$producto['prod_nombre'];?></b></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?> de <b><?=$producto['prod_nombre'];?></b></li>
 					</ul>
 				</div>
 			</div>
@@ -100,7 +98,7 @@ $producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM 
 				<div class="span12">
 					<div class="content-widgets light-gray">
 						<div class="widget-head green">
-							<h3><?=$tituloPagina;?> de <b><?=$producto['prod_nombre'];?></b></h3>
+							<h3><?=$paginaActual['pag_nombre'];?> de <b><?=$producto['prod_nombre'];?></b></h3>
 						</div>
 						<div class="widget-container">
 							<p>

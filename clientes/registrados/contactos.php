@@ -1,8 +1,6 @@
 <?php 
 include("sesion.php");
 
-$tituloPagina = "Mis Contactos";
-
 include("head.php");
 
 $cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'"), MYSQLI_BOTH);
@@ -71,11 +69,11 @@ $cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM c
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -88,7 +86,7 @@ $cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM c
 				<div class="span12">
 					<div class="content-widgets light-gray">
 						<div class="widget-head green">
-							<h3><?=$tituloPagina;?></h3>
+							<h3><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
 							<p></p>
