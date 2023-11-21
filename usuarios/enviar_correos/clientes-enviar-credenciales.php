@@ -21,7 +21,7 @@ $resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 						<p style="color:' . $configuracion["conf_color_letra"] . ';">' . strtoupper($resultado['cli_nombre']) . ',<br>
 						Estamos enviando sus credenciales de acceso al sistema de clientes de JMEQUIPOS. Sus credenciales son:<br>
 						<b>URL de acceso:</b> https://jmequipos.com/clientes.php<br>
-						<b>Usuario:</b> ' . $resultado['cli_usuario'] . '<br>
+						<b>Usuario:</b> ' . $resultado['cli_usuario_acceso'] . '<br>
 						<b>Contraseña:</b> ' . $resultado['cli_clave'] . '
 						</p>
 						
