@@ -19,7 +19,7 @@ $resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 					<div style="font-family:arial; background:' . $configuracion["conf_fondo_mensaje"] . '; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
 						
 						<p style="color:' . $configuracion["conf_color_letra"] . ';">' . strtoupper($resultado['cli_nombre']) . ',<br>
-						Estamos enviando sus credenciales de acceso al sistema de clientes de JMEQUIPOS. Sus credenciales son:<br>
+						Estamos enviando sus credenciales de acceso al sistema de clientes de '.$_SESSION["dataAdicional"]['nombre_empresa'].'. Sus credenciales son:<br>
 						<b>URL de acceso:</b> https://jmequipos.com/clientes.php<br>
 						<b>Usuario:</b> ' . $resultado['cli_usuario_acceso'] . '<br>
 						<b>Contraseña:</b> ' . $resultado['cli_clave'] . '
@@ -54,7 +54,7 @@ $resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 		$mail->Port       = 465;                                    // TCP port to connect to
 
 		//Recipients
-		$mail->setFrom($configuracion['conf_email'], 'INFORMACIÓN JMEQUIPOS');
+		$mail->setFrom($configuracion['conf_email'], 'INFORMACIÓN '.$_SESSION["dataAdicional"]['nombre_empresa']);
 
 		$mail->addAddress($resultado['cli_email'], $resultado['cli_nombre']);     // Add a recipient
 

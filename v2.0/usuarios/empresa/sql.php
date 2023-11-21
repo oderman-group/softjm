@@ -1106,7 +1106,7 @@ if($_POST["idSql"]==49){
 						<p align="center"><img src="'.$configuracion["conf_url_encuestas"].'/usuarios/files/'.$configuracion["conf_logo"].'" width="350"></p>
 						<div style="font-family:arial; background:'.$configuracion["conf_fondo_mensaje"].'; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
 							
-							<h3 align="center" style="background:darkblue; color:white;">Notificación servicio técnico - JMEQUIPOS</h3>
+							<h3 align="center" style="background:darkblue; color:white;">Notificación servicio técnico - '.$_SESSION["dataAdicional"]['nombre_empresa'].'</h3>
 							
 							<p style="color:'.$configuracion["conf_color_letra"].';">
 							'.$fechaHoy.'<br><br>
@@ -1114,7 +1114,7 @@ if($_POST["idSql"]==49){
 							'.strtoupper($cliente['cli_nombre']).'.<br>
 							'.strtoupper($contacto['cont_nombre']).'.<br><br>
 							Cordial saludo,<br><br>
-							El departamento técnico de JMEQUIPOS SAS le informa que su equipo se encuentra en el siguiente estado:<br>
+							El departamento técnico de '.$_SESSION["dataAdicional"]['nombre_empresa'].' SAS le informa que su equipo se encuentra en el siguiente estado:<br>
 							<b>Fecha de entrada:</b> '.$remision["rem_fecha"].'<br>
 							<b>Equipo:</b> '.$remision["rem_equipo"].'<br>
 							<b>Referencia:</b> '.$remision["rem_referencia"].'<br>
@@ -1138,7 +1138,7 @@ if($_POST["idSql"]==49){
 		$fin .=  '<html><body>';							
 		$sfrom="auxlaboratorio@jmequipos.com"; //LA CUETA DEL QUE ENVIA EL MENSAJE			
 		$sdestinatario=$contacto['cont_email'].", ".$cliente['cli_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-		$ssubject="Notificación servicio técnico - JMEQUIPOS"; //ASUNTO DEL MENSAJE 				
+		$ssubject="Notificación servicio técnico - ".$_SESSION["dataAdicional"]['nombre_empresa']; //ASUNTO DEL MENSAJE 				
 		$shtml=$fin; //MENSAJE EN SI			
 		$sheader="From:".$sfrom."\nReply-To:".$sfrom."\n"; 			
 		$sheader=$sheader."X-Mailer:PHP/".phpversion()."\n"; 			
@@ -1499,41 +1499,6 @@ if($_GET["get"]==31){
 	//$idPagina = 100; include("verificar-paginas.php");
 	mysqli_query($conexionBdPrincipal,"UPDATE remisiones SET rem_generar_certificado=1, rem_fecha_certificado=now(), rem_estado_certificado=1, rem_fecha=now() WHERE rem_id='".$_GET["id"]."'");
 	
-		/*
-		$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'"));
-		$fin =  '<html><body style="background-color:'.$configuracion["conf_fondo_boletin"].';">';
-		$fin .= '
-					<center>
-						<p align="center"><img src="'.$configuracion["conf_url_encuestas"].'/usuarios/files/'.$configuracion["conf_logo"].'" width="350"></p>
-						<div style="font-family:arial; background:'.$configuracion["conf_fondo_mensaje"].'; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
-							
-							<p style="color:'.$configuracion["conf_color_letra"].';">'.strtoupper($cliente['cli_nombre']).',<br>
-							Le informamos que su equipo está listo para ser entregado. El certificado <b>No. C'.$_GET["id"].'</b> ya fue generado.<br>
-							Agradecemos acercarse a las oficinas de <strong>JMENDOZA EQUIPOS</strong> a reclamar su equipo.
-							</p>
-							
-							<p align="center" style="color:'.$configuracion["conf_color_letra"].';">
-								<img src="'.$configuracion["conf_url_encuestas"].'/usuarios/files/'.$configuracion["conf_logo"].'" width="80"><br>
-								'.$configuracion["conf_mensaje_pie"].'<br>
-								<a href="'.$configuracion["conf_web"].'" style="color:'.$configuracion["conf_color_link"].';">'.$configuracion["conf_web"].'</a>
-							</p>
-							
-						</div>
-					</center>
-					<p>&nbsp;</p>
-				';	
-		$fin .='';						
-		$fin .=  '<html><body>';							
-		$sfrom=$configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
-		$sdestinatario=$cliente['cli_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-		$ssubject="Su equipo está listo para reclamar"; //ASUNTO DEL MENSAJE 				
-		$shtml=$fin; //MENSAJE EN SI			
-		$sheader="From:".$sfrom."\nReply-To:".$sfrom."\n"; 			
-		$sheader=$sheader."X-Mailer:PHP/".phpversion()."\n"; 			
-		$sheader=$sheader."Mime-Version: 1.0\n"; 		
-		$sheader=$sheader."Content-Type: text/html; charset=UTF-8\r\n"; 			
-		@mail($sdestinatario,$ssubject,$shtml,$sheader);
-		*/
 ?>
 		
 <?php
@@ -1582,7 +1547,7 @@ if($_GET["get"]==32){
 		$fin .=  '<html><body>';							
 		$sfrom=$configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
 		$sdestinatario=$contacto['cont_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-		$ssubject="Remisión de su equipo - JMEQUIPOS"; //ASUNTO DEL MENSAJE 				
+		$ssubject="Remisión de su equipo - ".$_SESSION["dataAdicional"]['nombre_empresa']; //ASUNTO DEL MENSAJE 				
 		$shtml=$fin; //MENSAJE EN SI			
 		$sheader="From:".$sfrom."\nReply-To:".$sfrom."\n"; 			
 		$sheader=$sheader."X-Mailer:PHP/".phpversion()."\n"; 			

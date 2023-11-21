@@ -865,7 +865,7 @@ switch ($remision['rem_tipo_equipo']) {
 	<table style="width:90%; padding: 10px; font-size: 18px;" border="0" align="center">
 		<tr>
 			<td style="font-weight: bold;">
-				JMENDOZA EQUIPO SAS. CERTIFICA QUE EL<br>
+				<?=$_SESSION["dataAdicional"]['nombre_empresa'];?>. CERTIFICA QUE EL<br>
 				INSTRUMENTO SE ENTREGA EN OPTIMAS CONDICIONES<br>
 				DE FUNCIONAMIENTO REALIZANDO EL AJUSTE Y/O<br>
 				REPARACION (SEGÚN PROTOCOLO DE NORMA ISO<br>
@@ -880,11 +880,11 @@ switch ($remision['rem_tipo_equipo']) {
 				<img src="ok.png" width="100"><br>
 				<!--<p>&nbsp;</p><br><br>
 				GEINER CUERVO MENDOZA<br>-->
-				TÉCNICO JMEQUIPOS SAS
+				TÉCNICO <?=$_SESSION["dataAdicional"]['nombre_empresa'];?>
 				<p style="text-align: left;">CERTIFICADO POR:<br>
 				<?=strtoupper($remision['rem_supervisor'])?><br>
 				SUPERVISOR DE LABORATORIO &emsp;&emsp;&emsp;&emsp;&emsp;FIRMA:<span style="border-top: 1px solid #000; width: 200px; display: inline-block;"></span></p>
-				<p style="color: red; text-align: left;">Este certificado no es válido sin el simbolo de aceptación, no puede ser<br>reproducido parcialmente, excepto en su totalidad, con autorización<br>previa por escrito del servicio técnico  de JMEQUIPOS.</p>
+				<p style="color: red; text-align: left;">Este certificado no es válido sin el simbolo de aceptación, no puede ser<br>reproducido parcialmente, excepto en su totalidad, con autorización<br>previa por escrito del servicio técnico  de <?=$_SESSION["dataAdicional"]['nombre_empresa'];?>.</p>
 				<br><br><span style="color: darkblue;">Verifique la validez de este certificado en<br>
 					<a href="https://jmequipos.com/consultar-certificados.php" target="_blank">www.jmequipos.com/consultar-certificados.php</a></span>
 			</td>
