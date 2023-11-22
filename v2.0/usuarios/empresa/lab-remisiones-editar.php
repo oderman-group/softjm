@@ -2,7 +2,7 @@
 include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 245;
-$tituloPagina = "Editar remisión";
+
 include("verificar-paginas.php");
 
 $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
@@ -70,7 +70,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-5 align-self-center">
-                        <h4 class="page-title"><?=$tituloPagina;?></h4>
+                        <h4 class="page-title"><?=$paginaActual['pag_nombre'];?></h4>
                     </div>
                     <div class="col-7 align-self-center">
                         <div class="d-flex align-items-center justify-content-end">
@@ -79,7 +79,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
                                     <li class="breadcrumb-item">
                                         <a href="lab-remisiones.php">Remisiones</a>
                                     </li>
-                                    <li class="breadcrumb-item active" aria-current="page"><?=$tituloPagina;?></li>
+                                    <li class="breadcrumb-item active" aria-current="page"><?=$paginaActual['pag_nombre'];?></li>
                                 </ol>
                             </nav>
                         </div>

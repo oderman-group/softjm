@@ -2,7 +2,7 @@
 include("sesion.php"); //exit();
 include("../compartido/head.php");
 $idPagina = 241;
-$tituloPagina = "Informes todos";
+
 include("verificar-paginas.php");
 ?>
     <!-- This page plugin CSS -->
@@ -51,7 +51,7 @@ include("verificar-paginas.php");
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-5 align-self-center">
-                        <h4 class="page-title"><?=$tituloPagina;?></h4>
+                        <h4 class="page-title"><?=$paginaActual['pag_nombre'];?></h4>
                     </div>
                     <div class="col-7 align-self-center">
                         <div class="d-flex align-items-center justify-content-end">
@@ -60,7 +60,7 @@ include("verificar-paginas.php");
                                     <li class="breadcrumb-item">
                                         <a href="lab-remisiones.php">Remisiones</a>
                                     </li>
-                                    <li class="breadcrumb-item active" aria-current="page"><?=$tituloPagina;?></li>
+                                    <li class="breadcrumb-item active" aria-current="page"><?=$paginaActual['pag_nombre'];?></li>
                                 </ol>
                             </nav>
                         </div>
@@ -80,7 +80,7 @@ include("verificar-paginas.php");
                         <div class="card-body">
                             <div class="d-flex align-items-center p-b-15">
                                 <div>
-                                    <h4 class="card-title m-b-0"><?=$tituloPagina;?></h4>
+                                    <h4 class="card-title m-b-0"><?=$paginaActual['pag_nombre'];?></h4>
                                 </div>
                             </div>
                             <div class="todo-widget scrollable" style="height:422px;">

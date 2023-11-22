@@ -95,7 +95,7 @@ if ($numero > 0) {
 
 					// Content
 					$mail->isHTML(true);                                  // Set email format to HTML
-					$mail->Subject = "PORTAFOLIO JMEQUIPOS SAS";
+					$mail->Subject = "PORTAFOLIO ".$_SESSION["dataAdicional"]['nombre_empresa'];
 					$mail->Body = $fin;
 					$mail->CharSet = 'UTF-8';
 

@@ -2,7 +2,7 @@
 include("sesion.php"); //exit();
 include("../compartido/head.php");
 $idPagina = 243;
-$tituloPagina = "Cotización";
+
 include("verificar-paginas.php");
 
 $consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 

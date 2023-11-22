@@ -2,7 +2,7 @@
 include("sesion.php"); //exit();
 include("../compartido/head.php");
 $idPagina = 250;
-$tituloPagina = "Remisiones";
+
 include("verificar-paginas.php");
 
 if(is_numeric($_GET["idRem"])){
@@ -57,7 +57,7 @@ if(is_numeric($_GET["idRem"])){
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-5 align-self-center">
-                        <h4 class="page-title"><?=$tituloPagina;?></h4>
+                        <h4 class="page-title"><?=$paginaActual['pag_nombre'];?></h4>
                     </div>
                 </div>
             </div>
