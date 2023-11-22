@@ -162,7 +162,7 @@ WHERE cli_id='".$_SESSION["id_cliente"]."'"), MYSQLI_BOTH);
 							<h3> <?=$tituloPagina;?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="solicitar-copia-certificado.php">
                             <input type="hidden" name="idSql" value="4">
                             <input type="hidden" name="idRem" value="<?=$_GET['id'];?>">
                             	

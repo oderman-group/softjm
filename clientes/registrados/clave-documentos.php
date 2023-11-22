@@ -192,7 +192,7 @@ WHERE cli_id='".$_SESSION["id_cliente"]."'"), MYSQLI_BOTH);
 							
 							<p style="color: red;">La clave será enviada al correo administrativo.</p>
 							
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="recordar-clave-acceso-documentos.php">
                             	<input type="hidden" name="idSql" value="2">
 								
                                 <div class="control-group">

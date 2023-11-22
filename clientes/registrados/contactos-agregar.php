@@ -158,7 +158,7 @@ include("head.php");
 							<h3> <?=$tituloPagina;?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="contactos-guardar.php">
                             <input type="hidden" name="idSql" value="5">
 								
                                <div class="control-group">
