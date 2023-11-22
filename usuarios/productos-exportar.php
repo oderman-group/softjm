@@ -52,7 +52,7 @@ $hojaActiva->setCellValue('O1', 'Materiales');
 $hojaActiva->getColumnDimension('P')->setWidth(20);
 $hojaActiva->setCellValue('P1', 'Facturas');
 
-if($_SESSION["id"]==7 or $_SESSION["id"]==15){
+// Check_id 7 y 15
     $hojaActiva->getColumnDimension('Q')->setWidth(20);
     $hojaActiva->setCellValue('Q1', 'Dcto. Max. (%)');
     $hojaActiva->getColumnDimension('R')->setWidth(20);
@@ -74,7 +74,7 @@ if($_SESSION["id"]==7 or $_SESSION["id"]==15){
     
     $hojaActiva->getColumnDimension('Y')->setWidth(20);
     $hojaActiva->setCellValue('Y1', 'Precio predetermindo');
-}
+    // endif-check_id 
 
 $i=2;
 $pdt = array("NO","SI");
@@ -142,7 +142,7 @@ while($res=mysqli_fetch_array($consulta)){
     $hojaActiva->setCellValue('O'.$i, $datosReg[0]);
     $hojaActiva->setCellValue('P'.$i, $datosReg[1]);
 
-    if($_SESSION["id"]==7 or $_SESSION["id"]==15){
+    // Check_id 7 y 15
         $hojaActiva->setCellValue('Q'.$i, $res['prod_descuento1']);
         $hojaActiva->setCellValue('R'.$i, $res['prod_descuento2']);
         $hojaActiva->setCellValue('S'.$i, $res['prod_utilidad']);
@@ -155,7 +155,7 @@ while($res=mysqli_fetch_array($consulta)){
         $hojaActiva->setCellValue('X'.$i, number_format($precioWeb,0,",","."));
         
         $hojaActiva->setCellValue('Y'.$i, $pdt[$res['prod_precio_predeterminado']]);
-    }
+    // endif-check_id 
 
     $i++;
 }
