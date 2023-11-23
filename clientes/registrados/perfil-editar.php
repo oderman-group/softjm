@@ -161,7 +161,7 @@ WHERE cli_id='".$_SESSION["id_cliente"]."'"), MYSQLI_BOTH);
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="clientes-actualizar.php">
                             <input type="hidden" name="idSql" value="1">
                             <input type="hidden" name="id" value="<?=$resultadoD['cli_id'];?>">
                             	

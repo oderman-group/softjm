@@ -77,7 +77,7 @@ include("head.php");
 			</div>
             <?php include("notificaciones.php");?>
 			
-			<p><a href="sql.php?get=1" class="btn btn-warning"> Salir de documentos</a></p>
+			<p><a href="documentos-salir.php?get=1" class="btn btn-warning"> Salir de documentos</a></p>
 			
 			
 			

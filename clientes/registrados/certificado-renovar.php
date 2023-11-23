@@ -164,7 +164,7 @@ AND rem_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" target="_blank">
+							<form class="form-horizontal" method="post" action="renovar-certificado.php" target="_blank">
                             <input type="hidden" name="idSql" value="3">
                             <input type="hidden" name="idCertificado" value="<?=$_GET['id'];?>">
                             	

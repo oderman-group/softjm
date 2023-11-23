@@ -80,7 +80,7 @@ include("verificar-paginas.php");
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
+                            <form class="form-horizontal" method="post" action="lab-remisiones-guardar.php" enctype="multipart/form-data">
 								<input type="hidden" name="idSql" value="47">
 								
                                 <div class="card-body">

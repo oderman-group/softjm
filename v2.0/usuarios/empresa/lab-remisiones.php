@@ -273,13 +273,13 @@ if(is_numeric($_GET["idRem"])){
 															<a class="dropdown-item" href="#" onClick="if(!confirm('Desea eliminar este registro?')){return false;}">Eliminar</a>
 															
 															<div class="dropdown-divider"></div>
-															<a class="dropdown-item" href="sql.php?get=32&id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>&contacto=<?=$resultado['rem_contacto'];?>">Enviar remisión actual</a>
+															<a class="dropdown-item" href="enviar-remision-actual-al-cliente.php?get=32&id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>&contacto=<?=$resultado['rem_contacto'];?>">Enviar remisión actual</a>
 															
 															<div class="dropdown-divider"></div>
 															<?php if($resultado['rem_generar_certificado']==1 and $resultado['rem_estado']==1){?>
-																<a class="dropdown-item" href="sql.php?get=30&id=<?=$resultado['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank">Generar salida</a>
+																<a class="dropdown-item" href="salida-remision-actualizar.php?get=30&id=<?=$resultado['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank">Generar salida</a>
 															<?php } if($resultado['rem_generar_certificado']!=1){?>
-																<a class="dropdown-item" href="sql.php?get=31&id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}">Generar certificado</a>
+																<a class="dropdown-item" href="generar-certificado.php?get=31&id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}">Generar certificado</a>
 															<?php }?>
 															
 															<div class="dropdown-divider"></div>
