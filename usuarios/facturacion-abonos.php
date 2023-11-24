@@ -6,6 +6,7 @@ $paginaActual['pag_nombre'] = "Abonos a Facturas";
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
 <?php
+/*
 mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
 if(mysql_errno()!=0){echo mysql_error(); exit();}
 $factura = mysql_fetch_array(mysql_query("SELECT * FROM facturacion WHERE fact_id='".$_GET["fact"]."'",$conexion));
@@ -14,7 +15,7 @@ $retencion = $factura['fact_valor'] * $factura['fact_retencion']/100;
 $descuento = $factura['fact_valor'] * $factura['fact_descuento']/100;
 								
 $valorReal = ($factura['fact_valor'] + $impuestos) - ($retencion + $descuento);
-
+*/
 ?>
 <!-- styles -->
 
@@ -161,13 +162,13 @@ $valorReal = ($factura['fact_valor'] + $impuestos) - ($retencion + $descuento);
                             <?php
 							$filtro="";
 							if(isset($_GET["fact"]) and $_GET["fact"]!="" and $factura[0]!=""){$filtro .= " AND (fpab_factura='".$_GET["fact"]."')";}
-							$consulta = mysql_query("SELECT * FROM facturacion_abonos
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM facturacion_abonos
 							INNER JOIN facturacion ON fact_id=fpab_factura
 							WHERE fpab_id=fpab_id ".$filtro."
 							ORDER BY fpab_id ASC
-							",$conexion);
+							");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta,MYSQLI_BOTH)){
 								$suma +=$res['fpab_valor'];
 								switch($res['fpab_medio_pago']){
 									case 1: $medio = 'Consignación'; break;

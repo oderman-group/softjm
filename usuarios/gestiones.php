@@ -5,10 +5,7 @@ $paginaActual['pag_nombre'] = "Gestiones";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
+
 <!-- styles -->
 
 
@@ -211,19 +208,19 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							<tbody>
                             <?php
 							
-								$consulta = mysql_query("SELECT * FROM gestiones
+								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM gestiones
 								INNER JOIN usuarios ON usr_id=gest_responsable
 								LIMIT $inicio, $limite
-								",$conexion);
+								");
 							
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta)){
 								
-								$numeros = mysql_fetch_array(mysql_query("
+								$numeros = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 								SELECT
 								(SELECT count(gestxc_id) FROM gestiones_clientes WHERE gestxc_gestion='".$res['gest_id']."'),
 								(SELECT count(gestxu_id) FROM gestiones_usuarios WHERE gestxu_gestion='".$res['gest_id']."')
-								",$conexion));
+								"));
 								
 								$color1='#FFF';
 								if($numeros[0]==0){$color1='#FFF090';}

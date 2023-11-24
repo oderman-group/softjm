@@ -5,10 +5,7 @@ $paginaActual['pag_nombre'] = "Notificaciones";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
+
 <!-- styles -->
 
 
@@ -170,23 +167,23 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 									case 3: $estadoNot = 'AND (not_estado=1 OR not_estado=2)'; break;
 								}
 							}
-							mysql_query("UPDATE notificaciones SET not_visto=1 WHERE not_usuario='".$_SESSION["id"]."' AND not_varios IS NULL",$conexion);
+							mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_usuario='".$_SESSION["id"]."' AND not_varios IS NULL");
 								
 							if(is_numeric($_GET["idNot"])){
-								mysql_query("UPDATE notificaciones SET not_visto=1 WHERE not_id='".$_GET["idNot"]."'",$conexion);
-								if(mysql_errno()!=0){echo mysql_error(); exit();}
-								mysql_query("DELETE FROM notificaciones WHERE not_seguimiento='".$_GET["idSeg"]."' AND not_id!='".$_GET["idNot"]."'",$conexion);
-								if(mysql_errno()!=0){echo mysql_error(); exit();}
-								mysql_query("UPDATE cliente_seguimiento SET cseg_usuario_encargado='".$_SESSION["id"]."' WHERE cseg_id='".$_GET["idSeg"]."'",$conexion);
-								if(mysql_errno()!=0){echo mysql_error(); exit();}
+								mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_id='".$_GET["idNot"]."'");
+								if(mysqli_errno()!=0){echo mysqli_error(); exit();}
+								mysqli_query($conexionBdPrincipal,"DELETE FROM notificaciones WHERE not_seguimiento='".$_GET["idSeg"]."' AND not_id!='".$_GET["idNot"]."'");
+								if(mysql_errno()!=0){echo mysqli_error(); exit();}
+								mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_usuario_encargado='".$_SESSION["id"]."' WHERE cseg_id='".$_GET["idSeg"]."'");
+								if(mysqli_errno()!=0){echo mysqli_error(); exit();}
 							}	
 								
-							$consulta = mysql_query("SELECT * FROM notificaciones 
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM notificaciones 
 							INNER JOIN clientes ON cli_id=not_cliente 
 							WHERE not_usuario='".$_SESSION["id"]."' $estadoNot
-							ORDER BY not_id DESC",$conexion);
+							ORDER BY not_id DESC");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta)){
 								switch($res['not_estado']){
 									case 1: $estado = 'Pendiente'; $etiquetaE='important'; break;
 									case 2: $estado = 'Completado'; $etiquetaE='success'; break;
