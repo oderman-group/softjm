@@ -1,8 +1,6 @@
 <?php 
 include("sesion.php");
 
-$tituloPagina = "Agegar contactos";
-
 include("head.php");
 ?>
 <link href="css/chosen.css" rel="stylesheet">
@@ -141,13 +139,13 @@ include("head.php");
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
                         
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
                         <li><a href="contactos.php">Mis Contactos</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -155,10 +153,10 @@ include("head.php");
 				<div class="span12">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> <?=$tituloPagina;?></h3>
+							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="contactos-guardar.php">
                             <input type="hidden" name="idSql" value="5">
 								
                                <div class="control-group">

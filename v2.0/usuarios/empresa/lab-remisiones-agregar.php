@@ -2,7 +2,7 @@
 include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 242;
-$tituloPagina = "Agregar remisión";
+
 include("verificar-paginas.php");
 ?>
     <!-- Custom CSS -->
@@ -50,7 +50,7 @@ include("verificar-paginas.php");
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-5 align-self-center">
-                        <h4 class="page-title"><?=$tituloPagina;?></h4>
+                        <h4 class="page-title"><?=$paginaActual['pag_nombre'];?></h4>
                     </div>
                     <div class="col-7 align-self-center">
                         <div class="d-flex align-items-center justify-content-end">
@@ -59,7 +59,7 @@ include("verificar-paginas.php");
                                     <li class="breadcrumb-item">
                                         <a href="lab-remisiones.php">Remisiones</a>
                                     </li>
-                                    <li class="breadcrumb-item active" aria-current="page"><?=$tituloPagina;?></li>
+                                    <li class="breadcrumb-item active" aria-current="page"><?=$paginaActual['pag_nombre'];?></li>
                                 </ol>
                             </nav>
                         </div>
@@ -80,7 +80,7 @@ include("verificar-paginas.php");
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
+                            <form class="form-horizontal" method="post" action="lab-remisiones-guardar.php" enctype="multipart/form-data">
 								<input type="hidden" name="idSql" value="47">
 								
                                 <div class="card-body">

@@ -118,6 +118,13 @@ include("includes/js-formularios.php");
 														<label class="control-label">Documento</label>
 														<div class="controls">
 															<input type="text" class="span4" name="usuarioCliente" value="<?=$resultadoD['cli_usuario'];?>" autocomplete="off" placeholder="Documento" title="Documento">
+														</div>
+													</div>
+
+													<div class="control-group">
+														<label class="control-label">Usuario de acceso</label>
+														<div class="controls">
+															<input type="text" class="span4" value="<?=$resultadoD['cli_usuario_acceso'];?>"  readonly name="usuarioAcceso" autocomplete="off">
 															Contraseña
 															<input type="<?php echo $campoC;?>" class="span4" name="claveCliente" value="<?=$resultadoD['cli_clave'];?>" autocomplete="off" placeholder="Contraseña" title="Contraseña">
 														</div>

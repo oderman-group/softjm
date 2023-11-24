@@ -186,7 +186,7 @@ include("includes/head.php");
                                 <th>Nombre</th>
 								<!--<th>Grupo</th>-->
 								<th>#Productos</th>
-								<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
+								<!-- Check_id 7 y 15 -->
 								<th>Actualización</th>
 								<th>Utilidad Min (%)</th>
 								<th>Utilidad Lista (%)</th>
@@ -194,7 +194,7 @@ include("includes/head.php");
 								<th title="Sobre el precio de lista.">Utilidad Dealer. (%)</th>
 								<th title="Sobre el precio de lista.">Utilidad Web. (%)</th>
 								<th>Comisión (%)</th>
-								<?php }?>
+								<!-- endif-check_id -->
                                 <th></th>
 							</tr>
 							</thead>
@@ -221,7 +221,7 @@ include("includes/head.php");
 								<td style="text-align: center;">
 									<a href="productos.php?grupo1=<?=$res2[0];?>" data-toggle="tooltip" title="Productos"><?=$numProductos2;?></a>
 								</td>
-								<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
+								<!-- Check_id 7 y 15 -->
 								<td>
 										<span style="font-size: 9px;"><?=strtoupper($usuario2['usr_nombre']);?></span>
 										<br><span style="font-size: 9px;"><?=$res2['catp_fecha'];?></span>
@@ -252,7 +252,7 @@ include("includes/head.php");
 								<td>
 										<input type="text" title="prod_comision" alt="catp_comision" name="<?=$res2[0];?>" style="width: 40px; text-align: center" onChange="grupoUno(this)" value="<?=$res2['catp_comision'];?>">
 								</td>
-								<?php }?>
+								<!-- endif-check_id -->
                                 <td><h4>
                                     <a href="categoriasp-editar.php?id=<?=$res2[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
                                     <a href="bd_delete/categoriasp-eliminar.php?id=<?=$res2[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
@@ -290,7 +290,7 @@ include("includes/head.php");
                                 <th>Nombre</th>
 								<!--<th>Grupo</th>-->
 								<th>#Productos</th>
-								<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
+								<!-- Check_id 7 y 15 -->
 								<th>Actualización</th>
 								<th>Utilidad Min (%)</th>
 								<th>Utilidad Lista (%)</th>
@@ -298,7 +298,7 @@ include("includes/head.php");
 								<th title="Sobre el precio de lista.">Utilidad Dealer. (%)</th>
 								<th title="Sobre el precio de lista.">Utilidad Web. (%)</th>
 								<th>Comisión (%)</th>
-								<?php }?>
+								<!-- endif-check_id -->
                                 <th></th>
 							</tr>
 							</thead>
@@ -325,7 +325,7 @@ include("includes/head.php");
 								<td style="text-align: center;">
 									<a href="productos.php?grupo2=<?=$res[0];?>" data-toggle="tooltip" title="Productos"><?=$numProductos;?></a>
 								</td>
-								<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
+								<!-- Check_id 7 y 15 -->
 								<td>
 										<span style="font-size: 9px;"><?php if(isset($usuario['usr_nombre'])){strtoupper($usuario['usr_nombre']);}?></span>
 										<br><span style="font-size: 9px;"><?=$res['catp_fecha'];?></span>
@@ -355,7 +355,7 @@ include("includes/head.php");
 								<td>
 										<input type="text" title="prod_comision" alt="catp_comision" name="<?=$res[0];?>" style="width: 40px; text-align: center" onChange="grupoUno(this)" value="<?=$res['catp_comision'];?>">
 								</td>
-								<?php }?>
+								<!-- endif-check_id -->
                                 <td><h4>
                                     <a href="categoriasp-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
                                     <a href="bd_delete/categoriasp-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
@@ -393,7 +393,7 @@ include("includes/head.php");
                                 <th>Nombre</th>
 								<!--<th>Grupo</th>-->
 								<th>#Productos</th>
-								<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
+								<!-- Check_id 7 y 15 -->
 								<th>Actualización</th>
 								<th>Utilidad Min (%)</th>
 								<th>Utilidad Lista (%)</th>
@@ -401,7 +401,7 @@ include("includes/head.php");
 								<th title="Sobre el precio de lista.">Utilidad Dealer. (%)</th>
 								<th title="Sobre el precio de lista.">Utilidad Web. (%)</th>
 								<th>Comisión (%)</th>
-								<?php }?>
+								<!-- endif-check_id -->
                                 <th></th>
 							</tr>
 							</thead>
@@ -428,7 +428,7 @@ include("includes/head.php");
 								<td style="text-align: center;">
 									<a href="productos.php?marca=<?=$res3[0];?>" data-toggle="tooltip" title="Productos"><?=$numProductos3;?></a>
 								</td>
-								<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
+								<!-- Check_id 7 y 15 -->
 								<td>
 										<span style="font-size: 9px;"><!--<?=strtoupper($usuario3['usr_nombre']);?>--></span>
 										<br><span style="font-size: 9px;"><!--<?=$res3['catp_fecha'];?>--></span>
@@ -459,7 +459,7 @@ include("includes/head.php");
 								<td>
 										<input type="text" title="prod_comision" alt="catp_comision" name="<?=$res3[0];?>" style="width: 40px; text-align: center" onChange="grupoTres(this)" value="<?=$res3['catp_comision'];?>">
 								</td>
-								<?php }?>
+								<!-- endif-check_id -->
                                 <td>
 									<!--
 									<h4>

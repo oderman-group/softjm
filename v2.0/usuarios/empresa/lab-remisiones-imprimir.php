@@ -2,7 +2,7 @@
 include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 248;
-$tituloPagina = "Cotización";
+
 //include("verificar-paginas.php");
 
 $consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
@@ -31,7 +31,7 @@ switch($_GET['estado']){
 		
 		$mensaje1 = "TIEMPO DE ENTREGA: <strong>".$remision['rem_dias_entrega']."</strong>";
 		
-		$mensaje2 = "El cliente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>JMENDOZA EQUIPOS</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
+		$mensaje2 = "El cliente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>{$_SESSION["dataAdicional"]['nombre_empresa']}</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
 		
 		$fecha = $remision['rem_fecha_registro'];
 	break;
@@ -45,7 +45,7 @@ switch($_GET['estado']){
 		
 		$mensaje1 = "A partir de la fecha el cliente cuenta con un plazo de <strong>".$remision['rem_dias_reclamar']." días</strong> para presentar cualquier inconformidad con respecto al ajuste del equipo, si pasado este tiempo no se recibe ningún reporte se asumirá que trabaja en óptimas condiciones.";
 		
-		$mensaje2 = "El ciente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>JMENDOZA EQUIPOS</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
+		$mensaje2 = "El ciente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>{$_SESSION["dataAdicional"]['nombre_empresa']}</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
 		
 		$fecha = $remision['rem_fecha_salida'];
 	break;	
@@ -207,7 +207,7 @@ switch($_GET['estado']){
 		<tr>
 			<td>
 				<!--<img src="../../assets/images/firmaAlex2.png">--><br>
-				JMENDOZA EQUIPOS S.A.S<br>
+				<?=$_SESSION["dataAdicional"]['nombre_empresa'];?><br>
 				NIT: 900.374.255-1
 			</td>
 			<td><div style="border: thin; border-top-style: solid; width: 250px;"></div></td>
@@ -229,7 +229,7 @@ switch($_GET['estado']){
 				
 			<td>
 				<!--<img src="../../assets/images/firmaAlex2.png">--><br>
-				JMENDOZA EQUIPOS S.A.S<br>
+				<?=$_SESSION["dataAdicional"]['nombre_empresa'];?><br>
 				NIT: 900.374.255-1
 			</td>	
 			

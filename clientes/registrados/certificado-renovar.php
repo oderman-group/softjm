@@ -2,7 +2,6 @@
 include("sesion.php");
 
 $idPagina = 254;
-$tituloPagina = "Renovar certificado";
 
 include("verificar-paginas.php");
 include("head.php");
@@ -148,12 +147,12 @@ AND rem_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
                         
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -162,10 +161,10 @@ AND rem_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
 				<div class="span12">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> <?=$tituloPagina;?></h3>
+							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" target="_blank">
+							<form class="form-horizontal" method="post" action="renovar-certificado.php" target="_blank">
                             <input type="hidden" name="idSql" value="3">
                             <input type="hidden" name="idCertificado" value="<?=$_GET['id'];?>">
                             	

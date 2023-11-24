@@ -2,7 +2,7 @@
 include("sesion.php"); //exit();
 include("../compartido/head.php");
 $idPagina = 244;
-$tituloPagina = "Cotización";
+
 include("verificar-paginas.php");
 ?>
     <!-- This page plugin CSS -->
@@ -51,7 +51,7 @@ include("verificar-paginas.php");
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-5 align-self-center">
-                        <h4 class="page-title"><?=$tituloPagina;?></h4>
+                        <h4 class="page-title"><?=$paginaActual['pag_nombre'];?></h4>
                     </div>
                 </div>
             </div>

@@ -1,8 +1,6 @@
 <?php 
 include("sesion.php");
 
-$tituloPagina = "Mis Cupones";
-
 include("head.php");
 ?>
 <link href="css/styles.css" rel="stylesheet">
@@ -71,7 +69,7 @@ include("head.php");
 				<div class="span12">
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -80,7 +78,7 @@ include("head.php");
 				<div class="span12">
 					<div class="content-widgets light-gray">
 						<div class="widget-head green">
-							<h3><?=$tituloPagina;?></h3>
+							<h3><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
 							<p>

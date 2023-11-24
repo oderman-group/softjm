@@ -2,7 +2,7 @@
 include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 245;
-$tituloPagina = "Editar remisión";
+
 include("verificar-paginas.php");
 
 $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
@@ -70,7 +70,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-5 align-self-center">
-                        <h4 class="page-title"><?=$tituloPagina;?></h4>
+                        <h4 class="page-title"><?=$paginaActual['pag_nombre'];?></h4>
                     </div>
                     <div class="col-7 align-self-center">
                         <div class="d-flex align-items-center justify-content-end">
@@ -79,7 +79,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
                                     <li class="breadcrumb-item">
                                         <a href="lab-remisiones.php">Remisiones</a>
                                     </li>
-                                    <li class="breadcrumb-item active" aria-current="page"><?=$tituloPagina;?></li>
+                                    <li class="breadcrumb-item active" aria-current="page"><?=$paginaActual['pag_nombre'];?></li>
                                 </ol>
                             </nav>
                         </div>
@@ -100,7 +100,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
+                            <form class="form-horizontal" method="post" action="lab-remisiones-actualizar.php" enctype="multipart/form-data">
 								<input type="hidden" name="idSql" value="48">
 								<input type="hidden" name="id" value="<?=$_GET["id"];?>">
 								
@@ -122,13 +122,13 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 											}
 											if($resultadoD['rem_generar_certificado']==1 and $resultadoD['rem_estado']==1){
 										?>
-										<a href="sql.php?get=30&id=<?=$resultadoD['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Remisión salida</a>
+										<a href="salida-remision-actualizar.php?get=30&id=<?=$resultadoD['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Remisión salida</a>
 										<?php 
 											}
 											$disabled="";
 											if($resultadoD['rem_generar_certificado']!=1){
 										?>
-										<a href="sql.php?get=31&id=<?=$resultadoD['rem_id'];?>&cte=<?=$resultadoD['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Generar Certificado</a>
+										<a href="generar-certificado.php?get=31&id=<?=$resultadoD['rem_id'];?>&cte=<?=$resultadoD['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Generar Certificado</a>
 										<?php 
 											}else{
 												$disabled="disabled";
@@ -148,7 +148,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 								
                                 <div class="card-body">
 									
-									<?php if($resultadoD['rem_archivo']!=""){echo '<p><a href="sql.php?get=33&id='.$resultadoD["rem_id"].'" title="Eliminar">X</a> <img src="../../../usuarios/files/adjuntos/'.$resultadoD["rem_archivo"].'" width="50"></p>';}?>
+									<?php if($resultadoD['rem_archivo']!=""){ echo '<p><a href="quitar-imagen-remision.php?get=33&id='.$resultadoD["rem_id"].'" title="Eliminar">X</a> <img src="../../../usuarios/files/adjuntos/'.$resultadoD["rem_archivo"].'" width="50"></p>';}?>
 									
 										<h4 class="card-title">Datos básicos</h4>
 									
