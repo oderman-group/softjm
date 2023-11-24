@@ -1,6 +1,12 @@
 <?php
 include("sesion.php");
 
+require '../librerias/phpmailer/Exception.php';
+require '../librerias/phpmailer/PHPMailer.php';
+require '../librerias/phpmailer/SMTP.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 $idPagina = 317;
 
 include("includes/verificar-paginas.php");
