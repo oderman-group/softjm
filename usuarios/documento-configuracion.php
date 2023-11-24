@@ -7,8 +7,15 @@ include("includes/head.php");
 
 $consulta = $conexionBdAdmin->query("SELECT * FROM documentos_configuracion WHERE  dconf_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' AND dconf_id_documento='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
-
-
+$googleFonts = [
+    "Roboto","Open Sans","Lato", "Arial",
+    "Montserrat","Roboto Condensed",
+    "Ubuntu", "Source Sans Pro",
+    "PT Sans", "Oswald", "Raleway",
+    "Nunito", "Merriweather", "Roboto Slab",
+    "Playfair Display", "Pacifico", "Comfortaa",
+    "Cabin", "Poppins","Karla","Crimson Text",
+];
 ?>
 <!-- styles -->
 
@@ -73,20 +80,9 @@ include("includes/js-formularios.php");
                                         <?php }else{ ?>
                                         <option value="">Seleccione un estilo de letra</option>
                                         <?php } ?>
-                                        <option value="Arial">Arial</option>
-                                        <option value="Bahnschrift">Bahnschrift</option>
-                                        <option value="Calibri">Calibri</option>
-                                        <option value="Cambria">Cambria</option>
-                                        <option value="Comic">Comic Sans MS</option>
-                                        <option value="Courier_New">Courier New</option>
-                                        <option value="Daytona">Daytona</option>
-                                        <option value="Euphemia">Euphemia</option>
-                                        <option value="Georgia">Georgia</option>
-                                        <option value="Grandview">Grandview</option>
-                                        <option value="Kalinga">Kalinga</option>
-                                        <option value="Mangal">Mangal</option>
-                                        <option value="Wingdings">Wingdings</option>
-                                        <option value="Vrinda">Vrinda</option>
+                                        <?php foreach ($googleFonts as $font) : ?>
+                                            <option value="<?= $font; ?>"><?= $font; ?></option>
+                                        <?php endforeach; ?>
                                         </select> 
                                            
                                         </div>
