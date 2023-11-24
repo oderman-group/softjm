@@ -3,6 +3,12 @@ include("../sesion.php");
 
 $idPagina = 50;
 require_once("logica-cotizacion.php");
+
+$consulta=$conexionBdAdmin->query("SELECT * FROM documentos_configuracion 
+																		WHERE dconf_id_empresa= '".$idEmpresa."' 
+																		AND dconf_id_documento='".$idDocumentoCotizacion."';");
+$configuracionDoc = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+$fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', $configuracionDoc["dconf_estilo_letra"]) . "&display=swap";
 ?>
 
 <!DOCTYPE HTML>
@@ -13,6 +19,7 @@ require_once("logica-cotizacion.php");
 	<title>Cotización <?= $resultado['cotiz_id']; ?> (<?= $resultado['cotiz_fecha_propuesta']; ?>) - <?= $resultado['cli_nombre']; ?></title>
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="<?php echo $fontLink;?>">
 
 	<style type="text/css">
 		#contenedor {
@@ -26,7 +33,7 @@ require_once("logica-cotizacion.php");
 	</style>
 </head>
 
-<body style="font-family:Verdana, sans-serif; font-size:11px;">
+<body style="font-family:<?php echo $configuracionDoc['dconf_estilo_letra'] ?? 'Verdana, sans-serif'; ?>; font-size:<?php echo $configuracionDoc['dconf_tamano_letra'] ?? '11'; ?>px;">
 
 	<div class="container">
 
@@ -100,7 +107,7 @@ require_once("logica-cotizacion.php");
 
 				<table width="100%" border="0" rules="groups">
 					<thead>
-						<tr style="background-color: #0033a0; height: 50px; color: white;">
+						<tr style="background-color: <?php echo $configuracionDoc['dconf_estilo'] ?? '#0033a0'; ?>; height: 50px; color: white;">
 							<th>No</th>
 							<th>&nbsp;</th>
 							<th>Producto/Servicio</th>
@@ -289,8 +296,8 @@ require_once("logica-cotizacion.php");
 			<td align="right" colspan="2"><?php if(isset($resultado)) echo number_format(floatval($resultado['cotiz_envio']), 0, ",", "."); ?></td>
 		</tr>
 		<tr style="font-weight: bold; font-size: 13px; height: 20px;">
-			<td style="text-align: right; background-color: #0033a0; color:white;" colspan="3">TOTAL NETO <?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?></td>
-			<td align="right" style="background-color: #0033a0; color:white;" colspan="2"><?= number_format($total, 0, ",", "."); ?></td>
+			<td style="text-align: right; background-color: <?php echo $configuracionDoc['dconf_estilo'] ?? '#0033a0'; ?>; color:white;" colspan="3">TOTAL NETO <?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?></td>
+			<td align="right" style="background-color:  <?php echo $configuracionDoc['dconf_estilo'] ?? '#0033a0'; ?>; color:white;" colspan="2"><?= number_format($total, 0, ",", "."); ?></td>
 		</tr>
 	</tfoot>
 
