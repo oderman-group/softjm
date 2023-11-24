@@ -1,17 +1,13 @@
-<?php include("sesion.php");?>
 <?php
+include("sesion.php");
+
 $idPagina = 119;
-$paginaActual['pag_nombre'] = "Avances";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$proyecto = mysql_fetch_array(mysql_query("SELECT * FROM proyectos 
-WHERE proy_id='".$_GET["proy"]."'",$conexion));
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consultaProyecto = mysqli_query($conexionBdPrincipal, "SELECT * FROM proyectos 
+WHERE proy_id='".$_GET["proy"]."'");
+$proyecto = mysqli_fetch_array($consultaProyecto, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
@@ -217,20 +213,20 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
 							<tbody>
                             <?php
 							
-								$consulta = mysql_query("SELECT * FROM proyectos_tareas
+								$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM proyectos_tareas
 								INNER JOIN usuarios ON usr_id=ptar_responsable
 								WHERE ptar_id_proyecto='".$_GET["proy"]."'
 								LIMIT $inicio, $limite
-								",$conexion);
+								");
 							
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
 								
-								$numeros = mysql_fetch_array(mysql_query("
+								$numeros = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "
 								SELECT
 								(SELECT count(ptar_id) FROM proyectos_tareas WHERE ptar_id_proyecto='".$res['proy_id']."')
-								",$conexion));
+								"), MYSQLI_BOTH);
 								
 								$color1='#FFF';
 								if($numeros[0]==0){$color1='#FFF090';}
