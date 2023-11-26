@@ -235,8 +235,8 @@ $paginaActual['pag_nombre'] = "Gestiones";
                                         <?php if($res['gest_responsable']==$_SESSION["id"]){?>
 										
 										<a href="proyectos-editar.php?id=<?=$res['proy_id'];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
-										
-                                        <a href="bd_delete/proyecto-tareas-eliminar.php?get=35&id=<?=$res['proy_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+										<!-- se le puso el # porque en el archivo eliminar va a otra tabla -->
+                                        <a href="#bd_delete/proyecto-tareas-eliminar.php?get=35&id=<?=$res['proy_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 										
 										<?php }?>
 										
