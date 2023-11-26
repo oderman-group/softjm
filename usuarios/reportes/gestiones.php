@@ -60,12 +60,12 @@
                             <?php
 							$em = array("","NC","NE","EP","IN","AC","PR");
 								
-							$consulta = mysql_query("SELECT * FROM gestiones_clientes
+							$consulta = mysqli_query(conexionBdPrincipal,"SELECT * FROM gestiones_clientes
 							INNER JOIN clientes ON cli_id=gestxc_cliente
 							INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
 							INNER JOIN localidad_departamentos ON dep_id=ciu_departamento 
 							WHERE gestxc_gestion='".$_GET["gestion"]."'
-							",$conexion);
+							");
 							$no = 1;
 							while($res = mysql_fetch_array($consulta)){
 								
