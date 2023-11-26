@@ -171,11 +171,11 @@ $paginaActual['pag_nombre'] = "Notificaciones";
 								
 							if(is_numeric($_GET["idNot"])){
 								mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_id='".$_GET["idNot"]."'");
-								if(mysqli_errno()!=0){echo mysqli_error(); exit();}
+								
 								mysqli_query($conexionBdPrincipal,"DELETE FROM notificaciones WHERE not_seguimiento='".$_GET["idSeg"]."' AND not_id!='".$_GET["idNot"]."'");
-								if(mysql_errno()!=0){echo mysqli_error(); exit();}
+								
 								mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_usuario_encargado='".$_SESSION["id"]."' WHERE cseg_id='".$_GET["idSeg"]."'");
-								if(mysqli_errno()!=0){echo mysqli_error(); exit();}
+								
 							}	
 								
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM notificaciones 
@@ -183,7 +183,7 @@ $paginaActual['pag_nombre'] = "Notificaciones";
 							WHERE not_usuario='".$_SESSION["id"]."' $estadoNot
 							ORDER BY not_id DESC");
 							$no = 1;
-							while($res = mysqli_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								switch($res['not_estado']){
 									case 1: $estado = 'Pendiente'; $etiquetaE='important'; break;
 									case 2: $estado = 'Completado'; $etiquetaE='success'; break;

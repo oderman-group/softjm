@@ -6,16 +6,13 @@ $paginaActual['pag_nombre'] = "Abonos a Facturas";
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
 <?php
-/*
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-$factura = mysql_fetch_array(mysql_query("SELECT * FROM facturacion WHERE fact_id='".$_GET["fact"]."'",$conexion));
+
+$factura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM facturacion WHERE fact_id='".$_GET["fact"]."'"), MYSQLI_BOTH);
 $impuestos = $factura['fact_valor'] * $factura['fact_impuestos']/100;
 $retencion = $factura['fact_valor'] * $factura['fact_retencion']/100;
 $descuento = $factura['fact_valor'] * $factura['fact_descuento']/100;
 								
 $valorReal = ($factura['fact_valor'] + $impuestos) - ($retencion + $descuento);
-*/
 ?>
 <!-- styles -->
 
