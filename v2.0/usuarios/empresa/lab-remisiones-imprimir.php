@@ -2,7 +2,7 @@
 include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 248;
-$tituloPagina = "Cotización";
+
 //include("verificar-paginas.php");
 
 $consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
@@ -10,7 +10,7 @@ INNER JOIN clientes ON cli_id=rem_cliente
 INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_GET["id"]."'");
+WHERE rem_id='".$_GET["id"]."' AND rem_id_empresa='".$idEmpresa."'");
 $remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 
 $consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$remision['rem_contacto']."'");
@@ -26,7 +26,7 @@ switch($_GET['estado']){
 		
 		$mensaje1 = "TIEMPO DE ENTREGA: <strong>".$remision['rem_dias_entrega']."</strong>";
 		
-		$mensaje2 = "El cliente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>JMENDOZA EQUIPOS</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
+		$mensaje2 = "El cliente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>{$_SESSION["dataAdicional"]['nombre_empresa']}</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
 		
 		$fecha = $remision['rem_fecha_registro'];
 	break;
@@ -40,7 +40,7 @@ switch($_GET['estado']){
 		
 		$mensaje1 = "A partir de la fecha el cliente cuenta con un plazo de <strong>".$remision['rem_dias_reclamar']." días</strong> para presentar cualquier inconformidad con respecto al ajuste del equipo, si pasado este tiempo no se recibe ningún reporte se asumirá que trabaja en óptimas condiciones.";
 		
-		$mensaje2 = "El ciente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>JMENDOZA EQUIPOS</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
+		$mensaje2 = "El ciente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>{$_SESSION["dataAdicional"]['nombre_empresa']}</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
 		
 		$fecha = $remision['rem_fecha_salida'];
 	break;	
@@ -151,7 +151,7 @@ switch($_GET['estado']){
 			<td width="65%">
 				<div style="padding-bottom: 100px; padding-left:10px;  position: inherit;">
 					<?php
-					$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+					$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$idEmpresa."'");
 					while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 						
 						$consultaOpciones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios 
@@ -201,7 +201,7 @@ switch($_GET['estado']){
 		<tr>
 			<td>
 				<!--<img src="../../assets/images/firmaAlex2.png">--><br>
-				JMENDOZA EQUIPOS S.A.S<br>
+				<?=$_SESSION["dataAdicional"]['nombre_empresa'];?><br>
 				NIT: 900.374.255-1
 			</td>
 			<td><div style="border: thin; border-top-style: solid; width: 250px;"></div></td>
@@ -223,7 +223,7 @@ switch($_GET['estado']){
 				
 			<td>
 				<!--<img src="../../assets/images/firmaAlex2.png">--><br>
-				JMENDOZA EQUIPOS S.A.S<br>
+				<?=$_SESSION["dataAdicional"]['nombre_empresa'];?><br>
 				NIT: 900.374.255-1
 			</td>	
 			

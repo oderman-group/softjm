@@ -1,6 +1,12 @@
 <?php
 include("sesion.php");
 
+require '../librerias/phpmailer/Exception.php';
+require '../librerias/phpmailer/PHPMailer.php';
+require '../librerias/phpmailer/SMTP.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 $idPagina = 317;
 
 include("includes/verificar-paginas.php");
@@ -42,17 +48,17 @@ $resultado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM
 
 	try {
 		//Server settings
-		$mail->SMTPDebug = 2;                                       // Enable verbose debug output
-		$mail->isSMTP();                                            // Set mailer to use SMTP
-		$mail->Host       = 'mail.orioncrm.com.co';  // Specify main and backup SMTP servers
-		$mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-		$mail->Username   = $configuracion['conf_email'];                     // SMTP username
-		$mail->Password   = $configuracion['conf_clave_correo'];                              // SMTP password
-		$mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
-		$mail->Port       = 465;                                    // TCP port to connect to
+		$mail->SMTPDebug = 0;                                                           // Enable verbose debug output
+		$mail->isSMTP();                                                                // Set mailer to use SMTP
+		$mail->Host       = EMAIL_SERVER;                                               // Specify main and backup SMTP servers
+		$mail->SMTPAuth   = true;                                                       // Enable SMTP authentication
+		$mail->Username   = EMAIL_USER;                                                 // SMTP username
+		$mail->Password   = EMAIL_PASSWORD;                                             // SMTP password
+		$mail->SMTPSecure = 'ssl';                                                      // Enable TLS encryption, `ssl` also accepted
+		$mail->Port       = 465;                                                        // TCP port to connect to
 
 		//Recipients
-		$mail->setFrom($configuracion['conf_email'], '');
+		$mail->setFrom(EMAIL_SENDER, NAME_SENDER);
 		$mail->addAddress($resultado['cont_email'], $contacto['cont_nombre']);     // Add a recipient
 		$mail->addAddress($resultado['cli_email'], $contacto['cli_nombre']);     // Add a recipient
 		$mail->addAddress($resultado['usr_email'], $contacto['usr_nombre']);     // Add a recipient

@@ -2,7 +2,7 @@
 include("sesion.php");
 
 $idPagina = 274;
-$tituloPagina = "Filtro de cotizaciones con servicios";
+
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -57,7 +57,7 @@ include("includes/js-formularios.php");
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
                         <ul class="top-right-toolbar">
 							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
@@ -70,7 +70,7 @@ include("includes/js-formularios.php");
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
 						<li><a href="informes-todos.php">Informes</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -78,7 +78,7 @@ include("includes/js-formularios.php");
 				<div class="span12">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> <?=$tituloPagina;?></h3>
+							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="reportes/informe-cotizaciones-servicios.php" target="_blank">  

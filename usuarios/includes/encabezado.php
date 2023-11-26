@@ -48,9 +48,9 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 											<ul>
 												<li><a href="configuracion.php"><i class=" icon-file-alt"></i> Configuración</a></li>
 												<li><a href="configuracion-color-encabezado.php"><i class=" icon-file-alt"></i> Configuración Encabezado</a></li>
-												<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
+												<!-- Check_id 7 y 15 -->
 													<li><a href="metricas.php?id=1"><i class="icon-cogs"></i> Métricas </a></li>
-												<?php }?>
+												<!-- endif-check_id  -->
 												<li><a href="estructura-mensajes.php"><i class=" icon-file-alt"></i> Estructura de mensajes</a></li>
 											</ul>
 										</div>
@@ -58,6 +58,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 								<?php }?>
 									<li><a href="modulos.php"><i class=" icon-unlock"></i>Módulos</a></li>
 									<li><a href="paginas.php"><i class="icon-file"></i> Páginas</a></li>
+									<li><a href="documentos.php"><i class="icon-file-alt"></i> Documentos</a></li>
 									<li><a href="buzon.php"><i class="icon-envelope"></i> Buzón de salida </a></li>
 
 									<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Documentación</a>

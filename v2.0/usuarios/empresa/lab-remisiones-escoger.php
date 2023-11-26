@@ -2,7 +2,7 @@
 include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 246;
-$tituloPagina = "Imprimir remisiones";
+
 include("verificar-paginas.php");
 ?>
     <!-- Custom CSS -->
@@ -49,7 +49,7 @@ include("verificar-paginas.php");
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-5 align-self-center">
-                        <h4 class="page-title"><?=$tituloPagina;?></h4>
+                        <h4 class="page-title"><?=$paginaActual['pag_nombre'];?></h4>
                     </div>
                     <div class="col-7 align-self-center">
                         <div class="d-flex align-items-center justify-content-end">
@@ -58,7 +58,7 @@ include("verificar-paginas.php");
                                     <li class="breadcrumb-item">
                                         <a href="lab-remisiones.php">Remisiones</a>
                                     </li>
-                                    <li class="breadcrumb-item active" aria-current="page"><?=$tituloPagina;?></li>
+                                    <li class="breadcrumb-item active" aria-current="page"><?=$paginaActual['pag_nombre'];?></li>
                                 </ol>
                             </nav>
                         </div>
@@ -96,6 +96,7 @@ include("verificar-paginas.php");
 																	<?php
 																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
 																	INNER JOIN clientes ON cli_id=rem_cliente
+                                                                    WHERE rem_id_empresa='".$idEmpresa."'
 																	");
 																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																	?>

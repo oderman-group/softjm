@@ -157,7 +157,7 @@ include("includes/head.php");
 								while($m<=12){
 									$consultaRemisiones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 									INNER JOIN clientes ON cli_id=rem_cliente
-									WHERE rem_estado=1 AND MONTH(rem_fecha_registro)='".$m."'");
+									WHERE rem_estado=1 AND MONTH(rem_fecha_registro)='".$m."' AND rem_id_empresa='".$idEmpresa."'");
 									$numRem = mysqli_num_rows($consultaRemisiones);
 									if($m==$_GET["m"])
 										echo '<a style="font-weight:bold;">'.$meses[$m].'('.$numRem.')</a>&nbsp;&nbsp;&nbsp;';
@@ -237,7 +237,7 @@ include("includes/head.php");
 												LEFT JOIN clientes ON cli_id=rem_cliente
 												LEFT JOIN usuarios ON usr_id=rem_asesor
 												LEFT JOIN sucursales_propias ON sucp_id=usr_sucursal
-												WHERE rem_id=rem_id $filtro
+												WHERE rem_id=rem_id AND rem_id_empresa='".$idEmpresa."' $filtro
 												ORDER BY rem_id DESC
 												");
 												
@@ -247,7 +247,7 @@ include("includes/head.php");
 												LEFT JOIN clientes ON cli_id=rem_cliente
 												LEFT JOIN usuarios ON usr_id=rem_asesor
 												LEFT JOIN sucursales_propias ON sucp_id=usr_sucursal
-												WHERE rem_id=rem_id $filtro
+												WHERE rem_id=rem_id AND rem_id_empresa='".$idEmpresa."' $filtro
 												ORDER BY rem_id DESC
 												LIMIT 0, 100
 												");
@@ -264,7 +264,7 @@ include("includes/head.php");
 												}
 
 												$remisionesEnt = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT DATEDIFF(now(), rem_fecha_registro), rem_id FROM remisiones 
-												WHERE rem_id='".$resultado['rem_id']."'"), MYSQLI_BOTH);
+												WHERE rem_id='".$resultado['rem_id']."' AND rem_id_empresa='".$idEmpresa."'"), MYSQLI_BOTH);
 												
 												$remisionesSeg = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_seguimiento 
 												WHERE remseg_id_remisiones='".$resultado['rem_id']."'"));
@@ -295,7 +295,7 @@ include("includes/head.php");
 												DAY(rem_fecha), MONTH(rem_fecha), YEAR(rem_fecha),
 												DAY(DATE_ADD(rem_fecha, INTERVAL '".$resultado['rem_tiempo_certificado']."' MONTH)), MONTH(DATE_ADD(rem_fecha, INTERVAL '".$resultado['rem_tiempo_certificado']."' MONTH)), YEAR(DATE_ADD(rem_fecha, INTERVAL '".$resultado['rem_tiempo_certificado']."' MONTH))
 												FROM remisiones 
-												WHERE rem_id='".$resultado['rem_id']."'"), MYSQLI_BOTH);
+												WHERE rem_id='".$resultado['rem_id']."' AND rem_id_empresa='".$idEmpresa."'"), MYSQLI_BOTH);
 											?>
 							<tr>
 								<td><?=$conRegistros;?></td>

@@ -2,7 +2,7 @@
 include("sesion.php"); //exit();
 include("../compartido/head.php");
 $idPagina = 250;
-$tituloPagina = "Remisiones";
+
 include("verificar-paginas.php");
 
 if(is_numeric($_GET["idRem"])){
@@ -57,7 +57,7 @@ if(is_numeric($_GET["idRem"])){
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-5 align-self-center">
-                        <h4 class="page-title"><?=$tituloPagina;?></h4>
+                        <h4 class="page-title"><?=$paginaActual['pag_nombre'];?></h4>
                     </div>
                 </div>
             </div>
@@ -125,7 +125,7 @@ if(is_numeric($_GET["idRem"])){
 								while($m<=12){
 									$consultaRemisiones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 									INNER JOIN clientes ON cli_id=rem_cliente
-									WHERE rem_estado=1 AND MONTH(rem_fecha_registro)='".$m."'");
+									WHERE rem_estado=1 AND MONTH(rem_fecha_registro)='".$m."' AND rem_id_empresa='".$idEmpresa."'");
 									$numRem = mysqli_num_rows($consultaRemisiones);
 									if($m==$_GET["m"])
 										echo '<a style="font-weight:bold;">'.$meses[$m].'('.$numRem.')</a>&nbsp;&nbsp;&nbsp;';
@@ -188,7 +188,7 @@ if(is_numeric($_GET["idRem"])){
 												LEFT JOIN clientes ON cli_id=rem_cliente
 												LEFT JOIN usuarios ON usr_id=rem_asesor
 												LEFT JOIN sucursales_propias ON sucp_id=usr_sucursal
-												WHERE rem_id=rem_id $filtro
+												WHERE rem_id=rem_id AND rem_id_empresa='".$idEmpresa."' $filtro
 												ORDER BY rem_id DESC
 												");
 												
@@ -198,7 +198,7 @@ if(is_numeric($_GET["idRem"])){
 												LEFT JOIN clientes ON cli_id=rem_cliente
 												LEFT JOIN usuarios ON usr_id=rem_asesor
 												LEFT JOIN sucursales_propias ON sucp_id=usr_sucursal
-												WHERE rem_id=rem_id $filtro
+												WHERE rem_id=rem_id AND rem_id_empresa='".$idEmpresa."' $filtro
 												ORDER BY rem_id DESC
 												LIMIT 0, 100
 												");
@@ -216,7 +216,7 @@ if(is_numeric($_GET["idRem"])){
 												}
 												
 												$consultaRemisionesEnt=mysqli_query($conexionBdPrincipal,"SELECT DATEDIFF(now(), rem_fecha_registro), rem_id FROM remisiones 
-												WHERE rem_id='".$resultado['rem_id']."'");
+												WHERE rem_id='".$resultado['rem_id']."' AND rem_id_empresa='".$idEmpresa."'");
 												$remisionesEnt = mysqli_fetch_array($consultaRemisionesEnt, MYSQLI_BOTH);
 												
 												$consultaRemisioneSeg=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_seguimiento 
@@ -273,13 +273,13 @@ if(is_numeric($_GET["idRem"])){
 															<a class="dropdown-item" href="#" onClick="if(!confirm('Desea eliminar este registro?')){return false;}">Eliminar</a>
 															
 															<div class="dropdown-divider"></div>
-															<a class="dropdown-item" href="sql.php?get=32&id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>&contacto=<?=$resultado['rem_contacto'];?>">Enviar remisión actual</a>
+															<a class="dropdown-item" href="enviar-remision-actual-al-cliente.php?get=32&id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>&contacto=<?=$resultado['rem_contacto'];?>">Enviar remisión actual</a>
 															
 															<div class="dropdown-divider"></div>
 															<?php if($resultado['rem_generar_certificado']==1 and $resultado['rem_estado']==1){?>
-																<a class="dropdown-item" href="sql.php?get=30&id=<?=$resultado['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank">Generar salida</a>
+																<a class="dropdown-item" href="salida-remision-actualizar.php?get=30&id=<?=$resultado['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank">Generar salida</a>
 															<?php } if($resultado['rem_generar_certificado']!=1){?>
-																<a class="dropdown-item" href="sql.php?get=31&id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}">Generar certificado</a>
+																<a class="dropdown-item" href="generar-certificado.php?get=31&id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}">Generar certificado</a>
 															<?php }?>
 															
 															<div class="dropdown-divider"></div>

@@ -1,14 +1,13 @@
-<?php include("sesion.php");?>
 <?php
-$idPagina = 119;
-$paginaActual['pag_nombre'] = "Avances";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
+include("sesion.php");
 
-<?php
-$proyecto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM proyectos 
-WHERE proy_id='".$_GET["proy"]."'"));
+$idPagina = 119;
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consultaProyecto = mysqli_query($conexionBdPrincipal, "SELECT * FROM proyectos 
+WHERE proy_id='".$_GET["proy"]."'");
+$proyecto = mysqli_fetch_array($consultaProyecto, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
@@ -214,20 +213,20 @@ WHERE proy_id='".$_GET["proy"]."'"));
 							<tbody>
                             <?php
 							
-								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM proyectos_tareas
+								$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM proyectos_tareas
 								INNER JOIN usuarios ON usr_id=ptar_responsable
 								WHERE ptar_id_proyecto='".$_GET["proy"]."'
 								LIMIT $inicio, $limite
 								");
 							
 							$no = 1;
-							while($res = mysqli_fetch_array($consulta,MYSQLI_BOTH)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
 								
-								$numeros = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
+								$numeros = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "
 								SELECT
 								(SELECT count(ptar_id) FROM proyectos_tareas WHERE ptar_id_proyecto='".$res['proy_id']."')
-								"));
+								"), MYSQLI_BOTH);
 								
 								$color1='#FFF';
 								if($numeros[0]==0){$color1='#FFF090';}

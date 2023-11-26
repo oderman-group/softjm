@@ -2,7 +2,7 @@
 session_start();
 $_SESSION["bd"] = $_POST["bd"];
 include("../conexion.php");
-$rst_usr = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_usuario='".trim($_POST["Usuario"])."' AND cli_clave='".$_POST["Clave"]."' AND TRIM(cli_usuario)!='' AND cli_categoria!=1");
+$rst_usr = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_usuario_acceso='".trim($_POST["Usuario"])."' AND cli_clave='".$_POST["Clave"]."' AND TRIM(cli_usuario_acceso)!='' AND cli_categoria!=1");
 $num = mysqli_num_rows($rst_usr);
 $fila = mysqli_fetch_array($rst_usr, MYSQLI_BOTH);
 if($num>0)

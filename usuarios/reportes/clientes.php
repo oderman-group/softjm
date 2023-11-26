@@ -39,11 +39,11 @@
 							<p style="font-size: 11px;">
 								NC = No Contestó | NE = Número equivocado | EP = Enviar portafolio | IN = Incio negocio| AC = Actualizado | PR = Papelera reciclaje
 							</p>
-							<?php if($_SESSION["id"]==7 or $_SESSION["id"]==17){?>
+							<!-- Check_id 7 y 17 -->
 							<p>
 								<a href="clientes-imp.php?<?=$_SERVER['QUERY_STRING'];?>" target="_blank" style="text-decoration: underline; font-size: 18px;">IMPRIMIR INFORME</a>	
 							</p>
-							<?php }?>
+							<!-- endif-check_id  -->
 	
 							<span id="resp"></span>
 	

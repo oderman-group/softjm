@@ -5,6 +5,12 @@ $idPagina = 10;
 $paginaActual['pag_nombre'] = "Agegar clientes";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+
+if ( !empty($_SESSION["dataAdicional"]["dominio_empresa"]) ) {
+	$dominio = $_SESSION["dataAdicional"]["dominio_empresa"];
+} else {
+	$dominio = 'Dominio no encontrado';
+}
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <!--============ javascript ===========-->
@@ -36,7 +42,7 @@ include("includes/js-formularios.php");
 				"&opcion="+(opcion);
 			   $.ajax({
 				   type: "POST",
-				   url: "ajax-clientes-verificar.php",
+				   url: "ajax/ajax-clientes-verificar.php",
 				   data: datos,
 				   success: function(data){
 				   $('#resp').empty().hide().html(data).show(1);
@@ -116,6 +122,15 @@ include("includes/js-formularios.php");
                                         <span style="color:#F03;">Digite el Documento sin número de verificación.</span>
 									</div>
 									<span id="resp"></span>
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Usuario de acceso</label>
+									<div class="controls">
+										<input type="text" class="span2" name="usuarioAcceso" autocomplete="off">
+										<input type="text" class="span2 mr-0" value="<?= $dominio; ?>" readonly name="dominio">
+                                        <span style="color:#F03;">Este será el usuario con el que ingrese el cliente al sistema.</span>
+									</div>
 								</div>
 									
                                 <!--

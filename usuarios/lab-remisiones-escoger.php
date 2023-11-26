@@ -6,8 +6,8 @@ $paginaActual['pag_nombre'] = "Imprimir remisiones";
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
 <?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+mysqli_query($conexionBdAdmin,"INSERT INTO historial_acciones(hil_usuario, hil_url, hil_id_pagina, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')");
+if(mysqli_errno(conexionBdAdmin)!=0){echo mysqli_error(); exit();}
 ?>
 <!-- styles -->
 
@@ -95,10 +95,10 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="remisiones[]" multiple>
 											<option value=""></option>
                                             <?php
-                                                                    $consultaSelect = mysql_query("SELECT * FROM remisiones
-                                                                    INNER JOIN clientes ON cli_id=rem_cliente
-                                                                    ",$conexion);
-                                                                    while($datosSelect = mysql_fetch_array($consultaSelect)){
+																																		$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
+																																		INNER JOIN clientes ON cli_id=rem_cliente WHERE rem_id_empresa='".$idEmpresa."'
+																																		");
+                                                                    while($datosSelect = mysqli_fetch_array($consultaSelect)){
                                                                     ?>
                                                                     <option value="<?=$datosSelect[0];?>"><?=strtoupper($datosSelect['rem_id']." - ".$datosSelect['rem_equipo']." - ".$datosSelect['cli_nombre']);?></option>
                                                                     <?php }?>

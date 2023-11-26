@@ -2,8 +2,6 @@
 include("sesion.php");
 include("sesion-documentos.php");
 
-$tituloPagina = "Mis Documentos";
-
 include("head.php");
 ?>
 
@@ -73,13 +71,13 @@ include("head.php");
 				<div class="span12">
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
             <?php include("notificaciones.php");?>
 			
-			<p><a href="sql.php?get=1" class="btn btn-warning"> Salir de documentos</a></p>
+			<p><a href="documentos-salir.php?get=1" class="btn btn-warning"> Salir de documentos</a></p>
 			
 			
 			

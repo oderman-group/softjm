@@ -2,7 +2,7 @@
 include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 249;
-$tituloPagina = "Seguimiento a remisiones";
+
 include("verificar-paginas.php");
 
 $consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
@@ -10,7 +10,7 @@ INNER JOIN clientes ON cli_id=rem_cliente
 INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_GET["id"]."'");
+WHERE rem_id='".$_GET["id"]."' AND rem_id_empresa='".$idEmpresa."'");
 $remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 
 $consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$remision["rem_contacto"]."'");
@@ -105,7 +105,7 @@ $estadosRemision = array("","Entrada","Salida");
 									");
 									$conRegistros = 1;
 									while($resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-										$html = '<a href="sql.php?id='.$resultado['cseg_id'].'&get=28&idTK='.$_GET["idTK"].'" class="label label-warning">No notificado</a>';
+										$html = '<a href="cliente-seguimiento-actualizar.php?id='.$resultado['cseg_id'].'&get=28&idTK='.$_GET["idTK"].'" class="label label-warning">No notificado</a>';
 										if($resultado['remseg_notificar_cliente']==1){
 											$html = '<span class="label label-success">Notificado</span>';
 										}
@@ -145,7 +145,7 @@ $estadosRemision = array("","Entrada","Salida");
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="m-b-20">Seguimiento</h4>
-                                <form method="post" action="sql.php" enctype="multipart/form-data">
+                                <form method="post" action="seguimiento-equipo-agregar.php" enctype="multipart/form-data">
 									<input type="hidden" name="idSql" value="49">
 									<input type="hidden" name="id" value="<?=$_GET["id"];?>">
 									<input type="hidden" name="cliente" value="<?=$remision["rem_cliente"];?>">
@@ -250,7 +250,17 @@ $estadosRemision = array("","Entrada","Salida");
 									<?=$remision['cli_telefono'];?>
                                 </div>
 								<hr>
-								<h5><?=strtoupper($contacto['cont_nombre']);?></h5>
+								<h5><?php
+// Assuming $contacto is an array and you want to uppercase the 'cont_nombre' value
+if (isset($contacto['cont_nombre']) && $contacto['cont_nombre'] !== null) {
+    $uppercasedNombre = strtoupper($contacto['cont_nombre']);
+    echo '<h5>' . $uppercasedNombre . '</h5>';
+} else {
+    // Handle the case where $contacto['cont_nombre'] is not set or is null
+    // You might set a default value, display an error message, or take appropriate action
+}
+?>
+</h5>
 								<p>
 									<?=$contacto['cont_celular'];?><br>
 									<?=$contacto['cont_email'];?><br>

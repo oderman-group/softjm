@@ -2,7 +2,7 @@
 include("sesion.php"); //exit();
 include("../compartido/head.php");
 $idPagina = 243;
-$tituloPagina = "Cotización";
+
 include("verificar-paginas.php");
 
 $consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
@@ -10,7 +10,7 @@ INNER JOIN clientes ON cli_id=rem_cliente
 INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_GET["id"]."'");
+WHERE rem_id='".$_GET["id"]."' AND rem_id_empresa='".$idEmpresa."'");
 $remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 ?>
     <!-- This page plugin CSS -->
