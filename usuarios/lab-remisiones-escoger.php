@@ -7,7 +7,7 @@ $paginaActual['pag_nombre'] = "Imprimir remisiones";
 <?php include("includes/head.php");?>
 <?php
 mysqli_query($conexionBdAdmin,"INSERT INTO historial_acciones(hil_usuario, hil_url, hil_id_pagina, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')");
-if(mysqli_errno(conexionBdAdmin)!=0){echo mysqli_error(); exit();}
+if(mysqli_errno($conexionBdAdmin)!=0){echo mysqli_error(); exit();}
 ?>
 <!-- styles -->
 

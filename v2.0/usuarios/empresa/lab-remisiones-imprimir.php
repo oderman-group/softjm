@@ -16,6 +16,11 @@ $remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 $consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$remision['rem_contacto']."'");
 $contacto = mysqli_fetch_array($consultaContacto, MYSQLI_BOTH);
 
+$consulta=$conexionBdAdmin->query("SELECT * FROM documentos_configuracion 
+																		WHERE dconf_id_empresa= '".$idEmpresa."' 
+																		AND dconf_id_documento='".ID_DOC_REMISION."';");
+$configuracionDoc = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+$fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', $configuracionDoc["dconf_estilo_letra"]) . "&display=swap";
 switch($_GET['estado']){
 	case 1: 
 		$letra = "E";
@@ -51,6 +56,7 @@ switch($_GET['estado']){
 	<link rel="stylesheet" type="text/css" href="../../assets/libs/select2/dist/css/select2.min.css">
     <!-- Custom CSS -->
     <link href="../../dist/css/style.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="<?php echo $fontLink;?>">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -59,7 +65,7 @@ switch($_GET['estado']){
 <![endif]-->
 </head>
 
-<body style="color: black;">
+<body style="font-family:<?php echo $configuracionDoc['dconf_estilo_letra'] ?? 'Verdana, sans-serif'; ?>; font-size:<?php echo $configuracionDoc['dconf_tamano_letra'] ?? '11'; ?>px; color: black;">
 	
 	<table style="width:90%; height: 120px;" border="0" align="center">
 		<tr>
@@ -116,7 +122,7 @@ switch($_GET['estado']){
 				</table>	
 			</td>
 			
-			<td style="width: 30%; border-radius: 10px; background-color: lightgray;" align="center";>
+			<td style="width: 30%; border-radius: 10px; background-color:<?php echo $configuracionDoc['dconf_estilo'] ?? 'lightgray'; ?>;" align="center";>
 				<h3>REMISIÓN<br>
 				NO. <?=$letra."".$remision['rem_id'];?></h3></td>
 		</tr>
@@ -125,7 +131,7 @@ switch($_GET['estado']){
 	<p>&nbsp;</p>
 	
 	<table style="width:90%;" border="1" rules="all" align="center">
-		<tr style="background-color: lightgray">
+		<tr style="background-color: <?php echo $configuracionDoc['dconf_estilo'] ?? 'lightgray'; ?>;">
 			<td align="center"><strong>DETALLE</strong></td>
 		</tr> 
 		<tr style="height: 100%;">
@@ -142,7 +148,7 @@ switch($_GET['estado']){
 	
 	
 	<table style="width:90%" border="1" rules="all" align="center">
-		<tr style="background-color: lightgray">
+		<tr style="background-color: <?php echo $configuracionDoc['dconf_estilo'] ?? 'lightgray'; ?>;">
 			<td><strong>OBSERVACIONES:</strong></td>
 			<td><strong>DATOS DEL CONTACTO:</strong></td>
 		</tr>

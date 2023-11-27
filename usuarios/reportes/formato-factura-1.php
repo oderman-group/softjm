@@ -1,25 +1,32 @@
-<?php include("../../conexion.php");?>
+<?php include("../sesion.php");?>
 <?php
-$configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1",$conexion));
-$factura = mysql_fetch_array(mysql_query("SELECT * FROM facturacion
-						INNER JOIN clientes ON cli_id=fact_cliente
-						INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-						WHERE fact_id='".$_GET["id"]."'",$conexion));
+$configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"), MYSQLI_BOTH);
+
+$factura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM facturacion
+                        INNER JOIN clientes ON cli_id=fact_cliente
+                        INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+                        WHERE fact_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
 						switch($factura['fact_estado']){
 							case 1: $estadoF = 'Pagada'; break;
 							case 2: $estadoF = 'Por pagar'; break;
 							case 3: $estadoF = 'Anulada'; break;
 						}
+$consulta=$conexionBdAdmin->query("SELECT * FROM documentos_configuracion 
+                                    WHERE dconf_id_empresa= '".$idEmpresa."' 
+                                    AND dconf_id_documento= '".ID_DOC_FACTURA."';");
+$configuracionDoc = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+$fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', $configuracionDoc["dconf_estilo_letra"]) . "&display=swap";
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <title>Factura de venta <?=$factura['fact_id'];?> (<?=$factura['fact_fecha_real'];?>) - <?=$factura['cli_nombre'];?></title>
+<link rel="stylesheet" href="<?php echo $fontLink;?>">
 </head>
-<body style="font-family:Arial, Helvetica, sans-serif; font-size:12px;">
+<body style="font-family:<?php echo $configuracionDoc['dconf_estilo_letra'] ?? 'Verdana, sans-serif'; ?>; font-size:<?php echo $configuracionDoc['dconf_tamano_letra'] ?? '11'; ?>px;">
 <?php
-$colorFondo = '#ffca05';
+$colorFondo = $configuracionDoc['dconf_estilo'] ?? '#ffca05';
 $colorLetra = '#000';
 ?>
 
@@ -96,10 +103,10 @@ $colorLetra = '#000';
                                 </tr>
                                 <?php
 								$n=1;
-								$items = mysql_query("SELECT * FROM facturacion_productos
+								$items = mysqli_query($conexionBdPrincipal,"SELECT * FROM facturacion_productos
 								INNER JOIN productos ON prod_id=fpp_producto
-								WHERE fpp_factura='".$_GET["id"]."'",$conexion);
-								while($it = mysql_fetch_array($items)){
+								WHERE fpp_factura='".$_GET["id"]."'");
+								while($it = mysqli_fetch_array($items)){
 								?>
                                 <tr style="height:30px;">
                                 	<td><?=$n;?></td>
@@ -127,7 +134,7 @@ centrales de riesgo, se cobraran intereses por mora.
                             
                             <p>&nbsp;</p>
                             
-                            <div style="padding:10px; background:#ffca05; color:#030303; border:thin; border-style:double; border-radius:5px;">
+                            <div style="padding:10px; background:<?=$colorFondo;?>; color:#030303; border:thin; border-style:double; border-radius:5px;">
                             
                             <table width="100%" border="0" align="center">
 								<tr>
@@ -152,4 +159,7 @@ RECUERDE QUE EL NO PAGO A TIEMPO DE LAS FACTURAS PUEDE OCASIONAR SUSPENSIÓN EN 
                             <div style="margin-top:30px;" align="center">_____________________________________<br>ACEPTADA, FIRMA Y/O SELLO Y FECHA</div>
 
 </body>
+<script type="application/javascript">
+	print();
+</script>
 </html>
