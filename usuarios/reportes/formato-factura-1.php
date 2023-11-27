@@ -13,7 +13,7 @@ $factura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM 
 						}
 $consulta=$conexionBdAdmin->query("SELECT * FROM documentos_configuracion 
                                     WHERE dconf_id_empresa= '".$idEmpresa."' 
-                                    AND dconf_id_documento= '".$idDocumentoFactura."';");
+                                    AND dconf_id_documento= '".ID_DOC_FACTURA."';");
 $configuracionDoc = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 $fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', $configuracionDoc["dconf_estilo_letra"]) . "&display=swap";
 ?>

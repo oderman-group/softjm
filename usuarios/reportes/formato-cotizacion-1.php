@@ -6,7 +6,7 @@ require_once("logica-cotizacion.php");
 
 $consulta=$conexionBdAdmin->query("SELECT * FROM documentos_configuracion 
 																		WHERE dconf_id_empresa= '".$idEmpresa."' 
-																		AND dconf_id_documento='".$idDocumentoCotizacion."';");
+																		AND dconf_id_documento='".ID_DOC_COTIZACION."';");
 $configuracionDoc = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 $fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', $configuracionDoc["dconf_estilo_letra"]) . "&display=swap";
 ?>
