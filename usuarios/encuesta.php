@@ -75,7 +75,11 @@ $idPagina = 229;
 		<div class="container-fluid">
             <?php include("includes/notificaciones.php");?>
             <p>
-            	<a href="encuesta-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+						<?php
+							if (Modulos::validarRol([230], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+								echo '<a href="encuesta-agregar.php?cte='.$_GET["cte"].'" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>';
+							}
+						?>	   
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -135,10 +139,20 @@ $idPagina = 229;
                                 <td><?=$producto['prod_nombre'];?></td>
                                 <td><?=$promedio;?></td>
                                 <td><h4>
-                                    <a href="encuesta-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-                                    <a href="bd_delete/encuestas-eliminar.php?id=<?=$res[0];?>&get=15" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-                                    <a href="../formato-encuesta.php?id=<?=$res[0];?>" target="_blank" data-toggle="tooltip" title="Ver encuesta"><i class="icon-file"></i></a>
-                                    <a href="#" data-toggle="tooltip" title="Enviar encuesta" id="<?=$res[0];?>" name="<?=$res['encs_contacto'];?>" class="confirm" onClick="confirmar(this)"><i class="icon-envelope"></i></a>
+																<?php
+																	if (Modulos::validarRol([231], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																			echo '<a href="encuesta-editar.php?id=' . $res[0] . '" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>';
+																	}
+																	if (Modulos::validarRol([295], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																			echo ' <a href="bd_delete/encuestas-eliminar.php?id=' . $res[0] . '&get=15" onClick="return confirm(\'Desea eliminar el registro?\');" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>';
+																	}
+																	if (Modulos::validarRol([346], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																			echo ' <a href="../formato-encuesta.php?id=' . $res[0] . '" target="_blank" data-toggle="tooltip" title="Ver encuesta"><i class="icon-file"></i></a>';
+																	}
+																	if (Modulos::validarRol([298], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																			echo ' <a href="#" data-toggle="tooltip" title="Enviar encuesta" id="' . $res[0] . '" name="' . $res['encs_contacto'] . '" class="confirm" onClick="confirmar(this)"><i class="icon-envelope"></i></a>';
+																	}
+																	?>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>

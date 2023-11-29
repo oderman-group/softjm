@@ -91,8 +91,14 @@ include("includes/head.php");
 					<?php include("includes/notificaciones.php");?>
 					<span id="resp"></span>
 					<p>
-						<a href="usuarios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-						<a href="usuarios.php?bloq=1" class="btn btn-warning"><i class="icon-lock"></i> Usuarios bloqueados</a>
+						<?php
+							if (Modulos::validarRol([3], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+								echo '<a href="usuarios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a> ';
+							}
+							if (Modulos::validarRol([2], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+								echo '<a href="usuarios.php?bloq=1" class="btn btn-warning"><i class="icon-lock"></i> Usuarios bloqueados</a>';
+							}
+						?>	 					
 					</p>
 					<div class="row-fluid">
 						<div class="span12">
@@ -151,8 +157,11 @@ include("includes/head.php");
 																	$roles_id = explode(',', $res['roles_id']); 
 																	$roles_nombre = explode(',', $res['roles_nombre']);
 																	for ($i = 0; $i < count($roles_id); $i++) {
-										
-																		echo '<a href="roles-editar.php?id=' . $roles_id[$i] . '">' . $roles_nombre[$i] . '</a><br>';
+																		if (Modulos::validarRol([7], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																			echo '<a href="roles-editar.php?id=' . $roles_id[$i] . '">' . $roles_nombre[$i] . '</a><br>';
+																		}	else {
+																			echo '<span>'.$roles_nombre[$i].'</span><br>';
+																		}
 																}
 															} else {
 																	echo 'Sin roles asignados';
@@ -173,19 +182,26 @@ include("includes/head.php");
 
 												<td>
 													<h4>
-													<?php if(!isset($_SESSION['admin'])){?>
-														<a href="auto-login.php?user=<?=$res['usr_id'];?>" data-toggle="tooltip" title="Auto Login"><i class="icon-retweet"></i></a>
-													<?php }?>
-
-													<a href="usuarios-editar.php?id=<?=$res['usr_id'];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-														
-														<a href="bd_delete/usuarios-eliminar.php?id=<?=$res['usr_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-														
-														<a href="calendario.php?id=<?=$res['usr_id'];?>" data-toggle="tooltip" title="Calendario"><i class="icon-calendar"></i></a>
-														
-														<a href="graficos/4.php?usuario=<?=$res['usr_id'];?>" data-toggle="tooltip" title="Gestión comercial" target="_blank"><i class="icon-list"></i></a>
-
-														<a href="facturas.php?usuario=<?=$res['usr_id'];?>" data-toggle="tooltip" title="Facturación" target="_blank"><i class="icon-money"></i></a>
+														<?php
+														  if(!isset($_SESSION['admin']) && Modulos::validarRol([344], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+																echo '<a href="auto-login.php?user='.$res['usr_id'].'" data-toggle="tooltip" title="Auto Login"><i class="icon-retweet"></i></a> ';
+														  }
+															if (Modulos::validarRol([4], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																echo '<a href="usuarios-editar.php?id='.$res['usr_id'].'" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a> ';
+															}
+															if (Modulos::validarRol([53], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																echo '<a href="bd_delete/usuarios-eliminar.php?id='.$res['usr_id'].'" onClick="if(!confirm("Desea eliminar el registro?")){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a> ';
+															}
+															if (Modulos::validarRol([104], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																echo '<a href="calendario.php?id='.$res['usr_id'].'" data-toggle="tooltip" title="Calendario"><i class="icon-calendar"></i></a> ';
+															}
+															if (Modulos::validarRol([345], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																echo '<a href="graficos/4.php?usuario='.$res['usr_id'].'" data-toggle="tooltip" title="Gestión comercial" target="_blank"><i class="icon-list"></i></a> ';
+															}
+															if (Modulos::validarRol([126], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																echo '<a href="facturas.php?usuario='.$res['usr_id'].'" data-toggle="tooltip" title="Facturación" target="_blank"><i class="icon-money"></i></a> ';
+															}
+													?>		
 													</h4>
 												</td>
 											</tr>

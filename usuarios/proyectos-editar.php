@@ -61,7 +61,11 @@ include("includes/js-formularios.php");
 				</div>
 			</div>
             <p>
-				<a href="proyectos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+							<?php
+									if (Modulos::validarRol([109], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+										echo ' <a href="proyectos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>';
+									}
+							?> 
 				<a href="proyectos-tareas.php?proy=<?=$_GET["id"];?>" class="btn btn-info"><i class="icon-list"></i> Ver tareas</a>
 			</p>
             <?php include("includes/notificaciones.php");?>

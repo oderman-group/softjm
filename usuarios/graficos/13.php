@@ -1,4 +1,7 @@
-<?php include("../sesion.php");?>
+<?php 
+include("../sesion.php");
+$idPagina = 363;
+?>
 <?php include("../../conexion.php");?>
 <html>
 <head>

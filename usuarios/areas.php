@@ -65,7 +65,11 @@ include("includes/head.php");
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
-            <p><a href="areas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+				<?php
+					if (Modulos::validarRol([162], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+						echo '<p><a href="areas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>';
+					}
+				?>	        
 			<div class="row-fluid">
 			<?php include("includes/notificaciones.php"); ?>
 				<div class="span12">
@@ -95,8 +99,16 @@ include("includes/head.php");
                                 <td><?=$res['ar_id'];?></td>
                                 <td><?=$res['ar_nombre'];?></td>
                                 <td><h4>
-                                	<a href="areas-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-										<a href="bd_delete/areas-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																	<?php
+																		if (Modulos::validarRol([163], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																			echo '<a href="areas-editar.php?id='.$res[0].'" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a> ';
+																		}
+																		if (Modulos::validarRol([226], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																			echo '<a href="bd_delete/areas-eliminar.php?id='.$res[0].'" onClick="if(!confirm("Desea eliminar el registro?")){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a> ';
+																		}
+																	?>	
+                                	
+
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>
