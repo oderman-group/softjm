@@ -7,10 +7,10 @@ $paginaActual['pag_nombre'] = "Editar abonos a Factura";
 <?php include("includes/head.php");?>
 
 <?php
-$resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal," SELECT * FROM facturacion_abonos 
+$resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM facturacion_abonos 
 INNER JOIN usuarios ON usr_id=fpab_responsable_registro
-WHERE fpab_id='".$_GET["id"]."'"));
-$usuarioMod = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$resultadoD[9]."'"));
+WHERE fpab_id='".$_GET["id"]."'"),MYSQLI_BOTH);
+$usuarioMod = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$resultadoD[9]."'"),MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
