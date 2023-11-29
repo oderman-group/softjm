@@ -77,15 +77,28 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Administración <b class="icon-angle-down"></b></a>
 						<div class="dropdown-menu">
 							<ul>
-								<li><a href="roles.php"><i class=" icon-unlock"></i>Roles</a></li>
-								<li><a href="areas.php"><i class=" icon-unlock"></i>Áreas</a></li>
-								<li><a href="zonas.php"><i class=" icon-unlock"></i>Zonas</a></li>
-								<li><a href="sucursales.php"><i class=" icon-unlock"></i>Mis sucursales</a></li>
-								<li><a href="bodegas.php"><i class=" icon-unlock"></i>Bodegas</a></li>
-                                <li><a href="usuarios.php"><i class="icon-file"></i> Usuarios</a></li>
-								<li><a href="historial-acciones.php"><i class="icon-time"></i> Historial de acciones </a></li>
-								<li><a href="proyectos.php"><i class="icon-ok-sign"></i> Proyectos </a></li>
-								<li><a href="encuesta.php"><i class="icon-file"></i> Encuestas </a></li>
+								<?php
+								$listaPaginasAdmin = [
+									["url" => "roles.php", "id" => 5, "nombre" => "Roles", "clase" => "icon-unlock"],
+									["url" => "areas.php", "id" => 161, "nombre" => "Áreas", "clase" => "icon-unlock"],
+									["url" => "zonas.php", "id" => 47, "nombre" => "Zonas", "clase" => "icon-unlock"],
+									["url" => "sucursales.php", "id" => 136, "nombre" => "Mis sucursales", "clase" => "icon-unlock"],
+									["url" => "bodegas.php", "id" => 142, "nombre" => "Bodegas", "clase" => "icon-unlock"],
+									["url" => "usuarios.php", "id" => 2, "nombre" => "Usuarios", "clase" => "icon-file"],
+									["url" => "historial-acciones.php", "id" => 8, "nombre" => "Historial de acciones", "clase" => "icon-time"],
+									["url" => "proyectos.php", "id" => 108, "nombre" => "Proyectos", "clase" => "icon-ok-sign"],
+									["url" => "encuesta.php", "id" => 229, "nombre" => "Encuestas", "clase" => "icon-file"],
+								];
+								$informesSubmenu = [
+									["url" => "informes-todos.php", "id" => 120, "nombre" => "Informes", "clase" => "icon-file-alt"],
+									["url" => "estadisticas.php", "id" => 67, "nombre" => "Estadisticas", "clase" => "icon-bar-chart"],
+								];
+								    foreach ($listaPaginasAdmin as $datosPagina => $pagina) {
+											if (Modulos::validarRol([$pagina['id']], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+												echo '<li><a href="'.$pagina['url'].'"><i class="'. $pagina['clase'].'"></i>'.$pagina['nombre'].'</a></li>';
+										}
+									}
+								?>
 															
 								<?php if($_SESSION["bd"]=='odermancom_jm_crm' and $datosUsuarioActual['usr_tipo']==1){?>
 									<li class="divider"></li>
@@ -94,8 +107,13 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 								<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Informes</a>
 								<div class="dropdown-menu">
 									<ul>
-										<li><a href="informes-todos.php"><i class=" icon-file-alt"></i> Informes</a></li>
-										<li><a href="estadisticas.php"><i class="icon-bar-chart"></i> Estadisticas</a></li>
+										<?php 
+											foreach ($informesSubmenu as $datosPagina => $pagina) {
+												if (Modulos::validarRol([$pagina['id']], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+													echo '<li><a href="'.$pagina['url'].'"><i class="'. $pagina['clase'].'"></i>'.$pagina['nombre'].'</a></li>';
+												}
+											}
+										?>
 									</ul>
 								</div>
 								</li>
