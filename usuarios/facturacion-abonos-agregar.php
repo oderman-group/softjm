@@ -6,7 +6,7 @@ $paginaActual['pag_nombre'] = "Agregar abonos a facturas";
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
 
-<!-- styles -->
+<!-- styles --->
 
 <!--[if IE 7]>
 <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
