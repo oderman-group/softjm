@@ -5,15 +5,12 @@ $paginaActual['pag_nombre'] = "Editar abonos a Factura";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
+
 <?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM facturacion_abonos 
+$resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM facturacion_abonos 
 INNER JOIN usuarios ON usr_id=fpab_responsable_registro
-WHERE fpab_id='".$_GET["id"]."'",$conexion));
-$usuarioMod = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$resultadoD[9]."'",$conexion));
+WHERE fpab_id='".$_GET["id"]."'"),MYSQLI_BOTH);
+$usuarioMod = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$resultadoD[9]."'"),MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
