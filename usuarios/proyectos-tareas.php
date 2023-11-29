@@ -144,7 +144,12 @@ $proyecto = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 			
             <p>
                 <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                <a href="proyectos-tareas-agregar.php?proy=<?=$_GET["proy"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+								<?php
+									if (Modulos::validarRol([112], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+										echo '<a href="proyectos-tareas-agregar.php?proy='.$_GET["proy"].'" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>';
+									}
+								?>	
+                
             </p>
 
             
