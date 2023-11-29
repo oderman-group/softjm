@@ -59,9 +59,14 @@ include("includes/js-formularios.php");
 
             
             <p>
-
-            	<a href="usuarios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>&nbsp;
-            	<a href="usuarios-editar-zonas.php?id=<?=$_GET["id"];?>" class="btn btn-info"><i class="icon-edit"></i> Editar zonas</a>
+							<?php
+								if (Modulos::validarRol([3], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+									echo '<a href="usuarios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>&nbsp;';
+								}
+								if (Modulos::validarRol([176], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+									echo '<a href="usuarios-editar-zonas.php?id='.$_GET["id"].'" class="btn btn-info"><i class="icon-edit"></i> Editar zonas</a>';
+								}
+							?>           	
 
             </p>
             
