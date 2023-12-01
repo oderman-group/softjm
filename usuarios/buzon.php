@@ -173,9 +173,9 @@ $(function(){
 							  <?php if($res['buz_estado']==2){?>
 							  	<a href="enviar-portafolios.php?cte=<?=$res['buz_cliente'];?>" class="btn btn-info">Reintentar</a>
 							  <?php }?>
-							<?php }  if(Modulos::validarRol([], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){ ?>	
+								
 							  <a href="#" class="btn btn-danger">Eliminar</a>
-							  <?php }?>
+							  
 						  </span> 
 						  
 						</section>
