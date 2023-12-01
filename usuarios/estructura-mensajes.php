@@ -86,7 +86,10 @@ include("includes/js-formularios.php");
 
 
                                     <div class="form-actions">
+                                    <?php if(Modulos::validarRol([159], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+                                    ?>
                                         <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+                                        <?php } ?>
                                         <button type="button" class="btn btn-danger">Cancelar</button>
                                     </div>
                                 </form>
