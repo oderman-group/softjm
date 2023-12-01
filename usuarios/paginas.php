@@ -57,7 +57,10 @@ include("includes/head.php");
 		<div class="main-wrapper">
 			<div class="container-fluid">
 				<div class="row-fluid ">
+				<?php if(Modulos::validarRol([74], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+                ?>
 					<p><a href="paginas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar Pagina</a></p>
+					<?php } ?>	
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="content-widgets light-gray">
@@ -94,7 +97,10 @@ include("includes/head.php");
 												<td><?=$tipoCrud[$res['pag_tipo_crud']];?></td>
 												<td><?=$nombreModulo;?></td>
 												<td><h4>
+												<?php if(Modulos::validarRol([76], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+                                   				 ?>
 													<a href="paginas-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+													<?php } ?>
 													<!-- <a href="bd_delete/paginas-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a> -->
 												</h4></td>
 											</tr>

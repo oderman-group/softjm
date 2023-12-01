@@ -103,8 +103,11 @@ include("includes/js-formularios.php");
                                 
                                
 								<div class="form-actions">
+                                <?php if(Modulos::validarRol([365], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+                                    ?>
 									<button type="submit" class="btn btn-info"><i class="icon-envelope"></i> Enviar Portafolios</button>
-								</div>
+								<?php } ?>
+                                </div>
 							</form>
 						</div>
 					</div>
