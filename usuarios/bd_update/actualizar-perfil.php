@@ -2,7 +2,6 @@
 require_once("../sesion.php");
 
 $idPagina = 177;
-include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 validarReferencia('perfil-editar.php');
 

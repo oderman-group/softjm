@@ -1,9 +1,6 @@
 <?php
 include("sesion.php");
-
 $idPagina = 257;
-
-include("verificar-paginas.php");
 include("head.php");
 
 $resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes 
