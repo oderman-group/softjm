@@ -129,12 +129,12 @@ include("includes/head.php");
 												$filtro = " AND usr_bloqueado='0'";
 												if(isset($_GET['bloq']) AND $_GET['bloq']==1){$filtro =" AND usr_bloqueado='1'";}
 
-												$consulta = $conexionBdAdmin->query("SELECT u.*, GROUP_CONCAT(r.utipo_id) AS roles_id,
+												$consulta = $conexionBdPrincipal->query("SELECT u.*, GROUP_CONCAT(r.utipo_id) AS roles_id,
 												GROUP_CONCAT(r.utipo_nombre) AS roles_nombre
-												FROM orioncrmcom_dev_jm_crm.usuarios AS u
-												LEFT JOIN usuarios_roles AS ru ON u.usr_id = ru.upr_id_usuario
-												LEFT JOIN orioncrmcom_dev_jm_crm.usuarios_tipos AS r ON ru.upr_id_rol = r.utipo_id
-												INNER JOIN orioncrmcom_dev_jm_crm.areas ON ar_id = u.usr_area
+												FROM usuarios AS u
+												LEFT JOIN ".BDADMIN.".usuarios_roles AS ru ON u.usr_id = ru.upr_id_usuario
+												LEFT JOIN usuarios_tipos AS r ON ru.upr_id_rol = r.utipo_id
+												LEFT JOIN areas ON ar_id = u.usr_area
 												WHERE u.usr_id != '" . $_SESSION["id"] . "' $filtro AND
 												usr_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'
 												GROUP BY u.usr_id");
@@ -190,7 +190,9 @@ include("includes/head.php");
 																echo '<a href="usuarios-editar.php?id='.$res['usr_id'].'" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a> ';
 															}
 															if (Modulos::validarRol([53], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
-																echo '<a href="bd_delete/usuarios-eliminar.php?id='.$res['usr_id'].'" onClick="if(!confirm("Desea eliminar el registro?")){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a> ';
+															?>
+																<a href="bd_delete/usuarios-eliminar.php?id=<?=$res['usr_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+															<?php
 															}
 															if (Modulos::validarRol([104], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 																echo '<a href="calendario.php?id='.$res['usr_id'].'" data-toggle="tooltip" title="Calendario"><i class="icon-calendar"></i></a> ';

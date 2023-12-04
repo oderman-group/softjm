@@ -73,13 +73,19 @@ $i=1;
 while($age = mysqli_fetch_array($agenda, MYSQLI_BOTH)){
 	
 	$age["mes"]--;
+
+	$url = '';
+	if( Modulos::validarRol(['117'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) { 
+		$url = "url: 'calendario-editar.php?id=".$age["age_id"]."'";
+	}
+
 	
 		$eventos .= '
 			{
 				title: "'.$age["age_id"].": ".$age["age_evento"].'",
 				start: new Date('.$age["agno"].', '.$age["mes"].', '.$age["dia"].', 6, 0),
 				backgroundColor: "black",
-				url: "calendario-editar.php?id='.$age["age_id"].'"
+				'.$url.'
 			},
 
 		'; 
@@ -196,7 +202,9 @@ $eventos .= '
 			<div class="row-fluid">
 				<div class="span12">
 					
-					<p><a href="calendario-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar evento</a></p>
+					<?php if( Modulos::validarRol(['116'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+						<p><a href="calendario-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar evento</a></p>
+					<?php }?>
 					
 					<div class="content-widgets gray">
 						<div class="widget-head orange">

@@ -39,29 +39,29 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 						<?php }?>
 
 						<?php if(Modulos::validarAccesoModulo($configuracion['conf_id_empresa'], 2, $conexionBdAdmin, $datosUsuarioActual)){?>
-							<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Sistema <b class="icon-angle-down"></b></a>
+							<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-cogs"></i> Sistema <b class="icon-angle-down"></b></a>
 							<div class="dropdown-menu">
 								<ul>
 								<?php if(Modulos::validarAccesoModulo($configuracion['conf_id_empresa'], 8, $conexionBdAdmin, $datosUsuarioActual)){?>
-									<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Parametrización</a>
+									<li class="dropdown-submenu"><a href="#"><i class="icon-sitemap"></i> Parametrización</a>
 										<div class="dropdown-menu">
 											<ul>
-												<li><a href="configuracion.php"><i class=" icon-file-alt"></i> Configuración</a></li>
-												<li><a href="configuracion-color-encabezado.php"><i class=" icon-file-alt"></i> Configuración Encabezado</a></li>
+												<li><a href="configuracion.php"><i class=" icon-cogs"></i> Configuración</a></li>
+												<li><a href="configuracion-color-encabezado.php"><i class=" icon-tint"></i> Configuración Encabezado</a></li>
 												<!-- Check_id 7 y 15 -->
-													<li><a href="metricas.php?id=1"><i class="icon-cogs"></i> Métricas </a></li>
+													<li><a href="metricas.php?id=1"><i class="icon-bar-chart"></i> Métricas </a></li>
 												<!-- endif-check_id  -->
-												<li><a href="estructura-mensajes.php"><i class=" icon-file-alt"></i> Estructura de mensajes</a></li>
+												<li><a href="estructura-mensajes.php"><i class=" icon-edit"></i> Estructura de mensajes</a></li>
 											</ul>
 										</div>
 									</li>
 								<?php }?>
-									<li><a href="modulos.php"><i class=" icon-unlock"></i>Módulos</a></li>
-									<li><a href="paginas.php"><i class="icon-file"></i> Páginas</a></li>
-									<li><a href="documentos.php"><i class="icon-file-alt"></i> Documentos</a></li>
+									<li><a href="modulos.php"><i class="icon-th-large"></i>Módulos</a></li>
+									<li><a href="paginas.php"><i class="icon-th-list"></i> Páginas</a></li>
+									<li><a href="documentos.php"><i class="icon-file"></i> Documentos</a></li>
 									<li><a href="buzon.php"><i class="icon-envelope"></i> Buzón de salida </a></li>
 
-									<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Documentación</a>
+									<li class="dropdown-submenu"><a href="#"><i class="icon-file-alt"></i> Documentación</a>
 									<div class="dropdown-menu">
 										<ul>
 											<li><a href="tutoriales.php"><i class="icon-facetime-video"></i> Tutoriales</a></li>
@@ -74,20 +74,20 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 							</li>
 						<?php }?>
 
-						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Administración <b class="icon-angle-down"></b></a>
+						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-suitcase"></i> Administración <b class="icon-angle-down"></b></a>
 						<div class="dropdown-menu">
 							<ul>
 								<?php
 								$listaPaginasAdmin = [
-									["url" => "roles.php", "id" => 5, "nombre" => "Roles", "clase" => "icon-unlock"],
-									["url" => "areas.php", "id" => 161, "nombre" => "Áreas", "clase" => "icon-unlock"],
-									["url" => "zonas.php", "id" => 47, "nombre" => "Zonas", "clase" => "icon-unlock"],
-									["url" => "sucursales.php", "id" => 136, "nombre" => "Mis sucursales", "clase" => "icon-unlock"],
-									["url" => "bodegas.php", "id" => 142, "nombre" => "Bodegas", "clase" => "icon-unlock"],
-									["url" => "usuarios.php", "id" => 2, "nombre" => "Usuarios", "clase" => "icon-file"],
+									["url" => "roles.php", "id" => 5, "nombre" => "Roles", "clase" => "icon-group"],
+									["url" => "areas.php", "id" => 161, "nombre" => "Áreas", "clase" => "icon-sitemap"],
+									["url" => "zonas.php", "id" => 47, "nombre" => "Zonas", "clase" => "icon-globe"],
+									["url" => "sucursales.php", "id" => 136, "nombre" => "Mis sucursales", "clase" => "icon-sitemap"],
+									["url" => "bodegas.php", "id" => 142, "nombre" => "Bodegas", "clase" => "icon-stop"],
+									["url" => "usuarios.php", "id" => 2, "nombre" => "Usuarios", "clase" => "icon-user"],
 									["url" => "historial-acciones.php", "id" => 8, "nombre" => "Historial de acciones", "clase" => "icon-time"],
-									["url" => "proyectos.php", "id" => 108, "nombre" => "Proyectos", "clase" => "icon-ok-sign"],
-									["url" => "encuesta.php", "id" => 229, "nombre" => "Encuestas", "clase" => "icon-file"],
+									["url" => "proyectos.php", "id" => 108, "nombre" => "Proyectos", "clase" => "icon-tasks"],
+									["url" => "encuesta.php", "id" => 229, "nombre" => "Encuestas", "clase" => "icon-ok-sign"],
 								];
 								$informesSubmenu = [
 									["url" => "informes-todos.php", "id" => 120, "nombre" => "Informes", "clase" => "icon-file-alt"],
@@ -104,7 +104,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 									<li class="divider"></li>
 									<li><a href="clientes-orion.php"><i class="icon-group"></i> CLientes ORION </a></li>
 								<?php }?>
-								<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Informes</a>
+								<li class="dropdown-submenu"><a href="#"><i class="icon-paste"></i> Informes</a>
 								<div class="dropdown-menu">
 									<ul>
 										<?php 
@@ -121,44 +121,44 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 						</div>
 						</li>
 
-						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Comercial <b class="icon-angle-down"></b></a>
+						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-bullhorn"></i> Comercial <b class="icon-angle-down"></b></a>
 						<div class="dropdown-menu">
 							<ul>
-							<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Clientes</a>
+							<li class="dropdown-submenu"><a href="#"><i class="icon-user"></i> Clientes</a>
 								<div class="dropdown-menu">
 									<ul>
-										<li><a href="clientes.php"><i class=" icon-file-alt"></i> Clientes</a></li>
-										<li><a href="dealer.php"><i class=" icon-file-alt"></i> Grupos</a></li>
-										<li><a href="clientes-filtro.php"><i class=" icon-file-alt"></i> Mercadeo</a></li>
-										<li><a href="enviar-portafolios.php"><i class="icon-list-ul"></i> Enviar portafolios </a></li>
+										<li><a href="clientes.php"><i class=" icon-user"></i> Clientes</a></li>
+										<li><a href="dealer.php"><i class=" icon-group"></i> Grupos</a></li>
+										<li><a href="clientes-filtro.php"><i class=" icon-phone"></i> Mercadeo</a></li>
+										<li><a href="enviar-portafolios.php"><i class="icon-suitcase"></i> Enviar portafolios </a></li>
 										<li class="divider"></li>
-										<li><a href="publicidad.php"><i class=" icon-file-alt"></i> Publicidad</a></li>
-										<li><a href="cupones.php"><i class=" icon-file-alt"></i> Cupones</a></li>
+										<li><a href="publicidad.php"><i class=" icon-bullhorn"></i> Publicidad</a></li>
+										<li><a href="cupones.php"><i class=" icon-certificate"></i> Cupones</a></li>
 									</ul>
 								</div>
 							</li>
-							<li><a href="clientes-tikets.php?tipo=1"><i class=" icon-unlock"></i>Tickets/Negociación</a></li>
-							<li><a href="clientes-seguimiento.php"><i class=" icon-unlock"></i>Seguimientos</a></li>	
-							<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Productos</a>
+							<li><a href="clientes-tikets.php?tipo=1"><i class="icon-copy"></i>Tickets/Negociación</a></li>
+							<li><a href="clientes-seguimiento.php"><i class="icon-eye-open"></i>Seguimientos</a></li>	
+							<li class="dropdown-submenu"><a href="#"><i class="icon-briefcase"></i> Productos</a>
 								<div class="dropdown-menu">
 									<ul>
-										<li><a href="productos.php"><i class=" icon-file-alt"></i> Productos</a></li>
-										<li><a href="combos.php"><i class=" icon-file-alt"></i> Combos</a></li>
-										<li><a href="categoriasp.php"><i class=" icon-file-alt"></i>Categorías</a></li>
-										<li><a href="marcas.php"><i class=" icon-file-alt"></i>Marcas</a></li>
+										<li><a href="productos.php"><i class="icon-briefcase"></i> Productos</a></li>
+										<li><a href="combos.php"><i class="icon-gift"></i> Combos</a></li>
+										<li><a href="categoriasp.php"><i class="icon-th-large"></i>Categorías</a></li>
+										<li><a href="marcas.php"><i class=" icon-tags"></i>Marcas</a></li>
 									</ul>
 								</div>
 							</li>
 											
-								<li><a href="proveedores.php"><i class=" icon-unlock"></i>Proveedores</a></li>
-								<li><a href="servicios.php"><i class=" icon-unlock"></i>Servicios</a></li>
+								<li><a href="proveedores.php"><i class=" icon-group"></i>Proveedores</a></li>
+								<li><a href="servicios.php"><i class="icon-check"></i>Servicios</a></li>
                                 <li><a href="cotizaciones.php"><i class="icon-file"></i> Cotización</a></li>
-								<li><a href="pedidos.php"><i class=" icon-unlock"></i>Pedido</a></li>
-								<li><a href="remisionbdg.php"><i class=" icon-unlock"></i>Remisión</a></li>
-								<li><a href="facturas.php"><i class=" icon-unlock"></i>Factura</a></li>
-								<li><a href="importacion.php"><i class=" icon-unlock"></i>Importación</a></li>
+								<li><a href="pedidos.php"><i class="icon-truck"></i>Pedido</a></li>
+								<li><a href="remisionbdg.php"><i class=" icon-copy"></i>Remisión</a></li>
+								<li><a href="facturas.php"><i class="icon-money"></i>Factura</a></li>
+								<li><a href="importacion.php"><i class=" icon-plane"></i>Importación</a></li>
 								<li class="divider"></li>
-								<li><a href="store-pedidos.php"><i class=" icon-unlock"></i>Tienda virtual</a></li>
+								<li><a href="store-pedidos.php"><i class=" icon-shopping-cart"></i>Tienda virtual</a></li>
 								
 							</ul>
 						</div>
@@ -168,8 +168,8 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-desktop"></i> Soporte Operativo <b class="icon-angle-down"></b></a>
 						<div class="dropdown-menu">
 							<ul>
-								<li><a href="clientes-tikets.php?tipo=3"><i class="icon-group"></i> Tickets </a></li>
-								<li><a href="productos-sop.php"><i class="icon-tasks"></i> Productos soporte</a></li>
+								<li><a href="clientes-tikets.php?tipo=3"><i class="icon-copy"></i> Tickets </a></li>
+								<li><a href="productos-sop.php"><i class="icon-circle-blank"></i> Productos soporte</a></li>
                                 <li><a href="facturacion.php"><i class="icon-list-ol"></i> Productos a clientes</a></li>
 							</ul>
 						</div>
@@ -178,10 +178,10 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 						
                         
                         
-                        <li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-suitcase"></i> Soporte técnico <b class="icon-angle-down"></b></a>
+                        <li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-wrench"></i> Soporte técnico <b class="icon-angle-down"></b></a>
 						<div class="dropdown-menu">
 							<ul>
-								<li><a href="remisiones.php"><i class="icon-ok-sign"></i> Soporte técnico </a></li>	
+								<li><a href="remisiones.php"><i class="icon-wrench"></i> Soporte técnico </a></li>	
 								<li><a href="tipos-equipos.php"><i class="icon-list-ol"></i> Tipos de equipos</a></li>
 							</ul>
 						</div>
@@ -190,10 +190,10 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-user"></i> Mi Cuenta <b class="icon-angle-down"></b></a>
 						<div class="dropdown-menu">
 							<ul>
-								<li><a href="perfil-editar.php"><i class="icon-user"></i> Editar perfil </a></li>
+								<li><a href="perfil-editar.php"><i class="icon-list-alt"></i> Editar perfil </a></li>
 								<li><a href="mis-ventas.php"><i class="icon-shopping-cart"></i> Mis ventas </a></li>
-								<li><a href="calendario.php"><i class="icon-envelope"></i> Mi calendario</a></li>
-                                <li><a href="../salir.php"><i class="icon-lock"></i> Salir </a></li>
+								<li><a href="calendario.php"><i class="icon-calendar"></i> Mi calendario</a></li>
+                                <li><a href="../salir.php"><i class="icon-signout"></i> Salir </a></li>
 							</ul>
 						</div>
 						</li>
@@ -206,7 +206,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 
 					<div class="btn-group">
 						<div class="dropdown">
-							<a href="../salir.php" class="btn btn-notification"><i class="icon-lock"></i></a>
+							<a href="../salir.php" class="btn btn-notification"><i class="icon-signout"></i></a>
 						</div>
 					</div>
 
