@@ -3,7 +3,7 @@
     $idPagina = 51;
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     $usr_login = $_POST["usuario"] . $_POST["dominio"];
-    $conexionBdPrincipal->query("INSERT INTO usuarios(usr_login, usr_clave, usr_nombre, usr_email, usr_bloqueado, usr_ciudad, usr_area, usr_sucursal)VALUES('" . $usr_login . "',SHA1('" . $_POST["clave"] . "'),'" . $_POST["nombre"] . "','" . $_POST["email"] . "',0,'" . $_POST["ciudad"] . "','" . $_POST["area"] . "', '" . $_POST["sucursal"] . "')");
+    $conexionBdPrincipal->query("INSERT INTO usuarios(usr_login, usr_clave, usr_nombre, usr_email, usr_bloqueado, usr_ciudad, usr_area, usr_sucursal, usr_id_empresa)VALUES('" . $usr_login . "',SHA1('" . $_POST["clave"] . "'),'" . $_POST["nombre"] . "','" . $_POST["email"] . "',0,'" . $_POST["ciudad"] . "','" . $_POST["area"] . "', '" . $_POST["sucursal"] . "', '".$idEmpresa."')");
 
     $idInsertU = mysqli_insert_id($conexionBdPrincipal);
     $id_empresa = $_SESSION["dataAdicional"]["id_empresa"];
@@ -20,6 +20,8 @@
     }
 
 
+
+if( !empty($_POST["zona"])) {
     $numero = (count($_POST["zona"]));
     $contador = 0;
     $conexionBdPrincipal->query("DELETE FROM zonas_usuarios WHERE zpu_usuario='" . $idInsertU . "'");
@@ -28,6 +30,7 @@
         $conexionBdPrincipal->query("INSERT INTO zonas_usuarios(zpu_usuario, zpu_zona)VALUES('" . $idInsertU . "'," . $_POST["zona"][$contador] . ")");
         $contador++;
     }
+}
 
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
