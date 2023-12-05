@@ -98,14 +98,19 @@ include("includes/js-formularios.php");
 			
 			
 			<p>
+				<?php if (Modulos::validarRol([149], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="remisionbdg-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+				<?php }?>
+				<?php if (Modulos::validarRol([376], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="reportes/formato-remision-1.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
+				<?php }?>
 				
 				<!--
 				<a href="sql.php?get=44&id=<?=$_GET["id"];?>" class="btn btn-warning" onClick="if(!confirm('Desea Enviar este mensaje al correo del contacto?')){return false;}"><i class="icon-envelope"></i> Enviar por correo</a>
 				-->
-
+				<?php if (Modulos::validarRol([377], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="bd_create/remisionbdg-generar-factura.php?id=<?=$resultadoD[0];?>" class="btn btn-info" onClick="if(!confirm('Desea generar factura de esta remisión?')){return false;}"><i class="icon-money"></i> Generar factura</a>
+				<?php }?>
 			</p>	
 								
 			
@@ -129,7 +134,9 @@ include("includes/js-formularios.php");
 								
 								<div class="form-actions">
                                 	<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+												<?php if (Modulos::validarRol([149], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
             						<a href="remisionbdg-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+												<?php }?>
 								</div>
 								
 
@@ -150,7 +157,9 @@ include("includes/js-formularios.php");
 											 ?>
 										 </select>
 									 </div>
+									<?php if (Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									 <a href="proveedores-editar.php?id=<?=$resultadoD['remi_proveedor'];?>" class="btn btn-info" target="_blank">Editar proveedor</a>
+									<?php }?>
 								</div>
  
 								<?php }?>
@@ -174,7 +183,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 								   <a href="clientes-editar.php?id=<?=$cliente;?>" class="btn btn-info" target="_blank">Editar cliente</a>
+									<?php }?>
                                </div>
                                
                                <div class="control-group">
@@ -201,7 +212,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 								   <a href="clientes-sucursales.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver sucursales</a>
+									<?php }?>
                                </div>
 								
 								<div class="control-group">
@@ -228,7 +241,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="clientes-contactos.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver contactos</a>
+									<?php }?>
                                </div>	
                                
 							</fieldset>
@@ -332,7 +347,7 @@ include("includes/js-formularios.php");
 												ORDER BY prod_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
-													if($resOp['prod_categoria'] == 28 and ($datosUsuarioActual[3]!=1 and $datosUsuarioActual[3]!=9) ){
+													if($resOp['prod_categoria'] == 28 and !Modulos::validarRol([392], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ){
 														continue;
 													}
 													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_producto, czpp_cotizacion 
@@ -450,8 +465,12 @@ include("includes/js-formularios.php");
 								<td><?=$no;?></td>
 								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td>
+									<?php if (Modulos::validarRol([378], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="bd_delete/remisionbdg-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<?php }?>
+									<?php if (Modulos::validarRol([175], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="combos-editar.php?id=<?=$prod['combo_id'];?>" target="_blank"><?=$prod['combo_nombre'];?></a><br>
+									<?php }?>
 									<span style="font-size: 9px; color: teal;">
 									<?php
 									$productosCombo = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
@@ -512,9 +531,15 @@ include("includes/js-formularios.php");
 								<td><?=$no;?></td>
 								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td>
+									<?php if (Modulos::validarRol([378], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="bd_delete/remisionbdg-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<?php }?>	
+									<?php if (Modulos::validarRol([379], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="bd_update/remisionbdg-productos-replicar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea replicar este producto?')){return false;}"><i class="icon-retweet"></i></a>
+									<?php }?>	
+									<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_nombre'];?></a><br>
+									<?php }?>	
 										
 									<p><textarea title="czpp_observacion" name="<?=$prod['czpp_id'];?>" onChange="productos(this)" style="width: 300px;" rows="4"><?=$prod['czpp_observacion'];?></textarea></p>
 								</td>
@@ -573,8 +598,12 @@ include("includes/js-formularios.php");
 								<td><?=$no;?></td>
 								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td>
+									<?php if (Modulos::validarRol([378], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="bd_delete/remisionbdg-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<?php }?>
+									<?php if (Modulos::validarRol([156], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="servicios-editar.php?id=<?=$prod['serv_id'];?>" target="_blank"><?=$prod['serv_nombre'];?></a>
+									<?php }?>									
 										
 									<p><textarea title="czpp_observacion" name="<?=$prod['czpp_id'];?>" onChange="productos(this)" style="width: 300px;" rows="4"><?=$prod['czpp_observacion'];?></textarea></p>
 								</td>
@@ -637,8 +666,9 @@ include("includes/js-formularios.php");
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									
 									
-										
+									<?php if (Modulos::validarRol([376], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="reportes/formato-remision-1.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
+									<?php }?>	
 								</div>
 							</form>
 							

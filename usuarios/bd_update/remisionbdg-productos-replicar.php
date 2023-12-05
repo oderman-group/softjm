@@ -1,6 +1,6 @@
 <?php
 require_once("../sesion.php");
-
+$idPagina = 379;
 $prod = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
 WHERE czpp_id='" . $_GET["idItem"] . "'"));
 

@@ -89,7 +89,9 @@ include("includes/head.php");
             <?php include("includes/notificaciones.php");?>
             <p>
             <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+						<?php if (Modulos::validarRol([149], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
             <a href="remisionbdg-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+						<?php } ?>
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -101,7 +103,7 @@ include("includes/head.php");
 							$filtro = '';
 							if($_GET["busqueda"]!=""){$filtro .= " AND (remi_id='".$_GET["busqueda"]."' OR cli_nombre='".$_GET["busqueda"]."' OR usr_nombre='".$_GET["busqueda"]."')";}	
 							
-							if($datosUsuarioActual['usr_tipo']!=1){
+							if(!Modulos::validarRol([389], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 								$filtro.=' AND cli_ciudad!="1122"';
 							}
 								
@@ -169,7 +171,7 @@ include("includes/head.php");
 							}
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-								if($datosUsuarioActual[3]!=1){
+								if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 									$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'");
 									$numZ = mysqli_num_rows($consultaZonas);
 									if($numZ==0) continue;
@@ -203,17 +205,18 @@ include("includes/head.php");
 										<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span>
 										</button>
 										<ul class="dropdown-menu">
-											<?php if($_SESSION["id"]==$res['remi_creador'] or $_SESSION["id"]==57 or $_SESSION["id"]==$res['remi_vendedor'] or $datosUsuarioActual[3]==13){?>
+											<?php if (Modulos::validarRol([150], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 											<li><a href="remisionbdg-editar.php?id=<?=$res[0];?>#productos"> Editar</a></li>
 											<?php }?>
 											
-											<?php if($_SESSION["id"]==$res['remi_creador'] or $_SESSION["id"]==57 or $_SESSION["id"]==$res['remi_vendedor']){?>
+											<?php if (Modulos::validarRol([375], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 											<li><a href="bd_delete/remisionbdg-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 											<?php }?>
-											
+											<?php if (Modulos::validarRol([376], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 											<li><a href="reportes/formato-remision-1.php?id=<?=$res[0];?>" target="_blank">Imprimir</a></li>
+											<?php }?>
 
-											<?php if($generoFactura[0]==""){?>
+											<?php if($generoFactura[0]=="" && Modulos::validarRol([377], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 											
 											<li><a href="bd_create/remisionbdg-generar-factura.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea generar factura de esta remisión?')){return false;}">Generar Factura</a></li>
 
