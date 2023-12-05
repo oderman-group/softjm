@@ -104,9 +104,13 @@ include("includes/head.php");
 				<p>
 					<a href="productos.php" class="btn btn-primary"><i class="icon-arrow"></i> Ir a productos</a>
 					<?php if(isset($_GET["prod"])){?>
+					<?php if (Modulos::validarRol([146], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<a href="bodegas-productos-agregar.php?prod=<?=$_GET["prod"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+					<?php } ?>
 					<?php }?>
+					<?php if (Modulos::validarRol([212], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<a href="reportes/bodegasprod.php" target="_blank" class="btn btn-success"><i class="icon-file"></i> Sacar informe</a>
+					<?php } ?>
 				</p>
 
 				<div class="row-fluid">
@@ -161,9 +165,13 @@ include("includes/head.php");
 												<td><?= $res['usr_nombre']; ?></td>
 												<td>
 													<h4>
-
+													
+													<?php if (Modulos::validarRol([146], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="bodegas-productos-agregar.php?id=<?= $res[0]; ?>&prod=<?= $res['prod_id']; ?>&bod=<?= $res['bod_id']; ?>&ex=<?= $res['prodb_existencias']; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+													<?php } ?>
+													<?php if (Modulos::validarRol([213], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="bd_delete/productos-bodegas-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+													<?php } ?>
 
 													</h4>
 												</td>

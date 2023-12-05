@@ -102,7 +102,7 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-												if($datosUsuarioActual[3]!=1){
+												if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
 													$numZ = mysqli_num_rows($consultaZonas);
 													if($numZ==0) continue;
@@ -115,7 +115,7 @@ include("includes/js-formularios.php");
                                     	</select>
                                     </div>
 								   
-								   <?php if(is_numeric($_GET['cte'])){?>
+								   <?php if(is_numeric($_GET['cte']) && Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 								   		<a href="clientes-editar.php?id=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Editar cliente</a>
 								   <?php }?>
 								   
@@ -151,7 +151,7 @@ include("includes/js-formularios.php");
 										 </select>
 									 </div>
 									
-									<?php if(is_numeric($_GET['prov'])){?>
+									<?php if(is_numeric($_GET['prov']) && Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 											<a href="proveedores-editar.php?id=<?=$_GET["prov"];?>" class="btn btn-info" target="_blank">Editar proveedor</a>
 									<?php }?>
 									
@@ -191,7 +191,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([128], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="clientes-sucursales.php?cte=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Ver sucursales</a>
+									<?php } ?>        
                                </div>
 								
 								<div class="control-group">
@@ -218,7 +220,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([128], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="clientes-contactos.php?cte=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Ver contactos</a>
+									<?php } ?>
                                </div>	
                                
 								<div class="control-group">

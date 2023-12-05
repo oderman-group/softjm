@@ -79,9 +79,15 @@ $paginaActual['pag_nombre'] = "Facturas";
 				<?php include("includes/notificaciones.php"); ?>
 				<p>
 					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+					<?php if (Modulos::validarRol([128], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<a href="facturas-agregar.php?cte=<?= $_GET["cte"]; ?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar factura de venta</a>
+					<?php } ?>
+					<?php if (Modulos::validarRol([129], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<a href="facturas-compra-agregar.php" class="btn btn-warning"><i class="icon-plus"></i> Agregar factura de compra nacional</a>
+					<?php } ?>
+					<?php if (Modulos::validarRol([131], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<a href="fce-agregar.php" class="btn btn-success"><i class="icon-plus"></i> Agregar factura de compra extrajera</a>
+					<?php } ?>
 				</p>
 				<div class="row-fluid">
 					<div class="span12">
@@ -185,13 +191,13 @@ $paginaActual['pag_nombre'] = "Facturas";
 												$czppFactura=$res['factura_remision'];
 											}
 
-											if ($datosUsuarioActual[3] != 1) {
+											if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$consultaZona=mysqli_query($conexionBdPrincipal, "SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
 												$numZ = mysqli_num_rows($consultaZona);
 												if ($numZ == 0) continue;
 											}
 
-											if ($datosUsuarioActual[3] == 14 and $res['factura_creador'] != $_SESSION["id"] and $res['factura_vendedor'] != $_SESSION["id"]) {
+											if (!Modulos::validarRol([397], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) and $res['factura_creador'] != $_SESSION["id"] and $res['factura_vendedor'] != $_SESSION["id"]) {
 												continue;
 											}
 
@@ -319,7 +325,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 														<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span>
 														</button>
 														<ul class="dropdown-menu">
-															<?php if ($_SESSION["id"] == $res['factura_creador'] or $_SESSION["id"] == $res['factura_vendedor'] or $datosUsuarioActual[3] == 1) {
+															<?php if ($_SESSION["id"] == $res['factura_creador'] or $_SESSION["id"] == $res['factura_vendedor'] or Modulos::validarRol([396], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 																if ($res['factura_tipo'] == 2 and $res['factura_extranjera'] == '0') {
 															?>
 																	<li><a href="facturas-compra-editar.php?id=<?= $res['factura_id']; ?>#productos"> Editar</a></li>
@@ -336,10 +342,12 @@ $paginaActual['pag_nombre'] = "Facturas";
 															<!--<li><a href="#reportes/formato-cotizacion-1.php?id=<?= $res['cotiz_id']; ?>" target="_blank">Imprimir</a></li>
 
 															<li><a href="#sql.php?get=46&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>-->
-
-															<li><a href="bd_update/redimir-factura-clientes-actualizar.php?get=66&id=<?= $res['factura_id']; ?>" onClick="if(!confirm('Desea redimir este saldo para el cliente?')){return false;}">Redimir saldo</a></li>
-
+															<?php if (Modulos::validarRol([307], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																<li><a href="bd_update/redimir-factura-clientes-actualizar.php?get=66&id=<?= $res['factura_id']; ?>" onClick="if(!confirm('Desea redimir este saldo para el cliente?')){return false;}">Redimir saldo</a></li>
+															<?php } ?>
+															<?php if (Modulos::validarRol([308], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<li><a href="bd_update/redimir-factura-vendedor-actualizar.php?get=67&id=<?= $res['factura_id']; ?>" onClick="if(!confirm('Desea saldar esta comisión para el vendedor?')){return false;}">Saldar comisión</a></li>
+															<?php } ?>
 
 															<!--
 											<li><a href="sql.php?get=48&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>

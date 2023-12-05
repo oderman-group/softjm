@@ -1,6 +1,6 @@
 <?php
 include("../sesion.php");
-
+$idPagina = 373;
 if (!empty($_GET["cte"]) AND $_GET["cte"] == 1) {
 	$_GET["id"] = base64_decode($_GET["id"]);
 } else {

@@ -155,7 +155,7 @@ include("includes/head.php");
 							}
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-								if($datosUsuarioActual[3]!=1){
+								if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 									$numZ = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'"));
 									if($numZ==0) continue;
 								}
@@ -192,7 +192,13 @@ include("includes/head.php");
                                 <td><?=$nombreCliente;?></td>
 								<td><?=$nombreResponsable;?></td>
 								<td><?=$nombreVendedor;?></td>
-								<td><a href="pedidos-timeline.php?id=<?=$res['pedid_id'];?>" target="_blank">En camino</a></td>
+								<td>
+									<?php if (Modulos::validarRol([237], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+										<a href="pedidos-timeline.php?id=<?=$res['pedid_id'];?>" target="_blank">En camino</a>
+										<?php } else {?>
+										<span>En camino</span>
+									<?php } ?>
+								</td>
 								<td><?=$res['pedid_cotizacion'];?></td>
                                 <td>
 									<div class="btn-group">
@@ -204,13 +210,16 @@ include("includes/head.php");
 											<li><a href="#pedidos-editar.php?id=<?=$res[0];?>#productos"> Editar</a></li>
 											
 											<li><a href="bd_delete/pedidos-anular.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea anular el registro?')){return false;}">Anular</a></li>-->
-											
+											<?php if (Modulos::validarRol([372], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 											<li><a href="bd_delete/pedidos-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
+											<?php } ?>
 											<?php }?>
 											
+											<?php if (Modulos::validarRol([373], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 											<li><a href="reportes/formato-pedido-1.php?id=<?=$res[0];?>" target="_blank">Imprimir</a></li>
+											<?php } ?>
 
-											<?php if($generoRemision[0]==""){?>
+											<?php if($generoRemision[0]=="" && Modulos::validarRol([374], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 											
 												<li><a href="bd_create/pedidos-generar-remision.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea generar remisión de este pedido?')){return false;}">Generar remisión</a></li>
 

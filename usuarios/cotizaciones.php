@@ -76,7 +76,9 @@ include("includes/head.php");
 
 				<p>
 					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+					<?php if (Modulos::validarRol([78], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<a href="cotizaciones-agregar.php?cte='<?php if(isset($_GET['cte'])) echo $_GET['cte'];?>'" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+					<?php } ?>
 					<a href="cotizaciones.php?dctoEspecial=1" class="btn btn-warning"><i class="icon-ok-sign"></i> Cotizaciones con descuentos especiales</a>
 				</p>
 
@@ -102,7 +104,7 @@ include("includes/head.php");
 										$filtro .= " AND cotiz_descuentos_especiales=1";
 									}
 								}
-								if($datosUsuarioActual['usr_tipo']!=1){
+								if(Modulos::validarRol([385], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 									$filtro.='AND cli_ciudad!="1122"';
 								}
 
@@ -178,14 +180,14 @@ include("includes/head.php");
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
-											if ($datosUsuarioActual[3] != 1) {
+											if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
 												WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
 												$numZ = $consultaNumZ->num_rows;
 												if ($numZ == 0) continue;
 											}
 
-											if ($datosUsuarioActual[3] == 14 and $res['cotiz_creador'] != $_SESSION["id"] and $res['cotiz_vendedor'] != $_SESSION["id"]) {
+											if (!Modulos::validarRol([395], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) and $res['cotiz_creador'] != $_SESSION["id"] and $res['cotiz_vendedor'] != $_SESSION["id"]) {
 												continue;
 											}
 
@@ -265,17 +267,22 @@ include("includes/head.php");
 														<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span>
 														</button>
 														<ul class="dropdown-menu">
-															<?php if ($_SESSION["id"] == $res['cotiz_creador'] or $_SESSION["id"] == $res['cotiz_vendedor'] or $datosUsuarioActual[3] == 1) { ?>
+																<?php if (Modulos::validarRol([79], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																<li><a href="cotizaciones-editar.php?id=<?= $res['cotiz_id']; ?>#productos"> Editar</a></li>
-
+																<?php } ?>
+																
+																<?php if (Modulos::validarRol([80], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																<li><a href="bd_delete/cotizaciones-eliminar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
-															<?php } ?>
+																<?php } ?>
+																
+																<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																<li><a href="reportes/formato-cotizacion-1.php?id=<?= $res['cotiz_id']; ?>" target="_blank">Imprimir</a></li>
+																<?php } ?>
+																<?php if (Modulos::validarRol([253], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																<li><a href="bd_create/cotizaciones-replicar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
+																<?php } ?>
 
-															<li><a href="reportes/formato-cotizacion-1.php?id=<?= $res['cotiz_id']; ?>" target="_blank">Imprimir</a></li>
-
-															<li><a href="bd_create/cotizaciones-replicar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
-
-																<?php if($IdGeneroPedido == ''){?>
+																<?php if($IdGeneroPedido == '' && Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ){?>
 															<li><a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
 															<?php }?>
 

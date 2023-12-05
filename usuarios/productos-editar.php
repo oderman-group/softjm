@@ -162,14 +162,20 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 						</div>
 						<ul class="breadcrumb">
 							<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
+							<?php if (Modulos::validarRol([36], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 							<li><a href="productos.php">Productos</a><span class="divider"><i class="icon-angle-right"></i></span></li>
+							<?php } ?>
 							<li class="active"><?= $paginaActual['pag_nombre']; ?></li>
 						</ul>
 					</div>
 				</div>
 				<p>
+				<?php if (Modulos::validarRol([37], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="productos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>&nbsp;&nbsp;
+				<?php } ?>
+				<?php if (Modulos::validarRol([145], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="bodegas-productos.php?prod=<?= $_GET["id"]; ?>" class="btn btn-warning"><i class="icon-pushpin"></i> Ver en bodegas</a>
+				<?php } ?>
 				</p>
 
 
@@ -196,7 +202,7 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 								<form class="form-horizontal" method="post" action="bd_update/productos-actualizar.php" enctype="multipart/form-data">
 									<input type="hidden" name="id" value="<?= $_GET["id"]; ?>">
 
-									<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10 or $datosUsuarioActual['usr_tipo'] == 13) { ?>
+									<?php if (Modulos::validarRol([398], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 										<div class="control-group">
 											<label class="control-label">CÓDIGO</label>
 											<div class="controls">
@@ -268,7 +274,9 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 											</div>
 
 
+							<?php if (Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 											<a href="proveedores-editar.php?id=<?= $resultadoD['prod_proveedor']; ?>" class="btn btn-info" target="_blank">Editar proveedor</a>
+							<?php } ?>
 
 
 										</div>
@@ -294,7 +302,9 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 												?>
 											</select>
 										</div>
+										<?php if (Modulos::validarRol([41], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 										<a href="categoriasp-editar.php?id=<?= $resultadoD['prod_grupo1']; ?>" class="btn btn-info" target="_blank">Editar grupo 1</a>
+										<?php } ?>
 									</div>
 
 									<div class="control-group">
@@ -314,7 +324,9 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 												?>
 											</select>
 										</div>
+										<?php if (Modulos::validarRol([41], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 										<a href="categoriasp-editar.php?id=<?= $resultadoD['prod_categoria']; ?>" class="btn btn-info" target="_blank">Editar grupo 2</a>
+										<?php } ?>
 									</div>
 
 									<div class="control-group">
@@ -334,10 +346,12 @@ $precioListaUSD = productosPrecioListaUSD($resultadoD['prod_utilidad'], $resulta
 												?>
 											</select>
 										</div>
+										<?php if (Modulos::validarRol([35], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 										<a href="marcas-editar.php?id=<?= $resultadoD['prod_marca']; ?>" class="btn btn-info" target="_blank">Editar marca</a>
+										<?php } ?>
 									</div>
 
-									<?php if ($datosUsuarioActual['usr_tipo'] == 1) { ?>
+									<?php if (Modulos::validarRol([399], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 										<div class="control-group">
 											<label class="control-label">Costo COP ($)</label>
 											<div class="controls">

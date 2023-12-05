@@ -54,7 +54,9 @@ include("includes/js-formularios.php");
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
+						<?php if (Modulos::validarRol([12], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 						<li><a href="clientes-seguimiento.php?idTK=<?=$_GET["idTK"];?>&cte=<?=$_GET["cte"];?>">Seguimiento de clientes</a><span class="divider"><i class="icon-angle-right"></i></span></li>
+							<?php } ?>
 						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
@@ -165,7 +167,9 @@ include("includes/js-formularios.php");
 							</div>
 							
 							<div align="center" style="padding: 5px;">
+								<?php if (Modulos::validarRol([90], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="clientes-tikets-editar.php?id=<?=$infoTicket['tik_id'];?>" class="btn btn-primary">Editar ticket</a>
+								<?php } ?>
 							</div>
 							
 						</div>
@@ -173,7 +177,9 @@ include("includes/js-formularios.php");
 				</div>
 				
 				<div class="span9">
+				<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<p><a href="clientes-seguimiento-agregar.php?idTK=<?=$_GET["idTK"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+				<?php } ?>
 					
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
@@ -212,7 +218,9 @@ include("includes/js-formularios.php");
                                     	</select>
                                     </div>
 								   
+									<?php if (Modulos::validarRol([45], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 								   <a href="#" onClick='window.open("clientes-contactos-agregar.php?cte=<?=$cliente;?>","contactos","width=1200,height=800,menubar=no")' class="btn btn-danger"><i class="icon-plus"></i> Agregar contactos</a>
+									<?php } ?> 
                                     <p style="margin-top:10px; font-weight:bold;">Cuando termine de crear el contacto, cierre la ventana emergente y actualice esta pantalla (F5)</p>
                                </div>
                                
@@ -294,7 +302,9 @@ include("includes/js-formularios.php");
 								</div>
 								
 								<?php if($resultadoD['cseg_archivo']!=""){?>
+									<?php if (Modulos::validarRol([14], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="bd_update/cliente-seguimiento-actualizar.php?get=32&id=<?=$resultadoD['cseg_id'];?>" onClick="if(!confirm('Desea eliminar este archivo?')){return false;}"><i class="icon-trash"></i></a>&nbsp;&nbsp;
+									<?php } ?>
 									<a href="files/adjuntos/<?=$resultadoD['cseg_archivo'];?>" target="_blank"><?=$resultadoD['cseg_archivo'];?></a>
 								<?php }?>
                                 

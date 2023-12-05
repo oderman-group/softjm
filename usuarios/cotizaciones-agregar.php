@@ -55,7 +55,9 @@ include("includes/js-formularios.php");
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
+						<?php if (Modulos::validarRol([77], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 						<li><a href="cotizaciones.php">Cotizaciones</a><span class="divider"><i class="icon-angle-right"></i></span></li>
+						<?php } ?>
 						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
@@ -83,12 +85,12 @@ include("includes/js-formularios.php");
 											<option value=""></option>
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_ciudad!='1122' AND cli_id_empresa='".$idEmpresa."'");
-											if($datosUsuarioActual['usr_tipo']==1){
+											if(Modulos::validarRol([389], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 												$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											}
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
-												if($datosUsuarioActual[3]!=1){
+												if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 													$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
 													$numZ = $consultaNumZ->num_rows;
 													if($numZ==0) continue;
@@ -99,7 +101,7 @@ include("includes/js-formularios.php");
 												if($resOp['cli_categoria']==3){
 													$dealer = '(DEALER)';
 
-													if($datosUsuarioActual['usr_tipo']!=1){
+													if(!Modulos::validarRol([390], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 														$disabled = 'disabled';
 													}	
 												}
@@ -113,8 +115,8 @@ include("includes/js-formularios.php");
                                     	</select>
                                     </div>
 								   
-								   <?php if(is_numeric($_GET['cte'])){?>
-								   		<a href="clientes-editar.php?id=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Editar cliente</a>
+								   <?php if(is_numeric($_GET['cte']) && Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
+											<a href="clientes-editar.php?id=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Editar cliente</a>
 								   <?php }?>
 								   
 							   </div>
@@ -149,7 +151,7 @@ include("includes/js-formularios.php");
 										 </select>
 									 </div>
 									
-									<?php if(is_numeric($_GET['prov'])){?>
+									<?php if(is_numeric($_GET['prov']) && Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 											<a href="proveedores-editar.php?id=<?=$_GET["prov"];?>" class="btn btn-info" target="_blank">Editar proveedor</a>
 									<?php }?>
 									
@@ -187,7 +189,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="clientes-sucursales.php?cte=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Ver sucursales</a>
+									<?php } ?>									
                                </div>
 								
 								<div class="control-group">
@@ -213,7 +217,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="clientes-contactos.php?cte=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Ver contactos</a>
+									<?php } ?>
                                </div>	
                                
 								<div class="control-group">
@@ -298,7 +304,7 @@ include("includes/js-formularios.php");
 												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' $filtroProd ORDER BY prod_nombre ");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 													
-													if($resOp['prod_categoria'] == 28 and ($datosUsuarioActual[3]!=1 and $datosUsuarioActual[3]!=9) ){
+													if($resOp['prod_categoria'] == 28 and !Modulos::validarRol([392], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ){
 														continue;
 													}
 												?>

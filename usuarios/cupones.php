@@ -76,7 +76,9 @@ include("includes/head.php");
 			</div>
             <?php include("includes/notificaciones.php");?>
             <p>
+						<?php if (Modulos::validarRol([166], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
             	<a href="cupones-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+						<?php } ?>
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -120,9 +122,13 @@ include("includes/head.php");
 								<td><?=$opcionesSINO[$res['cupo_redimido']];?></td>
 								
                                 <td><h4>
+																<?php if (Modulos::validarRol([235], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="cupones-editar.php?id=<?=$res[0]?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+																<?php } ?>
 									<?php if($res['cupo_redimido']==0){?>
+										<?php if (Modulos::validarRol([370], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     	<a href="bd_delete/cupones-eliminar.php?id=<?=$res[0]?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																<?php } ?>
 									<?php }?>
 									
                                 </h4></td>

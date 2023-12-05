@@ -131,21 +131,30 @@ include("includes/head.php");
             <?php include("includes/notificaciones.php");?>
             <p>
                 <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                <a href="clientes-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-				<a href="clientes-importar.php" class="btn btn-success"><i class="icon-upload"></i> Cargar masivamente</a>
+								<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<a href="clientes-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+								<?php } ?>
+								<?php if (Modulos::validarRol([252], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<a href="clientes-importar.php" class="btn btn-success"><i class="icon-upload"></i> Cargar masivamente</a>
+								<?php } ?>
                 	
 				<div class="btn-group">
 							<button class="btn btn-primary">Acciones</button>
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span>
 							</button>
 							<ul class="dropdown-menu">
-								<li><a href="clientes-filtro.php">Imprimir informe</a></li>
-								
-								<!-- Check_id 7, 15 y17 -->
-								<li><a href="excel_exportar/clientes-exportar.php?dpto=<?php if(isset($_GET["dpto"])) echo $_GET["dpto"];?>" target="_blank">Exportar a Excel</a></li>
-								<li><a href="bd_update/clientes-actualizar-claves.php" onClick="if(!confirm('Desea ejecutar esta accion?')){return false;}">Cambiar todas las claves</a></li>
-								<li><a href="clientes.php?pap=1">Ver clientes en papelera</a></li>
-								<!-- endif-check_id -->
+								<?php if (Modulos::validarRol([103], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<li><a href="clientes-filtro.php">Imprimir informe</a></li>
+								<?php } ?>
+								<?php if (Modulos::validarRol([264], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<li><a href="excel_exportar/clientes-exportar.php?dpto=<?php if(isset($_GET["dpto"])) echo $_GET["dpto"];?>" target="_blank">Exportar a Excel</a></li>
+								<?php } ?>
+								<?php if (Modulos::validarRol([57], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<li><a href="bd_update/clientes-actualizar-claves.php" onClick="if(!confirm('Desea ejecutar esta accion?')){return false;}">Cambiar todas las claves</a></li>
+								<?php } ?>
+								<?php if (Modulos::validarRol([2], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<li><a href="clientes.php?pap=1">Ver clientes en papelera</a></li>
+								<?php } ?>
 								
 							</ul>
 						</div>
@@ -163,7 +172,7 @@ include("includes/head.php");
 					<div class="widget-container">
                 <a href="clientes.php" style="margin-bottom:10px;">TODOS</a><br>
                 <?php
-                if($datosUsuarioActual[3]==1){
+                if(Modulos::validarRol([387], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 					$departamentos = $conexionBdAdmin->query("SELECT * FROM localidad_departamentos ORDER BY dep_nombre");
 				}else{
 					$departamentos = $conexionBdAdmin->query("SELECT * FROM ".BDADMIN.".localidad_departamentos
@@ -243,7 +252,7 @@ include("includes/head.php");
 						}
 						if(isset($_GET["pap"]) and $_GET["pap"]==1){ $filtro .= " AND cli_papelera=1";}
 						if(isset($_GET["tipoDoc"]) and is_numeric($_GET["tipoDoc"])){ $filtro .= " AND cli_tipo_documento='".$_GET["tipoDoc"]."'";}
-						if($datosUsuarioActual['usr_tipo']!=1){
+						if(Modulos::validarRol([385], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 							$filtro.=' AND cli_ciudad!="1122"';
 						}
 						?>
@@ -342,7 +351,7 @@ include("includes/head.php");
 									$titleEstado = 'Actualizado - '.$res['cli_estado_mercadeo_fecha'];
 								}
 								
-								if($datosUsuarioActual[3]!=1){
+								if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 									$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
 									WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'");
 									$numZ = $consultaNumZ->num_rows;
@@ -398,23 +407,47 @@ include("includes/head.php");
                                     <?php if($res['cli_email']!="") echo " | <b>Email:</b> ". $res['cli_email'];?>
 									
                                     <h4 style="margin-top:5px;">
-                                        <a href="clientes-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
-                                        <a href="bd_delete/clientes-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;
-                                        <a href="clientes-sucursales.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Sucursales" target="new"><i class="icon-home"></i></a>&nbsp;
-                                        <a href="clientes-contactos.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Contactos" target="new"><i class="icon-group"></i></a>&nbsp;
-                                        <a href="clientes-tikets.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Tikets de seguimiento" target="new"><i class="icon-list-ol"></i></a>&nbsp;
-                                        <a href="clientes-seguimiento.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Seguimiento de clientes" target="new"><i class="icon-list-alt"></i></a>&nbsp;
-                                        <a href="facturacion.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Facturación" target="new"><i class="icon-money"></i></a>&nbsp;
-										<a href="enviar-portafolios.php?cte=<?=$res[0];?>" data-toggle="tooltip" title="Enviar portafolios" target="_blank"><i class="icon-list-ul"></i></a>&nbsp;
+																			<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																				<a href="clientes-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
+																			<?php } ?>
+																			<?php if (Modulos::validarRol([55], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																				<a href="bd_delete/clientes-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;
+																			<?php } ?>
+																			<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																				<a href="clientes-sucursales.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Sucursales" target="new"><i class="icon-home"></i></a>&nbsp;
+																			<?php } ?>
+																			<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																				<a href="clientes-contactos.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Contactos" target="new"><i class="icon-group"></i></a>&nbsp;
+																			<?php } ?>
+																			<?php if (Modulos::validarRol([88], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																				<a href="clientes-tikets.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Tikets de seguimiento" target="new"><i class="icon-list-ol"></i></a>&nbsp;
+																			<?php } ?>
+																			<?php if (Modulos::validarRol([12], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																				<a href="clientes-seguimiento.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Seguimiento de clientes" target="new"><i class="icon-list-alt"></i></a>&nbsp;
+																			<?php } ?>
+																			<?php if (Modulos::validarRol([259], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																				<a href="facturacion.php?cte=<?=$res[0];?>&emg=1" data-toggle="tooltip" title="Facturación" target="new"><i class="icon-money"></i></a>&nbsp;
+																			<?php } ?>
+																			<?php if (Modulos::validarRol([110], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																				<a href="enviar-portafolios.php?cte=<?=$res[0];?>" data-toggle="tooltip" title="Enviar portafolios" target="_blank"><i class="icon-list-ul"></i></a>&nbsp;
+																			<?php } ?>									
                                 	</h4>
                                 </td>
-								
-								<td align="center" style="background:<?=$color1;?>;"><a href="clientes-tikets.php?cte=<?=$res['cli_id'];?>" target="_blank"><?=$numeros[0];?></a></td>
-								<td align="center" style="background:<?=$color2;?>;"><a href="clientes-seguimiento.php?cte=<?=$res['cli_id'];?>" target="_blank"><?=$numeros[1];?></a></td>
-								<td align="center" style="background:<?=$color3;?>;"><a href="clientes-sucursales.php?cte=<?=$res['cli_id'];?>" target="_blank"><?=$numeros[2];?></td>
-								<td align="center" style="background:<?=$color4;?>;"><a href="clientes-contactos.php?cte=<?=$res['cli_id'];?>" target="_blank"><?=$numeros[3];?></a></td>
-								<td align="center" style="background:<?=$color5;?>;"><a href="facturacion.php?cte=<?=$res['cli_id'];?>" target="_blank"><?=$numeros[4];?></a></td>
-								<td align="center" style="background:<?=$color6;?>;"><a href="../v2.0/usuarios/empresa/lab-remisiones.php?cte=<?=$res['cli_id'];?>" target="_blank"><?=$numeros[5];?></a></td>
+								<?php
+									$valoresClientes = [
+										["url" => "clientes-tikets.php?cte=" . $res['cli_id'], "id" => 88, "color" => $color1, "numero" => $numeros[0]],
+										["url" => "clientes-seguimiento.php?cte=" . $res['cli_id'], "id" => 88, "color" => $color2, "numero" => $numeros[1]],
+										["url" => "clientes-sucursales.php?cte=" . $res['cli_id'], "id" => 88, "color" => $color3, "numero" => $numeros[2]],
+										["url" => "clientes-contactos.php?cte=" . $res['cli_id'], "id" => 88, "color" => $color4, "numero" => $numeros[3]],
+										["url" => "facturacion.php?cte=" . $res['cli_id'], "id" => 88, "color" => $color5, "numero" => $numeros[4]],
+										["url" => "../v2.0/usuarios/empresa/lab-remisiones.php?cte=" . $res['cli_id'], "id" => 88, "color" => $color6, "numero" => $numeros[5]]
+								];
+								?>
+								<?php foreach ($valoresClientes as $pagina) { ?>
+									<?php if (Modulos::validarRol([$pagina['id']], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+											<td align="center" style="background:<?=$pagina['color']?>;"><a href="<?= $pagina['url'] ?>" target="_blank"><?=$pagina['numero']?></a></td>
+									<?php } ?>
+								<?php } ?>	
 								<td><img src="files/<?=$estadoSesion;?>"><br><?=$res['cli_ultimo_ingreso'];?></td>
 							</tr>
                             <?php $no++;}?>
