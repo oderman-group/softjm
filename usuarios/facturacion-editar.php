@@ -63,7 +63,9 @@ include("includes/js-formularios.php");
 				</div>
 			</div>
             <p>
-                <a href="facturacion-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+			<?php if( Modulos::validarRol(['260'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+				<a href="facturacion-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+			<?php }?>
             </p>
             <?php include("includes/notificaciones.php");?>
 			<div class="row-fluid">
