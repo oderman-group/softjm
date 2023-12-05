@@ -78,7 +78,9 @@ include("includes/head.php");
             <?php include("includes/notificaciones.php");?>
             <p>
             <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+						<?php if (Modulos::validarRol([134], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
             <a href="importacion-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+						<?php } ?>
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -160,7 +162,7 @@ include("includes/head.php");
 										<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span>
 										</button>
 										<ul class="dropdown-menu">
-											<?php if($_SESSION["id"]==$res['cotiz_creador'] or $_SESSION["id"]==$res['cotiz_vendedor'] or $datosUsuarioActual[3]==1){?>
+											<?php if($_SESSION["id"]==$res['cotiz_creador'] or $_SESSION["id"]==$res['cotiz_vendedor'] or Modulos::validarRol([135], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 											<li><a href="importacion-editar.php?id=<?=$res['imp_id'];?>#productos"> Editar</a></li>
 											<?php }?>
 											
