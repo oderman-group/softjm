@@ -112,7 +112,9 @@ include("includes/js-formularios.php");
 			
 			
 			<p>
+			<?php if (Modulos::validarRol([131], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="fce-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+			<?php } ?>
 				<a href="#reportes/formato-remision-1.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
 				
 				<!--
@@ -167,8 +169,9 @@ include("includes/js-formularios.php");
 										 </select>
 									 </div>
 									
-									
+									 	<?php if (Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 											<a href="proveedores-editar.php?id=<?=$resultadoD['factura_proveedor'];?>" class="btn btn-info" target="_blank">Editar proveedor</a>
+										<?php } ?>
 									
 									
 								</div>
@@ -380,7 +383,9 @@ include("includes/js-formularios.php");
 								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td style="background-color: <?= $colorPNI; ?>;">
 									<a href="sql.php?get=43&idItem=<?=$prod['czpp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_nombre'];?></a>
+									<?php } ?>
 								</td>
                                 <td><input type="number" title="czpp_cantidad" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td><input type="text" title="czpp_valor" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_valor'];?>" onChange="productos(this)" style="width: 200px;"></td>

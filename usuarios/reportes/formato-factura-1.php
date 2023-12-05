@@ -1,4 +1,7 @@
-<?php include("../sesion.php");?>
+<?php 
+include("../sesion.php");
+$idPagina = 367;
+?>
 <?php
 $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"), MYSQLI_BOTH);
 
