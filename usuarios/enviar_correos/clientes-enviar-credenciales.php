@@ -1,6 +1,6 @@
 <?php   
 require_once("../sesion.php");
-
+$idPagina = 368;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
