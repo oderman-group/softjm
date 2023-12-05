@@ -3,7 +3,7 @@
     $idPagina = 59;
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-	$conexionBdPrincipal->query("INSERT INTO usuarios_tipos(utipo_nombre)VALUES('" . $_POST["nombre"] . "')");
+	$conexionBdPrincipal->query("INSERT INTO usuarios_tipos(utipo_nombre, utipo_id_empresa)VALUES('" . $_POST["nombre"] . "', '".$idEmpresa."')");
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
     if(!empty($_POST["accionesNP"])){
 	    $numeroA = (count($_POST["accionesNP"]));

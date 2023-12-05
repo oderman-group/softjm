@@ -1,5 +1,13 @@
 <?php include("sesion.php");
 $idPagina = 332;
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../../librerias/phpmailer/Exception.php';
+require '../../librerias/phpmailer/PHPMailer.php';
+require '../../librerias/phpmailer/SMTP.php';
+
 $remision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM remisiones 
     INNER JOIN clientes ON cli_id=rem_cliente
     WHERE rem_id='" . $_POST["idRem"] . "'"), MYSQLI_BOTH);
@@ -65,15 +73,35 @@ if (empty($contactoV)) {
 				';	
 		$fin .='';						
 		$fin .=  '<html><body>';							
-		$sfrom="auxlaboratorio@jmequipos.com"; //LA CUETA DEL QUE ENVIA EL MENSAJE			
-		$sdestinatario="auxlaboratorio@jmequipos.com"; //CUENTA DEL QUE RECIBE EL MENSAJE			
-		$ssubject="Solicitud copia de certificado - ".$remision['cli_nombre']; //ASUNTO DEL MENSAJE 				
-		$shtml=$fin; //MENSAJE EN SI			
-		$sheader="From:".$sfrom."\nReply-To:".$sfrom."\n"; 			
-		$sheader=$sheader."X-Mailer:PHP/".phpversion()."\n"; 			
-		$sheader=$sheader."Mime-Version: 1.0\n"; 		
-		$sheader=$sheader."Content-Type: text/html; charset=UTF-8\r\n"; 			
-		@mail($sdestinatario,$ssubject,$shtml,$sheader);
+		
+		$mail = new PHPMailer(true);
+  try {
+    $mail->SMTPDebug = 0;                                                           // Enable verbose debug output
+    $mail->isSMTP();                                                                // Set mailer to use SMTP
+    $mail->Host       = EMAIL_SERVER;                                               // Specify main and backup SMTP servers
+    $mail->SMTPAuth   = true;                                                       // Enable SMTP authentication
+    $mail->Username   = EMAIL_USER;                                                 // SMTP username
+    $mail->Password   = EMAIL_PASSWORD;                                             // SMTP password
+    $mail->SMTPSecure = 'ssl';                                                      // Enable TLS encryption, `ssl` also accepted
+    $mail->Port       = 465;                                                        // TCP port to connect to
+
+    //Recipients
+    $mail->setFrom(EMAIL_SENDER, NAME_SENDER);
+    $mail->addAddress(EMAIL_RECIPIENT, "Auxiliar Laboratorio");   
+	$mail->addAddress($_POST["email"], $_POST["nombre"]);   // Add a recipient
+
+
+    // Content
+    $mail->isHTML(true);                                                            // Set email format to HTML
+    $mail->Subject = "Solicitud copia de certificado - ".$remision['cli_nombre'];
+    $mail->Body = $fin;
+    $mail->CharSet = 'UTF-8';
+
+    $mail->send();
+  } catch (Exception $e) {
+    echo "Error: {$mail->ErrorInfo}";
+  }
+  
 	echo '<script type="text/javascript">window.location.href="documentos.php?id='.$_POST["id"].'&msg=1";</script>';
 	exit();
 ?>

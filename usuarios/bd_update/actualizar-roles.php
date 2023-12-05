@@ -3,8 +3,11 @@ require_once("../sesion.php");
 
 $idPagina = 64;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
+$consulta   = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos WHERE utipo_id='".$_POST["id"]."' AND utipo_id_empresa={$idEmpresa}");
+$resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+if(!empty($resultadoD)) {
 
-	$conexionBdPrincipal->query("UPDATE usuarios_tipos SET utipo_nombre='" . $_POST["nombre"] . "' WHERE utipo_id='" . $_POST["id"] . "'");
+	$conexionBdPrincipal->query("UPDATE usuarios_tipos SET utipo_nombre='" . $_POST["nombre"] . "' WHERE utipo_id='" . $_POST["id"] . "' AND utipo_id_empresa={$idEmpresa}");
 
     if(isset($_POST["accionesNP"])){
 	    $numeroA = (count($_POST["accionesNP"]));
@@ -48,4 +51,7 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 	echo '<script type="text/javascript">window.location.href="../roles-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
+} else {
+	echo '<script type="text/javascript">window.location.href="../index.php?error=Unauthorized";</script>';
+}
 	exit();

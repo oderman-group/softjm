@@ -75,7 +75,11 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
-            <p><a href="areas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+				<?php
+					if (Modulos::validarRol([162], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+						echo '<p><a href="areas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>';
+					}
+				?>	
             <?php include("includes/notificaciones.php");?>
 			<div class="row-fluid">
 				<div class="span12">

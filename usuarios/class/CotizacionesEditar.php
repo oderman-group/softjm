@@ -3,6 +3,7 @@ class CotizacionesEditar {
   
   public static function generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas) {
     $htmlTabla = ''; 
+    global $datosUsuarioActual;
 						
     $productos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,
         prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad

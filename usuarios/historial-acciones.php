@@ -70,7 +70,11 @@ include("includes/head.php");
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span>
 							</button>
 							<ul class="dropdown-menu">
-                            	<li><a href="historial-acciones-filtro.php">Imprimir informe</a></li>
+							<?php
+								if (Modulos::validarRol([66], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+									echo '<li><a href="historial-acciones-filtro.php">Imprimir informe</a></li> ';
+								}
+							?>	               	
 							</ul>
 						</div>
             </p>

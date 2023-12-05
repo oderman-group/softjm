@@ -57,7 +57,11 @@ include("includes/head.php");
 		<div class="main-wrapper">
 			<div class="container-fluid">
 				<div class="row-fluid ">
-					<p><a href="roles-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+					<?php
+						if (Modulos::validarRol([6], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+							echo '<p><a href="roles-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>';
+						}
+					?>		
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="content-widgets light-gray">
@@ -86,8 +90,16 @@ include("includes/head.php");
 												<td><?=$res['utipo_id'];?></td>
 												<td><?=$res['utipo_nombre'];?></td>
 												<td><h4>
-													<a href="roles-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-													<?php if($res['utipo_id']!=1){?><a href="bd_delete/roles-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a><?php }?>
+												<?php
+														if (Modulos::validarRol([7], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+															echo '<a href="roles-editar.php?id='.$res[0].'" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a> ';
+														}
+														if($res['utipo_id']!=1){
+															if (Modulos::validarRol([54], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { 
+																echo '<a href="bd_delete/roles-eliminar.php?id='.$res[0].'" onClick="if(!confirm("Desea eliminar el registro?")){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a> ';
+															} 
+														}
+												?>
 												</h4></td>
 											</tr>
 											<?php $no++;}?>

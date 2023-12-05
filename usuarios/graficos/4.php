@@ -1,4 +1,7 @@
-<?php include("../sesion.php");?>
+<?php 
+include("../sesion.php");
+$idPagina = 345;
+?>
 <html>
 <head>
 	<meta charset="utf-8">

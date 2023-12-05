@@ -65,7 +65,11 @@ include("includes/head.php");
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
-            <p><a href="sucursales-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+				<?php
+					if (Modulos::validarRol([137], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+						echo '<p><a href="sucursales-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>';
+					}
+				?>	
 			<div class="row-fluid">
 				<div class="span12">
 					<div class="content-widgets light-gray">
@@ -94,9 +98,17 @@ include("includes/head.php");
                                 <td><?=$res['sucp_id'];?></td>
                                 <td><?=$res['sucp_nombre'];?></td>
                                 <td><h4>
-                                	<a href="metricas.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Métricas"><i class="icon-bar-chart"></i></a>
-                                	<a href="sucursales-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-                                    <a href="bd_delete/sucursales-eliminar.php?id=<?=$res['sucp_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																<?php
+																	if (Modulos::validarRol([157], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																		echo '<a href="metricas.php?id='.$res[0].'" data-toggle="tooltip" title="Métricas"><i class="icon-bar-chart"></i></a> ';
+																	}
+																	if (Modulos::validarRol([138], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																		echo '<a href="sucursales-editar.php?id='.$res[0].'" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a> ';
+																	}
+																	if (Modulos::validarRol([276], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																		echo '<a href="bd_delete/sucursales-eliminar.php?id='.$res['sucp_id'].'" onClick="if(!confirm("Desea eliminar el registro?")){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>';
+																	}	
+																?>   
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>

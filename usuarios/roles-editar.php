@@ -4,8 +4,12 @@ $idPagina = 7;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consulta=$conexionBdPrincipal->query("SELECT * FROM usuarios_tipos WHERE utipo_id='".$_GET["id"]."'");
+$consulta=$conexionBdPrincipal->query("SELECT * FROM usuarios_tipos WHERE utipo_id='".$_GET["id"]."' AND utipo_id_empresa={$idEmpresa}");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+if(empty($resultadoD)) {
+	echo '<script type="text/javascript">window.location.href="index.php?error=Unauthorized";</script>';
+	exit();
+}
 ?>
 <!-- styles -->
 <link href="css/tablecloth.css" rel="stylesheet">
@@ -59,7 +63,11 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
-            <p><a href="roles-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a> <div id="solo"></div></p>
+				<?php
+					if (Modulos::validarRol([6], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+						echo '<p><a href="roles-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a> <div id="solo"></div></p>';
+					}
+				?>	
             
             <?php include("includes/notificaciones.php");?>
             <div class="row-fluid">

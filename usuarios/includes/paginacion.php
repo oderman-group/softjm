@@ -30,8 +30,11 @@ else{
 		$inicio = 0;
 	else
 		$inicio = ($_GET["inicio"] - 1) * $limite;	
+}
+if($limite > 0) {
+	$paginas = ceil($numTotal/$limite);
 }	
-$paginas = ceil($numTotal/$limite);
+
 ?>
 <!--<div class="pagination pagination-right">-->
 <div class="pagination">

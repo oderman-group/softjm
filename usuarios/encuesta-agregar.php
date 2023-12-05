@@ -119,8 +119,12 @@ include("includes/js-formularios.php");
                                     	</select>
                                     </div>
                                     <?php if(isset($_GET["cte"]) and $_GET["cte"]!=""){?>
-                                    <a href="#" onClick='window.open("clientes-contactos-agregar.php?cte=<?=$_GET["cte"];?>","contactos","width=1200,height=800,menubar=no")' class="btn btn-danger"><i class="icon-plus"></i> Agregar contactos</a>
-                                    <p style="margin-top:10px; font-weight:bold;">Cuando termine de crear el contacto, cierre la ventana emergente y actualice esta pantalla (F5)</p>
+																			<?php
+																				if (Modulos::validarRol([45], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																					echo '<a href="#" onClick="window.open("clientes-contactos-agregar.php?cte='.$_GET["cte"].'","contactos","width=1200,height=800,menubar=no")" class="btn btn-danger"><i class="icon-plus"></i> Agregar contactos</a>';
+																					echo '<p style="margin-top:10px; font-weight:bold;">Cuando termine de crear el contacto, cierre la ventana emergente y actualice esta pantalla (F5)</p>';
+																				}
+																			?>	                                   
 									<?php }?>
                                </div>
                                
