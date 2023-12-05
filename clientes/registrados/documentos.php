@@ -170,7 +170,7 @@ include("head.php");
 										</button>
 										<ul class="dropdown-menu">
 											
-											<li><a href="https://softjm.com/usuarios/reportes/formato-cotizacion-1.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
+											<li><a href="<?=REDIRECT_ROUTE?>/usuarios/reportes/formato-cotizacion-1.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
 											
 											
 										</ul>
@@ -231,7 +231,7 @@ include("head.php");
 										
 
 										<?php if($configu['conf_cliente_imprimir_certificado']==1){?>
-											<a href="https://softjm.com/v2.0/usuarios/empresa/lab-certificado-imprimir.php?id=<?=$resC['rem_id'];?>&cp=1" class="btn btn-danger" target="_blank">Imprimir certificado</a><br>
+											<a href="<?=REDIRECT_ROUTE?>/v2.0/usuarios/empresa/lab-certificado-imprimir.php?id=<?=$resC['rem_id'];?>&cp=1" class="btn btn-danger" target="_blank">Imprimir certificado</a><br>
 										<?php }else{?>
 											<a href="solicitud.php?id=<?=$resC['rem_id'];?>" class="btn btn-info">Solicitar copia</a>
 										<?php }?>

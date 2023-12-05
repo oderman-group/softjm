@@ -4,6 +4,13 @@ include("../compartido/head.php");
 $idPagina = 341;
 $tituloPagina = "Seguuimiento equipo agregar";
 include("verificar-paginas.php");
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require RUTA_PROYECTO.'/librerias/phpmailer/Exception.php';
+require RUTA_PROYECTO.'/librerias/phpmailer/PHPMailer.php';
+require RUTA_PROYECTO.'/librerias/phpmailer/SMTP.php';
+
 
 if($_POST["notfCliente"]==""){$_POST["notfCliente"]=0;}
 	
@@ -31,7 +38,7 @@ if($_POST["notfCliente"]==1){
 					<p align="center"><img src="'.$configuracion["conf_url_encuestas"].'/usuarios/files/'.$configuracion["conf_logo"].'" width="350"></p>
 					<div style="font-family:arial; background:'.$configuracion["conf_fondo_mensaje"].'; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
 						
-						<h3 align="center" style="background:darkblue; color:white;">Notificación servicio técnico - JMEQUIPOS</h3>
+						<h3 align="center" style="background:darkblue; color:white;">Notificación servicio técnico</h3>
 						
 						<p style="color:'.$configuracion["conf_color_letra"].';">
 						'.$fechaHoy.'<br><br>
@@ -47,7 +54,7 @@ if($_POST["notfCliente"]==1){
 						<b>NOTA:</b><br>
 						Para revisar este pendiente ingresa a nuestro sistema ORIÓN con tus datos de acceso, mediante el siguiente link.</p>
 						
-						<p align="center"><a href="https://softjm.com/clientes/index.php?idseg='.$idInsertU.'" target="_blank" style="color:'.$configuracion["conf_color_link"].';">VER EL SEGUIMIENTO</a></p>
+						<p align="center"><a href="'.REDIRECT_ROUTE.'/clientes/index.php?idseg='.$idInsertU.'" target="_blank" style="color:'.$configuracion["conf_color_link"].';">VER EL SEGUIMIENTO</a></p>
 						
 						<p align="center" style="color:'.$configuracion["conf_color_letra"].';">
 							<img src="'.$configuracion["conf_url_encuestas"].'/usuarios/files/'.$configuracion["conf_logo"].'" width="80"><br>
@@ -61,15 +68,33 @@ if($_POST["notfCliente"]==1){
 			';	
 	$fin .='';						
 	$fin .=  '<html><body>';							
-	$sfrom="auxlaboratorio@jmequipos.com"; //LA CUETA DEL QUE ENVIA EL MENSAJE			
-	$sdestinatario=$contacto['cont_email'].", ".$cliente['cli_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-	$ssubject="Notificación servicio técnico - JMEQUIPOS"; //ASUNTO DEL MENSAJE 				
-	$shtml=$fin; //MENSAJE EN SI			
-	$sheader="From:".$sfrom."\nReply-To:".$sfrom."\n"; 			
-	$sheader=$sheader."X-Mailer:PHP/".phpversion()."\n"; 			
-	$sheader=$sheader."Mime-Version: 1.0\n"; 		
-	$sheader=$sheader."Content-Type: text/html; charset=UTF-8\r\n"; 			
-	@mail($sdestinatario,$ssubject,$shtml,$sheader);
+	$mail = new PHPMailer(true);
+  try {
+    $mail->SMTPDebug = 0;                                                           // Enable verbose debug output
+    $mail->isSMTP();                                                                // Set mailer to use SMTP
+    $mail->Host       = EMAIL_SERVER;                                               // Specify main and backup SMTP servers
+    $mail->SMTPAuth   = true;                                                       // Enable SMTP authentication
+    $mail->Username   = EMAIL_USER;                                                 // SMTP username
+    $mail->Password   = EMAIL_PASSWORD;                                             // SMTP password
+    $mail->SMTPSecure = 'ssl';                                                      // Enable TLS encryption, `ssl` also accepted
+    $mail->Port       = 465;                                                        // TCP port to connect to
+
+    //Recipients
+    $mail->setFrom(EMAIL_SENDER, NAME_SENDER);
+		$mail->addAddress($contacto['cont_email'], $contacto['cont_nombre']);   // Add a recipient
+		$mail->addAddress($cliente['cli_email'], $cliente['cli_nombre']);   // Add a recipient
+
+
+    // Content
+    $mail->isHTML(true);                                                            // Set email format to HTML
+    $mail->Subject = "Notificación servicio técnico";
+    $mail->Body = $fin;
+    $mail->CharSet = 'UTF-8';
+
+    $mail->send();
+  } catch (Exception $e) {
+    echo "Error: {$mail->ErrorInfo}";
+  }
 }
 /*
 echo $fin."<br>";

@@ -1122,7 +1122,7 @@ if($_POST["idSql"]==49){
 							<b>NOTA:</b><br>
 							Para revisar este pendiente ingresa a nuestro sistema ORIÓN con tus datos de acceso, mediante el siguiente link.</p>
 							
-							<p align="center"><a href="https://softjm.com/clientes/index.php?idseg='.$idInsertU.'" target="_blank" style="color:'.$configuracion["conf_color_link"].';">VER EL SEGUIMIENTO</a></p>
+							<p align="center"><a href="'.REDIRECT_ROUTE.'/clientes/index.php?idseg='.$idInsertU.'" target="_blank" style="color:'.$configuracion["conf_color_link"].';">VER EL SEGUIMIENTO</a></p>
 							
 							<p align="center" style="color:'.$configuracion["conf_color_letra"].';">
 								<img src="'.$configuracion["conf_url_encuestas"].'/usuarios/files/'.$configuracion["conf_logo"].'" width="80"><br>
@@ -1530,7 +1530,7 @@ if($_GET["get"]==32){
 							<b>Equipo:</b> '.$remision["rem_equipo"].'<br>
 							<b>Referencia:</b> '.$remision["rem_referencia"].'<br>
 							<b>Serial:</b> '.$remision['rem_serial'].'<br>
-							<b>LINK DE DESCARGA:</b><br> https://softjm.com/v2.0/usuarios/empresa/lab-remisiones-imprimir.php?id='.$_GET["id"].'&estado='.$remision["rem_estado"].'<br>
+							<b>LINK DE DESCARGA:</b><br> '.REDIRECT_ROUTE.'/v2.0/usuarios/empresa/lab-remisiones-imprimir.php?id='.$_GET["id"].'&estado='.$remision["rem_estado"].'<br>
 							</p>
 							
 							<p align="center" style="color:'.$configuracion["conf_color_letra"].';">
