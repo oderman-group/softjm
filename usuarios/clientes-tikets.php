@@ -83,7 +83,9 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 				<?php include("includes/notificaciones.php");?>
 				<p>
 					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+					<?php if (Modulos::validarRol([89], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<a href="clientes-tikets-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+					<?php } ?>
 				</p>
 
 				<div class="row-fluid">
@@ -107,13 +109,13 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 							if (isset($_GET["tipo"]) and $_GET["tipo"] != "") {
 								$filtro .= " AND tik_tipo_tiket='" . $_GET["tipo"] . "'";
 							}
-							if($datosUsuarioActual['usr_tipo']!=1){
+							if(Modulos::validarRol([385], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 								$filtro.=' AND cli_ciudad!="1122"';
 							}
 							?>
 
 							<?php
-							if ($datosUsuarioActual[3] == 1) {
+							if (Modulos::validarRol([384], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 								$SQL = "SELECT * FROM clientes_tikets
 								INNER JOIN clientes ON cli_id=tik_cliente
 								INNER JOIN usuarios ON usr_id=tik_usuario_responsable
@@ -154,7 +156,7 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 									</thead>
 									<tbody>
 										<?php
-										if ($datosUsuarioActual[3] == 1) {
+										if (Modulos::validarRol([384], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 											$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets
 											INNER JOIN clientes ON cli_id=tik_cliente
 											INNER JOIN usuarios ON usr_id=tik_usuario_responsable
@@ -177,7 +179,7 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 											$consultaAsuntos=mysqli_query($conexionBdPrincipal,"SELECT * FROM tikets_asuntos WHERE tkpas_id='" . $res["tik_asunto_principal"] . "'");
 											$asuntos = mysqli_fetch_array($consultaAsuntos, MYSQLI_BOTH);
 
-											if ($datosUsuarioActual[3] != 1) {
+											if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$consultaNumZ=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
 												$numZ = mysqli_num_rows($consultaNumZ);
 												if ($numZ == 0) continue;
@@ -238,17 +240,28 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 												<td><?= $sucursal['sucu_nombre']; ?></td>
 												<td><?= $res['tik_asunto_principal']; ?></td>
 												<td><?= $res['usr_nombre'];?></td>
-												<td><a href="bd_update/clientes-tikets-actualizar-estado.php?get=29&id=<?= $res[0]; ?>" onClick="if(!confirm('Recuerde completar todos los seguimientos pendientes, en caso de tenerlos, antes de cerrar el ticket. Desea continuar con el cierre del ticket?')){return false;}"><span class="label label-<?= $etiquetaE; ?>"><?= $estado; ?></span></a></td>
+												<td>
+												<?php if (Modulos::validarRol([301], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<a href="bd_update/clientes-tikets-actualizar-estado.php?get=29&id=<?= $res[0]; ?>" onClick="if(!confirm('Recuerde completar todos los seguimientos pendientes, en caso de tenerlos, antes de cerrar el ticket. Desea continuar con el cierre del ticket?')){return false;}"><span class="label label-<?= $etiquetaE; ?>"><?= $estado; ?></span></a>
+												<?php } ?>
+												</td>
 												<td><span class="label label-<?= $etiquetaP; ?>"><?= $prioridad; ?></span></td>
-												<td align="center" style="background:<?= $color2; ?>;"><a href="clientes-seguimiento.php?idTK=<?= $res[0]; ?>" target="_blank"><?= $numeros[0]; ?></a></td>
+												<td align="center" style="background:<?= $color2; ?>;">
+													<?php if (Modulos::validarRol([12], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+														<a href="clientes-seguimiento.php?idTK=<?= $res[0]; ?>" target="_blank"><?= $numeros[0]; ?></a>
+													<?php } ?>
+												</td>
 												<td>
 													<h4>
 														<!--
                                 	<a href="clientes-seguimiento.php?idTK=<?= $res[0]; ?>&emg=1" data-toggle="tooltip" title="Seguimiento" target="new"><i class="icon-list-alt"></i></a>
 									-->
-
+												<?php if (Modulos::validarRol([90], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="clientes-tikets-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+												<?php } ?>
+												<?php if (Modulos::validarRol([91], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="bd_delete/clientes-tikets-eliminar.php?id=<?=$res[0];?>&cte=<?=$_GET["cte"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+												<?php } ?>
 													</h4>
 												</td>
 											</tr>

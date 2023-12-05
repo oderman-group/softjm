@@ -97,7 +97,9 @@ if(!empty($_GET["idTK"])){
 				<?php include("includes/notificaciones.php");?>
 				<p>
 					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+					<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<a href="clientes-seguimiento-agregar.php?idTK=<?= $_GET["idTK"]; ?>&cte=<?= $_GET["cte"]; ?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+					<?php } ?>
 				</p>
 
 				<div class="alert alert-info">
@@ -279,7 +281,7 @@ if(!empty($_GET["idTK"])){
 											WHERE cont_id='" . $res['cseg_contacto'] . "'");
 											$contacto = mysqli_fetch_array($consultaContacto, MYSQLI_BOTH);
 
-											if ($datosUsuarioActual[3] != 1) {
+											if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$consultaNumZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
 												$numZ = mysqli_num_rows($consultaNumZonas);
 												if ($numZ == 0) continue;
@@ -312,9 +314,15 @@ if(!empty($_GET["idTK"])){
 													<?php echo "<br><b>Ciudad:</b> " . $res['ciu_nombre']; ?>
 
 													<h4 style="margin-top:10px;">
+														<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="clientes-seguimiento-agregar.php?idTK=<?= $res['cseg_tiket']; ?>" data-toggle="tooltip" title="Nuevo Seguimiento"><i class="icon-plus"></i></a>
+														<?php } ?>
+														<?php if (Modulos::validarRol([14], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="clientes-seguimiento-editar.php?id=<?= $res[0]; ?>&idTK=<?= $_GET["idTK"]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
+														<?php } ?>
+														<?php if (Modulos::validarRol([56], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="bd_delete/clientes-seguimiento-eliminar.php?id=<?=$res[0]; ?>&cte=<?=$_GET["cte"];?>&idTK=<?= $_GET["idTK"]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+														<?php } ?>
 
 													</h4>
 												</td>

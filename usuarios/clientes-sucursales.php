@@ -86,7 +86,9 @@ $cliente = mysqli_fetch_array($consultaClientes, MYSQLI_BOTH);
             <?php include("includes/notificaciones.php");?>
             <p>
             	<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+							<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                 <a href="clientes-sucursales-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+							<?php } ?>
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -126,8 +128,12 @@ $cliente = mysqli_fetch_array($consultaClientes, MYSQLI_BOTH);
                                 <td><?=$res['ciu_nombre'].", ".$res['dep_nombre'];?></td>
                                 <td><?=$res['cli_nombre'];?></td>
                                 <td><h4>
+																	<?php if (Modulos::validarRol([85], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="clientes-sucursales-editar.php?id=<?=$res[0];?>&cte=<?=$_GET["cte"];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+																	<?php } ?>
+																	<?php if (Modulos::validarRol([86], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="bd_delete/clientes-sucursales-eliminar.php?id=<?=$res[0];?>&cte=<?=$_GET["cte"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																	<?php } ?>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>
