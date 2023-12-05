@@ -57,7 +57,9 @@ include("includes/js-formularios.php");
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
+						<?php if (Modulos::validarRol([259], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 						<li><a href="facturacion.php">Facturación</a><span class="divider"><i class="icon-angle-right"></i></span></li>
+						<?php } ?>
 						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
@@ -97,7 +99,7 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-												if($datosUsuarioActual[3]!=1){
+												if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 													$consultaNumZona=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
 													$numZ = mysqli_num_rows($consultaNumZona);
 													if($numZ==0) continue;

@@ -123,7 +123,7 @@ include("includes/head.php");
 								
 								$saldoFinal = $valorReal - $abonos[0];
 
-								if($datosUsuarioActual[3]!=1){
+								if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 									$consultaNumZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'");
 									$numZ = mysqli_num_rows($consultaNumZonas);
 									if($numZ==0) continue;

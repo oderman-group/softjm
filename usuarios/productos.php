@@ -162,7 +162,7 @@ include("includes/head.php");
 
 <?php
 $columna = '';
-if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) {
+if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 	$columna = 'columnas1';
 ?>
 
@@ -209,15 +209,22 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 
 
 				<p>
-					<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10 or $datosUsuarioActual['usr_tipo'] == 13) { ?>
+					<?php if (Modulos::validarRol([37], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 						<a href="productos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+					<?php } ?>
+					<?php if (Modulos::validarRol([153], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 						<a href="productos-condiciones.php" class="btn btn-warning"><i class="icon-random"></i> Condicionar productos</a>
+					<?php } ?>
+					<?php if (Modulos::validarRol([152], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 						<a href="productos-store.php" class="btn btn-info"><i class="icon-th-large"></i> Editar Productos Store JM</a>
+					<?php } ?>
+					<?php if (Modulos::validarRol([121], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 						<a href="productos-predeterminados.php" class="btn btn-danger"><i class="icon-th-large"></i> Editar Productos predeterminados</a>
 					<?php } ?>
-
-					<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10 or $datosUsuarioActual['usr_tipo'] == 13) { ?>
+					<?php if (Modulos::validarRol([21], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 						<a href="productos-importar.php" class="btn btn-success"><i class="icon-file"></i> Importar excel</a>
+					<?php } ?>
+					<?php if (Modulos::validarRol([208], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 						<a href="guardar-precios.php" class="btn btn-danger" onClick="if(!confirm('Desea guardar los precios actuales en el historial?')){return false;}"><i class="icon-save"></i> Guardar precios en historial</a>
 					<?php } ?>
 				</p>
@@ -228,7 +235,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 
 				<p>
 					<a href="productos.php?todo=1" style="text-decoration: underline; font-weight: bold; color: navy; font-size: 16px;">[VER TODOS]</a>&nbsp;|&nbsp;
-					<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+					<?php if (Modulos::validarRol([401], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 						<a href="productos.php?web=1" style="text-decoration: underline;">Tienda/Visible Web</a>&nbsp;|&nbsp;
 						<a href="productos.php?pdt=1" style="text-decoration: underline;">Predeterminados</a>&nbsp;|&nbsp;
 						<a href="productos.php?nopdt=1" style="text-decoration: underline;">No predeterminados</a>&nbsp;|&nbsp;
@@ -308,21 +315,21 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 									<thead>
 										<tr>
 											<th>No</th>
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>PDT</th>
 												<th>VIS. WEB</th>
 											<?php } ?>
 											<th>CÓDIGO</th>
 											<th>Nombre</th>
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10 or $datosUsuarioActual['usr_tipo'] == 13) { ?>
+											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>Costo</th>
 											<?php } ?>
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>Utilidad (%)</th>
 											<?php } ?>
 											<th title="Sobre el precio de lista.">Dcto. Max. (%)</th>
 
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>Comisión (%)</th>
 												<th>Comisión externo (%)</th>
 												<th title="Sobre el precio de lista.">Utilidad Web. (%)</th>
@@ -334,17 +341,17 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 											<th>Precio lista</br>Segun dolar hoy</th>
 											<th>Precio lista (USD)</th>
 
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>Precio lista + IVA</th>
 												<th>Precio dealer</th>	
 											<?php } ?>
 
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>Grupo 1</th>
 											<?php } ?>
 											<th>Grupo 2</th>
 											<th>Marca</th>
-											<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+											<?php if ($Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>P. Fábrica<br>USD</th>
 												<th>Flete<br>USD</th>
 												<th>Aduana<br>USD</th>
@@ -463,14 +470,14 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 											<tr>
 												<td><?= $no; ?></td>
 
-												<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td><a href="#" onClick="pred(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_precio_predeterminado']; ?>" id="p<?= $res[$pk]; ?>"><?=$opcionSINO[$res['prod_precio_predeterminado']];?></a></td>
 
 													<td><a href="#" onClick="visweb(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_visible_web']; ?>" id="vw<?= $res[$pk];?>"><?= $opcionSINO[$res['prod_visible_web']]; ?></a></td>
 												<?php } ?>
 
 												<td align="center" style="font-weight: bold;">
-													<input type="text" title="prod_referencia" name="<?= $res[$pk]; ?>" value="<?= $res['prod_referencia']; ?>" style="width: 60px; text-align: center" onChange="productos(this)" <?php if (!$datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) {echo "disabled";} ?>>
+													<input type="text" title="prod_referencia" name="<?= $res[$pk]; ?>" value="<?= $res['prod_referencia']; ?>" style="width: 60px; text-align: center" onChange="productos(this)" <?php if (!Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {echo "disabled";} ?>>
 													<span style="visibility: hidden;"><?= $res['prod_referencia']; ?></span>
 												</td>
 
@@ -478,18 +485,30 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 													<div class="<?= $columna; ?>">
 														<?= $res['prod_nombre']; ?>
 														<h4>
+														<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="productos-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+														<?php } ?>
+														<?php if (Modulos::validarRol([61], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="bd_delete/productos-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+														<?php } ?>
 															<!--<a href="productos-materiales.php?pdto=<?= $res[0]; ?>" data-toggle="tooltip" title="Materiales"><i class="icon-folder-open"></i></a>-->
+														<?php if (Modulos::validarRol([209], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="productos-galeria.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Galería"><i class="icon-picture"></i></a>
+														<?php } ?>
+														<?php if (Modulos::validarRol([145], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="bodegas-productos.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Bodegas por productos"><i class="icon-pushpin"></i></a>
+														<?php } ?>
+														<?php if (Modulos::validarRol([214], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="productos-historial-precios.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Historial de precios"><i class="icon-time"></i></a>
+														<?php } ?>
+														<?php if (Modulos::validarRol([215], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="bd_create/productos-replicar-guardar.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Replicar a productos de soporte" onClick="if(!confirm('Desea replicar este producto a soporte operativo?')){return false;}"><i class="icon-repeat"></i></a>
+														<?php } ?>
 														</h4>
 													</div>
 												</td>
 
-												<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10 or $datosUsuarioActual['usr_tipo'] == 13) { ?>
+												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td>
 														COP: <input id="costo<?= $res['prod_id']; ?>" type="text" alt="<?= $res['prod_utilidad']; ?>" title="prod_costo" name="<?= $res[$pk]; ?>" value="<?= $res['prod_costo']; ?>" style="width: 80px; text-align: center" onChange="productos(this)"><br>
 
@@ -497,7 +516,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 													</td>
 													<?php } ?>	
 
-													<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+													<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 
 													<td>
 														<input id="utilidad<?= $res['prod_id']; ?>" type="text" alt="<?= $res['prod_costo']; ?>" title="prod_utilidad" name="<?= $res[$pk]; ?>" value="<?= $res['prod_utilidad']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
@@ -511,7 +530,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 													<span style="visibility: hidden;"><?= $res['prod_descuento1']; ?></span>
 												</td>
 
-												<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td>
 														<input type="text" title="prod_comision" name="<?= $res[$pk]; ?>" value="<?= $res['prod_comision']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
 														<span style="visibility: hidden;"><?= $res['prod_comision']; ?></span>
@@ -550,7 +569,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 
 												<td id="precioListaUSD<?= $res['prod_id']; ?>">USD <?= number_format($precioListaUSD, 2, ",", "."); ?></td>
 
-												<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td id="precioListaIva<?= $res['prod_id']; ?>">$<?= number_format($precioConIva, 0, ",", "."); ?></td>
 
 													<td>$<?= number_format($precioDealer, 0, ",", "."); ?></td>
@@ -558,7 +577,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 													
 												<?php } ?>
 
-												<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td><?= $grupo1['catp_nombre']; ?></td>
 												<?php } ?>
 
@@ -567,7 +586,7 @@ if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 1
 
 
 
-												<?php if ($datosUsuarioActual['usr_tipo'] == 1 or $datosUsuarioActual['usr_tipo'] == 10) { ?>
+												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td>
 														<input type="text" title="prod_precio_fabrica" name="<?= $res[$pk]; ?>" value="<?= $res['prod_precio_fabrica']; ?>" style="width: 80px; text-align: center" onChange="productos(this)">
 														<span style="visibility: hidden;"><?= $res['prod_precio_fabrica']; ?></span>

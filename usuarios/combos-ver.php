@@ -200,7 +200,7 @@ include("includes/js-formularios.php");
 							<tbody>
                             <?php
 							$editarCantidad = 'disabled';
-							if ($datosUsuarioActual['usr_tipo'] == 1 ) {
+							if (Modulos::validarRol([388], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {
 								$editarCantidad = '';
 							}
 
@@ -223,7 +223,11 @@ include("includes/js-formularios.php");
 							<tr>
 								<td><?=$no;?></td>
                                 <td>
+										<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_id']." - ".$prod['prod_nombre'];?></a>
+										<?php } else {?>
+											<span><?=$prod['prod_id']." - ".$prod['prod_nombre'];?></span>
+										<?php } ?>
 								</td>
                                 <td><?=$prod['copp_cantidad'];?></td>
                                 <td>$<?=number_format($prod['copp_precio'],0,",",".");?></td>

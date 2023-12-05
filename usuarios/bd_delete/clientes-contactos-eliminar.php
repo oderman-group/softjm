@@ -1,5 +1,6 @@
 <?php
 require_once("../sesion.php");
+$idPagina = 369;
 
 $conexionBdPrincipal->query("DELETE FROM contactos WHERE cont_id='" . $_GET["id"] . "'");
 

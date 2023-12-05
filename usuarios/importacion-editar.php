@@ -225,7 +225,9 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 
 
 				<p>
+				<?php if (Modulos::validarRol([134], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<a href="importacion-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+				<?php } ?>
 					<a href="#reportes/formato-remision-1.php?id=<?= $_GET["id"]; ?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
 
 					<!--
@@ -277,8 +279,9 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 											</select>
 										</div>
 
-
+										<?php if (Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 										<a href="proveedores-editar.php?id=<?= $resultadoD['imp_proveedor']; ?>" class="btn btn-info" target="_blank">Editar proveedor</a>
+										<?php } ?>		
 
 
 									</div>
@@ -309,7 +312,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 											</select>
 										</div>
 
-										<?php if ($resultadoD['imp_fce'] != "") { ?>
+										<?php if ($resultadoD['imp_fce'] != "" && Modulos::validarRol([132], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 											<a href="fce-editar.php?id=<?= $resultadoD['imp_fce']; ?>" class="btn btn-info" target="_blank">Detalles de la factura</a>
 										<?php } ?>
 
@@ -518,7 +521,9 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 												<td><input type="number" title="czpp_orden" name="<?= $prod['czpp_id']; ?>" value="<?= $prod['czpp_orden']; ?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
 												<td style="background-color: <?= $colorPNI; ?>;">
 													<a href="sql.php?get=43&idItem=<?= $prod['czpp_id']; ?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+													<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 													<a href="productos-editar.php?id=<?= $prod['prod_id']; ?>" target="_blank"><?= $prod['prod_nombre']; ?></a>
+													<?php } ?>
 												</td>
 												<td><input type="number" title="czpp_cantidad" name="<?= $prod['czpp_id']; ?>" value="<?= $prod['czpp_cantidad']; ?>" onChange="productos(this)" style="width: 50px; text-align: center;" disabled></td>
 												<td><input type="text" title="czpp_valor" name="<?= $prod['czpp_id']; ?>" value="<?= $prod['czpp_valor']; ?>" onChange="productos(this)" style="width: 200px;" disabled></td>
@@ -575,7 +580,9 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 												<td><?= $no; ?></td>
 												<td>-</td>
 												<td style="background-color: yellow;">
+												<?php if (Modulos::validarRol([130], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 													<a href="facturas-compra-editar.php?id=<?= $fact['factura_id']; ?>#productos" target="_blank"><?= $fact['factura_concepto']; ?></a>
+												<?php } ?>
 												</td>
 												<td>-</td>
 												<?php if($fact['factura_preferencia']!=1){?>

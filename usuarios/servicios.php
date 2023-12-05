@@ -96,7 +96,9 @@ include("includes/head.php");
 		<div class="main-wrapper">
 			<div class="container-fluid">
 				<?php include("includes/notificaciones.php"); ?>
+				<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<p><a href="servicios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+				<?php } ?>
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="content-widgets light-gray">
@@ -126,8 +128,12 @@ include("includes/head.php");
 												<td>$<?= number_format($res['serv_precio'], 0, ",", "."); ?></td>
 												<td>
 													<h4>
+														<?php if (Modulos::validarRol([156], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="servicios-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+														<?php } ?>
+														<?php if (Modulos::validarRol([225], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="bd_delete/servicios-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+														<?php } ?>
 													</h4>
 												</td>
 											</tr>

@@ -109,13 +109,13 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 							if (isset($_GET["tipo"]) and $_GET["tipo"] != "") {
 								$filtro .= " AND tik_tipo_tiket='" . $_GET["tipo"] . "'";
 							}
-							if($datosUsuarioActual['usr_tipo']!=1){
+							if(Modulos::validarRol([385], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 								$filtro.=' AND cli_ciudad!="1122"';
 							}
 							?>
 
 							<?php
-							if ($datosUsuarioActual[3] == 1) {
+							if (Modulos::validarRol([384], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 								$SQL = "SELECT * FROM clientes_tikets
 								INNER JOIN clientes ON cli_id=tik_cliente
 								INNER JOIN usuarios ON usr_id=tik_usuario_responsable
@@ -156,7 +156,7 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 									</thead>
 									<tbody>
 										<?php
-										if ($datosUsuarioActual[3] == 1) {
+										if (Modulos::validarRol([384], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 											$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets
 											INNER JOIN clientes ON cli_id=tik_cliente
 											INNER JOIN usuarios ON usr_id=tik_usuario_responsable
@@ -179,7 +179,7 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 											$consultaAsuntos=mysqli_query($conexionBdPrincipal,"SELECT * FROM tikets_asuntos WHERE tkpas_id='" . $res["tik_asunto_principal"] . "'");
 											$asuntos = mysqli_fetch_array($consultaAsuntos, MYSQLI_BOTH);
 
-											if ($datosUsuarioActual[3] != 1) {
+											if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$consultaNumZ=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
 												$numZ = mysqli_num_rows($consultaNumZ);
 												if ($numZ == 0) continue;

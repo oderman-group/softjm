@@ -66,9 +66,14 @@ include("includes/js-formularios.php");
 				</div>
 			</div>
             <p>
+						<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="clientes-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+						<?php } ?>
 
+						<?php if (Modulos::validarRol([368], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="enviar_correos/clientes-enviar-credenciales.php?id=<?=$_GET["id"];?>" class="btn btn-info" onClick="if(!confirm('Desea ejecutar esta accion?')){return false;}"><i class="icon-envelope"></i> Enviar credenciales</a>
+						<?php } ?>
+
 			</p>
 
             <?php include("includes/notificaciones.php");?>
@@ -98,7 +103,7 @@ include("includes/js-formularios.php");
 
 												<input type="hidden" name="id" value="<?=$_GET["id"];?>">
 													<?php
-													if($datosUsuarioActual['usr_tipo']==1){$campoC = "text";} else{$campoC = "password";}
+													if(Modulos::validarRol([386], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){$campoC = "text";} else{$campoC = "password";}
 													?>
 													<fieldset class="default">
 														<legend>Datos básicos</legend>
@@ -452,7 +457,9 @@ include("includes/js-formularios.php");
 							<h3>Sucursales</h3>
 						</div>
 						<div class="widget-container">
-							<p><a href="clientes-sucursales-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar sucursal</a></p>
+							<?php if (Modulos::validarRol([84], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<p><a href="clientes-sucursales-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar sucursal</a></p>
+							<?php } ?>
 							<table class="table table-striped table-bordered" id="data-table">
 							<thead>
 							<tr>
@@ -498,7 +505,9 @@ include("includes/js-formularios.php");
 															<h3>Contactos</h3>
 														</div>
 														<div class="widget-container">
+														<?php if (Modulos::validarRol([45], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<p><a href="clientes-contactos-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar contacto</a></p>
+														<?php } ?>
 														
 															<table class="table table-striped table-bordered" id="data-table">
 															<thead>
@@ -534,7 +543,9 @@ include("includes/js-formularios.php");
 																<td><?=$res['cont_email'];?></td>
 																<td><?=$sucursalNombre;?></td>
 																<td><h4>
+																<?php if (Modulos::validarRol([46], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																	<a href="clientes-contactos-editar.php?id=<?=$res[0];?>&cte=<?=$_GET["id"];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>
+																<?php } ?>
 																</h4></td>
 															</tr>
 															<?php $no++;}?>
@@ -556,7 +567,9 @@ include("includes/js-formularios.php");
 														</div>
 														<div class="widget-container">
 															<p>
+															<?php if (Modulos::validarRol([89], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																<a href="clientes-tikets-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar ticket</a>
+															<?php } ?>
 															</p>
 															<table class="table table-striped table-bordered" id="data-table">
 															<thead>
@@ -610,9 +623,14 @@ include("includes/js-formularios.php");
 																<td><?=$res['usr_nombre'];?></td>
 																<td><span class="label label-<?=$etiquetaE;?>"><?=$estado;?></span></td>
 																<td><span class="label label-<?=$etiquetaP;?>"><?=$prioridad;?></span></td>
-																<td><a href="clientes-seguimiento.php?idTK=<?=$res[0];?>" target="_blank"><span class="label label-info"><?=$numSeg;?></span><b></b></td>
+																<td>
+																	<?php if (Modulos::validarRol([12], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																		<a href="clientes-seguimiento.php?idTK=<?=$res[0];?>" target="_blank"><span class="label label-info"><?=$numSeg;?></span><b></b></td>
+																	<?php } ?>
 																<td><h4>
+																<?php if (Modulos::validarRol([90], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																	<a href="clientes-tikets-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>
+																<?php } ?>
 																	<!– codigo 24 no se encontro en el archivo sql.php–>
 																	<a href="sql.php?id=<?=$res[0];?>&get=24" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 																</h4></td>
@@ -636,7 +654,9 @@ include("includes/js-formularios.php");
 														</div>
 														<div class="widget-container">
 															<p>
+															<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="clientes-seguimiento-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar seguimiento</a>
+															<?php } ?>	
 															</p>
 															<table class="table table-striped table-bordered" id="data-table">
 															<thead>
@@ -661,7 +681,7 @@ include("includes/js-formularios.php");
 
 																$consultaContacto = $conexionBdPrincipal->query("SELECT * FROM contactos WHERE cont_id='".$res['cseg_contacto']."'");
 																$contacto = mysqli_fetch_array($consultaContacto, MYSQLI_BOTH);
-																if($datosUsuarioActual[3]!=1){
+																if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 																	$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'");
 																	$numZ = $consultaNumZ->num_rows;
 																	if($numZ ==0 ) continue;
@@ -694,9 +714,13 @@ include("includes/js-formularios.php");
 																	<?php if(isset($res['cont_email'])) echo "<br><b>Email:</b> ". $res['cont_email'];?>
 																	
 																	<h4 style="margin-top:10px;">
+																			<?php if (Modulos::validarRol([14], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<a href="clientes-seguimiento-editar.php?id=<?=$res[0];?>&cte=<?=$_GET["id"];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
+																			<?php } ?>
+																			<?php if (Modulos::validarRol([382], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<a href="sql.php?id=<?=$res[0];?>&get=4" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 																			<?php // codigo 4 no se encontro en el archivo sql.php ?>
+																			<?php } ?>
 																	</h4>
 																</td>
 																<td <?=$fondoColor;?>>
@@ -731,7 +755,9 @@ include("includes/js-formularios.php");
 														</div>
 														<div class="widget-container">
 															<p>
+															<?php if (Modulos::validarRol([78], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="cotizaciones-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar cotización</a>
+															<?php } ?>
 															</p>
 															<table class="table table-striped table-bordered" id="data-table">
 															<thead>
@@ -786,16 +812,23 @@ include("includes/js-formularios.php");
 																		</button>
 																		<ul class="dropdown-menu">
 																			<?php if($_SESSION["id"]==$res['cotiz_creador'] or $_SESSION["id"]==$res['cotiz_vendedor'] or $datosUsuarioActual[3]==1){?>
+																			<?php if (Modulos::validarRol([79], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<li><a href="cotizaciones-editar.php?id=<?=$res['cotiz_id'];?>#productos"> Editar</a></li>
+																			<?php } ?>
 
 																			<li><a href="sql.php?id=<?=$res['cotiz_id'];?>&get=22" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 																			<?php } //el codigo 22 no se encontro en el archivo sql?>
-
+																			<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<li><a href="reportes/formato-cotizacion-1.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
-
+																			<?php } ?>
+																			
+																			<?php if (Modulos::validarRol([380], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<li><a href="sql.php?get=46&id=<?=$res['cotiz_id'];?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
+																			<?php } ?>		
 																			<?php //el codigo 46 no se encontro en el archivo sql ?> 
+																			<?php if (Modulos::validarRol([381], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<li><a href="sql.php?get=48&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
+																			<?php } ?>		
 																			<?php //el codigo 48 no se encontro en el archivo sql ?> 
 																		</ul>
 																	</div>
@@ -819,7 +852,9 @@ include("includes/js-formularios.php");
 														</div>
 														<div class="widget-container">
 															<p>
+															<?php if (Modulos::validarRol([260], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="facturacion-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar factura</a>
+															<?php } ?>
 															</p>
 															<table class="table table-striped table-bordered" id="data-table">
 															<thead>
@@ -880,13 +915,21 @@ include("includes/js-formularios.php");
 																	<b>Descuento:</b> $<?=number_format($descuento,0,",",".")." (".$res['fact_descuento']."%)";?><br>
 																</td>
 																<td><h4 style="margin-top:10px;">
+																<?php if (Modulos::validarRol([261], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                 	<a href="facturacion-editar.php?id=<?=$res['fact_id'];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
+																<?php } ?>
                                     <?php //el codigo 6 no se encontro en el archivo sql ?> 
 									<a href="sql.php?id=<?=$res['fact_id'];?>&get=6" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;
+																<?php if (Modulos::validarRol([92], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="#" onClick='window.open("facturacion-abonos.php?fact=<?=$res['fact_id'];?>","abonos","width=1200,height=800,menubar=no")' data-toggle="tooltip" title="Abonos"><i class="icon-money"></i></a>&nbsp;
+																<?php } ?>
+																<?php if (Modulos::validarRol([367], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="reportes/formato-factura-1.php?id=<?=$res['fact_id'];?>" data-toggle="tooltip" title="Imprimir factura" target="_blank"><i class="icon-print"></i></a>&nbsp;
+																<?php } ?>
+																<?php if (Modulos::validarRol([311], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="bd_create/replicar-factura-guardar.php?get=19&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea replicar este registro?')){return false;}" title="Replicar factura"><i class="icon-repeat"></i></a>&nbsp;
-                                    <?php if($saldoFinal>0){?>
+																<?php } ?>
+                                    <?php if($saldoFinal>0 && Modulos::validarRol([299], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="bd_create/abono-automatico-agregar.php?get=26&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea generar un abono automático por el saldo pendiente de esta factura?')){return false;}" title="Abono automático y saldar factura"><i class="icon-retweet"></i></a>
                                     <?php }?>
                                 </h4></td>

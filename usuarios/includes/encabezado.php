@@ -124,42 +124,75 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-bullhorn"></i> Comercial <b class="icon-angle-down"></b></a>
 						<div class="dropdown-menu">
 							<ul>
+								<?php
+												$submenuClientes = [
+													["url" => "clientes.php", "id" => 9 , "nombre" => " Clientes", "clase" => " icon-file-alt"],
+													["url" => "dealer.php", "id" => 232, "nombre" => " Grupos", "clase" => " icon-file-alt"],
+													["url" => "clientes-filtro.php", "id" => 103, "nombre" => " Mercadeo", "clase" => " icon-file-alt"],
+													["url" => "enviar-portafolios.php", "id" => 110, "nombre" => " Enviar portafolios", "clase" => " icon-list-ul"],
+													["divider" => true],
+													["url" => "publicidad.php", "id" => 267, "nombre" => " Publicidad", "clase" => " icon-file-alt"],
+													["url" => "cupones.php", "id" => 165, "nombre" => " Cupones", "clase" => " icon-file-alt"],
+												];
+								?>
 							<li class="dropdown-submenu"><a href="#"><i class="icon-user"></i> Clientes</a>
 								<div class="dropdown-menu">
-									<ul>
-										<li><a href="clientes.php"><i class=" icon-user"></i> Clientes</a></li>
-										<li><a href="dealer.php"><i class=" icon-group"></i> Grupos</a></li>
-										<li><a href="clientes-filtro.php"><i class=" icon-phone"></i> Mercadeo</a></li>
-										<li><a href="enviar-portafolios.php"><i class="icon-suitcase"></i> Enviar portafolios </a></li>
-										<li class="divider"></li>
-										<li><a href="publicidad.php"><i class=" icon-bullhorn"></i> Publicidad</a></li>
-										<li><a href="cupones.php"><i class=" icon-certificate"></i> Cupones</a></li>
-									</ul>
+								<ul>
+									<?php foreach ($submenuClientes as $pagina) { ?>
+											<?php if (isset($pagina['divider'])) { ?>
+													<li class="divider"></li>
+											<?php } else { ?>
+													<?php if (Modulos::validarRol([$pagina['id']], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+															<li><a href="<?= $pagina['url'] ?>"><i class="<?= $pagina['clase'] ?>"></i><?= $pagina['nombre'] ?></a></li>
+													<?php } ?>
+											<?php } ?>
+									<?php } ?>
+								</ul>
 								</div>
 							</li>
-							<li><a href="clientes-tikets.php?tipo=1"><i class="icon-copy"></i>Tickets/Negociación</a></li>
-							<li><a href="clientes-seguimiento.php"><i class="icon-eye-open"></i>Seguimientos</a></li>	
-							<li class="dropdown-submenu"><a href="#"><i class="icon-briefcase"></i> Productos</a>
+							<?php
+								$submenuProductos = [
+									["url" => "productos.php", "id" => 36 , "nombre" => " Productos", "clase" => " icon-file-alt"],
+									["url" => "combos.php", "id" => 172, "nombre" => " Combos", "clase" => " icon-file-alt"],
+									["url" => "categoriasp.php", "id" => 39, "nombre" => " Categorías", "clase" => " icon-file-alt"],
+									["url" => "marcas.php", "id" => 33, "nombre" => " Marcas", "clase" => " icon-file-alt"],
+								];
+								?>
+							<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Productos</a>
 								<div class="dropdown-menu">
 									<ul>
-										<li><a href="productos.php"><i class="icon-briefcase"></i> Productos</a></li>
-										<li><a href="combos.php"><i class="icon-gift"></i> Combos</a></li>
-										<li><a href="categoriasp.php"><i class="icon-th-large"></i>Categorías</a></li>
-										<li><a href="marcas.php"><i class=" icon-tags"></i>Marcas</a></li>
+									<?php foreach ($submenuProductos as $pagina) { ?>										
+										<?php if (Modulos::validarRol([$pagina['id']], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+												<li><a href="<?= $pagina['url'] ?>"><i class="<?= $pagina['clase'] ?>"></i><?= $pagina['nombre'] ?></a></li>
+										<?php } ?>
+									<?php } ?>
 									</ul>
 								</div>
 							</li>
-											
-								<li><a href="proveedores.php"><i class=" icon-group"></i>Proveedores</a></li>
-								<li><a href="servicios.php"><i class="icon-check"></i>Servicios</a></li>
-                                <li><a href="cotizaciones.php"><i class="icon-file"></i> Cotización</a></li>
-								<li><a href="pedidos.php"><i class="icon-truck"></i>Pedido</a></li>
-								<li><a href="remisionbdg.php"><i class=" icon-copy"></i>Remisión</a></li>
-								<li><a href="facturas.php"><i class="icon-money"></i>Factura</a></li>
-								<li><a href="importacion.php"><i class=" icon-plane"></i>Importación</a></li>
-								<li class="divider"></li>
-								<li><a href="store-pedidos.php"><i class=" icon-shopping-cart"></i>Tienda virtual</a></li>
-								
+							<?php
+								$menuComercial = [
+									["url" => "clientes-tikets.php?tipo=1", "id" => 88 , "nombre" => " Tickets/Negociación", "clase" => " icon-unlock"],
+									["url" => "clientes-seguimiento.php", "id" => 12, "nombre" => " Seguimientos", "clase" => " icon-unlock"],
+									["url" => "proveedores.php", "id" => 123, "nombre" => " Proveedores", "clase" => " icon-unlock"],
+									["url" => "servicios.php", "id" => 154, "nombre" => " Servicios", "clase" => " icon-unlock"],
+									["url" => "cotizaciones.php", "id" => 77, "nombre" => " Cotización", "clase" => " icon-file"],
+									["url" => "pedidos.php", "id" => 151, "nombre" => " Pedido", "clase" => " icon-unlock"],
+									["url" => "remisionbdg.php", "id" => 148, "nombre" => " Remisión", "clase" => " icon-unlock"],
+									["url" => "facturas.php", "id" => 126, "nombre" => " Factura", "clase" => " icon-unlock"],
+									["url" => "importacion.php", "id" => 133, "nombre" => " Importación", "clase" => " icon-unlock"],
+									["divider" => true],
+									["url" => "store-pedidos.php", "id" => 141, "nombre" => " Tienda virtual", "clase" => " icon-unlock"],
+								];
+								?>
+									<?php foreach ($menuComercial as $pagina) { ?>
+											<?php if (isset($pagina['divider'])) { ?>
+													<li class="divider"></li>
+											<?php } else { ?>
+													<?php if (Modulos::validarRol([$pagina['id']], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+															<li><a href="<?= $pagina['url'] ?>"><i class="<?= $pagina['clase'] ?>"></i><?= $pagina['nombre'] ?></a></li>
+													<?php } ?>
+											<?php } ?>
+									<?php } ?>						
 							</ul>
 						</div>
 						</li>

@@ -111,8 +111,12 @@ include("includes/js-formularios.php");
 			
 			
 			<p>
+				<?php if (Modulos::validarRol([129], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="facturas-compra-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+				<?php } ?>
+				<?php if (Modulos::validarRol([376], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="#reportes/formato-remision-1.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
+				<?php } ?>
 				
 				<!--
 				<a href="sql.php?get=44&id=<?=$_GET["id"];?>" class="btn btn-warning" onClick="if(!confirm('Desea Enviar este mensaje al correo del contacto?')){return false;}"><i class="icon-envelope"></i> Enviar por correo</a>
@@ -171,8 +175,9 @@ include("includes/js-formularios.php");
 										 </select>
 									 </div>
 									
-									
+									 		<?php if (Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 											<a href="proveedores-editar.php?id=<?=$resultadoD['factura_proveedor'];?>" class="btn btn-info" target="_blank">Editar proveedor</a>
+											<?php } ?>
 									
 									
 								</div>
@@ -340,8 +345,12 @@ include("includes/js-formularios.php");
 								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td> <?php //el codigo 43 no se encontro en el archivo sql ?> 
 									<a href="sql.php?get=43&idItem=<?=$prod['czpp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<?php if (Modulos::validarRol([215], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="bd_create/replicar-productos-guardar.php?get=64&idItem=<?=$prod['czpp_id'];?>" onClick="if(!confirm('Desea replicar este producto?')){return false;}"><i class="icon-retweet"></i></a>
+									<?php } ?>
+									<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_nombre'];?></a><br>
+									<?php } ?>
 									
 									<span style="font-size: 9px; color: darkblue;"><?=$prod['prod_descripcion_corta'];?></span><br>
 										
@@ -408,7 +417,7 @@ include("includes/js-formularios.php");
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									
 									
-										
+									
 									<a href="#reportes/formato-remision-1.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
 								</div>
 							</form>
