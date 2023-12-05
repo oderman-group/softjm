@@ -20,7 +20,7 @@ if ($numero > 0) {
 	$contador = 0;
 	while ($contador < $numero) {
 		
-		$portafolios .= '<a href="https://softjm.com/usuarios/files/portafolios/' . $_POST["portafolios"][$contador] . '.pdf">' . $portafNombres[$_POST["portafolios"][$contador]] . '</a><br>';
+		$portafolios .= '<a href="'.REDIRECT_ROUTE.'/usuarios/files/portafolios/' . $_POST["portafolios"][$contador] . '.pdf">' . $portafNombres[$_POST["portafolios"][$contador]] . '</a><br>';
 		$contador++;
 	}
 }

@@ -4,6 +4,12 @@ include("../compartido/head.php");
 $idPagina = 340;
 $tituloPagina = "Enviar remision actual al cliente";
 include("verificar-paginas.php");
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require RUTA_PROYECTO.'/librerias/phpmailer/Exception.php';
+require RUTA_PROYECTO.'/librerias/phpmailer/PHPMailer.php';
+require RUTA_PROYECTO.'/librerias/phpmailer/SMTP.php';
 
 		$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'"));
 		$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$_GET["contacto"]."'"));
@@ -26,7 +32,7 @@ include("verificar-paginas.php");
 							<b>Equipo:</b> '.$remision["rem_equipo"].'<br>
 							<b>Referencia:</b> '.$remision["rem_referencia"].'<br>
 							<b>Serial:</b> '.$remision['rem_serial'].'<br>
-							<b>LINK DE DESCARGA:</b><br> https://softjm.com/v2.0/usuarios/empresa/lab-remisiones-imprimir.php?id='.$_GET["id"].'&estado='.$remision["rem_estado"].'<br>
+							<b>LINK DE DESCARGA:</b><br> '.REDIRECT_ROUTE.'/v2.0/usuarios/empresa/lab-remisiones-imprimir.php?id='.$_GET["id"].'&estado='.$remision["rem_estado"].'<br>
 							</p>
 							
 							<p align="center" style="color:'.$configuracion["conf_color_letra"].';">
@@ -41,15 +47,32 @@ include("verificar-paginas.php");
 				';	
 		$fin .='';						
 		$fin .=  '<html><body>';							
-		$sfrom=$configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
-		$sdestinatario=$contacto['cont_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-		$ssubject="Remisión de su equipo - JMEQUIPOS"; //ASUNTO DEL MENSAJE 				
-		$shtml=$fin; //MENSAJE EN SI			
-		$sheader="From:".$sfrom."\nReply-To:".$sfrom."\n"; 			
-		$sheader=$sheader."X-Mailer:PHP/".phpversion()."\n"; 			
-		$sheader=$sheader."Mime-Version: 1.0\n"; 		
-		$sheader=$sheader."Content-Type: text/html; charset=UTF-8\r\n"; 			
-		@mail($sdestinatario,$ssubject,$shtml,$sheader);
+		$mail = new PHPMailer(true);
+  try {
+    $mail->SMTPDebug = 0;                                                           // Enable verbose debug output
+    $mail->isSMTP();                                                                // Set mailer to use SMTP
+    $mail->Host       = EMAIL_SERVER;                                               // Specify main and backup SMTP servers
+    $mail->SMTPAuth   = true;                                                       // Enable SMTP authentication
+    $mail->Username   = EMAIL_USER;                                                 // SMTP username
+    $mail->Password   = EMAIL_PASSWORD;                                             // SMTP password
+    $mail->SMTPSecure = 'ssl';                                                      // Enable TLS encryption, `ssl` also accepted
+    $mail->Port       = 465;                                                        // TCP port to connect to
+
+    //Recipients
+    $mail->setFrom(EMAIL_SENDER, NAME_SENDER);
+		$mail->addAddress($contacto['cont_email'], $contacto['cont_nombre']);   // Add a recipient
+
+
+    // Content
+    $mail->isHTML(true);                                                            // Set email format to HTML
+    $mail->Subject = "Remisión de su equipo";
+    $mail->Body = $fin;
+    $mail->CharSet = 'UTF-8';
+
+    $mail->send();
+  } catch (Exception $e) {
+    echo "Error: {$mail->ErrorInfo}";
+  }
 	/*
 	echo $fin."<br>";
 	echo $contacto['cont_email'];
