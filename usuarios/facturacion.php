@@ -68,9 +68,9 @@ include("includes/head.php");
             <?php include("includes/notificaciones.php");?>
             <p>
             <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-						<?php if (Modulos::validarRol([260], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-            <a href="facturacion-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-						<?php } ?>
+			<?php if( Modulos::validarRol(['260'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+            	<a href="facturacion-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+			<?php }?>
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -138,21 +138,23 @@ include("includes/head.php");
 									<?php echo "<b>Nombre</b>: ". $res['cli_nombre']."<br>";?>
                                     <?php echo "<b>Ciudad</b>: ". $res['ciu_nombre'].", ".$res['dep_nombre']." (<b>03".$res['dep_indicativo']."</b>)";?>
                                     <h4 style="margin-top:10px;">
-																		<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-																			<a href="facturacion-editar.php?id=<?=$res['fact_id'];?>&cte=<?=$_GET['cte'];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
-																		<?php } ?>
-																		<?php if (Modulos::validarRol([58], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-																			<a href="bd_delete/facturacion-eliminar.php?id=<?=$res['fact_id'];?>&cte=<?=$_GET['cte'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-																		<?php } ?>
+									<?php if( Modulos::validarRol(['261'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+                                		<a href="facturacion-editar.php?id=<?=$res['fact_id'];?>&cte=<?=$_GET['cte'];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
+									<?php }?>
+									<?php if( Modulos::validarRol(['58'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+                                    	<a href="bd_delete/facturacion-eliminar.php?id=<?=$res['fact_id'];?>&cte=<?=$_GET['cte'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+									<?php }?>
                                 </h4>
                                 </td>
 
                                 
                                 <td><?php 
 								while($pds = mysqli_fetch_array($Cpd, MYSQLI_BOTH)){
-									if (Modulos::validarRol([68], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+									if( Modulos::validarRol(['68'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {
 										echo '<a href="productos-materiales.php?pdto='.$pds['prod_id'].'" title="Ver materiales">'.$pds['prod_nombre']."</a><br>";
-										}
+									} else {
+										echo $pds['prod_nombre']."<br>";
+									}
 								}
 								?></td>
                                 

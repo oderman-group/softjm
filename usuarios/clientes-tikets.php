@@ -83,9 +83,9 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 				<?php include("includes/notificaciones.php");?>
 				<p>
 					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-					<?php if (Modulos::validarRol([89], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-					<a href="clientes-tikets-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-					<?php } ?>
+					<?php if( Modulos::validarRol(['89'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+						<a href="clientes-tikets-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+					<?php }?>
 				</p>
 
 				<div class="row-fluid">
@@ -241,27 +241,29 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 												<td><?= $res['tik_asunto_principal']; ?></td>
 												<td><?= $res['usr_nombre'];?></td>
 												<td>
-												<?php if (Modulos::validarRol([301], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-													<a href="bd_update/clientes-tikets-actualizar-estado.php?get=29&id=<?= $res[0]; ?>" onClick="if(!confirm('Recuerde completar todos los seguimientos pendientes, en caso de tenerlos, antes de cerrar el ticket. Desea continuar con el cierre del ticket?')){return false;}"><span class="label label-<?= $etiquetaE; ?>"><?= $estado; ?></span></a>
-												<?php } ?>
+													<?php if( Modulos::validarRol(['301'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+														<a href="bd_update/clientes-tikets-actualizar-estado.php?get=29&id=<?= $res[0]; ?>" onClick="if(!confirm('Recuerde completar todos los seguimientos pendientes, en caso de tenerlos, antes de cerrar el ticket. Desea continuar con el cierre del ticket?')){return false;}"><span class="label label-<?= $etiquetaE; ?>"><?= $estado; ?></span></a>
+													<?php } else {?>
+														<span class="label label-<?= $etiquetaE; ?>"><?= $estado; ?></span>
+													<?php }?>
 												</td>
 												<td><span class="label label-<?= $etiquetaP; ?>"><?= $prioridad; ?></span></td>
 												<td align="center" style="background:<?= $color2; ?>;">
-													<?php if (Modulos::validarRol([12], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-														<a href="clientes-seguimiento.php?idTK=<?= $res[0]; ?>" target="_blank"><?= $numeros[0]; ?></a>
-													<?php } ?>
+												<?php if( Modulos::validarRol(['12'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+													<a href="clientes-seguimiento.php?idTK=<?= $res[0]; ?>" target="_blank"><?= $numeros[0]; ?></a>
+												<?php } else {?>
+													<?= $numeros[0]; ?>
+												<?php }?>
 												</td>
 												<td>
 													<h4>
-														<!--
-                                	<a href="clientes-seguimiento.php?idTK=<?= $res[0]; ?>&emg=1" data-toggle="tooltip" title="Seguimiento" target="new"><i class="icon-list-alt"></i></a>
-									-->
-												<?php if (Modulos::validarRol([90], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-														<a href="clientes-tikets-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-												<?php } ?>
-												<?php if (Modulos::validarRol([91], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-														<a href="bd_delete/clientes-tikets-eliminar.php?id=<?=$res[0];?>&cte=<?=$_GET["cte"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-												<?php } ?>
+														<?php if( Modulos::validarRol(['90'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+															<a href="clientes-tikets-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+														<?php }?>
+
+														<?php if( Modulos::validarRol(['91'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+															<a href="bd_delete/clientes-tikets-eliminar.php?id=<?=$res[0];?>&cte=<?=$_GET["cte"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+														<?php }?>
 													</h4>
 												</td>
 											</tr>

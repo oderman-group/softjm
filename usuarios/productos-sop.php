@@ -151,9 +151,6 @@ include("includes/head.php");
             <?php include("includes/notificaciones.php");?>
 			
 			<span id="resp"></span>
-            <p>
-				<a href="#" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-            </p>
 			
 
 			
@@ -205,9 +202,9 @@ include("includes/head.php");
 									<div>
 									<?=$res['prod_nombre'];?>
 									<h4>
-										<a href="#" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-										<a href="#" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-										<a href="productos-materiales.php?pdto=<?=$res[0];?>" data-toggle="tooltip" title="Materiales"><i class="icon-folder-open"></i></a>
+										<?php if( Modulos::validarRol(['68'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+											<a href="productos-materiales.php?pdto=<?=$res[0];?>" data-toggle="tooltip" title="Materiales"><i class="icon-folder-open"></i></a>
+										<?php }?>
 									</h4>
 									</div>	
 								</td>
