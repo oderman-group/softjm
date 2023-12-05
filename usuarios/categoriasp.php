@@ -166,7 +166,9 @@ include("includes/head.php");
             <?php include("includes/notificaciones.php");?>
 			
             <p>
+						<?php if (Modulos::validarRol([40], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
             	<a href="categoriasp-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+						<?php } ?>
             </p>
 			
 			<span id="respG1"></span>
@@ -186,7 +188,7 @@ include("includes/head.php");
                                 <th>Nombre</th>
 								<!--<th>Grupo</th>-->
 								<th>#Productos</th>
-								<!-- Check_id 7 y 15 -->
+								<?php if (Modulos::validarRol([403], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 								<th>Actualización</th>
 								<th>Utilidad Min (%)</th>
 								<th>Utilidad Lista (%)</th>
@@ -194,7 +196,7 @@ include("includes/head.php");
 								<th title="Sobre el precio de lista.">Utilidad Dealer. (%)</th>
 								<th title="Sobre el precio de lista.">Utilidad Web. (%)</th>
 								<th>Comisión (%)</th>
-								<!-- endif-check_id -->
+								<?php }?>
                                 <th></th>
 							</tr>
 							</thead>
@@ -221,7 +223,7 @@ include("includes/head.php");
 								<td style="text-align: center;">
 									<a href="productos.php?grupo1=<?=$res2[0];?>" data-toggle="tooltip" title="Productos"><?=$numProductos2;?></a>
 								</td>
-								<!-- Check_id 7 y 15 -->
+								<?php if (Modulos::validarRol([403], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 								<td>
 										<span style="font-size: 9px;"><?=strtoupper($usuario2['usr_nombre']);?></span>
 										<br><span style="font-size: 9px;"><?=$res2['catp_fecha'];?></span>
@@ -252,10 +254,14 @@ include("includes/head.php");
 								<td>
 										<input type="text" title="prod_comision" alt="catp_comision" name="<?=$res2[0];?>" style="width: 40px; text-align: center" onChange="grupoUno(this)" value="<?=$res2['catp_comision'];?>">
 								</td>
-								<!-- endif-check_id -->
+								<?php } ?>
                                 <td><h4>
+																	<?php if (Modulos::validarRol([41], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="categoriasp-editar.php?id=<?=$res2[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+																	<?php } ?>
+																	<?php if (Modulos::validarRol([62], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="bd_delete/categoriasp-eliminar.php?id=<?=$res2[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																	<?php } ?>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>
@@ -290,7 +296,7 @@ include("includes/head.php");
                                 <th>Nombre</th>
 								<!--<th>Grupo</th>-->
 								<th>#Productos</th>
-								<!-- Check_id 7 y 15 -->
+								<?php if (Modulos::validarRol([403], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 								<th>Actualización</th>
 								<th>Utilidad Min (%)</th>
 								<th>Utilidad Lista (%)</th>
@@ -298,7 +304,7 @@ include("includes/head.php");
 								<th title="Sobre el precio de lista.">Utilidad Dealer. (%)</th>
 								<th title="Sobre el precio de lista.">Utilidad Web. (%)</th>
 								<th>Comisión (%)</th>
-								<!-- endif-check_id -->
+								<?php }?>
                                 <th></th>
 							</tr>
 							</thead>
@@ -325,7 +331,7 @@ include("includes/head.php");
 								<td style="text-align: center;">
 									<a href="productos.php?grupo2=<?=$res[0];?>" data-toggle="tooltip" title="Productos"><?=$numProductos;?></a>
 								</td>
-								<!-- Check_id 7 y 15 -->
+								<?php if (Modulos::validarRol([403], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 								<td>
 										<span style="font-size: 9px;"><?php if(isset($usuario['usr_nombre'])){strtoupper($usuario['usr_nombre']);}?></span>
 										<br><span style="font-size: 9px;"><?=$res['catp_fecha'];?></span>
@@ -355,10 +361,14 @@ include("includes/head.php");
 								<td>
 										<input type="text" title="prod_comision" alt="catp_comision" name="<?=$res[0];?>" style="width: 40px; text-align: center" onChange="grupoUno(this)" value="<?=$res['catp_comision'];?>">
 								</td>
-								<!-- endif-check_id -->
+								<?php }?>
                                 <td><h4>
+																	<?php if (Modulos::validarRol([41], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="categoriasp-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+																	<?php } ?>
+																	<?php if (Modulos::validarRol([62], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="bd_delete/categoriasp-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																	<?php } ?>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>
@@ -393,7 +403,7 @@ include("includes/head.php");
                                 <th>Nombre</th>
 								<!--<th>Grupo</th>-->
 								<th>#Productos</th>
-								<!-- Check_id 7 y 15 -->
+								<?php if (Modulos::validarRol([403], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 								<th>Actualización</th>
 								<th>Utilidad Min (%)</th>
 								<th>Utilidad Lista (%)</th>
@@ -401,7 +411,7 @@ include("includes/head.php");
 								<th title="Sobre el precio de lista.">Utilidad Dealer. (%)</th>
 								<th title="Sobre el precio de lista.">Utilidad Web. (%)</th>
 								<th>Comisión (%)</th>
-								<!-- endif-check_id -->
+								<?php }?>
                                 <th></th>
 							</tr>
 							</thead>
@@ -428,7 +438,7 @@ include("includes/head.php");
 								<td style="text-align: center;">
 									<a href="productos.php?marca=<?=$res3[0];?>" data-toggle="tooltip" title="Productos"><?=$numProductos3;?></a>
 								</td>
-								<!-- Check_id 7 y 15 -->
+								<?php if (Modulos::validarRol([403], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 								<td>
 										<span style="font-size: 9px;"><!--<?=strtoupper($usuario3['usr_nombre']);?>--></span>
 										<br><span style="font-size: 9px;"><!--<?=$res3['catp_fecha'];?>--></span>
@@ -459,7 +469,7 @@ include("includes/head.php");
 								<td>
 										<input type="text" title="prod_comision" alt="catp_comision" name="<?=$res3[0];?>" style="width: 40px; text-align: center" onChange="grupoTres(this)" value="<?=$res3['catp_comision'];?>">
 								</td>
-								<!-- endif-check_id -->
+								<?php } ?>
                                 <td>
 									<!--
 									<h4>
