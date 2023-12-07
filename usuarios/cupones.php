@@ -104,7 +104,6 @@ include("includes/head.php");
 							</thead>
 							<tbody>
                             <?php
-							$opcionesSINO = array("NO","SI");
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones WHERE cupo_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
