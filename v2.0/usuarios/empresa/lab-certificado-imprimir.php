@@ -28,7 +28,6 @@ $camposRemision = mysqli_fetch_array($ConsultaCampoRemision, MYSQLI_BOTH);
 
 $estadosCertificados = array("", "ACEPTABLE", "VENCIDO", "PROVICIONAL");
 
-$meses = array("", "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE");
 
 switch ($remision['rem_tipo_equipo']) {
 	case 1:
