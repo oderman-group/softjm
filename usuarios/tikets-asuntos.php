@@ -10,8 +10,8 @@ $pk = 'tkpas_id';
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
 <?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
+mysqli_query($conexionBdAdmin ,"INSERT INTO historial_acciones(hil_usuario, hil_url, hil_id_pagina, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')");
+if(mysqli_errno($conexionBdAdmin)!=0){echo mysqli_error(); exit();}
 ?>
 <!-- styles -->
 
@@ -154,9 +154,9 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							</thead>
 							<tbody>
                             <?php
-							$consulta = mysql_query("SELECT * FROM ".$tabla,$conexion);
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM ".$tabla);
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta)){
 							?>
 							<tr>
 								<td><?=$no;?></td>
