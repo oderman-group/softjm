@@ -8,6 +8,7 @@ if($_SESSION["id_cliente"]=="" || !is_numeric($_SESSION["id_cliente"]) ){
 $tiempo_inicial = microtime(true);
 
 include("../../conexion.php");
+require_once(RUTA_PROYECTO."/usuarios/config/config.php");
 //USUARIO ACTUAL
 $consultaUsuarioActual = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_SESSION["id_cliente"]."'");
 $numUsuarioActual = mysqli_num_rows($consultaUsuarioActual);

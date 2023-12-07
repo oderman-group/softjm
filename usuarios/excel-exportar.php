@@ -44,8 +44,6 @@ INNER JOIN clientes ON cli_id=rem_cliente WHERE rem_id_empresa='".$idEmpresa."'"
 					<tbody>
 						<?php
 						$conta = 1;
-						$meses = array("", "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE");
-						$estadosCertificados = array("", "Vigente", "Vencido", "Provisional");
 						
 						while ($res = mysqli_fetch_array($consulta)) {
 							
@@ -304,7 +302,6 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"]);
 							INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 							WHERE cseg_id=cseg_id " . $filtro . "
 							ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"]);
-								$opcionesSino = array("NO", "SI");
 								$conta = 1;
 								while ($res = mysqli_fetch_array($consulta)) {
 									$encargado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $res['cseg_usuario_encargado'] . "' AND usr_id_empresa='".$idEmpresa."'"));
@@ -381,8 +378,6 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"]);
 								<tbody>
 									<?php
 									$conta = 1;
-									$meses = array("", "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE");
-									$estadosCertificados = array("", "Vigente", "Vencido", "Provisional");						
 
 									while ($res = mysqli_fetch_array($consulta)) {
 

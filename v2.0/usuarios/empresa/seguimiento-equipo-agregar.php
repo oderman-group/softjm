@@ -29,7 +29,6 @@ if($_POST["notfCliente"]==1){
 	$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$_POST["contacto"]."'"));
 	$remision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["id"]."'"));
 	
-	$meses = array("","ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE");
 	$fechaHoy = date("d")." de ".$meses[date("m")]." del ".date("Y");
 		
 	$fin =  '<html><body style="background-color:'.$configuracion["conf_fondo_boletin"].';">';

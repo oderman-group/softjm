@@ -72,8 +72,6 @@
 							</thead>
 							<tbody>
                             <?php
-							$em = array("","NC","NE","EP","IN","AC","PR");
-							$emColor = array("white","goldenrod","gold","green","limegreen","aqua","tomato");	
 							$filtro = '';
 							$filtro2 = '';
 							$filtro3 = '';	

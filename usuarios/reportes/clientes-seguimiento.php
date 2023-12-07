@@ -92,9 +92,9 @@ if($_POST["formato"]==2){
                                 <td><?=$res['cli_nombre'];?></td>
                                 <td><?=$res['usr_nombre'];?></td>
 								
-                                <td><?=$opcionesSino[$res['cseg_cotizo']];?></td>
-								<td><?=$opcionesSino[$res['cseg_vendio']];?></td>
-								<td><?=$opcionesSino[$res['cseg_consiguio_datos']];?></td>
+                                <td><?=$opcionesSINO[$res['cseg_cotizo']];?></td>
+								<td><?=$opcionesSINO[$res['cseg_vendio']];?></td>
+								<td><?=$opcionesSINO[$res['cseg_consiguio_datos']];?></td>
 								
                                 <td><?=$res['cseg_observacion'];?></td>
                                 <td><?=$res['cseg_fecha_proximo_contacto'];?></td>

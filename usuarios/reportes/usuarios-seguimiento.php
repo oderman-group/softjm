@@ -169,7 +169,6 @@
 							}
 							
 							
-							$opcionesSino = array("NO","SI");	
 							$no = 1;
 							while($res = mysql_fetch_array($consulta)){
 								
@@ -220,9 +219,9 @@
                                     </p>
 									<?php }?>
                                 </td>
-                                <td <?=$fondoColor;?>><?=$opcionesSino[$res['cseg_consiguio_datos']];?></td>
-								<td <?=$fondoColor;?>><?=$opcionesSino[$res['cseg_cotizo']];?></td>
-								<td <?=$fondoColor;?>><?=$opcionesSino[$res['cseg_vendio']];?></td>
+                                <td <?=$fondoColor;?>><?=$opcionesSINO[$res['cseg_consiguio_datos']];?></td>
+								<td <?=$fondoColor;?>><?=$opcionesSINO[$res['cseg_cotizo']];?></td>
+								<td <?=$fondoColor;?>><?=$opcionesSINO[$res['cseg_vendio']];?></td>
 								<td <?=$fondoColor;?>><?=$html;?></td>
 							</tr>
                             <?php $no++;}?>

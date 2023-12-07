@@ -139,7 +139,6 @@ include("includes/head.php");
 												usr_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'
 												GROUP BY u.usr_id");
 												$no = 1;
-												$bloq = array("NO","SI");	
 												while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 													$estadoSesion = 'gris.jpg';
 													if(empty($res['usr_sesion']) && $res['usr_sesion']==1){$estadoSesion = 'verde.jpg';}
@@ -170,7 +169,7 @@ include("includes/head.php");
 												</td>
 												<td><a href="#areas-editar.php?id=<?=$res['usr_area'];?>"><?=$res['ar_nombre'];?></a></td>
 												<td><?=$res['usr_login'];?></td>
-												<td><?=$bloq[$res['usr_bloqueado']];?></td>
+												<td><?=$opcionesSINO[$res['usr_bloqueado']];?></td>
 												<td><img src="files/<?=$estadoSesion;?>" width="20"></td>
 												<td><?=$res['usr_ultimo_ingreso'];?></td>
 
