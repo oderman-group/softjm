@@ -124,12 +124,11 @@ if(!empty($_GET["idTK"])){
 				<div align="center" style="margin:10px; font-size:18px;">
 					<?php
 					$m = 1;
-					$meses = array("", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic");
 					while ($m <= 12) {
 						if ($m == $_GET["m"])
-							echo '<a style="font-weight:bold;">' . $meses[$m] . '</a>&nbsp;&nbsp;&nbsp;';
+							echo '<a style="font-weight:bold;">' . $mesesAbre[$m] . '</a>&nbsp;&nbsp;&nbsp;';
 						else
-							echo '<a href="clientes-seguimiento.php?m=' . $m . '&a=' . $_GET["a"] . '&u=' . $_GET["u"] . '">' . $meses[$m] . '</a>&nbsp;&nbsp;&nbsp;';
+							echo '<a href="clientes-seguimiento.php?m=' . $m . '&a=' . $_GET["a"] . '&u=' . $_GET["u"] . '">' . $mesesAbre[$m] . '</a>&nbsp;&nbsp;&nbsp;';
 						$m++;
 					}
 					?>
@@ -269,7 +268,6 @@ if(!empty($_GET["idTK"])){
 										}
 
 
-										$opcionesSino = array("NO", "SI");
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 

@@ -121,16 +121,15 @@ if(is_numeric($_GET["idRem"])){
 								<div align="center" style="margin:10px; font-size:18px;">
 								<?php
 								$m = 1;
-								$meses = array("","Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic");
 								while($m<=12){
 									$consultaRemisiones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 									INNER JOIN clientes ON cli_id=rem_cliente
 									WHERE rem_estado=1 AND MONTH(rem_fecha_registro)='".$m."' AND rem_id_empresa='".$idEmpresa."'");
 									$numRem = mysqli_num_rows($consultaRemisiones);
 									if($m==$_GET["m"])
-										echo '<a style="font-weight:bold;">'.$meses[$m].'('.$numRem.')</a>&nbsp;&nbsp;&nbsp;';
+										echo '<a style="font-weight:bold;">'.$mesesAbre[$m].'('.$numRem.')</a>&nbsp;&nbsp;&nbsp;';
 									else
-										echo '<a href="lab-remisiones.php?m='.$m.'&a='.$_GET["a"].'&u='.$_GET["u"].'">'.$meses[$m].'('.$numRem.')</a>&nbsp;&nbsp;&nbsp;';	
+										echo '<a href="lab-remisiones.php?m='.$m.'&a='.$_GET["a"].'&u='.$_GET["u"].'">'.$mesesAbre[$m].'('.$numRem.')</a>&nbsp;&nbsp;&nbsp;';	
 									$m++;
 								}
 								?>
@@ -171,7 +170,6 @@ if(is_numeric($_GET["idRem"])){
                                         </thead>
                                         <tbody>
 											<?php
-											$meses = array("","ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE");
 											
 											$filtro = '';
 											if(is_numeric($_GET["idRem"])){$filtro = " AND rem_id='".$_GET["idRem"]."'";}

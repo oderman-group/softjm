@@ -120,7 +120,6 @@ if($_POST["idSql"]==4){
 	mysqli_query($conexionBdPrincipal,"INSERT INTO notificaciones(not_asunto, not_cliente, not_usuario, not_visto, not_estado, not_fecha, not_seguimiento)VALUES('COPIA DE CERTIFICADO C".$_POST["idRem"]."', '".$_SESSION["id_cliente"]."', 21, 0, 1, now(), '".$idSeguimiento."')");
 	
 		
-		$meses = array("","ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE");
 		$fechaHoy = date("d")." de ".$meses[date("m")]." del ".date("Y");
 			
 		$fin =  '<html><body style="background-color:'.$configuracion["conf_fondo_boletin"].';">';

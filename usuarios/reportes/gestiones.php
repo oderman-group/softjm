@@ -58,7 +58,6 @@
 							</thead>
 							<tbody>
                             <?php
-							$em = array("","NC","NE","EP","IN","AC","PR");
 								
 							$consulta = mysqli_query(conexionBdPrincipal,"SELECT * FROM gestiones_clientes
 							INNER JOIN clientes ON cli_id=gestxc_cliente

@@ -202,8 +202,6 @@ include("head.php");
 							ORDER BY rem_id DESC
 							");
 							$no = 1;
-							$meses = array("","ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE");	
-							$estadosCertificados = array("","Vigente","Vencido","Provisional");
 							$labCert = array("","success","important","warning");
 							while($resC = mysqli_fetch_array($consultaC, MYSQLI_BOTH)){
 								$camposRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT 

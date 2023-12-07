@@ -507,12 +507,11 @@ $epordia = substr($epordia,0,-1);
             <div align="center" style="margin:10px; font-size:18px;">
             <?php
 			$m = 1;
-			$meses = array("","Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic");
 			while($m<=12){
 				if($m==$mesConsulta)
-					echo '<a style="font-weight:bold;">'.$meses[$m].'</a>&nbsp;&nbsp;&nbsp;';
+					echo '<a style="font-weight:bold;">'.$mesesAbre[$m].'</a>&nbsp;&nbsp;&nbsp;';
 				else
-					echo '<a href="estadisticas.php?m='.$m.'&a='.$_GET["a"].'&u='.$_GET["u"].'">'.$meses[$m].'</a>&nbsp;&nbsp;&nbsp;';	
+					echo '<a href="estadisticas.php?m='.$m.'&a='.$_GET["a"].'&u='.$_GET["u"].'">'.$mesesAbre[$m].'</a>&nbsp;&nbsp;&nbsp;';	
             	$m++;
 			}
 			?>

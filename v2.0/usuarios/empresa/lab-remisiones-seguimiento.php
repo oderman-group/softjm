@@ -16,7 +16,6 @@ $remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 $consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$remision["rem_contacto"]."'");
 $contacto = mysqli_fetch_array($consultaContacto, MYSQLI_BOTH);
 
-$estadosRemision = array("","Entrada","Salida");
 ?>
     <!-- This page css -->
     <link href="../../assets/extra-libs/c3/c3.min.css" rel="stylesheet">
