@@ -6,10 +6,6 @@ $paginaActual['pag_nombre'] = "Editar asuntos de tikets";
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
 <?php
-mysqli_query($conexionBdAdmin ,"INSERT INTO historial_acciones(hil_usuario, hil_url, hil_id_pagina, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')");
-if(mysqli_errno($conexionBdAdmin)!=0){echo mysqli_error(); exit();}
-?>
-<?php
 $consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM tikets_asuntos WHERE tkpas_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta);
 ?>
