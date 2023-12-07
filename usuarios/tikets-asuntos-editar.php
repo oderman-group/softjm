@@ -6,11 +6,8 @@ $paginaActual['pag_nombre'] = "Editar asuntos de tikets";
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
 <?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM tikets_asuntos WHERE tkpas_id='".$_GET["id"]."'",$conexion));
+$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM tikets_asuntos WHERE tkpas_id='".$_GET["id"]."'");
+$resultadoD = mysqli_fetch_array($consulta);
 ?>
 <!-- styles -->
 
@@ -19,7 +16,6 @@ $resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM tikets_asuntos WHERE 
 <![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 
 <!--[if IE 7]>
 <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />

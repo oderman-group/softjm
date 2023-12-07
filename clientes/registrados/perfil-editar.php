@@ -8,7 +8,6 @@ WHERE cli_id='".$_SESSION["id_cliente"]."'"), MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
 <link rel="shortcut icon" href="ico/favicon.ico">
