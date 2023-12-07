@@ -17,7 +17,7 @@
             <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
         <![endif]-->
 <link href="../usuarios/css/styles.css" rel="stylesheet">
-<link href="../usuarios/css/theme-wooden.css" rel="stylesheet">
+<link href="../usuarios/css/theme-blue.css" rel="stylesheet">
 
 <!--[if IE 7]>
             <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
