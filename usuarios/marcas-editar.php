@@ -11,7 +11,6 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 <!-- styles -->
 <link href="css/chosen.css" rel="stylesheet">
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>

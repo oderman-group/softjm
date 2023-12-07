@@ -19,7 +19,6 @@ if(mysqli_errno($conexionBdAdmin)!=0){echo mysqli_error(); exit();}
             <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
         <![endif]-->
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 
 <!--[if IE 7]>
             <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
