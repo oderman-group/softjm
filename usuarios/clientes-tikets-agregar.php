@@ -191,10 +191,9 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="etapa" onChange="razones(this)">
 											<option value="1"></option>
                                             <?php
-											$opciones = array("N/A","En progreso","En espera","Propuesta/Cotización","Negociación/Revisión","Cerrado y ganado","Cerrado y perdido");
 											for($i=1; $i<=6; $i++){
-												if($resultadoD['tik_etapa']==$i)echo '<option value="'.$i.'" selected>'.$opciones[$i].'</option>';
-												else echo '<option value="'.$i.'">'.$opciones[$i].'</option>';	
+												if($resultadoD['tik_etapa']==$i)echo '<option value="'.$i.'" selected>'.$opcionesEtapa[$i].'</option>';
+												else echo '<option value="'.$i.'">'.$opcionesEtapa[$i].'</option>';	
 											}
 											?>
                                     	</select>
@@ -254,10 +253,9 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoNegocio">
 											<option value="0"></option>
                                             <?php
-											$opciones = array("N/A","Venta","Servicio","Servicio Post venta");
 											for($i=1; $i<=3; $i++){
-												if($resultadoD['tik_tipo_negocio']==$i)echo '<option value="'.$i.'" selected>'.$opciones[$i].'</option>';
-												else echo '<option value="'.$i.'">'.$opciones[$i].'</option>';	
+												if($resultadoD['tik_tipo_negocio']==$i)echo '<option value="'.$i.'" selected>'.$opcionesTipoNegocio[$i].'</option>';
+												else echo '<option value="'.$i.'">'.$opcionesTipoNegocio[$i].'</option>';	
 											}
 											?>
                                     	</select>
@@ -270,10 +268,9 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="origenNegocio">
 											<option value="0"></option>
                                             <?php
-											$opciones = array("N/A","LLamada mercadeo","Email Marketing","Sitio Web","Publicidad","Cliente existente","Recomendación","Exhibición","Otro");
 											for($i=1; $i<=8; $i++){
-												if($_GET["origenNegocio"]==$i)echo '<option value="'.$i.'" selected>'.$opciones[$i].'</option>';
-												else echo '<option value="'.$i.'">'.$opciones[$i].'</option>';	
+												if($_GET["origenNegocio"]==$i)echo '<option value="'.$i.'" selected>'.$opcionesOrigenNegocio[$i].'</option>';
+												else echo '<option value="'.$i.'">'.$opcionesOrigenNegocio[$i].'</option>';	
 											}
 											?>
                                     	</select>

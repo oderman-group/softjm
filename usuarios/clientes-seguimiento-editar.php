@@ -120,12 +120,11 @@ include("includes/js-formularios.php");
 									<div class="controls">
 										
                                             <?php
-											$opciones = array("N/A","En progreso","En espera","Propuesta/Cotización","Negociación/Revisión","Cerrado y ganado","Cerrado y perdido");
 											for($i=1; $i<=6; $i++){
 												
-												if($infoTicket['tik_etapa']==$i) {echo '<span style="color:green; font-weight:bold; font-size:13px;">'.$opciones[$i].'</span><br>';}
+												if($infoTicket['tik_etapa']==$i) {echo '<span style="color:green; font-weight:bold; font-size:13px;">'.$opcionesEtapa[$i].'</span><br>';}
 												
-												else {echo '<a href="bd_update/cliente-tikets-actualizar.php?get=41&idtk='.$infoTicket['tik_id'].'&etapa='.$i.'">'.$opciones[$i].'</a><br>';}
+												else {echo '<a href="bd_update/cliente-tikets-actualizar.php?get=41&idtk='.$infoTicket['tik_id'].'&etapa='.$i.'">'.$opcionesEtapa[$i].'</a><br>';}
 											}
 											?>
                                     </div>
@@ -136,9 +135,8 @@ include("includes/js-formularios.php");
 									<div class="controls">
 									
                                             <?php
-											$opciones = array("N/A","Venta","Servicio","Servicio Post venta");
 											for($i=1; $i<=3; $i++){
-												if($infoTicket['tik_tipo_negocio']==$i)echo $opciones[$i];	
+												if($infoTicket['tik_tipo_negocio']==$i)echo $opcionesTipoNegocio[$i];	
 											}
 											?>
                                     	
@@ -150,9 +148,8 @@ include("includes/js-formularios.php");
 									<div class="controls">
 										
                                             <?php
-											$opciones = array("N/A","LLamada mercadeo","Email Marketing","Sitio Web","Publicidad","Cliente existente","Recomendación","Exhibición","Otro");
 											for($i=1; $i<=8; $i++){
-												if($infoTicket['tik_origen_negocio']==$i)echo $opciones[$i];	
+												if($infoTicket['tik_origen_negocio']==$i)echo $opcionesOrigenNegocio[$i];	
 											}
 											?>
                                     </div>
