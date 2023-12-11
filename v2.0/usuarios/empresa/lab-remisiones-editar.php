@@ -537,25 +537,42 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 														<td>EQUIPO AJUSTADO</td>
 														<td>DIFERENCIA</td>
 													</tr>
+													<?php
+														$valor="";
+														$valorN1P="11.591";
+														$valorN2P="11.620";
+														$valorN3P="11.605";
+														$disabledM="";
+														$mensaje="";
+														if ($resultadoD['rem_tipo_equipo'] == 2) {
+															$valor="N/A";
+															$valorN1P="N/A";
+															$valorN2P="N/A";
+															$valorN3P="N/A";
+															$disabledM="disabled";
+															$mensaje="<span>Nota: NO Aplica en este equipo (N/A)</span>";
+														}
+													?>
 													<tr align="center">
 														<td>Nº1</td>
-														<td><input value="<?=$resultadoD['rem_n1_patron'];?>" name="n1_patron" style="text-align: center;" <?=$disabled;?>></td>
-														<td><input value="<?=$resultadoD['rem_n1_equipo'];?>" name="n1_equipo" style="text-align: center;" <?=$disabled;?>></td>
-														<td><input value="<?=$resultadoD['rem_n1_diferencia'];?>" name="n1_diferencia" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input name="n1_patron" style="text-align: center;" disabled value="<?=$valorN1P;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n1_equipo'];?>" name="n1_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n1_diferencia'];?>" name="n1_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
 													</tr>
 													<tr align="center">
 														<td>Nº2</td>
-														<td><input value="<?=$resultadoD['rem_n2_patron'];?>" name="n2_patron" style="text-align: center;" <?=$disabled;?>></td>
-														<td><input value="<?=$resultadoD['rem_n2_equipo'];?>" name="n2_equipo" style="text-align: center;" <?=$disabled;?>></td>
-														<td><input value="<?=$resultadoD['rem_n2_diferencia'];?>" name="n2_diferencia" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input name="n2_patron" style="text-align: center;" disabled value="<?=$valorN2P;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n2_equipo'];?>" name="n2_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n2_diferencia'];?>" name="n2_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
 													</tr>
 													<tr align="center">
 														<td>Nº3</td>
-														<td><input value="<?=$resultadoD['rem_n3_patron'];?>" name="n3_patron" style="text-align: center;" <?=$disabled;?>></td>
-														<td><input value="<?=$resultadoD['rem_n3_equipo'];?>" name="n3_equipo" style="text-align: center;" <?=$disabled;?>></td>
-														<td><input value="<?=$resultadoD['rem_n3_diferencia'];?>" name="n3_diferencia" style="text-align: center;" <?=$disabled;?>></td>
+														<td><input name="n3_patron" style="text-align: center;" disabled value="<?=$valorN3P;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n3_equipo'];?>" name="n3_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n3_diferencia'];?>" name="n3_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
 													</tr>
 												</table>
+												<?=$mensaje;?>
 											</td>
 										</tr>
 									</table>
