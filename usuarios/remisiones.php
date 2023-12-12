@@ -132,12 +132,43 @@ include("includes/head.php");
             <?php include("includes/notificaciones.php");?>
             <p>
                 <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                <a href="../v2.0/usuarios/empresa/lab-remisiones-agregar.php" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar nuevo</a>
-                <a href="certificados-filtros.php" class="btn btn-info"><i class="icon-filter"></i> Informe certificados</a>
-                <a href="lab-remisiones-escoger.php" class="btn btn-warning"><i class="icon-print"></i> Imprimir varias remisiones</a>
+                <a href="remisiones-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+                <a href="remisiones-informes-todos.php" class="btn btn-info"><i class="icon-filter"></i> Informe certificados</a>
+                <a href="remisiones-escoger.php" class="btn btn-warning"><i class="icon-print"></i> Imprimir varias remisiones</a>
             </p>
-
-            <div align="center" style="margin:10px; font-size:20px;">
+            
+			<div class="row-fluid">
+				<div class="span12">
+					<div class="content-widgets light-gray">
+						<div class="widget-head green">
+							<h3><?=$paginaActual['pag_nombre'];?></h3>
+						</div>      
+						<div style="margin: 10px; padding: 10px; background-color: darkgray;">
+							<h4 style="color: white;">Buscar por</h4>
+							
+							<form class="m-t-25" action="<?=$_SERVER["PHP_SELF"];?>" method="get">
+								<div class="form-group">
+									<select class="select2 form-control" style="width: 100%; height:36px;" name="campo">
+										<option value="rem_id" <?php if($_GET["campo"]=="rem_id") echo "selected"; ?> >ID</option>
+										<option value="rem_serial" <?php if($_GET["campo"]=="rem_serial") echo "selected"; ?>>Serial</option>
+									</select>
+								</div>	
+								
+								<div class="form-group">
+									<input type="text" class="form-control" style="width: 99%;" name="busqueda" value="<?=$_GET["busqueda"];?>" placeholder="Buscar...">
+								</div>
+								
+								<div class="action-form">
+									<div class="form-group m-b-0 text-left">
+										<button type="submit" class="btn btn-info">Aplicar filtros</button>
+										<a href="<?=$_SERVER["PHP_SELF"];?>" class="btn btn-danger">Quitar filtros</a>
+									</div>
+								</div>
+							</form>
+						</div>
+		
+						<div class="widget-container">	
+							<div align="center" style="margin:10px; font-size:20px;">
 								<?php
 								$a = $configuracion['conf_agno_inicio'];
 								while($a<=date("Y")){
@@ -165,41 +196,8 @@ include("includes/head.php");
 									$m++;
 								}
 								?>
-								</div>
-            
-			<div class="row-fluid">
-				
-				<div class="span12">
-					<div class="content-widgets light-gray">
-						<div class="widget-head green">
-							<h3><?=$paginaActual['pag_nombre'];?></h3>
-						</div>
-                        <?php
-						if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){
-							$filtro = "AND (cli_usuario LIKE '%".$_GET["busqueda"]."%' OR cli_nombre LIKE '%".$_GET["busqueda"]."%')";
-						}else{
-							$filtro = "";
-						}
-						?>
-                        
-		
-						<div class="widget-container">
-							<div style="border:thin; border-style:solid; height:150px; margin:10px;">
-                            	<h4 align="center">-Busqueda general y paginación-</h4>
-                                <p> 
-                                    <form class="form-horizontal" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
-                                        <div class="search-box">
-                                            <div class="input-append input-icon">
-                                                <input class="search-input" placeholder="Buscar..." type="text" name="busqueda" value="<?=$_GET["busqueda"];?>">
-                                                <i class=" icon-search"></i>
-                                                <input class="btn" type="submit" name="buscar" value="Buscar">
-                                            </div>
-                                            <?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
-                                        </div>
-                                    </form>
-                                    <?php //include("includes/paginacion.php");?> 
-                                </p>
-                            </div>
+							</div>
+
 							<table class="table table-striped table-bordered" id="data-table">
 							<thead>
 							<tr>
@@ -221,10 +219,10 @@ include("includes/head.php");
                             <?php
 											
 											$filtro = '';
-											if(is_numeric($_GET["idRem"])){$filtro = " AND rem_id='".$_GET["idRem"]."'";}
-											if(is_numeric($_GET["cliente"])){$filtro = " AND rem_cliente='".$_GET["cliente"]."'";}
+											if(is_numeric($_GET["idRem"])){$filtro .= " AND rem_id='".$_GET["idRem"]."'";}
+											if(is_numeric($_GET["cliente"])){$filtro .= " AND rem_cliente='".$_GET["cliente"]."'";}
 											
-											if($_GET["busqueda"]!=""){$filtro = " AND ".$_GET["campo"]."='".$_GET["busqueda"]."'";}
+											if($_GET["busqueda"]!=""){$filtro .= " AND ".$_GET["campo"]."='".$_GET["busqueda"]."'";}
 											
 											if(is_numeric($_GET["a"])){$filtro .= " AND YEAR(rem_fecha_registro)='".$_GET["a"]."'";}
 											if(is_numeric($_GET["m"])){$filtro .= " AND MONTH(rem_fecha_registro)='".$_GET["m"]."'";}
@@ -235,7 +233,7 @@ include("includes/head.php");
 												LEFT JOIN clientes ON cli_id=rem_cliente
 												LEFT JOIN usuarios ON usr_id=rem_asesor
 												LEFT JOIN sucursales_propias ON sucp_id=usr_sucursal
-												WHERE rem_id=rem_id AND rem_id_empresa='".$idEmpresa."' $filtro
+												WHERE rem_id_empresa='".$idEmpresa."' $filtro
 												ORDER BY rem_id DESC
 												");
 												
@@ -245,7 +243,7 @@ include("includes/head.php");
 												LEFT JOIN clientes ON cli_id=rem_cliente
 												LEFT JOIN usuarios ON usr_id=rem_asesor
 												LEFT JOIN sucursales_propias ON sucp_id=usr_sucursal
-												WHERE rem_id=rem_id AND rem_id_empresa='".$idEmpresa."' $filtro
+												WHERE rem_id_empresa='".$idEmpresa."' $filtro
 												ORDER BY rem_id DESC
 												LIMIT 0, 100
 												");
@@ -304,19 +302,41 @@ include("includes/head.php");
 							<button data-toggle="dropdown" class="btn btn-danger dropdown-toggle"><span class="caret"></span>
 							</button>
 							<ul class="dropdown-menu">
-								<li><a href="../v2.0/usuarios/empresa/lab-remisiones-editar.php?id=<?=$resultado['rem_id'];?>" target="_blank">Ver detalles</a></li>
-
-								<li><a href="../v2.0/usuarios/empresa/lab-remisiones-imprimir.php?estado=1&id=<?=$resultado['rem_id'];?>" target="_blank">Remisión de entrada</a></li>
-
-								<li><a href="../v2.0/usuarios/empresa/lab-remisiones-imprimir.php?estado=2&id=<?=$resultado['rem_id'];?>" target="_blank">Remisión de salida</a></li>
-
-								<li><a href="../v2.0/usuarios/empresa/lab-certificado-imprimir.php?id=<?=$resultado['rem_id'];?>" target="_blank">Ver certificado</a></li>
+								<li><a href="remisiones-editar.php?id=<?=$resultado['rem_id'];?>">Ver detalles</a></li>
 								
+								<li><a href="#" onClick="if(!confirm('Desea eliminar este registro?')){return false;}">Eliminar</a></li>
+								
+								<hr>
+								<li><a href="enviar_correos/enviar-remision-actual-al-cliente.php?id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>&contacto=<?=$resultado['rem_contacto'];?>">Enviar remisión actual</a></li>
+								
+								<?php if($resultado['rem_generar_certificado']==1 and $resultado['rem_estado']==1){?>
+									<hr>
+									<li><a href="bd_update/salida-remision-actualizar.php?id=<?=$resultado['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank">Generar salida</a></li>
+								<?php } if($resultado['rem_generar_certificado']!=1){?>
+									<hr>
+									<li><a href="bd_update/generar-certificado.php?id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}">Generar certificado</a></li>
+								<?php }?>
+								
+								<hr>
+								<li><a href="reportes/remisiones-imprimir.php?id=<?=$resultado['rem_id'];?>&estado=1" target="_blank">Remisión Entrada</a></li>
+								
+								<?php if($resultado['rem_estado']==2){?>
+								<li><a href="reportes/remisiones-imprimir.php?id=<?=$resultado['rem_id'];?>&estado=2" target="_blank">Remisión Salida</a></li>
+								<?php }?>
+								
+								<?php if($resultado['rem_generar_certificado']==1){?>
+								<li><a href="reportes/certificado-imprimir.php?id=<?=$resultado['rem_id'];?>" target="_blank">Certificado</a></li>
+								<?php }?>
+								
+								<?php if(!empty($resultado['rem_archivo'])){?>
+									<hr>
+									<li><a href="files/adjuntos/<?=$resultado['rem_archivo'];?>" target="_blank">Ver imagen</a></li>
+								<?php }?>
 							</ul>
 						</div>
 												</td>
 												
-												<td><a href="#"><?=$resultado['rem_id'];?></a></td>
+												<td><a href="remisiones-editar.php?id=<?=$resultado['rem_id'];?>"><?=$resultado['rem_id'];?></a></td>
 												
 												<td><?=$resultado['rem_fecha'];?></td>
                                                 
