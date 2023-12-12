@@ -508,28 +508,47 @@ switch ($remision['rem_tipo_equipo']) {
 										<td style="width:25%;" align="center">EQUIPO AJUSTADO</td>
 										<td style="width:25%;" align="center">DIFERENCIA</td>
 									</tr>
+									<?php
+										$valor="";
+										$valorN1P="11.591";
+										$valorN2P="11.620";
+										$valorN3P="11.605";
+										$mensaje="";
+										if ($remision['rem_tipo_equipo'] == 2) {
+											$valor="N/A";
+											$valorN1P="N/A";
+											$valorN2P="N/A";
+											$valorN3P="N/A";
+											$mensaje="<span>Nota: NO Aplica en este equipo (N/A)</span>";
+										}
+									?>
 									<tr>
 										<td align="center">N°1</td>
-										<td align="center"><?= $remision['rem_n1_patron']; ?></td>
-										<td align="center"><?= $remision['rem_n1_equipo']; ?></td>
-										<td align="center"><?= $remision['rem_n1_diferencia']; ?></td>
+										<td align="center"><?= $valorN1P; ?></td>
+										<td align="center"><?= $remision['rem_n1_equipo'] ?? $valor; ?></td>
+										<td align="center"><?= $remision['rem_n1_diferencia'] ?? $valor; ?></td>
 									</tr>
 									<tr>
 										<td align="center">N°2</td>
-										<td align="center"><?= $remision['rem_n2_patron']; ?></td>
-										<td align="center"><?= $remision['rem_n2_equipo']; ?></td>
-										<td align="center"><?= $remision['rem_n2_diferencia']; ?></td>
+										<td align="center"><?= $valorN2P; ?></td>
+										<td align="center"><?= $remision['rem_n2_equipo'] ?? $valor; ?></td>
+										<td align="center"><?= $remision['rem_n2_diferencia'] ?? $valor; ?></td>
 									</tr>
 									<tr>
 										<td align="center">N°3</td>
-										<td align="center"><?= $remision['rem_n3_patron']; ?></td>
-										<td align="center"><?= $remision['rem_n3_equipo']; ?></td>
-										<td align="center"><?= $remision['rem_n3_diferencia']; ?></td>
+										<td align="center"><?= $valorN3P; ?></td>
+										<td align="center"><?= $remision['rem_n3_equipo'] ?? $valor; ?></td>
+										<td align="center"><?= $remision['rem_n3_diferencia'] ?? $valor; ?></td>
 									</tr>
 								</table>
 							</td>
 						</tr>
 					</table>
+				</td>
+			</tr>
+			<tr align="center">
+				<td align="center" colspan="2">
+					<?=$mensaje;?>
 				</td>
 			</tr>
 		</table>
@@ -843,11 +862,10 @@ switch ($remision['rem_tipo_equipo']) {
 		<?php } ?>
 	<?php } ?>
 
-	
-	<p>&nbsp;</p>
 	<?php
 	//sólo para teodolito. Unos espacios más.
 	if ($remision['rem_tipo_equipo'] == 3) { ?>
+		<p>&nbsp;</p>
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
