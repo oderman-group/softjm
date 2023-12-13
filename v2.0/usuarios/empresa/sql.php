@@ -366,7 +366,7 @@ if($_POST["idSql"]==10){
 }
 //AGREGAR FACTURAS
 if($_POST["idSql"]==11){
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_categoria=2, cli_fecha_ingreso=now() WHERE cli_id='".$_POST["cliente"]."' AND cli_categoria=1");
+	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_categoria='".CLI_CATEGORIA_CLIENTE."', cli_fecha_ingreso=now() WHERE cli_id='".$_POST["cliente"]."' AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."'");
 	
 	if($_POST["valor"]=="") $_POST["valor"]=0; if($_POST["descuento"]=="") $_POST["descuento"]=0; if($_POST["impuestos"]=="") $_POST["impuestos"]=0; if($_POST["retencion"]=="") $_POST["retencion"]=0;
 	mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion(fact_cliente, fact_fecha, fact_valor, fact_estado, fact_usuario_responsable, fact_descripcion, fact_observacion, fact_descuento, fact_numero_fisica, fact_usuario_influyente, fact_fecha_real, fact_fecha_vencimiento, fact_tipo, fact_impuestos, fact_retencion)VALUES('".$_POST["cliente"]."',now(),'".$_POST["valor"]."','".$_POST["estado"]."','".$_SESSION["id"]."','".$_POST["descripcion"]."','".$_POST["observacion"]."','".$_POST["descuento"]."','".$_POST["numFisica"]."','".$_POST["influyente"]."','".$_POST["fechaFactura"]."','".$_POST["fechaVencimiento"]."','".$_POST["tipo"]."','".$_POST["impuestos"]."','".$_POST["retencion"]."')");
@@ -395,7 +395,7 @@ if($_POST["idSql"]==11){
 }
 //EDITAR FACTURAS
 if($_POST["idSql"]==12){
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_categoria=2, cli_fecha_ingreso=now() WHERE cli_id='".$_POST["cliente"]."' AND cli_categoria=1");
+	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_categoria='".CLI_CATEGORIA_CLIENTE."', cli_fecha_ingreso=now() WHERE cli_id='".$_POST["cliente"]."' AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."'");
 	
 	if($_POST["valor"]=="") $_POST["valor"]=0; if($_POST["descuento"]=="") $_POST["descuento"]=0; if($_POST["impuestos"]=="") $_POST["impuestos"]=0; if($_POST["retencion"]=="") $_POST["retencion"]=0;
 	mysqli_query($conexionBdPrincipal,"UPDATE facturacion SET fact_cliente='".$_POST["cliente"]."', fact_valor='".$_POST["valor"]."', fact_descripcion='".$_POST["descripcion"]."', fact_estado='".$_POST["estado"]."', fact_observacion='".$_POST["observacion"]."', fact_ultima_modificacion=now(), fact_usuario_modificacion='".$_SESSION["id"]."', fact_descuento='".$_POST["descuento"]."', fact_numero_fisica='".$_POST["numFisica"]."', fact_usuario_influyente='".$_POST["influyente"]."', fact_fecha_real='".$_POST["fechaFactura"]."', fact_fecha_vencimiento='".$_POST["fechaVencimiento"]."', fact_tipo='".$_POST["tipo"]."', fact_impuestos='".$_POST["impuestos"]."', fact_retencion='".$_POST["retencion"]."' WHERE fact_id='".$_POST["id"]."'");

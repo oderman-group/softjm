@@ -52,7 +52,7 @@ class CotizacionesEditar {
         $htmlTabla .= '</td>';
         $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;"></td>';
         $htmlTabla .= '<td>';
-        if ($resultadoD['cli_categoria'] == 3 && $datosUsuarioActual['usr_tipo'] == 1) {
+        if ($resultadoD['cli_categoria'] == CLI_CATEGORIA_DEALER && $datosUsuarioActual['usr_tipo'] == 1) {
             $htmlTabla .= '<b>Precio Dealer: $' . number_format($precioDealer, 0, ",", ".") . '</b><br>';
         }
         $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;"><br>';

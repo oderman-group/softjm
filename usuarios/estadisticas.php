@@ -13,35 +13,35 @@ if(is_numeric($_GET["u"])){$userConsulta = $_GET["u"];}else{$userConsulta = 9;}
 include("includes/head.php");
 
 $consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=1 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=2 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=3 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=4 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=5 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=6 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=7 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=8 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=9 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=10 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=11 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=12 AND cli_categoria=2 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta.")
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=1 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=2 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=3 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=4 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=5 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=6 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=7 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=8 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=9 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=10 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=11 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=12 AND cli_categoria='".CLI_CATEGORIA_CLIENTE."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta.")
 ");
 $clientes = mysqli_fetch_array($consultaClientes, MYSQLI_BOTH);
 for($i=0; $i<=11; $i++){if($clientes[$i]==null){$clientes[$i]=0;}}
 
 $consultaProspectos=mysqli_query($conexionBdPrincipal,"SELECT 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=1 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=2 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=3 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=4 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=5 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=6 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=7 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=8 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=9 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=10 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=11 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
-(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=12 AND cli_categoria=1 AND YEAR(cli_fecha_ingreso)=".$agnoConsulta.")
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=1 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=2 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=3 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=4 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=5 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=6 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=7 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=8 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=9 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=10 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=11 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta."), 
+(SELECT count(cli_id) FROM clientes WHERE MONTH(cli_fecha_ingreso)=12 AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."' AND YEAR(cli_fecha_ingreso)=".$agnoConsulta.")
 ");
 $prospectos = mysqli_fetch_array($consultaProspectos, MYSQLI_BOTH);
 for($i=0; $i<=11; $i++){if($prospectos[$i]==null){$prospectos[$i]=0;}}

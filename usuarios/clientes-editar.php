@@ -270,9 +270,9 @@ include("includes/js-formularios.php");
 														<div class="controls">
 															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="categoria">
 																<option value=""></option>
-																<option value="1" <?php if($resultadoD['cli_categoria']==1){echo "selected";}?>>Prospecto</option>
-																<option value="2" <?php if($resultadoD['cli_categoria']==2){echo "selected";}?>>Cliente</option>
-																<option value="3" <?php if($resultadoD['cli_categoria']==3){echo "selected";}?>>Dealer</option>
+																<option value="<?= CLI_CATEGORIA_PROSPECTO ?>" <?php if($resultadoD['cli_categoria'] == CLI_CATEGORIA_PROSPECTO){echo "selected";} ?>>Prospecto</option>
+																<option value="<?= CLI_CATEGORIA_CLIENTE ?>" <?php if($resultadoD['cli_categoria'] == CLI_CATEGORIA_CLIENTE){echo "selected";} ?>>Cliente</option>
+																<option value="<?= CLI_CATEGORIA_DEALER ?>" <?php if($resultadoD['cli_categoria'] == CLI_CATEGORIA_DEALER){echo "selected";} ?>>Dealer</option>
 															</select>
 														</div>
 												   </div>
