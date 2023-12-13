@@ -427,7 +427,7 @@ include("includes/js-formularios.php");
 												ORDER BY combo_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
-													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo  FROM cotizacion_productos WHERE czpp_combo='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo=1");
+													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo  FROM cotizacion_productos WHERE czpp_combo='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo='".CZPP_TIPO_COTZ."'");
 													$productoN = $consultaCotizacionP->num_rows;
 												?>
 													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>

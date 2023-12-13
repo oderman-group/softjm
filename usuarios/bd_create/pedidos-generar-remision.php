@@ -12,7 +12,7 @@ mysqli_query($conexionBdPrincipal,"INSERT INTO remisionbdg(remi_fecha_propuesta,
 $idInsert = mysqli_insert_id($conexionBdPrincipal);
 
 
-$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2 AND czpp_producto!=''");
+$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."' AND czpp_producto!=''");
 
 
 while ($prod = mysqli_fetch_array($productos)) {
@@ -26,7 +26,7 @@ while ($prod = mysqli_fetch_array($productos)) {
 
 
 //Ingresar todos los productos cuando son combos
-$productosCombos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2 AND czpp_combo!=''");
+$productosCombos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."' AND czpp_combo!=''");
 
 
 while ($combo = mysqli_fetch_array($productosCombos)) {

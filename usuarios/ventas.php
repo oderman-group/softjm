@@ -364,7 +364,7 @@
 												$consultaTotal = mysql_query("SELECT * FROM cotizacion_productos
 													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_tipo=1 $filtroFactura
 													INNER JOIN clientes ON cli_id=factura_cliente $filtroCliente
-													WHERE czpp_tipo IN(4) AND czpp_valor>0 AND czpp_cantidad>0
+													WHERE czpp_tipo IN('".CZPP_TIPO_FACT."') AND czpp_valor>0 AND czpp_cantidad>0
 													GROUP BY czpp_id
 													",$conexion);
 
@@ -502,7 +502,7 @@
 													INNER JOIN usuarios ON usr_id=factura_vendedor
 													INNER JOIN sucursales_propias ON sucp_id=usr_sucursal
 													INNER JOIN clientes ON cli_id=factura_cliente $filtroCliente
-													WHERE czpp_tipo=4 AND czpp_cantidad>0
+													WHERE czpp_tipo='".CZPP_TIPO_FACT."' AND czpp_cantidad>0
 													GROUP BY factura_vendedor
 													ORDER BY sumaTotal DESC
 													",$conexion);
@@ -594,7 +594,7 @@
 													INNER JOIN usuarios ON usr_id=factura_vendedor
                           							INNER JOIN sucursales_propias ON sucp_id=usr_sucursal
                           							INNER JOIN clientes ON cli_id=factura_cliente $filtroCliente
-													WHERE czpp_tipo=4 AND czpp_cantidad>0
+													WHERE czpp_tipo='".CZPP_TIPO_FACT."' AND czpp_cantidad>0
 													GROUP BY  sucp_id
 													ORDER BY sumaTotal DESC
 													",$conexion);

@@ -479,7 +479,7 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"]);
 											$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $res['factura_vendedor'] . "' AND usr_id_empresa='".$idEmpresa."'"));
 
 											$valorFactura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT SUM(czpp_cantidad * czpp_valor) FROM cotizacion_productos 
-                      WHERE czpp_cotizacion='" . $res['factura_id'] . "' and czpp_tipo=4"));
+                      WHERE czpp_cotizacion='" . $res['factura_id'] . "' and czpp_tipo='".CZPP_TIPO_FACT."'"));
 
 											$pCom = $configuracion['conf_comision_vendedores'] / 100;
 
@@ -496,7 +496,7 @@ ORDER BY " . $_GET["orden"] . " " . $_GET["formaOrden"]);
 													<?php
 													$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
 										INNER JOIN productos ON prod_id=czpp_producto
-										WHERE czpp_cotizacion='" . $res['factura_id'] . "' AND czpp_tipo=4
+										WHERE czpp_cotizacion='" . $res['factura_id'] . "' AND czpp_tipo='".CZPP_TIPO_FACT."'
 										");
 													$i = 1;
 													while ($prod = mysqli_fetch_array($productos)) {

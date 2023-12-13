@@ -103,7 +103,7 @@ $fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', 
 					<!-- COMBOS -->
 					<?php
 						$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos
-		INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2
+		INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."'
 		ORDER BY czpp_orden");
 
 
@@ -188,7 +188,7 @@ $fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', 
 					$no = 1;
 					$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 		INNER JOIN productos_categorias ON catp_id=prod_categoria
-		INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2
+		INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."'
 		ORDER BY czpp_orden");
 					while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 						$dcto = 0;
@@ -244,7 +244,7 @@ $fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', 
 					<?php
 					//Servicios
 					$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios
-		INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2
+		INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."'
 		ORDER BY czpp_orden");
 					while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 						$valorTotal += ($prod['czpp_valor'] * $prod['czpp_cantidad']);
