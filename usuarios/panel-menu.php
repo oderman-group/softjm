@@ -385,14 +385,14 @@ FLOT PIE CHART
 					<?php
 					$ConsultaNumTikets=$conexionBdPrincipal->query("SELECT * FROM clientes_tikets
 					INNER JOIN clientes ON cli_id=tik_cliente
-					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado=1 
+					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado='".TIK_ESTADO_ABIERTO."'
 					ORDER BY tik_tipo_tiket DESC
 					");
 					$NumtiketsI = $ConsultaNumTikets->num_rows;
 
 					$tiketsI = $conexionBdPrincipal->query("SELECT * FROM clientes_tikets
 					INNER JOIN clientes ON cli_id=tik_cliente
-					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado=1 
+					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado='".TIK_ESTADO_ABIERTO."' 
 					ORDER BY tik_tipo_tiket DESC
 					LIMIT 0,5
 					");

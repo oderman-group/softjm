@@ -5,7 +5,7 @@ $idPagina = 301;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado=2 WHERE tik_id='" . $_GET["id"] . "'");
+mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado='".TIK_ESTADO_CERRADO."' WHERE tik_id='" . $_GET["id"] . "'");
 mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_realizado=1 WHERE cseg_tiket='" . $_GET["id"] . "'");
 
 

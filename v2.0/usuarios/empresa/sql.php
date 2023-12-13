@@ -172,7 +172,7 @@ if($_POST["idSql"]==7){
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 	
 	if($_POST["cerrarTK"]==1){
-		mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado=2 WHERE tik_id='".$_POST["IDticket"]."'");
+		mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado='".TIK_ESTADO_CERRADO."' WHERE tik_id='".$_POST["IDticket"]."'");
 		
 	}
 	
@@ -1480,7 +1480,7 @@ if($_GET["get"]==28){
 }
 if($_GET["get"]==29){
 	//$idPagina = 100; include("verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado=2 WHERE tik_id='".$_GET["id"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado='".TIK_ESTADO_CERRADO."' WHERE tik_id='".$_GET["id"]."'");
 	
 	echo '<script type="text/javascript">window.location.href="'.$_SERVER['HTTP_REFERER'].'";</script>';
 	exit();
