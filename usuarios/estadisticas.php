@@ -47,35 +47,35 @@ $prospectos = mysqli_fetch_array($consultaProspectos, MYSQLI_BOTH);
 for($i=0; $i<=11; $i++){if($prospectos[$i]==null){$prospectos[$i]=0;}}
 
 $consultaVentas=mysqli_query($conexionBdPrincipal,"SELECT 
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=1 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=2 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=3 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=4 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=5 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=6 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=7 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=8 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=9 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=10 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=11 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1 WHERE MONTH(fpab_fecha_abono)=12 AND YEAR(fpab_fecha_abono)=".$agnoConsulta.")
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=1 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=2 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=3 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=4 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=5 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=6 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=7 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=8 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=9 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=10 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=11 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."' WHERE MONTH(fpab_fecha_abono)=12 AND YEAR(fpab_fecha_abono)=".$agnoConsulta.")
 ");
 $ventas = mysqli_fetch_array($consultaVentas, MYSQLI_BOTH);
 for($i=0; $i<=11; $i++){if($ventas[$i]==null){$ventas[$i]=0;}}
 
 $consultaEgresos=mysqli_query($conexionBdPrincipal,"SELECT 
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=1 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=2 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=3 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=4 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=5 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=6 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=7 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=8 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=9 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=10 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=11 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
-(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2 WHERE MONTH(fpab_fecha_abono)=12 AND YEAR(fpab_fecha_abono)=".$agnoConsulta.")
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=1 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=2 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=3 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=4 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=5 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=6 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=7 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=8 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=9 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=10 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=11 AND YEAR(fpab_fecha_abono)=".$agnoConsulta."),
+(SELECT sum(fpab_valor) FROM facturacion_abonos INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."' WHERE MONTH(fpab_fecha_abono)=12 AND YEAR(fpab_fecha_abono)=".$agnoConsulta.")
 ");
 $egresos = mysqli_fetch_array($consultaEgresos, MYSQLI_BOTH);
 for($i=0; $i<=11; $i++){if($egresos[$i]==null){$egresos[$i]=0;}}
@@ -84,7 +84,7 @@ $i=1;
 $ipordia ="";
 while($i<=31){
   $consultaIpdia=mysqli_query($conexionBdPrincipal,"SELECT sum(fpab_valor) FROM facturacion_abonos
-	INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=1
+	INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_VENTA."'
 	WHERE YEAR(fpab_fecha_abono)=".$agnoConsulta." AND MONTH(fpab_fecha_abono)=".$mesConsulta." AND DAY(fpab_fecha_abono)=".$i);
 	$datosipdia = mysqli_fetch_array($consultaIpdia, MYSQLI_BOTH);
 	if($datosipdia[0]=="") $datosipdia[0] = 0;
@@ -98,7 +98,7 @@ $i=1;
 $epordia ="";
 while($i<=31){
   $consultaIpdia=mysqli_query($conexionBdPrincipal,"SELECT sum(fpab_valor) FROM facturacion_abonos
-	INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo=2
+	INNER JOIN facturacion ON fact_id=fpab_factura AND fact_estado!=3 AND fact_tipo='".FACT_TIPO_COMPRA."'
 	WHERE YEAR(fpab_fecha_abono)=".$agnoConsulta." AND MONTH(fpab_fecha_abono)=".$mesConsulta." AND DAY(fpab_fecha_abono)=".$i);
 	$datosepdia = mysqli_fetch_array($consultaIpdia, MYSQLI_BOTH);
 	if($datosepdia[0]=="") $datosepdia[0] = 0;
@@ -209,7 +209,7 @@ $epordia = substr($epordia,0,-1);
     
     <?php
 	$compradores = mysqli_query($conexionBdPrincipal,"SELECT cli_nombre, sum(fpab_valor) as total FROM facturacion_abonos
-								INNER JOIN facturacion ON fact_id=fpab_factura AND fact_tipo=1 AND fact_estado!=3
+								INNER JOIN facturacion ON fact_id=fpab_factura AND fact_tipo='".FACT_TIPO_VENTA."' AND fact_estado!=3
 								INNER JOIN clientes ON cli_id=fact_cliente
 								WHERE YEAR(fpab_fecha_abono)=".$agnoConsulta."
 								GROUP BY fact_cliente ORDER BY total desc LIMIT 0,10");
@@ -243,7 +243,7 @@ $epordia = substr($epordia,0,-1);
     <?php
 	$confianza = mysqli_query($conexionBdPrincipal,"SELECT cli_nombre, count(fact_cliente) as numero FROM facturacion
 								INNER JOIN clientes ON cli_id=fact_cliente
-								WHERE fact_tipo=1 AND fact_estado!=3 AND YEAR(fact_fecha_real)=".$agnoConsulta."
+								WHERE fact_tipo='".FACT_TIPO_VENTA."' AND fact_estado!=3 AND YEAR(fact_fecha_real)=".$agnoConsulta."
 								GROUP BY fact_cliente ORDER BY numero desc LIMIT 0,10");
 	$num = mysqli_num_rows($confianza);
 	$i=1;
