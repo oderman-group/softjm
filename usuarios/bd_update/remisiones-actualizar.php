@@ -71,7 +71,7 @@
 	rem_l2c='".$_POST["l2c"]."',
 	rem_error_detectado='".$_POST["errorDetectado"]."'
 	
-	WHERE rem_id='".$_POST["id"]."'");
+	WHERE rem_id='".$_POST["id"]."' AND rem_id_empresa='".$idEmpresa."'");
 	
 	if (!empty($_POST["servicios"])) {
 	$numero =(count($_POST["servicios"]));

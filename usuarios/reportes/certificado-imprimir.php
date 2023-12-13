@@ -511,37 +511,54 @@ switch ($remision['rem_tipo_equipo']) {
 										$valorN1P="11.591";
 										$valorN2P="11.620";
 										$valorN3P="11.605";
+										$valorN1E=$remision['rem_n1_equipo'];
+										$valorN2E=$remision['rem_n2_equipo'];
+										$valorN3E=$remision['rem_n3_equipo'];
+										$valorN1D=$remision['rem_n1_diferencia'];
+										$valorN2D=$remision['rem_n2_diferencia'];
+										$valorN3D=$remision['rem_n3_diferencia'];
 										$mensaje="";
 										if ($remision['rem_tipo_equipo'] == 2) {
 											$valor="N/A";
 											$valorN1P="N/A";
 											$valorN2P="N/A";
 											$valorN3P="N/A";
+											$valorN1E="N/A";
+											$valorN2E="N/A";
+											$valorN3E="N/A";
+											$valorN1D="N/A";
+											$valorN2D="N/A";
+											$valorN3D="N/A";
 											$mensaje="<span>Nota: NO Aplica en este equipo (N/A)</span>";
 										}
 									?>
 									<tr>
 										<td align="center">N°1</td>
 										<td align="center"><?= $valorN1P; ?></td>
-										<td align="center"><?= $remision['rem_n1_equipo'] ?? $valor; ?></td>
-										<td align="center"><?= $remision['rem_n1_diferencia'] ?? $valor; ?></td>
+										<td align="center"><?= $valorN1E ?></td>
+										<td align="center"><?= $valorN1D ?></td>
 									</tr>
 									<tr>
 										<td align="center">N°2</td>
 										<td align="center"><?= $valorN2P; ?></td>
-										<td align="center"><?= $remision['rem_n2_equipo'] ?? $valor; ?></td>
-										<td align="center"><?= $remision['rem_n2_diferencia'] ?? $valor; ?></td>
+										<td align="center"><?= $valorN2E ?></td>
+										<td align="center"><?= $valorN2D ?></td>
 									</tr>
 									<tr>
 										<td align="center">N°3</td>
 										<td align="center"><?= $valorN3P; ?></td>
-										<td align="center"><?= $remision['rem_n3_equipo'] ?? $valor; ?></td>
-										<td align="center"><?= $remision['rem_n3_diferencia'] ?? $valor; ?></td>
+										<td align="center"><?= $valorN3E ?></td>
+										<td align="center"><?= $valorN3D ?></td>
 									</tr>
 								</table>
 							</td>
 						</tr>
 					</table>
+				</td>
+			</tr>
+			<tr align="center">
+				<td align="center" colspan="2">
+					<?=$mensaje;?>
 				</td>
 			</tr>
 		</table>

@@ -456,34 +456,46 @@ include("includes/js-formularios.php");
 													$valorN1P="11.591";
 													$valorN2P="11.620";
 													$valorN3P="11.605";
-													$disabledM="";
+													$valorN1E=$resultadoD['rem_n1_equipo'];
+													$valorN2E=$resultadoD['rem_n2_equipo'];
+													$valorN3E=$resultadoD['rem_n3_equipo'];
+													$valorN1D=$resultadoD['rem_n1_diferencia'];
+													$valorN2D=$resultadoD['rem_n2_diferencia'];
+													$valorN3D=$resultadoD['rem_n3_diferencia'];
 													$mensaje="";
+													$disabledM="";
 													if ($resultadoD['rem_tipo_equipo'] == 2) {
 														$valor="N/A";
 														$valorN1P="N/A";
 														$valorN2P="N/A";
 														$valorN3P="N/A";
-														$disabledM="disabled";
+														$valorN1E="N/A";
+														$valorN2E="N/A";
+														$valorN3E="N/A";
+														$valorN1D="N/A";
+														$valorN2D="N/A";
+														$valorN3D="N/A";
 														$mensaje="<span>Nota: NO Aplica en este equipo (N/A)</span>";
+														$disabledM="disabled";
 													}
 												?>
 												<tr align="center">
 													<td>Nº1</td>
 													<td><input name="n1_patron" style="text-align: center;" disabled value="<?=$valorN1P;?>"></td>
-													<td><input value="<?=$resultadoD['rem_n1_equipo'];?>" name="n1_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
-													<td><input value="<?=$resultadoD['rem_n1_diferencia'];?>" name="n1_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+													<td><input name="n1_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valorN1E;?>"></td>
+													<td><input name="n1_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valorN1D;?>"></td>
 												</tr>
 												<tr align="center">
 													<td>Nº2</td>
 													<td><input name="n2_patron" style="text-align: center;" disabled value="<?=$valorN2P;?>"></td>
-													<td><input value="<?=$resultadoD['rem_n2_equipo'];?>" name="n2_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
-													<td><input value="<?=$resultadoD['rem_n2_diferencia'];?>" name="n2_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+													<td><input name="n2_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valorN2E;?>"></td>
+													<td><input name="n2_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valorN2D;?>"></td>
 												</tr>
 												<tr align="center">
 													<td>Nº3</td>
 													<td><input name="n3_patron" style="text-align: center;" disabled value="<?=$valorN3P;?>"></td>
-													<td><input value="<?=$resultadoD['rem_n3_equipo'];?>" name="n3_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
-													<td><input value="<?=$resultadoD['rem_n3_diferencia'];?>" name="n3_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+													<td><input name="n3_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valorN3E;?>"></td>
+													<td><input name="n3_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valorN3D;?>"></td>
 												</tr>
 											</table>
 											<?=$mensaje;?>
