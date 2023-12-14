@@ -239,7 +239,7 @@ if(is_numeric($_GET["idRem"])){
 												
 												$certificado = '<span class="label label-success">Vigente</a>';
 												
-												if($resultado['rem_estado_certificado']==2){
+												if($resultado['rem_estado_certificado']==REM_ESTADO_CERTIFICADO_VENCIDO){
 													$certificado = '<span class="label label-danger">Vencido</span>';
 												}
 												//Para obtener la fecha
