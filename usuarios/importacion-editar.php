@@ -401,7 +401,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 												<?php
 												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
 												LEFT JOIN proveedores ON prov_id=factura_proveedor  
-												WHERE factura_tipo=2 AND factura_preferencia=1 AND factura_id_empresa='".$idEmpresa."'
+												WHERE factura_tipo='".FACTURA_TIPO_COMPRA."' AND factura_preferencia=1 AND factura_id_empresa='".$idEmpresa."'
 												");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 													$facturasNConsulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones_facturas 
