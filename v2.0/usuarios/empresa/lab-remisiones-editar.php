@@ -274,8 +274,8 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 													<div class="col-sm-9">
 														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="tiposEquipos" <?=$disabled;?>>
 															<option value="2">--</option>
-															<option value="1" <?php if($resultadoD['rem_tipos_equipos']==1){echo "selected";} ?>>Nuevo</option>
-															<option value="2" <?php if($resultadoD['rem_tipos_equipos']==2){echo "selected";} ?>>Usado</option>
+															<option value="<?= REM_TIPOS_EQUIPOS_NUEVO?>" <?php if($resultadoD['rem_tipos_equipos']==REM_TIPOS_EQUIPOS_NUEVO){echo "selected";} ?>>Nuevo</option>
+															<option value="<?= REM_TIPOS_EQUIPOS_USADO?>" <?php if($resultadoD['rem_tipos_equipos']==REM_TIPOS_EQUIPOS_USADO){echo "selected";} ?>>Usado</option>
 														</select>
 													</div>
 												</div>
