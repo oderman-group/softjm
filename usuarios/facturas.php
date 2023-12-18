@@ -243,7 +243,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 												}
 
 												//Para el total al pie de pagina
-												if($res['factura_tipo'] == 1){
+												if($res['factura_tipo'] == FACTURA_TIPO_VENTA){
 
 													$sumaFacturasSinIva += $sumaTotalConDcto;
 													$sumaFacturasConIva += $sumaTotalFinal;
@@ -326,12 +326,12 @@ $paginaActual['pag_nombre'] = "Facturas";
 														</button>
 														<ul class="dropdown-menu">
 															<?php if ($_SESSION["id"] == $res['factura_creador'] or $_SESSION["id"] == $res['factura_vendedor'] or Modulos::validarRol([396], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
-																if ($res['factura_tipo'] == 2 and $res['factura_extranjera'] == '0') {
+																if ($res['factura_tipo'] == FACTURA_TIPO_COMPRA and $res['factura_extranjera'] == '0') {
 															?>
 																	<li><a href="facturas-compra-editar.php?id=<?= $res['factura_id']; ?>#productos"> Editar</a></li>
 																<?php
 																}
-																if ($res['factura_tipo'] == 2 and $res['factura_extranjera'] == 1) {
+																if ($res['factura_tipo'] == FACTURA_TIPO_COMPRA and $res['factura_extranjera'] == 1) {
 																?>
 																	<li><a href="fce-editar.php?id=<?= $res['factura_id']; ?>#productos"> Editar</a></li>
 															<?php

@@ -33,7 +33,7 @@ $valorCostosFletes = mysqli_fetch_array($valorCostosFletes, MYSQLI_BOTH);
 
 $valorFletes = mysqli_query($conexionBdPrincipal, "SELECT SUM(czpp_valor) FROM cotizacion_productos
 INNER JOIN productos ON prod_id=czpp_producto AND prod_no_inventariable=1
-WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4");
+WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo='".CZPP_TIPO_FACT."'");
 $valorFletes = mysqli_fetch_array($valorFletes, MYSQLI_BOTH);
 
 $totalFlete = ($valorFletes[0] * $trmMultFlete);
@@ -48,7 +48,7 @@ if (!empty($resultadoD['imp_otros_gastos']) && !empty($totalFlete)) {
 
 $valorTotalProductosImpConsulta = mysqli_query($conexionBdPrincipal, "SELECT SUM((czpp_cantidad*czpp_valor)) FROM cotizacion_productos
 INNER JOIN productos ON prod_id=czpp_producto AND prod_no_inventariable='0'
-WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4");
+WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo='".CZPP_TIPO_FACT."'");
 $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MYSQLI_BOTH);
 ?>
 
@@ -401,7 +401,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 												<?php
 												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
 												LEFT JOIN proveedores ON prov_id=factura_proveedor  
-												WHERE factura_tipo=2 AND factura_preferencia=1 AND factura_id_empresa='".$idEmpresa."'
+												WHERE factura_tipo='".FACTURA_TIPO_COMPRA."' AND factura_preferencia=1 AND factura_id_empresa='".$idEmpresa."'
 												");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 													$facturasNConsulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones_facturas 
@@ -481,7 +481,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 										$no = 1;
 										$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM productos 
 										INNER JOIN productos_categorias ON catp_id=prod_categoria
-										INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $resultadoD['imp_fce'] . "' AND czpp_tipo=4
+										INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $resultadoD['imp_fce'] . "' AND czpp_tipo='".CZPP_TIPO_FACT."'
 										WHERE prod_id_empresa='".$idEmpresa."'
 										ORDER BY prod_no_inventariable DESC, czpp_orden");
 										while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {

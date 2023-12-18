@@ -199,7 +199,7 @@ include("includes/head.php");
 
 												$consultaTotal = $conexionBdPrincipal->query("SELECT * FROM cotizacion_productos
 													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_vendedor='".$_SESSION['id']."' $filtroFactura
-													WHERE czpp_tipo IN(4) AND czpp_valor>0 AND czpp_cantidad>0
+													WHERE czpp_tipo IN('".CZPP_TIPO_FACT."') AND czpp_valor>0 AND czpp_cantidad>0
 													GROUP BY czpp_id
 													");
 
@@ -309,7 +309,7 @@ include("includes/head.php");
 													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_vendedor='".$_SESSION['id']."' $filtroFactura
 													INNER JOIN usuarios ON usr_id=factura_vendedor
 													INNER JOIN sucursales_propias ON sucp_id=usr_sucursal
-													WHERE czpp_tipo=4 AND czpp_cantidad>0
+													WHERE czpp_tipo='".CZPP_TIPO_FACT."' AND czpp_cantidad>0
 													GROUP BY factura_vendedor
 													ORDER BY sumaTotal DESC
 													");
