@@ -4,81 +4,114 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>JM EQUIPOS</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Admin Panel Template">
-<meta name="author" content="Westilian: Kamrujaman Shohel">
-<!-- styles -->
-<link href="../usuarios/css/bootstrap.css" rel="stylesheet">
-<link href="../usuarios/css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="../usuarios/css/font-awesome.css">
-<!--[if IE 7]>
-            <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
-        <![endif]-->
-<link href="../usuarios/css/styles.css" rel="stylesheet">
-<link href="../usuarios/css/theme-blue.css" rel="stylesheet">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>ORIÓN - Clientes</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="../assets-login/vendors/iconfonts/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="../assets-login/vendors/css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="../assets-login/vendors/css/vendor.bundle.addons.css">
+  <!-- endinject -->
+  <!-- plugin css for this page -->
+  <!-- End plugin css for this page -->
+  <!-- inject:css -->
+  <link rel="stylesheet" href="../assets-login/css/style.css">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="../assets-login/images/favicon.png" />
 
-<!--[if IE 7]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie7.css" />
-        <![endif]-->
-<!--[if IE 8]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie8.css" />
-        <![endif]-->
-<!--[if IE 9]>
-            <link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
-        <![endif]-->
-<link href="../usuarios/css/aristo-ui.css" rel="stylesheet">
-<link href="../usuarios/css/elfinder.css" rel="stylesheet">
-<link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
-<!--fav and touch icons -->
-<link rel="shortcut icon" href="usuarios/ico/favicon.ico">
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="../usuarios/ico/apple-touch-icon-144-precomposed.png">
-<link rel="apple-touch-icon-precomposed" sizes="114x114" href="../usuarios/ico/apple-touch-icon-114-precomposed.png">
-<link rel="apple-touch-icon-precomposed" sizes="72x72" href="../usuarios/ico/apple-touch-icon-72-precomposed.png">
-<link rel="apple-touch-icon-precomposed" href="../usuarios/ico/apple-touch-icon-57-precomposed.png">
-<!--============j avascript===========-->
-<script src="../usuarios/js/jquery.js"></script>
-<script src="../usuarios/js/jquery-ui-1.10.1.custom.min.js"></script>
-<script src="../usuarios/js/bootstrap.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="https://kit.fontawesome.com/e84fa1cf78.js" crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="layout">
-	<!-- Navbar================================================== -->
-	<div class="navbar navbar-inverse top-nav">
-		<div class="navbar-inner">
-			<div class="container">
-				<span class="home-link"><a href="index.php" class="icon-home"></a></span>
-				<div class="btn-toolbar pull-right notification-nav">
-					<div class="btn-group">
-						<div class="dropdown">
-							<a class="btn btn-notification"><i class="icon-reply"></i></a>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="container">
-		<form class="form-signin" action="autentico.php" method="post">
-			<input type="hidden" name="idseg" value="<?=$_GET["idseg"];?>">
-			<input type="hidden" name="bd" value="<?=MAINBD;?>">
-			
-            <div align="center">
-                <h3 class="form-signin-heading">Ingreso al Área de Clientes</h3>
-                <img src="../usuarios/files/logojm.png" width="153" height="70" alt="Falgun">
+  <div class="container-scroller">
+    <div class="container-fluid page-body-wrapper full-page-wrapper">
+      <div class="content-wrapper d-flex align-items-stretch auth auth-img-bg">
+        <div class="row flex-grow">
+          <div class="col-lg-6 d-flex align-items-center justify-content-center">
+          
+            <div class="auth-form-transparent text-left p-3">
+              <div class="brand-logo">
+                <img src="../usuarios/files/orion-600.png" alt="Logo Orion">
+              </div>
+              <h4>Bienvenido a ORION</h4>
+              <h6 class="font-weight-light">Ingreso al Área de Clientes</h6>
+              <form class="pt-3" action="autentico.php" method="post" id="demo-form">
+
+                <input type="hidden" name="idseg" value="<?= $idSeguimiento; ?>">
+
+                <input type="hidden" name="bd" value="<?=MAINBD;?>">
+
+                <div class="form-group">
+                  <label for="exampleInputEmail">Usuario</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend bg-transparent">
+                      <span class="input-group-text bg-transparent border-right-0">
+                        <i class="fa fa-user text-primary"></i>
+                      </span>
+                    </div>
+                    <input type="text" class="form-control form-control-lg border-left-0" placeholder="Usuario" name="Usuario">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="exampleInputPassword">Contraseña</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend bg-transparent">
+                      <span class="input-group-text bg-transparent border-right-0">
+                        <i class="fa fa-lock text-primary"></i>
+                      </span>
+                    </div>
+                    <input type="password" class="form-control form-control-lg border-left-0" placeholder="Contraseña" name="Clave" id="passwordInput">
+                    <div class="input-group-prepend bg-transparent" onclick="mostrarClave()">
+                      <span class="input-group-text bg-transparent border-left-0">
+                      <i class="fa-solid fa-eye" id="icoVer"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <script>
+                    function mostrarClave() {
+                        var campo = document.getElementById("passwordInput");
+                        var icoVer = document.getElementById("icoVer");
+
+                        if (campo.type === "password") {
+                            campo.type = "text";
+                            icoVer.classList.remove("fa-eye");
+                            icoVer.classList.add("fa-eye-slash");
+                        } else {
+                            campo.type = "password";
+                            icoVer.classList.remove("fa-eye-slash");
+                            icoVer.classList.add("fa-eye");
+                        }
+                    }
+                </script>
+                <div class="my-3">
+                  <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">ENTRAR</button>
+                </div>
+              </form>
             </div>
-			<div class="controls input-icon">
-				<i class=" icon-user-md"></i>
-				<input type="text" class="input-block-level" placeholder="Usuario" name="Usuario">
-			</div>
-			<div class="controls input-icon">
-				<i class=" icon-key"></i><input type="password" class="input-block-level" placeholder="Contraseña" name="Clave">
-			</div>
-			<label class="checkbox">
-			<button class="btn btn-inverse btn-block" type="submit">Entrar</button>
-		</form>
-	</div>
-</div>
+          </div>
+          <div class="col-lg-6 login-half-bg d-flex flex-row">
+            <p class="text-white font-weight-medium text-center flex-grow align-self-end">Copyright &copy; 2019 Todos los derechos reservados.</p>
+          </div>
+        </div>
+      </div>
+      <!-- content-wrapper ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+  <!-- plugins:js -->
+  <script src="assets-login/vendors/js/vendor.bundle.base.js"></script>
+  <script src="assets-login/vendors/js/vendor.bundle.addons.js"></script>
+  <!-- endinject -->
+  <!-- inject:js -->
+  <script src="assets-login/js/off-canvas.js"></script>
+  <script src="assets-login/js/hoverable-collapse.js"></script>
+  <script src="assets-login/js/misc.js"></script>
+  <script src="assets-login/js/settings.js"></script>
+  <script src="assets-login/js/todolist.js"></script>
+  <!-- endinject -->
 </body>
 </html>
