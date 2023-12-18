@@ -268,8 +268,8 @@ include("includes/js-formularios.php");
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="estado">
 											<option value="0"></option>
-                                            <option value="1" <?php if($resultadoD['tik_estado']==1){echo "selected";}?>>Abierto</option>
-                                            <option value="2" <?php if($resultadoD['tik_estado']==2){echo "selected";}?>>Cerrado</option>
+																<option value="<?= TIK_ESTADO_ABIERTO ?>" <?php if($resultadoD['tik_estado'] == TIK_ESTADO_ABIERTO){echo "selected";} ?>>Abierto</option>
+																<option value="<?= TIK_ESTADO_CERRADO ?>" <?php if($resultadoD['tik_estado'] == TIK_ESTADO_CERRADO){echo "selected";} ?>>Cerrado</option>
                                     	</select>
                                     </div>
                                </div>

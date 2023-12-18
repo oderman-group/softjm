@@ -10,7 +10,7 @@ $consulta= $conexionBdPrincipal->query("INSERT INTO pedidos (pedid_fecha_propues
 $idInsert = mysqli_insert_id($conexionBdPrincipal);
 
 
-$productos = $conexionBdPrincipal->query("SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=1");
+$productos = $conexionBdPrincipal->query("SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_COTZ."'");
 
 while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
     if ($prod['czpp_orden'] == "") $prod['czpp_orden'] = 1;

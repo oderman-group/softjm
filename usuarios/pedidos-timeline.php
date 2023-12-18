@@ -305,9 +305,9 @@ LinkedIn
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span12" tabindex="2" name="estado">
 											<option value=""></option>
-											<option value="1" <?php if($resultadoD['pedid_estado']==1){echo "selected";}?>>En preparación</option>
-											<option value="2" <?php if($resultadoD['pedid_estado']==2){echo "selected";}?>>En camino</option>
-											<option value="3" <?php if($resultadoD['pedid_estado']==3){echo "selected";}?>>Entregado</option>
+											<option value="<?= PEDID_ESTADO_PREPARACION ?>" <?php if($resultadoD['pedid_estado']==PEDID_ESTADO_PREPARACION){echo "selected";}?>>En preparación</option>
+											<option value="<?= PEDID_ESTADO_CAMINO ?>" <?php if($resultadoD['pedid_estado']==PEDID_ESTADO_CAMINO){echo "selected";}?>>En camino</option>
+											<option value="<?= PEDID_ESTADO_ENTREGADO ?>" <?php if($resultadoD['pedid_estado']==PEDID_ESTADO_ENTREGADO){echo "selected";}?>>Entregado</option>
                                     	</select>
                                     </div>
                                </div>

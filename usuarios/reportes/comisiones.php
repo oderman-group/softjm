@@ -70,7 +70,7 @@
 									<?php
 										$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
 										INNER JOIN productos ON prod_id=czpp_producto
-										WHERE czpp_cotizacion='".$res['factura_id']."' AND czpp_tipo=4");
+										WHERE czpp_cotizacion='".$res['factura_id']."' AND czpp_tipo='".CZPP_TIPO_FACT."'");
 										$i = 1;
 										while($prod = mysqli_fetch_array($productos)){
 											echo "<b>".$i.".</b> ".$prod['prod_nombre'].", ";

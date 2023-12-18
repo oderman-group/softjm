@@ -220,7 +220,7 @@ include("head.php");
                                 <b>Equipo:</b> <?=$resC['rem_equipo'];?><br>
 								<b>Serial:</b> <?=$resC['rem_serial'];?><br>
 									
-									<?php if($resC['rem_estado_certificado']!=2){?>
+									<?php if($resC['rem_estado_certificado']!= REM_ESTADO_CERTIFICADO_VENCIDO){?>
 										<!--
 										<a href="http://softjm.com/v2.0/usuarios/empresa/lab-certificado-imprimir.php?id=<?=$resC['rem_id'];?>" target="_blank">Imprimir</a>
 										-->

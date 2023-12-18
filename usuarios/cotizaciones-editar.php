@@ -251,7 +251,7 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT cli_id, cli_nombre, cli_categoria, 
 												CASE 
-													WHEN cli_categoria = 3 THEN '(DEALER)'
+													WHEN cli_categoria = '".CLI_CATEGORIA_DEALER."' THEN '(DEALER)'
 													ELSE ''
 												END AS 'categoria'	
 												FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
@@ -259,7 +259,7 @@ include("includes/js-formularios.php");
 
 												$disabled = '';
 												
-												if(!Modulos::validarRol([393], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) and $resOp['cli_categoria']==3){
+												if(!Modulos::validarRol([393], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) and $resOp['cli_categoria']== CLI_CATEGORIA_DEALER){
 													$disabled = 'disabled';
 												}	
 												
@@ -427,7 +427,7 @@ include("includes/js-formularios.php");
 												ORDER BY combo_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
-													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo  FROM cotizacion_productos WHERE czpp_combo='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo=1");
+													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo  FROM cotizacion_productos WHERE czpp_combo='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo='".CZPP_TIPO_COTZ."'");
 													$productoN = $consultaCotizacionP->num_rows;
 												?>
 													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>
@@ -732,7 +732,7 @@ include("includes/js-formularios.php");
                                 <td><input type="number" title="czpp_cantidad" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td>
 									<?php
-									if($resultadoD['cli_categoria']==3 and Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+									if($resultadoD['cli_categoria']== CLI_CATEGORIA_DEALER and Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 										echo "<b>Precio Dealer: $".number_format($totalDealer, 0, ",", ".")."</b><br>";
 									}
 									?>

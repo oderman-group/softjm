@@ -244,7 +244,7 @@ include("includes/js-formularios.php");
 												ORDER BY prod_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 													$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
-													WHERE czpp_producto='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['factura_id']."' AND czpp_tipo=4");
+													WHERE czpp_producto='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['factura_id']."' AND czpp_tipo='".CZPP_TIPO_FACT."'");
 													$productoN = mysqli_num_rows($consultaProducto);
 												?>
 													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_id'].". ".$resOp['prod_referencia']." ".$resOp['prod_nombre']." - [HAY ".$resOp['prod_existencias']."]";?></option>
@@ -311,7 +311,7 @@ include("includes/js-formularios.php");
 							$no = 1;
 							$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 							INNER JOIN productos_categorias ON catp_id=prod_categoria
-							INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='".$_GET["id"]."' AND czpp_tipo=4
+							INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='".$_GET["id"]."' AND czpp_tipo='".CZPP_TIPO_FACT."'
 							WHERE prod_id_empresa='".$idEmpresa."'
 							ORDER BY czpp_orden");
 							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){

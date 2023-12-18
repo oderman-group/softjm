@@ -75,7 +75,7 @@ $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * 
 				
 				$consultaServicios = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
 				INNER JOIN servicios ON serv_id=czpp_servicio
-				WHERE czpp_tipo=1 AND czpp_cotizacion='" . $res['cotiz_id'] . "'");
+				WHERE czpp_tipo='".CZPP_TIPO_COTZ."' AND czpp_cotizacion='" . $res['cotiz_id'] . "'");
 				$numServicios=mysqli_num_rows($consultaServicios);
 				if($numServicios>0){
 

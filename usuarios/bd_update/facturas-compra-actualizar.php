@@ -17,7 +17,7 @@
 			while ($contador < $numero) {
 
 				$productoNum = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
-				WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_producto='" . $_POST["producto"][$contador] . "' AND czpp_tipo=4"));
+				WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_producto='" . $_POST["producto"][$contador] . "' AND czpp_tipo='".CZPP_TIPO_FACT."'"));
 				
 
 
@@ -36,7 +36,7 @@
 
 
 			//ELIMINAR LOS QUE YA NO ESTÁN EN LA FACTURACIÓN.
-			$productosWeb = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=4");
+			$productosWeb = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo='".CZPP_TIPO_FACT."'");
 			while ($pWeb = mysqli_fetch_array($productosWeb)) {
 
 				$encontrado = 0;
@@ -52,12 +52,12 @@
 				}
 
 				if ($encontrado == 0) {
-					mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_producto='" . $pWeb['czpp_producto'] . "' AND czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=4");
+					mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_producto='" . $pWeb['czpp_producto'] . "' AND czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo='".CZPP_TIPO_FACT."'");
 					
 				}
 			}
 		} else {
-			mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_servicio IS NULL AND czpp_combo IS NULL AND czpp_tipo=4");
+			mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_servicio IS NULL AND czpp_combo IS NULL AND czpp_tipo='".CZPP_TIPO_FACT."'");
 			
 		}
 
@@ -76,7 +76,7 @@
 			while ($contador < $numero) {
 
 				$productoNum = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
-				WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_producto='" . $_POST["producto"][$contador] . "' AND czpp_tipo=4"));
+				WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_producto='" . $_POST["producto"][$contador] . "' AND czpp_tipo='".CZPP_TIPO_FACT."'"));
 				
 
 
@@ -112,7 +112,7 @@
 
 
 			//ELIMINAR LOS QUE YA NO ESTÁN EN LA FACTURACIÓN.
-			$productosWeb = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=4");
+			$productosWeb = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo='".CZPP_TIPO_FACT."'");
 			while ($pWeb = mysqli_fetch_array($productosWeb)) {
 
 				$encontrado = 0;
@@ -128,12 +128,12 @@
 				}
 
 				if ($encontrado == 0) {
-					mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_producto='" . $pWeb['czpp_producto'] . "' AND czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=4");
+					mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_producto='" . $pWeb['czpp_producto'] . "' AND czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo='".CZPP_TIPO_FACT."'");
 					
 				}
 			}
 		} else {
-			mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_servicio IS NULL AND czpp_combo IS NULL AND czpp_tipo=4");
+			mysqli_query($conexionBdPrincipal,"DELETE FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_servicio IS NULL AND czpp_combo IS NULL AND czpp_tipo='".CZPP_TIPO_FACT."'");
 			
 		}
 

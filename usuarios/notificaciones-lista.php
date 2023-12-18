@@ -153,12 +153,13 @@ $paginaActual['pag_nombre'] = "Notificaciones";
 							</thead>
 							<tbody>
                             <?php
-							if(!isset($_GET["estNot"]) or !is_numeric($_GET["estNot"])){$estadoNot = 'AND not_estado=1';}
+							if(!isset($_GET["estNot"]) or !is_numeric($_GET["estNot"])){$estadoNot = 'AND not_estado=' . NOT_ESTADO_PENDIENTE;}
 							else{
 								switch($_GET["estNot"]){
-									case 1: $estadoNot = 'AND not_estado=1'; break;
-									case 2: $estadoNot = 'AND not_estado=2'; break;
-									case 3: $estadoNot = 'AND (not_estado=1 OR not_estado=2)'; break;
+									case 1: $estadoNot = 'AND not_estado=' . NOT_ESTADO_PENDIENTE; break;
+									case 2: $estadoNot = 'AND not_estado=' . NOT_ESTADO_COMPLETA; break;
+									case 3: $estadoNot = $estadoNot = 'AND (not_estado=' . NOT_ESTADO_PENDIENTE . ' OR not_estado=' . NOT_ESTADO_COMPLETA . ')';
+									break;
 								}
 							}
 							mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_usuario='".$_SESSION["id"]."' AND not_varios IS NULL");

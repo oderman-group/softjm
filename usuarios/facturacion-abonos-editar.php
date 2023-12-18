@@ -112,14 +112,15 @@ include("includes/js-formularios.php");
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span3" tabindex="2" name="medio">
 											<option value=""></option>
-                                            <option value="1" <?php if($resultadoD['fpab_medio_pago']==1){echo "selected";}?>>Consignación</option>
-                                            <option value="2" <?php if($resultadoD['fpab_medio_pago']==2){echo "selected";}?>>Transferencia</option>
-                                            <option value="3" <?php if($resultadoD['fpab_medio_pago']==3){echo "selected";}?>>P. Web</option>
-                                            <option value="4" <?php if($resultadoD['fpab_medio_pago']==4){echo "selected";}?>>Efectivo</option>
-                                            <option value="5" <?php if($resultadoD['fpab_medio_pago']==5){echo "selected";}?>>Cheque</option>
-                                            <option value="6" <?php if($resultadoD['fpab_medio_pago']==6){echo "selected";}?>>Efecty</option>
-                                            <option value="7" <?php if($resultadoD['fpab_medio_pago']==7){echo "selected";}?>>Gana</option>
-                                            <option value="8" <?php if($resultadoD['fpab_medio_pago']==8){echo "selected";}?>>Otro medio</option>
+																		<option value="<?= FPAB_MEDIO_CONSIG ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_CONSIG){echo "selected";} ?>>Consignación</option>
+																		<option value="<?= FPAB_MEDIO_TRANSF ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_TRANSF){echo "selected";} ?>>Transferencia</option>
+																		<option value="<?= FPAB_MEDIO_WEB ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_WEB){echo "selected";} ?>>P. Web</option>
+																		<option value="<?= FPAB_MEDIO_EFECTIVO ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_EFECTIVO){echo "selected";} ?>>Efectivo</option>
+																		<option value="<?= FPAB_MEDIO_CHEQUE ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_CHEQUE){echo "selected";} ?>>Cheque</option>
+																		<option value="<?= FPAB_MEDIO_EFECTY ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_EFECTY){echo "selected";} ?>>Efecty</option>
+																		<option value="<?= FPAB_MEDIO_GANA ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_GANA){echo "selected";} ?>>Gana</option>
+																		<option value="<?= FPAB_MEDIO_OTRO ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_OTRO){echo "selected";} ?>>Otro medio</option>
+
                                     	</select>
                                     </div>
                                </div>

@@ -22,7 +22,7 @@ if($_POST["combo"]!=''){
             }
 
             //Si el cliente es DEALER
-            if($datosCliente['cli_categoria'] == 3){
+            if($datosCliente['cli_categoria'] == CLI_CATEGORIA_DEALER){
                 if ($dctoComboDealer > 0) {
                     $precioCombo = round($precioCombo - ($precioCombo * ($dctoComboDealer / 100)), 0);
                 }

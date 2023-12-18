@@ -97,7 +97,7 @@ while($resC = mysql_fetch_array($consultaC)){
 	
 	//Actualizar estado del certificado a vencido con 1 o más días
 	if($vencimiento[0]<0){
-		mysql_query("UPDATE remisiones SET rem_estado_certificado=2 WHERE rem_id='".$resC['rem_id']."'",$conexion);
+		mysql_query("UPDATE remisiones SET rem_estado_certificado='".REM_ESTADO_CERTIFICADO_VENCIDO."' WHERE rem_id='".$resC['rem_id']."'",$conexion);
 		if(mysql_errno()!=0){echo mysql_error(); exit();}
 	}
 	

@@ -69,7 +69,7 @@ use PHPMailer\PHPMailer\Exception;
 
 
 	if ($_POST["cerrarTK"] == 1) {
-		mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado=2 WHERE tik_id='" . $tiketID . "'");
+		mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado='".TIK_ESTADO_CERRADO."' WHERE tik_id='" . $tiketID . "'");
 
 		mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_realizado=1 WHERE cseg_id='" . $idInsertU . "'");
 	}
