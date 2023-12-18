@@ -66,7 +66,9 @@ include("includes/head.php");
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			<div class="row-fluid ">
+						<?php if (Modulos::validarRol([411], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
             <p><a href="tipos-equipos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+						<?php } ?>
 			<div class="row-fluid">
 				<div class="span12">
 					<div class="content-widgets light-gray">
@@ -95,8 +97,12 @@ include("includes/head.php");
                                 <td><?=$res['tipeq_id'];?></td>
                                 <td><?=$res['tipeq_nombre'];?></td>
                                 <td><h4>
+																	<?php if (Modulos::validarRol([412], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                 	<a href="tipos-equipos-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+																	<?php } ?>
+																	<?php if (Modulos::validarRol([413], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="#bd_delete/tipos-equipos-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																	<?php } ?>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>
