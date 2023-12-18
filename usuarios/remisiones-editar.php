@@ -71,40 +71,48 @@ include("includes/js-formularios.php");
 			<div class="row-fluid" style="margin-bottom: 10px;">
 				<div class="span12">
 					<div class="span6" style="text-align: left;">
+						<?php if (Modulos::validarRol([244], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 						<a href="remisiones-cotizacion.php?id=<?=$_GET["id"];?>" class="btn btn-success">Cotización</a>
+        		<?php } ?>
+						<?php if (Modulos::validarRol([249], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 						<a href="remisiones-seguimiento.php?id=<?=$_GET["id"];?>" class="btn btn-warning">Seguimiento</a>
+        		<?php } ?>
 					</div>
 					<div class="span6" style="text-align: right;">
+						<?php if (Modulos::validarRol([248], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 						<a href="reportes/remisiones-imprimir.php?id=<?=$resultadoD['rem_id'];?>&estado=1" target="_blank" class="btn btn-success">Remisión entrada</a>
+        		<?php } ?>
 						
 						<?php
-							if($resultadoD['rem_estado']==2){
+							if($resultadoD['rem_estado']==2 and Modulos::validarRol([248], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 						?>
 						<a href="reportes/remisiones-imprimir.php?id=<?=$resultadoD['rem_id'];?>&estado=2" target="_blank" class="btn btn-success">Remisión salida</a>
 						<?php 
 							}
-							if($resultadoD['rem_generar_certificado']==1 and $resultadoD['rem_estado']==1){
+							if($resultadoD['rem_generar_certificado']==1 and $resultadoD['rem_estado']==1 and Modulos::validarRol([338], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 						?>
 						<a href="bd_update/salida-remision-actualizar.php?id=<?=$resultadoD['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank" class="btn btn-success">Remisión salida</a>
 						<?php 
 							}
 							$disabled="";
-							if($resultadoD['rem_generar_certificado']!=1){
+							if($resultadoD['rem_generar_certificado']!=1 and Modulos::validarRol([339], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 						?>
 						<a href="bd_update/generar-certificado.php?id=<?=$resultadoD['rem_id'];?>&cte=<?=$resultadoD['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}" target="_blank" class="btn btn-success">Generar Certificado</a>
 						<?php 
 							}else{
 								$disabled="disabled";
 						?>
+						<?php if (Modulos::validarRol([240], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 						<a href="reportes/certificado-imprimir.php?id=<?=$resultadoD['rem_id'];?>" target="_blank" class="btn btn-success">Certificado</a>
+        		<?php } ?>
 						<?php 
 							}
-							if($numAnulado==0 && $resultadoD['rem_certificado_anulado']!=1 && $resultadoD['rem_generar_certificado']==1){
+							if($numAnulado==0 && $resultadoD['rem_certificado_anulado']!=1 && $resultadoD['rem_generar_certificado']==1 and Modulos::validarRol([239], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 						?>
 						<a href="remisiones-certificado-anular.php?id=<?=$resultadoD['rem_id'];?>" class="btn btn-danger">Anular Certificado</a>
 						<?php }?>
 						
-						<?php if(!empty($resultadoD['rem_archivo'])){?>
+						<?php if(!empty($resultadoD['rem_archivo']) and Modulos::validarRol([409], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 							<a href="files/adjuntos/<?=$resultadoD['rem_archivo'];?>" target="_blank" class="btn btn-info">Ver imagen</a>
 						<?php }?>
 					</div>
@@ -121,7 +129,7 @@ include("includes/js-formularios.php");
 							<form class="form-horizontal" method="post" action="bd_update/remisiones-actualizar.php" enctype="multipart/form-data">
 								<input type="hidden" name="id" value="<?=$_GET["id"];?>">
 
-								<?php if($resultadoD['rem_archivo']!=""){ echo '<p><a href="bd_update/quitar-imagen-remision.php?id='.$resultadoD["rem_id"].'" title="Eliminar">X</a> <img src="files/adjuntos/'.$resultadoD["rem_archivo"].'" width="50"></p>';}?>
+								<?php if($resultadoD['rem_archivo']!="" and Modulos::validarRol([410], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){ echo '<p><a href="bd_update/quitar-imagen-remision.php?id='.$resultadoD["rem_id"].'" title="Eliminar">X</a> <img src="files/adjuntos/'.$resultadoD["rem_archivo"].'" width="50"></p>';}?>
 
 								<h4 class="card-title">Datos básicos</h4>
 								<div class="control-group">
@@ -587,7 +595,7 @@ include("includes/js-formularios.php");
 													while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 														
 														//Solo Vendedores externos
-														if($datosUsuarioActual[3] == 14){
+														if(!Modulos::validarRol([408], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 															$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$datosSelect['cli_zona']."'");
 															$numZ = mysqli_num_rows($consultaZonas);
 															if($numZ==0) continue;

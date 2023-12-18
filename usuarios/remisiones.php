@@ -132,9 +132,15 @@ include("includes/head.php");
             <?php include("includes/notificaciones.php");?>
             <p>
                 <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+								<?php if (Modulos::validarRol([242], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                 <a href="remisiones-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+								<?php } ?>
+								<?php if (Modulos::validarRol([241], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                 <a href="remisiones-informes-todos.php" class="btn btn-info"><i class="icon-filter"></i> Informe certificados</a>
+								<?php } ?>
+								<?php if (Modulos::validarRol([246], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                 <a href="remisiones-escoger.php" class="btn btn-warning"><i class="icon-print"></i> Imprimir varias remisiones</a>
+								<?php } ?>
             </p>
             
 			<div class="row-fluid">
@@ -227,7 +233,7 @@ include("includes/head.php");
 											if(is_numeric($_GET["a"])){$filtro .= " AND YEAR(rem_fecha_registro)='".$_GET["a"]."'";}
 											if(is_numeric($_GET["m"])){$filtro .= " AND MONTH(rem_fecha_registro)='".$_GET["m"]."'";}
 											
-											if($datosUsuarioActual[3] == 14){
+											if(!Modulos::validarRol([408], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 
 												$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
 												LEFT JOIN clientes ON cli_id=rem_cliente
@@ -254,7 +260,7 @@ include("includes/head.php");
 											while($resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 												
 												//Solo Vendedores externos
-												if($datosUsuarioActual[3] == 14){
+												if(!Modulos::validarRol([408], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 													$numZ = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resultado['cli_zona']."'"));
 													if($numZ==0) continue;
 												}
@@ -302,45 +308,60 @@ include("includes/head.php");
 							<button data-toggle="dropdown" class="btn btn-danger dropdown-toggle"><span class="caret"></span>
 							</button>
 							<ul class="dropdown-menu">
+								<?php if (Modulos::validarRol([245], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 								<li><a href="remisiones-editar.php?id=<?=$resultado['rem_id'];?>">Ver detalles</a></li>
+        				<?php } ?>
 								
 								<li><a href="#" onClick="if(!confirm('Desea eliminar este registro?')){return false;}">Eliminar</a></li>
 								
 								<hr>
+								<?php if (Modulos::validarRol([340], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 								<li><a href="enviar_correos/enviar-remision-actual-al-cliente.php?id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>&contacto=<?=$resultado['rem_contacto'];?>">Enviar remisión actual</a></li>
+								<?php } ?>
 								
-								<?php if($resultado['rem_generar_certificado']==1 and $resultado['rem_estado']==1){?>
+								<?php if($resultado['rem_generar_certificado']==1 and $resultado['rem_estado']==1 and Modulos::validarRol([338], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 									<hr>
 									<li><a href="bd_update/salida-remision-actualizar.php?id=<?=$resultado['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank">Generar salida</a></li>
-								<?php } if($resultado['rem_generar_certificado']!=1){?>
+								<?php } if($resultado['rem_generar_certificado']!=1 and Modulos::validarRol([339], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 									<hr>
 									<li><a href="bd_update/generar-certificado.php?id=<?=$resultado['rem_id'];?>&cte=<?=$resultado['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}">Generar certificado</a></li>
 								<?php }?>
 								
 								<hr>
+								<?php if (Modulos::validarRol([248], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 								<li><a href="reportes/remisiones-imprimir.php?id=<?=$resultado['rem_id'];?>&estado=1" target="_blank">Remisión Entrada</a></li>
+								<?php } ?>
 								
-								<?php if($resultado['rem_estado']==2){?>
+								<?php if($resultado['rem_estado']==2 and Modulos::validarRol([248], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 								<li><a href="reportes/remisiones-imprimir.php?id=<?=$resultado['rem_id'];?>&estado=2" target="_blank">Remisión Salida</a></li>
 								<?php }?>
 								
-								<?php if($resultado['rem_generar_certificado']==1){?>
+								<?php if($resultado['rem_generar_certificado']==1 and Modulos::validarRol([240], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 								<li><a href="reportes/certificado-imprimir.php?id=<?=$resultado['rem_id'];?>" target="_blank">Certificado</a></li>
 								<?php }?>
 								
-								<?php if(!empty($resultado['rem_archivo'])){?>
+								<?php if(!empty($resultado['rem_archivo']) and Modulos::validarRol([409], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 									<hr>
 									<li><a href="files/adjuntos/<?=$resultado['rem_archivo'];?>" target="_blank">Ver imagen</a></li>
 								<?php }?>
 							</ul>
 						</div>
 												</td>
-												
+
+												<?php if (Modulos::validarRol([245], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<td><a href="remisiones-editar.php?id=<?=$resultado['rem_id'];?>"><?=$resultado['rem_id'];?></a></td>
+												<?php } else{ ?>
+												<td><span><?=$resultado['rem_id'];?></span></td>
+												<?php } ?>
+												
 												
 												<td><?=$resultado['rem_fecha'];?></td>
-                                                
-												<td><a href="clientes-editar.php?id=<?php echo $resultado['cli_id'];?>" target="_blank"><?php echo $resultado['cli_nombre'];?></a></td>
+												<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+													<td><a href="clientes-editar.php?id=<?php echo $resultado['cli_id'];?>" target="_blank"><?php echo $resultado['cli_nombre'];?></a></td>
+												<?php } else{ ?>
+												<td><span><?php echo $resultado['cli_nombre'];?></span></td>
+												<?php } ?>                       
+												
 												
 												<td><?=$resultado['rem_equipo'];?></td>
 												<td><?=$resultado['rem_referencia'];?></td>
