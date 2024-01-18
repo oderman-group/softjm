@@ -2,7 +2,7 @@
 include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 239;
-$tituloPagina = "Anular Certificado";
+
 include("verificar-paginas.php");
 
 $resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
@@ -47,7 +47,7 @@ WHERE rem_id='".$_GET["id"]."'"));
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-5 align-self-center">
-                        <h4 class="page-title"><?=$tituloPagina;?></h4>
+                        <h4 class="page-title"><?=$paginaActual['pag_nombre'];?></h4>
                     </div>
                     <div class="col-7 align-self-center">
                         <div class="d-flex align-items-center justify-content-end">
@@ -56,7 +56,7 @@ WHERE rem_id='".$_GET["id"]."'"));
                                     <li class="breadcrumb-item">
                                         <a href="lab-remisiones.php">Remisiones</a>
                                     </li>
-                                    <li class="breadcrumb-item active" aria-current="page"><?=$tituloPagina;?></li>
+                                    <li class="breadcrumb-item active" aria-current="page"><?=$paginaActual['pag_nombre'];?></li>
                                 </ol>
                             </nav>
                         </div>
@@ -201,8 +201,8 @@ WHERE rem_id='".$_GET["id"]."'"));
                                                 <div class="col-sm-9">
                                                     <select class="select2 form-control custom-select" style="width: 100%; height:36px;" disabled>
                                                         <option value="2">--</option>
-                                                        <option value="1" <?php if($resultadoD['rem_tipos_equipos']==1){echo "selected";} ?>>Nuevo</option>
-                                                        <option value="2" <?php if($resultadoD['rem_tipos_equipos']==2){echo "selected";} ?>>Usado</option>
+                                                        <option value="<?= REM_TIPOS_EQUIPOS_NUEVO?>" <?php if($resultadoD['rem_tipos_equipos']==REM_TIPOS_EQUIPOS_NUEVO){echo "selected";} ?>>Nuevo</option>
+											            <option value="<?= REM_TIPOS_EQUIPOS_USADO?>" <?php if($resultadoD['rem_tipos_equipos']==REM_TIPOS_EQUIPOS_USADO){echo "selected";} ?>>Usado</option>
                                                     </select>
                                                 </div>
                                             </div>

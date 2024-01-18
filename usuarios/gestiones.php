@@ -5,10 +5,7 @@ $paginaActual['pag_nombre'] = "Gestiones";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
+
 <!-- styles -->
 
 
@@ -136,12 +133,6 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						<ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -211,19 +202,19 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							<tbody>
                             <?php
 							
-								$consulta = mysql_query("SELECT * FROM gestiones
+								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM gestiones
 								INNER JOIN usuarios ON usr_id=gest_responsable
 								LIMIT $inicio, $limite
-								",$conexion);
+								");
 							
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta)){
 								
-								$numeros = mysql_fetch_array(mysql_query("
+								$numeros = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 								SELECT
 								(SELECT count(gestxc_id) FROM gestiones_clientes WHERE gestxc_gestion='".$res['gest_id']."'),
 								(SELECT count(gestxu_id) FROM gestiones_usuarios WHERE gestxu_gestion='".$res['gest_id']."')
-								",$conexion));
+								"));
 								
 								$color1='#FFF';
 								if($numeros[0]==0){$color1='#FFF090';}
@@ -238,8 +229,8 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
                                         <?php if($res['gest_responsable']==$_SESSION["id"]){?>
 										
 										<a href="proyectos-editar.php?id=<?=$res['proy_id'];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
-										
-                                        <a href="sql.php?get=35&id=<?=$res['proy_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+										<!-- se le puso el # porque en el archivo eliminar va a otra tabla -->
+                                        <a href="#bd_delete/proyecto-tareas-eliminar.php?get=35&id=<?=$res['proy_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 										
 										<?php }?>
 										

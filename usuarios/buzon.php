@@ -148,7 +148,7 @@ $(function(){
 					  
 					$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM buzon_salida
 					INNER JOIN usuarios ON usr_id=buz_usuario
-					WHERE buz_id=buz_id $filtro
+					WHERE buz_id=buz_id $filtro AND buz_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'
 					ORDER BY buz_id DESC");
 					$no = 1;
 					while($res = mysqli_fetch_array($consulta)){
@@ -166,13 +166,16 @@ $(function(){
 						
                       <section class="right"> <span class="price"><?=$estadoBuzon[$res['buz_estado']];?></span> 
 						  <span class="rate-it"></span>
-						  
+						
 						  <span class="darkview">
+						  <?php if(Modulos::validarRol([110], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+                          ?>
 							  <?php if($res['buz_estado']==2){?>
 							  	<a href="enviar-portafolios.php?cte=<?=$res['buz_cliente'];?>" class="btn btn-info">Reintentar</a>
 							  <?php }?>
-						  
+								
 							  <a href="#" class="btn btn-danger">Eliminar</a>
+							  
 						  </span> 
 						  
 						</section>

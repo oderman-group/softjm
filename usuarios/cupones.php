@@ -2,7 +2,6 @@
 include("sesion.php");
 
 $idPagina = 165;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -77,7 +76,9 @@ include("includes/head.php");
 			</div>
             <?php include("includes/notificaciones.php");?>
             <p>
+						<?php if (Modulos::validarRol([166], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
             	<a href="cupones-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+						<?php } ?>
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -103,11 +104,10 @@ include("includes/head.php");
 							</thead>
 							<tbody>
                             <?php
-							$opcionesSINO = array("NO","SI");
-							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones");
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones WHERE cupo_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-								$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$res['cupo_cliente']."'");
+								$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$res['cupo_cliente']."' AND cli_id_empresa='".$idEmpresa."'");
 								$cliente = mysqli_fetch_array($consultaClientes, MYSQLI_BOTH);
 							?>
 							<tr>
@@ -121,9 +121,13 @@ include("includes/head.php");
 								<td><?=$opcionesSINO[$res['cupo_redimido']];?></td>
 								
                                 <td><h4>
+																<?php if (Modulos::validarRol([235], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="cupones-editar.php?id=<?=$res[0]?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+																<?php } ?>
 									<?php if($res['cupo_redimido']==0){?>
+										<?php if (Modulos::validarRol([370], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     	<a href="bd_delete/cupones-eliminar.php?id=<?=$res[0]?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																<?php } ?>
 									<?php }?>
 									
                                 </h4></td>

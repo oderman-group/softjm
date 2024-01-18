@@ -57,12 +57,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -79,7 +73,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="bd_create/calendario-guardar.php">
                             <input type="hidden" name="idSql" value="52">  
                                
                                
@@ -170,7 +164,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente">
 											<option value="0"></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa={$_SESSION['dataAdicional']['id_empresa']}");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												if($datosUsuarioActual[3]!=1){
 													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
@@ -190,6 +184,16 @@ include("includes/js-formularios.php");
                                     </div>
                                </div>
                                
+							   <div class="control-group">
+									<label class="control-label">Desea enviar un correo al cliente?</label>
+									<div class="controls">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="enviarCorreo">
+											<option value="">Escoje una opción</option>
+											<option value="1">Si</option>
+											<option value="0">No</option>
+                                    	</select>
+                                    </div>
+                               </div>
 
                               
 								<div class="form-actions">

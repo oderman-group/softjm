@@ -1,7 +1,6 @@
 <?php
-session_start();
-include("../../conexion.php");
-
+include("../sesion.php");
+$idPagina = 373;
 if (!empty($_GET["cte"]) AND $_GET["cte"] == 1) {
 	$_GET["id"] = base64_decode($_GET["id"]);
 } else {
@@ -22,6 +21,11 @@ INNER JOIN sucursales ON sucu_id=pedid_sucursal
 INNER JOIN contactos ON cont_id=pedid_contacto
 INNER JOIN usuarios ON usr_id=pedid_vendedor
 WHERE pedid_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
+$consulta=$conexionBdAdmin->query("SELECT * FROM documentos_configuracion 
+WHERE dconf_id_empresa= '".$idEmpresa."' 
+AND dconf_id_documento= '".ID_DOC_PEDIDO."';");
+$configuracionDoc = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+$fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', $configuracionDoc["dconf_estilo_letra"]) . "&display=swap";
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
@@ -29,7 +33,7 @@ WHERE pedid_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
 <head>
 	<meta charset="utf-8">
 	<title>Pedido <?= $resultado['pedid_id']; ?> (<?= $resultado['pedid_propuesta']; ?>) - <?= $resultado['pedid_nombre']; ?></title>
-
+	<link rel="stylesheet" href="<?php echo $fontLink;?>">
 	<style type="text/css">
 		#contenedor {
 			max-height: 1122px;
@@ -38,7 +42,7 @@ WHERE pedid_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
 	</style>
 </head>
 
-<body style="font-family:Arial, Helvetica, sans-serif; font-size:12px;">
+<body style="font-family:<?php echo $configuracionDoc['dconf_estilo_letra'] ?? 'Verdana, sans-serif'; ?>; font-size:<?php echo $configuracionDoc['dconf_tamano_letra'] ?? '11'; ?>px;">
 	<!--
 <div style="text-align:left;"><img src="https://softjm.com/usuarios/files/logojm.png" width="300"></div>
 
@@ -83,7 +87,7 @@ WHERE pedid_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
 		<div style="margin: 10px; font-size: 10px;" align="center">
 			<table width="100%" border="0" rules="groups">
 				<thead>
-					<tr style="background-color: #00002b; height: 50px; color: white;">
+					<tr style="background-color:<?php echo $configuracionDoc['dconf_estilo'] ?? '#00002b'; ?>; height: 50px; color: white;">
 						<th>No</th>
 						<th>&nbsp;</th>
 						<th>Producto/Servicio</th>
@@ -99,7 +103,7 @@ WHERE pedid_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
 					<!-- COMBOS -->
 					<?php
 						$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos
-		INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2
+		INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."'
 		ORDER BY czpp_orden");
 
 
@@ -184,7 +188,7 @@ WHERE pedid_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
 					$no = 1;
 					$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 		INNER JOIN productos_categorias ON catp_id=prod_categoria
-		INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2
+		INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."'
 		ORDER BY czpp_orden");
 					while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 						$dcto = 0;
@@ -240,7 +244,7 @@ WHERE pedid_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
 					<?php
 					//Servicios
 					$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios
-		INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=2
+		INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."'
 		ORDER BY czpp_orden");
 					while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 						$valorTotal += ($prod['czpp_valor'] * $prod['czpp_cantidad']);
@@ -319,8 +323,8 @@ WHERE pedid_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
 					</tr>
 					<tr style="font-weight: bold; font-size: 13px; height: 30px;">
 
-						<td style="text-align: right; background-color: #da5c31;">TOTAL NETO</td>
-						<td align="right" style="background-color: #da5c31;"><?= $simbolosMonedas[$resultado['pedid_moneda']]; ?><?= number_format($total, 0, ",", "."); ?></td>
+						<td style="text-align: right; background-color: <?php echo $configuracionDoc['dconf_estilo'] ?? '#00002b'; ?>;">TOTAL NETO</td>
+						<td align="right" style="background-color: <?php echo $configuracionDoc['dconf_estilo'] ?? '#00002b'; ?>;"><?= $simbolosMonedas[$resultado['pedid_moneda']]; ?><?= number_format($total, 0, ",", "."); ?></td>
 					</tr>
 				</tfoot>
 

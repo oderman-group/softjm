@@ -6,15 +6,13 @@ $paginaActual['pag_nombre'] = "Abonos a Facturas";
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
 <?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-$factura = mysql_fetch_array(mysql_query("SELECT * FROM facturacion WHERE fact_id='".$_GET["fact"]."'",$conexion));
+
+$factura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM facturacion WHERE fact_id='".$_GET["fact"]."'"), MYSQLI_BOTH);
 $impuestos = $factura['fact_valor'] * $factura['fact_impuestos']/100;
 $retencion = $factura['fact_valor'] * $factura['fact_retencion']/100;
 $descuento = $factura['fact_valor'] * $factura['fact_descuento']/100;
 								
 $valorReal = ($factura['fact_valor'] + $impuestos) - ($retencion + $descuento);
-
 ?>
 <!-- styles -->
 
@@ -114,12 +112,6 @@ $valorReal = ($factura['fact_valor'] + $impuestos) - ($retencion + $descuento);
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?> : <b><?=$factura['fact_descripcion'];?></b></h3>
-						<ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -161,13 +153,13 @@ $valorReal = ($factura['fact_valor'] + $impuestos) - ($retencion + $descuento);
                             <?php
 							$filtro="";
 							if(isset($_GET["fact"]) and $_GET["fact"]!="" and $factura[0]!=""){$filtro .= " AND (fpab_factura='".$_GET["fact"]."')";}
-							$consulta = mysql_query("SELECT * FROM facturacion_abonos
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM facturacion_abonos
 							INNER JOIN facturacion ON fact_id=fpab_factura
 							WHERE fpab_id=fpab_id ".$filtro."
 							ORDER BY fpab_id ASC
-							",$conexion);
+							");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta,MYSQLI_BOTH)){
 								$suma +=$res['fpab_valor'];
 								switch($res['fpab_medio_pago']){
 									case 1: $medio = 'Consignación'; break;
@@ -197,7 +189,7 @@ $valorReal = ($factura['fact_valor'] + $impuestos) - ($retencion + $descuento);
                                 <td><?=$res['fpab_fecha_ultima_modificacion'];?></td>
                                 <td><h4>
                                 	<a href="facturacion-abonos-editar.php?id=<?=$res['fpab_id'];?>&fact=<?=$_GET["fact"];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-                                    <a href="sql.php?id=<?=$res['fpab_id'];?>&get=25&fact=<?=$_GET["fact"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                    <a href="bd_delete/facturacion-bonos-eliminar.php?id=<?=$res['fpab_id'];?>&get=25&fact=<?=$_GET["fact"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>

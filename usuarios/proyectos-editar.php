@@ -45,12 +45,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -61,7 +55,11 @@ include("includes/js-formularios.php");
 				</div>
 			</div>
             <p>
-				<a href="proyectos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+							<?php
+									if (Modulos::validarRol([109], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+										echo ' <a href="proyectos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>';
+									}
+							?> 
 				<a href="proyectos-tareas.php?proy=<?=$_GET["id"];?>" class="btn btn-info"><i class="icon-list"></i> Ver tareas</a>
 			</p>
             <?php include("includes/notificaciones.php");?>
@@ -95,7 +93,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="proy_responsable_principal">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado=0");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado=0 and usr_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqlI_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD["proy_responsable_principal"]==$resOp[0]){echo "selected";}?> ><?=$resOp['usr_nombre'];?></option>

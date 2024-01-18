@@ -3,13 +3,13 @@ include("sesion.php");
 
 //EDITAR USUARIOS
 if($_POST["idSql"]==1){
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_usuario='".$_POST["usuario"]."', cli_clave='".$_POST["clave"]."', cli_nombre='".$_POST["nombre"]."', cli_email='".$_POST["email"]."' WHERE cli_id='".$_SESSION["id"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_usuario='".$_POST["usuario"]."', cli_clave='".$_POST["clave"]."', cli_nombre='".$_POST["nombre"]."', cli_email='".$_POST["email"]."' WHERE cli_id='".$_SESSION["id_cliente"]."'");
 	echo '<script type="text/javascript">window.location.href="perfil-editar.php?msg=2";</script>';
 	exit();
 }
 //RECORDAR CLAVE DE ACCESO A DOCUMENTOS
 if($_POST["idSql"]==2){
-	$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_SESSION["id"]."'"), MYSQLI_BOTH);
+	$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_SESSION["id_cliente"]."'"), MYSQLI_BOTH);
 		$fin =  '<html><body style="background-color:'.$configuracion["conf_fondo_boletin"].';">';
 		$fin .= '
 					<center>
@@ -49,7 +49,7 @@ if($_POST["idSql"]==2){
 if($_POST["idSql"]==3){
 	$servicio = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id='".$_POST["servicio"]."'"), MYSQLI_BOTH);
 	
-	mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion(fact_cliente, fact_fecha, fact_valor, fact_estado, fact_descripcion, fact_observacion, fact_fecha_real, fact_fecha_vencimiento, fact_tipo, fact_impuestos, fact_producto)VALUES('".$_SESSION["id"]."',now(),'".$servicio['serv_precio']."',2,'Renovar certificado ".$_POST["certificado"]."','Factura automática',now(),now(),1,'19','".$_POST["idCertificado"]."')");
+	mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion(fact_cliente, fact_fecha, fact_valor, fact_estado, fact_descripcion, fact_observacion, fact_fecha_real, fact_fecha_vencimiento, fact_tipo, fact_impuestos, fact_producto, fact_id_empresa)VALUES('".$_SESSION["id_cliente"]."',now(),'".$servicio['serv_precio']."',2,'Renovar certificado ".$_POST["certificado"]."','Factura automática',now(),now(),1,'19','".$_POST["idCertificado"]."', '".$_SESSION["id_empresa"]."')");
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 	
 	$totalaPagar = ($servicio['serv_precio'] * 1.19);
@@ -57,8 +57,8 @@ if($_POST["idSql"]==3){
 	
 	$certificado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["idCertificado"]."'"), MYSQLI_BOTH);
 	$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes 
-	INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-	WHERE cli_id='".$_SESSION["id"]."'"), MYSQLI_BOTH);
+	INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+	WHERE cli_id='".$_SESSION["id_cliente"]."'"), MYSQLI_BOTH);
 	
 	$firmaDatos = 'C4budLS1xJFM8LwZQNQt218wHx~764579~'.$idInsertU.'~'.$totalaPagar.'~COP';
 	$firma = md5($firmaDatos);
@@ -97,9 +97,10 @@ if($_POST["idSql"]==4){
 	INNER JOIN clientes ON cli_id=rem_cliente
 	WHERE rem_id='".$_POST["idRem"]."'"), MYSQLI_BOTH);
 	
-	$contactoV = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_email='".trim($_POST["email"])."'", MYSQLI_BOTH));
+	$contactoV = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos 
+	WHERE cont_email='".trim($_POST["email"])."' AND cont_cliente_principal='".$_SESSION["id_cliente"]."'", MYSQLI_BOTH));
 	if($contactoV[0]==""){
-		mysqli_query($conexionBdPrincipal,"INSERT INTO contactos(cont_nombre, cont_email, cont_cliente_principal)VALUES('".$_POST["nombre"]."','".$_POST["email"]."','".$_SESSION["id"]."')");
+		mysqli_query($conexionBdPrincipal,"INSERT INTO contactos(cont_nombre, cont_email, cont_cliente_principal)VALUES('".$_POST["nombre"]."','".$_POST["email"]."','".$_SESSION["id_cliente"]."')");
 		$idContacto = mysqli_insert_id($conexionBdPrincipal);
 		$contacto = $idContacto;
 	}else{
@@ -108,18 +109,17 @@ if($_POST["idSql"]==4){
 	
 	
 	mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_tikets(tik_asunto_principal, tik_tipo_tiket, tik_fecha_creacion, tik_usuario_responsable, tik_estado, tik_cliente, tik_prioridad, tik_canal)
-	VALUES('SOLICITUD COPIA CERTIFICADO',2,now(),27,1,'".$_SESSION["id"]."',1,7)");
+	VALUES('SOLICITUD COPIA CERTIFICADO',2,now(),27,1,'".$_SESSION["id_cliente"]."',1,7)");
 	
 	$tiketID = mysqli_insert_id($conexionBdPrincipal);
 	
-	mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto)VALUES('".$_SESSION["id"]."',now(),'Solicitud de copia a certificado C".$_POST["idRem"]."',27,now(),'Respuesta a la solicitud de  la copia',21,now(),2,'".$contacto."','".$tiketID."',7,8)");
+	mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto)VALUES('".$_SESSION["id_cliente"]."',now(),'Solicitud de copia a certificado C".$_POST["idRem"]."',27,now(),'Respuesta a la solicitud de  la copia',21,now(),2,'".$contacto."','".$tiketID."',7,8)");
 	
 	$idSeguimiento = mysqli_insert_id($conexionBdPrincipal);
 	
-	mysqli_query($conexionBdPrincipal,"INSERT INTO notificaciones(not_asunto, not_cliente, not_usuario, not_visto, not_estado, not_fecha, not_seguimiento)VALUES('COPIA DE CERTIFICADO C".$_POST["idRem"]."', '".$_SESSION["id"]."', 21, 0, 1, now(), '".$idSeguimiento."')");
+	mysqli_query($conexionBdPrincipal,"INSERT INTO notificaciones(not_asunto, not_cliente, not_usuario, not_visto, not_estado, not_fecha, not_seguimiento)VALUES('COPIA DE CERTIFICADO C".$_POST["idRem"]."', '".$_SESSION["id_cliente"]."', 21, 0, 1, now(), '".$idSeguimiento."')");
 	
 		
-		$meses = array("","ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE");
 		$fechaHoy = date("d")." de ".$meses[date("m")]." del ".date("Y");
 			
 		$fin =  '<html><body style="background-color:'.$configuracion["conf_fondo_boletin"].';">';
@@ -162,7 +162,7 @@ if($_POST["idSql"]==4){
 }
 //AGREGAR CONTACTOS
 if($_POST["idSql"]==5){
-	mysqli_query($conexionBdPrincipal,"INSERT INTO contactos(cont_nombre, cont_email, cont_cliente_principal, cont_celular, cont_sucursal, cont_rol)VALUES('".$_POST["nombre"]."','".$_POST["email"]."','".$_SESSION["id"]."','".$_POST["celular"]."','".$_POST["sucursal"]."','".$_POST["rol"]."')");
+	mysqli_query($conexionBdPrincipal,"INSERT INTO contactos(cont_nombre, cont_email, cont_cliente_principal, cont_celular, cont_sucursal, cont_rol)VALUES('".$_POST["nombre"]."','".$_POST["email"]."','".$_SESSION["id_cliente"]."','".$_POST["celular"]."','".$_POST["sucursal"]."','".$_POST["rol"]."')");
 	
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 	echo '<script type="text/javascript">window.location.href="contactos-editar.php?id='.$idInsertU.'&msg=1";</script>';

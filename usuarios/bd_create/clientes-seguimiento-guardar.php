@@ -69,7 +69,7 @@ use PHPMailer\PHPMailer\Exception;
 
 
 	if ($_POST["cerrarTK"] == 1) {
-		mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado=2 WHERE tik_id='" . $tiketID . "'");
+		mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado='".TIK_ESTADO_CERRADO."' WHERE tik_id='" . $tiketID . "'");
 
 		mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_realizado=1 WHERE cseg_id='" . $idInsertU . "'");
 	}
@@ -81,7 +81,7 @@ use PHPMailer\PHPMailer\Exception;
         if ($numero > 0) {
             $contador = 0;
             while ($contador < $numero) {
-                $portafolios .= '<a href="https://softjm.com/usuarios/files/portafolios/' . $_POST["portafolios"][$contador] . '.pdf">' . $portafNombres[$_POST["portafolios"][$contador]] . '</a><br>';
+                $portafolios .= '<a href="'.REDIRECT_ROUTE.'/usuarios/files/portafolios/' . $_POST["portafolios"][$contador] . '.pdf">' . $portafNombres[$_POST["portafolios"][$contador]] . '</a><br>';
                 $contador++;
             }
         }
@@ -152,7 +152,7 @@ use PHPMailer\PHPMailer\Exception;
 
                 // Content
                 $mail->isHTML(true);                                  // Set email format to HTML
-                $mail->Subject = "PORTAFOLIO JMEQUIPOS SAS";
+                $mail->Subject = "PORTAFOLIO ".$_SESSION["dataAdicional"]['nombre_empresa'];
                 $mail->Body = $fin;
                 $mail->CharSet = 'UTF-8';
 

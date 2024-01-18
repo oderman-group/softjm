@@ -5,6 +5,12 @@ $idPagina = 10;
 $paginaActual['pag_nombre'] = "Agegar clientes";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+
+if ( !empty($_SESSION["dataAdicional"]["dominio_empresa"]) ) {
+	$dominio = $_SESSION["dataAdicional"]["dominio_empresa"];
+} else {
+	$dominio = 'Dominio no encontrado';
+}
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <!--============ javascript ===========-->
@@ -36,7 +42,7 @@ include("includes/js-formularios.php");
 				"&opcion="+(opcion);
 			   $.ajax({
 				   type: "POST",
-				   url: "ajax-clientes-verificar.php",
+				   url: "ajax/ajax-clientes-verificar.php",
 				   data: datos,
 				   success: function(data){
 				   $('#resp').empty().hide().html(data).show(1);
@@ -71,12 +77,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -116,6 +116,15 @@ include("includes/js-formularios.php");
                                         <span style="color:#F03;">Digite el Documento sin número de verificación.</span>
 									</div>
 									<span id="resp"></span>
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Usuario de acceso</label>
+									<div class="controls">
+										<input type="text" class="span2" name="usuarioAcceso" autocomplete="off">
+										<input type="text" class="span2 mr-0" value="<?= $dominio; ?>" readonly name="dominio">
+                                        <span style="color:#F03;">Este será el usuario con el que ingrese el cliente al sistema.</span>
+									</div>
 								</div>
 									
                                 <!--
@@ -335,7 +344,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" multiple tabindex="2" name="grupos[]">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM dealer");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>

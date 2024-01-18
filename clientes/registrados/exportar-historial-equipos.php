@@ -26,8 +26,8 @@ include("head.php");
 		<tbody>
 			<?php
 			$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM remisiones
-							INNER JOIN usuarios ON usr_id=rem_asesor
-							WHERE rem_cliente='" . $_GET["cte"] . "'
+							INNER JOIN usuarios ON usr_id=rem_asesor AND usr_id_empresa={$_SESSION['id_empresa']}
+							WHERE rem_cliente='" . $_GET["cte"] . "' AND rem_id_empresa={$_SESSION['id_empresa']}
 							");
 			$no = 1;
 			while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {

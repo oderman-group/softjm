@@ -2,14 +2,14 @@
 session_start();
 $_SESSION["bd"] = $_POST["bd"];
 include("../conexion.php");
-$rst_usr = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_usuario='".trim($_POST["Usuario"])."' AND cli_clave='".$_POST["Clave"]."' AND TRIM(cli_usuario)!='' AND cli_categoria!=1");
+$rst_usr = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_usuario_acceso='".trim($_POST["Usuario"])."' AND cli_clave='".$_POST["Clave"]."' AND TRIM(cli_usuario_acceso)!='' AND cli_categoria!='".CLI_CATEGORIA_PROSPECTO."'");
 $num = mysqli_num_rows($rst_usr);
 $fila = mysqli_fetch_array($rst_usr, MYSQLI_BOTH);
 if($num>0)
 {
 	//INICIO SESION
-	//session_start();
-	$_SESSION["id"] = $fila[0];
+	$_SESSION["id_cliente"] = $fila['cli_id'];
+	$_SESSION["id_empresa"] = $fila['cli_id_empresa'];
 	
 	switch($_POST["refe"]){
 		case 1:	$url = 'registrados/'; break;

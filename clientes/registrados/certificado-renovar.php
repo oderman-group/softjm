@@ -2,19 +2,18 @@
 include("sesion.php");
 
 $idPagina = 254;
-$tituloPagina = "Renovar certificado";
 
 include("verificar-paginas.php");
 include("head.php");
 
 $resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes 
-WHERE cli_id='".$_SESSION["id"]."'"), MYSQLI_BOTH);
+WHERE cli_id='".$_SESSION["id_cliente"]."'"), MYSQLI_BOTH);
 
-$equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_GET["id"]."'"), MYSQLI_BOTH);
+$equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_GET["id"]."' 
+AND rem_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
 <link rel="shortcut icon" href="ico/favicon.ico">
@@ -147,12 +146,12 @@ $equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM re
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
                         
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -161,10 +160,10 @@ $equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM re
 				<div class="span12">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> <?=$tituloPagina;?></h3>
+							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" target="_blank">
+							<form class="form-horizontal" method="post" action="renovar-certificado.php" target="_blank">
                             <input type="hidden" name="idSql" value="3">
                             <input type="hidden" name="idCertificado" value="<?=$_GET['id'];?>">
                             	
@@ -197,10 +196,11 @@ $equipo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM re
 										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="servicio" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$_SESSION["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+                                                $precio = !empty($resOp['serv_precio']) ? $resOp['serv_precio'] : 0;
 											?>
-                                            	<option value="<?=$resOp[0];?>"><?=$resOp['serv_nombre']." ($".number_format($resOp['serv_precio'],0,",",".").")";?></option>
+                                            	<option value="<?=$resOp[0];?>"><?=$resOp['serv_nombre']." ($".number_format($precio,0,",",".").")";?></option>
                                             <?php
 											}
 											?>

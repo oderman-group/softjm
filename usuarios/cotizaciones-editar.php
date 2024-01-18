@@ -5,11 +5,10 @@ $idPagina = 79;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-
 $consultaCliente=$conexionBdPrincipal->query("SELECT * FROM cotizacion 
 INNER JOIN clientes ON cli_id=cotiz_cliente
 INNER JOIN contactos ON cont_id=cotiz_contacto
-WHERE cotiz_id='".$_GET["id"]."'");
+WHERE cotiz_id='".$_GET["id"]."' AND cotiz_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 
 if(isset($_GET["cte"])){
@@ -22,7 +21,7 @@ if(isset($_GET["cte"])){
 ?>
 
 <link href="css/chosen.css" rel="stylesheet">
-
+<link href="../assets-login/plugins/select2/css/select2.css" rel="stylesheet" />
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -38,6 +37,7 @@ if(isset($_GET["cte"])){
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+<script src="../assets-login/plugins/select2/js/select2.js"></script>
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
@@ -88,7 +88,14 @@ include("includes/js-formularios.php");
 	}	
 	</script>
 <?php }?>
-
+<?php
+		require '../usuarios/class/CotizacionesEditar.php';
+		if (isset($_POST['action']) && $_POST['action'] === 'generarTablaProductos') {
+			$htmlTablaProductos = CotizacionesEditar::generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas);
+			echo $htmlTablaProductos;
+			exit; 
+		}
+?>
 </head>
 <body>
 <div class="layout">
@@ -150,11 +157,15 @@ include("includes/js-formularios.php");
 			</div>
 			
 			<p>
+				<?php if (Modulos::validarRol([78], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="cotizaciones-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+				<?php } ?>
+				<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="reportes/formato-cotizacion-1.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
+				<?php } ?>
 				
 				<?php
-				if($resultadoD['cotiz_vendida']!=1){
+				if($resultadoD['cotiz_vendida']!=1 && Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 				?>
 					<a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $resultadoD['cotiz_id']; ?>" class="btn btn-info" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}"><i class="icon-money"></i> Generar pedido</a>
 				<?php
@@ -208,7 +219,7 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" onChange="provee(this)" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = $conexionBdPrincipal->query("SELECT prov_id, prov_nombre FROM proveedores");
+											 $conOp = $conexionBdPrincipal->query("SELECT prov_id, prov_nombre FROM proveedores WHERE prov_id_empresa='".$idEmpresa."'");
 											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_proveedor']==$resOp[0]) echo "selected";?>><?=$resOp['prov_nombre'];?></option>
@@ -219,7 +230,9 @@ include("includes/js-formularios.php");
 									 </div>
 									
 									
+											<?php if (Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 											<a href="proveedores-editar.php?id=<?=$resultadoD['cotiz_proveedor'];?>" class="btn btn-info" target="_blank">Editar proveedor</a>
+											<?php } ?>
 									
 									
 								</div>
@@ -238,15 +251,15 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT cli_id, cli_nombre, cli_categoria, 
 												CASE 
-													WHEN cli_categoria = 3 THEN '(DEALER)'
+													WHEN cli_categoria = '".CLI_CATEGORIA_DEALER."' THEN '(DEALER)'
 													ELSE ''
 												END AS 'categoria'	
-												FROM clientes");
+												FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
 												$disabled = '';
 												
-												if($datosUsuarioActual['usr_tipo']!=1 and $resOp['cli_categoria']==3){
+												if(!Modulos::validarRol([393], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) and $resOp['cli_categoria']== CLI_CATEGORIA_DEALER){
 													$disabled = 'disabled';
 												}	
 												
@@ -258,7 +271,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 								   <a href="clientes-editar.php?id=<?=$cliente;?>" class="btn btn-info" target="_blank">Editar cliente</a>
+									<?php } ?>
                                </div>
                                
                                <div class="control-group">
@@ -285,7 +300,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 								   <a href="clientes-sucursales.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver sucursales</a>
+									<?php } ?>
                                </div>
 								
 								<div class="control-group">
@@ -312,7 +329,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="clientes-contactos.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver contactos</a>
+									<?php } ?>
                                </div>	
                                
 							</fieldset>
@@ -323,7 +342,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre");
+											$conOp = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['usr_id'];?>" <?php if($resultadoD['cotiz_vendedor']==$resOp['usr_id']){echo "selected";}?>><?=strtoupper($resOp['usr_nombre'])." (".$resOp['usr_email'].")";?></option>
@@ -404,11 +423,11 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="combo[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT combo_id, combo_nombre FROM combos 
+												$conOp = $conexionBdPrincipal->query("SELECT combo_id, combo_nombre FROM combos WHERE combo_id_empresa='".$idEmpresa."'
 												ORDER BY combo_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 
-													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo  FROM cotizacion_productos WHERE czpp_combo='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo=1");
+													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo  FROM cotizacion_productos WHERE czpp_combo='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo='".CZPP_TIPO_COTZ."'");
 													$productoN = $consultaCotizacionP->num_rows;
 												?>
 													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>
@@ -422,34 +441,91 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 										<label class="control-label">Productos</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="producto[]" multiple>
-												<option value=""></option>
-												<?php
-												$filtroProd = '';
-												if(is_numeric($resultadoD['cotiz_proveedor']) and $resultadoD['cotiz_proveedor']!='0' and $resultadoD['cotiz_proveedor']!=''){ $filtroProd .=" AND prod_proveedor='".$resultadoD['cotiz_proveedor']."'";}
+											<select data-placeholder="Escoja una opción1..." class="span10" tabindex="2" name="producto[]" multiple id="product-select">
+											<?php
+            						$consultaProductos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, 
+																																			czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad
+                                                            FROM productos
+                                                            INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "'
+																														WHERE prod_id_empresa='".$idEmpresa."'
+                                                            ORDER BY czpp_orden");
 
-												$conOp = $conexionBdPrincipal->query("SELECT prod_id, prod_referencia, prod_nombre, prod_existencias, prod_categoria FROM productos 
-												WHERE prod_id=prod_id $filtroProd
-												ORDER BY prod_nombre");
-												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-
-													if($resOp['prod_categoria'] == 28 and ($datosUsuarioActual[3]!=1 and $datosUsuarioActual[3]!=9) ){
-														continue;
-													}
-													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_producto, czpp_cotizacion 
-														FROM cotizacion_productos 
-														WHERE czpp_producto='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."'");
-													$productoN = $consultaCotizacionP->num_rows;
-
+												while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
+														$productoN = !empty($resProducto['czpp_id']) ? 1 : 0;
 												?>
-													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_id'].". ".$resOp['prod_referencia']." ".strtoupper($resOp['prod_nombre'])." - [HAY ".$resOp['prod_existencias']."]";?></option>
+													<option <?php if ($productoN > 0) {
+														echo "selected";
+												} ?>
+													value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
 												<?php
-												}
+													}
 												?>
 											</select>
 										</div>
-								   </div>
-								
+									</div>
+									<script>
+										$(document).ready(function () {
+												let productSelect = $("#product-select").select2({
+														placeholder: "Escoja una opción...",
+														multiple: true,
+														minimumInputLength: 3,
+														ajax: {
+																type: "GET",
+																url: "../usuarios/ajax/ajax-buscar-productos.php",
+																dataType: "json",
+																processResults: function (items) {
+																		return {
+																				results: items.map(function (item) {
+																						return {
+																								id: item.id,
+																								text: item.text,
+																						};
+																				})
+																		};
+																}
+														}
+												});
+												
+												productSelect.on("change", function (e) {
+														const producto = productSelect.val() || [];
+														const url = new URL(window.location.href);
+														const id = url.searchParams.get("id");
+														$.ajax({
+																type: "POST",
+																url: "../usuarios/ajax/ajax-actualizar-productos-cotizacion.php",
+																data: {
+																	producto,
+																	id
+																},
+																success: function (response) {
+																		actulizarTablaProductos()	
+																}
+														});
+												});
+
+												productSelect.on("select2:clear", function (e) {
+														console.log("clear")
+												});
+
+											function actulizarTablaProductos(){
+												$.ajax({
+														type: "POST",
+														url: "", 
+														data: {
+																action: "generarTablaProductos"
+                    					},
+														success: function(response) {
+															let bodyStart = response.indexOf('<body>');
+															let bodyEnd = response.indexOf('</body>');
+															let bodyContent = response.slice(bodyStart + 6, bodyEnd);
+															$('#tableBody .producto').remove();
+															$('#tableBody').append(bodyContent);
+                    				}
+                					});
+											}
+											actulizarTablaProductos()	
+										});
+									</script>
 								
 									<div class="control-group">
 										<label class="control-label">Servicios</label>
@@ -457,7 +533,7 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="servicio[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT serv_id, serv_nombre FROM servicios 
+												$conOp = $conexionBdPrincipal->query("SELECT serv_id, serv_nombre FROM servicios WHERE serv_id_empresa='".$idEmpresa."'
 												ORDER BY serv_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 													
@@ -561,13 +637,14 @@ include("includes/js-formularios.php");
                                 <th>SUBTOTAL</th>
 							</tr>
 							</thead>
-							<tbody>
+							<tbody id="tableBody">
 								
 							<!-- COMBOS -->
 							<?php
 							$no = 1;
 							$productos = $conexionBdPrincipal->query("SELECT * FROM combos
 							INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='".$_GET["id"]."'
+							WHERE combo_id_empresa='".$idEmpresa."'
 							ORDER BY czpp_orden");
 							$sumaUtilidad = 0;
 							$totalIva = 0;
@@ -625,8 +702,12 @@ include("includes/js-formularios.php");
 								<td><?=$no;?></td>
 								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td>
+									<?php if (Modulos::validarRol([371], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="bd_delete/cotizaciones-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<?php } ?>
+									<?php if (Modulos::validarRol([175], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="combos-editar.php?id=<?=$prod['combo_id'];?>" target="_blank"><?=$prod['combo_nombre'];?></a><br>
+									<?php } ?>
 									<?php if($prod['combo_descuento']!="" and $resultadoD['cotiz_ocultar_descuento_combo']=='0'){?>
 										<span><b>Precio Normal:</b> $<?=number_format($precioNormalCombo[0],0,".",".");?></span><br>
 										<span><b>Descuento:</b> <?=$prod['combo_descuento'];?>%</span><br>
@@ -638,6 +719,7 @@ include("includes/js-formularios.php");
 										prod_id, prod_nombre
 									   FROM productos
 									INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='".$prod['combo_id']."'
+									WHERE prod_id_empresa='".$idEmpresa."'
 									ORDER BY copp_id");
 									while($prodCombo = mysqli_fetch_array($productosCombo, MYSQLI_BOTH)){
 										echo $prodCombo['prod_nombre']." (".$prodCombo['copp_cantidad']." Unds.).<br>";
@@ -650,13 +732,13 @@ include("includes/js-formularios.php");
                                 <td><input type="number" title="czpp_cantidad" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td>
 									<?php
-									if($resultadoD['cli_categoria']==3 and $datosUsuarioActual['usr_tipo']==1){
+									if($resultadoD['cli_categoria']== CLI_CATEGORIA_DEALER and Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 										echo "<b>Precio Dealer: $".number_format($totalDealer, 0, ",", ".")."</b><br>";
 									}
 									?>
                                 	<input type="text" title="czpp_valor" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_valor'];?>" onChange="productos(this)" style="width: 200px;" disabled><br>
                                 	<?php
-									if($datosUsuarioActual['usr_tipo']==1){
+									if(Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 										echo "
 										<b>Costo: $".number_format($sumaCostosProductosCombos, 0, ",", ".")."</b><br>
 										<b>Valor Utilidad: $".number_format(($prod['czpp_valor'] - $sumaCostosProductosCombos), 0, ",", ".")."</b><br>
@@ -671,16 +753,13 @@ include("includes/js-formularios.php");
 									<td>
 										<input type="text" title="czpp_descuento_especial" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento_especial'];?>" onChange="combos(this)" style="width: 50px; text-align: center;">
 
-										<?php
-									if($datosUsuarioActual['usr_tipo']==1 and $prod['czpp_aprobado_usuario']=="" and $prod['czpp_descuento_especial']>0){
-										
-										?>
-
-										<br><a href="sql.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
+									<?php if (Modulos::validarRol([57], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+										<br><a href="bd_update/descuentos-cotizaciones-actualizar.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
+									<?php } ?>
 
 
-									<?php }
-									$consultaDctoEspecial=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']."'");
+									<?php 
+									$consultaDctoEspecial=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']." AND usr_id_empresa='".$idEmpresa."''");
 									$usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
 									?>
 
@@ -694,98 +773,20 @@ include("includes/js-formularios.php");
 									</td>
 								<?php }?>
 
-                                <td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($valorTotal,0,",",".");?></td>
-							</tr>
-							<?php 
-								$no ++;
-							}
-							?>
-								
-							<!-- PRODUCTOS -->	
-                            <?php
-							$productos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,
-								prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad
-								FROM productos
-							INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='".$_GET["id"]."'
-							ORDER BY czpp_orden");
-							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
-								$dcto = 0;
-								$valorTotal = 0;
-
-								$valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
-
-								if($prod['czpp_cantidad']>0 and $prod['czpp_descuento']>0){
-									$dcto = ($valorTotal * ($prod['czpp_descuento']/100));
-									$totalDescuento += $dcto;	
-								}
-
-								$valorConDcto = $valorTotal - $dcto;
-
-								$totalIva += ($valorConDcto * ($prod['czpp_impuesto']/100));
-
-								$subtotal +=$valorTotal;
-								
-								
-								$totalCantidad += $prod['czpp_cantidad'];
-
-
-
-								$utilidadDealer = $prod['prod_descuento2'] / 100;
-								$precioDealer = $prod['prod_costo'] + ($prod['prod_costo'] * $utilidadDealer);
-
-								$sumaUtilidad += ($prod['czpp_valor'] - $prod['prod_costo']);
-							?>
-							<tr>
-								<td><?=$no;?></td>
-								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-                                <td>
-									<a href="bd_delete/cotizaciones-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
-									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_nombre'];?></a><br>
-									
-									<span style="font-size: 9px; color: darkblue;"><?=$prod['prod_descripcion_corta'];?></span><br>
-										
-									<p><textarea title="czpp_observacion" name="<?=$prod['czpp_id'];?>" onChange="productos(this)" style="width: 300px;" rows="4"><?=$prod['czpp_observacion'];?></textarea></p>
-								</td>
-                                <td><input type="number" title="czpp_cantidad" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-                                <td>
-									<?php
-									if($resultadoD['cli_categoria']==3 and $datosUsuarioActual['usr_tipo']==1){
-										echo "<b>Precio Dealer: $".number_format($precioDealer, 0, ",", ".")."</b><br>";
-									}
-									?>
-
-									<input type="text" alt="<?=$resultadoD['cli_categoria'];?>" title="czpp_valor" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_valor'];?>" onChange="productos(this)" style="width: 200px;"><br>
-									<?php
-									if($datosUsuarioActual['usr_tipo']==1){
-										echo "
-										<b>Costo: $".number_format($prod['prod_costo'], 0, ",", ".")."</b><br>
-										<b>Utilidad: ".$prod['prod_utilidad']."%</b><br>
-										<b>Valor Utilidad: $".number_format(($prod['czpp_valor'] - $prod['prod_costo']), 0, ",", ".")."</b><br>
-										";
-									}
-									?>
-								</td>
-                                <td><input type="text" title="czpp_impuesto" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_impuesto'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
 								<td>
-									<input type="text" title="czpp_descuento" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"><br>
-										<?php 
-										if($dcto>0)
-											echo "$".number_format($dcto,0,".",".");
-										?>
+										<span class="moneda-simbolo"><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?></span>
+										<span class="valor-numerico"><?=number_format($valorTotal, 0, ",", ".");?></span>
 								</td>
 
 								<?php if($resultadoD['cotiz_descuentos_especiales'] == 1){?>
 									<td><input type="text" title="czpp_descuento_especial" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento_especial'];?>" onChange="combos(this)" style="width: 50px; text-align: center;">
 
-										<?php
-									if($datosUsuarioActual['usr_tipo']==1 and $prod['czpp_aprobado_usuario']=="" and $prod['czpp_descuento_especial']>0){
-										
-										?>
-
-										<br><a href="sql.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
+									<?php if (Modulos::validarRol([57], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+										<br><a href="bd_update/descuentos-cotizaciones-actualizar.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
+									<?php } ?>
 
 
-									<?php }
+									<?php 
 									$consultaDctoEspecial=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']."'");
 									$usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
 									?>
@@ -812,6 +813,7 @@ include("includes/js-formularios.php");
 							<?php
 							$productos = $conexionBdPrincipal->query("SELECT * FROM servicios
 							INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='".$_GET["id"]."'
+							WHERE serv_id_empresa='".$idEmpresa."'
 							ORDER BY czpp_orden");
 							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 								$dcto = 0;
@@ -837,8 +839,12 @@ include("includes/js-formularios.php");
 								<td><?=$no;?></td>
 								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
                                 <td>
+									<?php if (Modulos::validarRol([371], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="bd_delete/cotizaciones-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<?php } ?>
+									<?php if (Modulos::validarRol([156], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="servicios-editar.php?id=<?=$prod['serv_id'];?>" target="_blank"><?=$prod['serv_nombre'];?></a>
+									<?php } ?>
 										
 									<p><textarea title="czpp_observacion" name="<?=$prod['czpp_id'];?>" onChange="productos(this)" style="width: 300px;" rows="4"><?=$prod['czpp_observacion'];?></textarea></p>
 								</td>
@@ -849,7 +855,10 @@ include("includes/js-formularios.php");
 								<?php if($resultadoD['cotiz_descuentos_especiales'] == 1){?>
 									<td><input type="text" title="czpp_descuento_especial" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento_especial'];?>" onChange="combos(this)" style="width: 50px; text-align: center;"></td>
 								<?php }?>
-                                <td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($valorTotal,0,",",".");?></td>
+									<td>
+											<span class="moneda-simbolo"><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?></span>
+											<span class="valor-numerico"><?=number_format($valorTotal, 0, ",", ".");?></span>
+									</td>
 							</tr>
 							<?php 
 								$no ++;
@@ -864,30 +873,45 @@ include("includes/js-formularios.php");
 							<tfoot>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">SUBTOTAL</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($subtotal,0,",",".");?></td>
+									<td id="subtotal">
+									<span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=number_format($subtotal,0,",",".");?>
+										</span>
+									</td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">DESCUENTO</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($totalDescuento,0,",",".");?></td>
+									<td id="totalDiscount"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=number_format($totalDescuento,0,",",".");?>
+										</span></td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">IVA</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($totalIva,0,",",".");?></td>
+									<td id="totalIva"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=number_format($totalIva,0,",",".");?>
+										</span></td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">ENVÍO</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($envio,0,",",".");?></td>
+									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($envio,0,",",".");?>
+										</td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">TOTAL NETO</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($total,0,",",".");?></td>
+									<td id="total"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=number_format($subtotal,0,",",".");?>
+										</span></td>
 								</tr>
 							</tfoot>	
 								
 							</table>
 
 							<?php
-							if($datosUsuarioActual['usr_tipo']==1){?>
+							if(Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 
 								<p style="color: black; background-color: <?=$colorCredito;?>; padding: 15px; font-weight: bold; font-size: 16px;">Esta cotización deja una utilidad aproximada de $<?=number_format( ($sumaUtilidad) ,0,",",".");?></p>
 							<?php }?>
@@ -903,7 +927,9 @@ include("includes/js-formularios.php");
 									<?php }?>
 									
 										
+									<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="reportes/formato-cotizacion-1.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
+									<?php } ?>
 								</div>
 							</form>
 							
@@ -915,6 +941,102 @@ include("includes/js-formularios.php");
 		</div>
 	</div>
 	<?php include("includes/pie.php");?>
+	<script>
+  // Función para recalcular totales
+  function recalculate() {
+    let subtotal = 0;
+    let totalDiscount = 0;
+    let totalIva = 0;
+
+    $("#data-table tbody tr").each(function () {
+      let quantity = parseInt($(this).find("input[title='czpp_cantidad']").val()) || 0;
+      let value = parseFloat($(this).find("input[title='czpp_valor']").val()) || 0;
+      let discount = parseFloat($(this).find("input[title='czpp_descuento']").val()) || 0;
+      let subtotalRow = quantity * value;
+      let discountAmount = (subtotalRow * discount) / 100;
+      let rowTotal = subtotalRow - discountAmount;
+      let rowIva = (rowTotal * parseFloat($(this).find("input[title='czpp_impuesto']").val())) / 100;
+
+      subtotal += subtotalRow;
+      totalDiscount += discountAmount;
+      totalIva += rowIva;
+    });
+
+    $("#subtotal .valor-numerico").text(subtotal.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+    $("#totalDiscount .valor-numerico").text(totalDiscount.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+    $("#totalIva .valor-numerico" ).text(totalIva.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+
+    let envio = parseFloat($("input[name='envio']").val()) || 0;
+    let total = subtotal - totalDiscount + totalIva + envio;
+    $("#total .valor-numerico").text(total.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+  }
+
+  $("#data-table tbody").on("input", "input[title='czpp_cantidad'], input[title='czpp_valor'], input[title='czpp_descuento'], input[title='czpp_impuesto']", recalculate);
+
+  $("input[name='envio']").on("input", recalculate);
+
+  let observer = new MutationObserver(function (mutations) {
+    recalculate();
+  });
+
+  let tbody = document.getElementById("data-table").getElementsByTagName("tbody")[0];
+
+  let config = { childList: true };
+
+  observer.observe(tbody, config);
+
+  recalculate();
+</script>
+
+<script>
+    // Función para actualizar una subtotal parcial específica
+    function updatePartialSubtotal(row) {
+        let cantidad = parseFloat(row.find("input[title='czpp_cantidad']").val()) || 0;
+        let valor = parseFloat(row.find("input[title='czpp_valor']").val()) || 0;
+        let descuento = parseFloat(row.find("input[title='czpp_descuento']").val()) || 0;
+        let iva = parseFloat(row.find("input[title='czpp_iva']").val()) || 0;
+
+        let subtotalParcial = cantidad * valor;
+        // let subtotalParcial = cantidad * valor - (cantidad * valor * descuento / 100);
+        let ivaAmount = (subtotalParcial * iva / 100);
+        subtotalParcial += ivaAmount;
+        let valorNumeric = row.find('.valor-numerico');
+        valorNumeric.text(subtotalParcial.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+    }
+
+
+    function recalculatePartialSubtotals() {
+        $('#data-table tbody tr').each(function () {
+            let row = $(this);
+            updatePartialSubtotal(row);
+        });
+    }
+    $('#data-table tbody').on('input', 'input[title^="czpp_"]', function () {
+        let row = $(this).closest('tr');
+        updatePartialSubtotal(row);
+    });
+    recalculatePartialSubtotals();
+</script>
+
+<script>
+	// Controlador de eventos para hacer clic en los enlaces de eliminación
+	$(document).on("click", ".delete-product", function (e) {
+	    e.preventDefault(); 
+	    if (!confirm('¿Desea eliminar este registro?')) {
+	        return;
+	    }
+	  const idItem = $(this).data("id"); 
+
+	  const select2Element = $("#product-select"); 
+		
+		const currentSelectedValues = select2Element.val();
+
+		const newSelectedValues = currentSelectedValues.filter(value => value != idItem);
+
+		select2Element.val(newSelectedValues|| []);
+		select2Element.trigger("change");
+	});
+</script>
 </div>
 </body>
 </html>

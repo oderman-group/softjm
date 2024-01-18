@@ -151,9 +151,6 @@ include("includes/head.php");
             <?php include("includes/notificaciones.php");?>
 			
 			<span id="resp"></span>
-            <p>
-				<a href="#" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-            </p>
 			
 
 			
@@ -184,16 +181,16 @@ include("includes/head.php");
 								
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec 
 							LEFT JOIN productos_categorias ON catp_id=prod_categoria
-							WHERE prod_id=prod_id $filtro");
+							WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' $filtro");
 							$no = 1;
 							$visible = array("SI","SI","NO");
 							$estadoVisible = array(2,2,1);	
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
-								$consultaGrupo=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'");
+								$consultaGrupo=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'  AND catp_id_empresa='".$idEmpresa."'");
 								$grupo1 = mysqli_fetch_array($consultaGrupo, MYSQLI_BOTH);
 								
-								$consultaMarca=mysqli_query($conexionBdPrincipal,"SELECT * FROM marcas WHERE mar_id='".$res['prod_marca']."'");
+								$consultaMarca=mysqli_query($conexionBdPrincipal,"SELECT * FROM marcas WHERE mar_id='".$res['prod_marca']."'  AND mar_id_empresa='".$idEmpresa."'");
 								$marca = mysqli_fetch_array($consultaMarca, MYSQLI_BOTH);
 
 							?>
@@ -205,9 +202,9 @@ include("includes/head.php");
 									<div>
 									<?=$res['prod_nombre'];?>
 									<h4>
-										<a href="#" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-										<a href="#" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-										<a href="productos-materiales.php?pdto=<?=$res[0];?>" data-toggle="tooltip" title="Materiales"><i class="icon-folder-open"></i></a>
+										<?php if( Modulos::validarRol(['68'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+											<a href="productos-materiales.php?pdto=<?=$res[0];?>" data-toggle="tooltip" title="Materiales"><i class="icon-folder-open"></i></a>
+										<?php }?>
 									</h4>
 									</div>	
 								</td>

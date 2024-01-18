@@ -5,9 +5,12 @@ $idPagina = 4;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$consulta=$conexionBdPrincipal->query("SELECT * FROM usuarios 
-INNER JOIN usuarios_tipos ON utipo_id=usr_tipo
-WHERE usr_id='".$_GET["id"]."'");
+$consulta=$conexionBdAdmin->query("SELECT u.*, GROUP_CONCAT(r.utipo_id) AS roles
+FROM orioncrmcom_dev_jm_crm.usuarios AS u
+LEFT JOIN usuarios_roles AS ru ON u.usr_id = ru.upr_id_usuario 
+LEFT JOIN orioncrmcom_dev_jm_crm.usuarios_tipos AS r ON ru.upr_id_rol  = r.utipo_id 
+WHERE u.usr_id = '".$_GET["id"]."'
+GROUP BY u.usr_id;");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
@@ -56,9 +59,14 @@ include("includes/js-formularios.php");
 
             
             <p>
-
-            	<a href="usuarios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>&nbsp;
-            	<a href="usuarios-editar-zonas.php?id=<?=$_GET["id"];?>" class="btn btn-info"><i class="icon-edit"></i> Editar zonas</a>
+							<?php
+								if (Modulos::validarRol([3], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+									echo '<a href="usuarios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>&nbsp;';
+								}
+								if (Modulos::validarRol([176], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+									echo '<a href="usuarios-editar-zonas.php?id='.$_GET["id"].'" class="btn btn-info"><i class="icon-edit"></i> Editar zonas</a>';
+								}
+							?>           	
 
             </p>
             
@@ -115,17 +123,19 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Tipo de usuario</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoU">
-											<option value=""></option>
-                                            <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos");
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-											?>
-                                            	<option value="<?=$resOp[0];?>" <?php if($resultadoD['usr_tipo']==$resOp[0]) echo "selected";?>><?=$resOp[1];?></option>
-                                            <?php
-											}
-											?>
-                                    	</select>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoU[]" multiple>
+											<?php
+													$roles = explode(',', $resultadoD['roles']);
+													$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos  WHERE utipo_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
+													while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
+														$selected = (is_array($roles) && in_array($resOp[0], $roles)) ? 'selected' : '';
+
+												?>
+															<option value="<?=$resOp[0];?>" <?=$selected;?>><?=$resOp[1];?></option>
+												<?php
+													}
+												?>
+											</select>
                                     </div>
                                </div>
 
@@ -135,7 +145,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="sucursal">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM sucursales_propias");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM sucursales_propias WHERE sucp_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['usr_sucursal']==$resOp[0]) echo "selected";?>><?=$resOp[1];?></option>
@@ -164,7 +174,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="area">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM areas");
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM areas WHERE ar_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['usr_area']==$resOp[0]) echo "selected";?>><?=$resOp[1];?></option>

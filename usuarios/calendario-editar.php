@@ -6,7 +6,7 @@ $paginaActual['pag_nombre'] = "Editar evento";
 <?php include("includes/verificar-paginas.php");?>
 <?php
 include("includes/head.php");
-$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM agenda WHERE age_id='".$_GET["id"]."'");
+$consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM agenda WHERE age_id='".$_GET["id"]."' AND age_id_empresa={$_SESSION['dataAdicional']['id_empresa']}");
 $resultadoD = mysqli_fetch_array($consulta);
 ?>
 <!-- styles -->
@@ -61,12 +61,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -76,8 +70,11 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
-			
-			<p><a href="sql.php?get=37&id=<?=$_GET["id"];?>" class="btn btn-danger" onClick="if(!confirm('Desea eliminar el registro?')){return false;}"><i class="icon-trash"></i> Eliminar</a></p>
+			<?php
+			if( Modulos::validarRol(['118'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {
+			?>
+				<p><a href="bd_delete/calendario-evento-eliminar.php?get=37&id=<?=$_GET["id"];?>" class="btn btn-danger" onClick="if(!confirm('Desea eliminar el registro?')){return false;}"><i class="icon-trash"></i> Eliminar</a></p>
+			<?php }?>
 			
 			<div class="row-fluid">
 				<div class="span12">
@@ -86,7 +83,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="bd_update/calendario-actualizar.php">
                             <input type="hidden" name="idSql" value="53">
 							<input type="hidden" name="id" value="<?=$_GET["id"];?>">
                                
@@ -177,7 +174,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente">
 											<option value="0"></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$resultadoD["age_cliente"]."'");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$resultadoD["age_cliente"]."' AND cli_id_empresa={$_SESSION['dataAdicional']['id_empresa']}");
 											while($resOp = mysqli_fetch_array($conOp)){
 												if($datosUsuarioActual[3]!=1){
 													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");

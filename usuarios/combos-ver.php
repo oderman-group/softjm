@@ -100,8 +100,9 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
+						
 							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-                            <input type="hidden" name="idSql" value="62">
+                            <input type="hidden" name="idSql" value="62"> <?php //el codigo 62 no se encontro en el archivo sql ?> 
 								<input type="hidden" name="id" value="<?=$_GET["id"];?>">
                                 
                                 <div class="control-group">
@@ -199,7 +200,7 @@ include("includes/js-formularios.php");
 							<tbody>
                             <?php
 							$editarCantidad = 'disabled';
-							if ($datosUsuarioActual['usr_tipo'] == 1 ) {
+							if (Modulos::validarRol([388], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {
 								$editarCantidad = '';
 							}
 
@@ -222,7 +223,11 @@ include("includes/js-formularios.php");
 							<tr>
 								<td><?=$no;?></td>
                                 <td>
+										<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_id']." - ".$prod['prod_nombre'];?></a>
+										<?php } else {?>
+											<span><?=$prod['prod_id']." - ".$prod['prod_nombre'];?></span>
+										<?php } ?>
 								</td>
                                 <td><?=$prod['copp_cantidad'];?></td>
                                 <td>$<?=number_format($prod['copp_precio'],0,",",".");?></td>

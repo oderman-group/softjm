@@ -1,11 +1,9 @@
 <?php 
 include("sesion.php");
 
-$tituloPagina = "Editar Contactos";
-
 include("head.php");
 
-$resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$_GET["id"]."'"), MYSQLI_BOTH);
+$resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$_GET["id"]."' AND cont_cliente_principal={$_SESSION["id_cliente"]}"), MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
@@ -143,13 +141,13 @@ $resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FRO
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
                         
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
                         <li><a href="contactos.php">Mis Contactos</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -158,10 +156,10 @@ $resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FRO
 				<div class="span12">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> <?=$tituloPagina;?></h3>
+							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="contactos-actualizar.php">
                             <input type="hidden" name="idSql" value="6">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
                             	   
@@ -172,7 +170,7 @@ $resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FRO
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="sucursal">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_SESSION["id"]."'");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_SESSION["id_cliente"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>" <?php if($resultadoD['cont_sucursal']==$resOp[0]) echo "selected";?>><?=$resOp[7];?></option>

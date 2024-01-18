@@ -14,8 +14,15 @@ function validarClave($clave) {
     return preg_match($regex, $clave);
 }
 
-function generarClaves(){
-	return rand(10000, 99999);
+function generarClaves($length=10)
+{
+	$key = "";
+	$pattern = "1234567890abcdefghijklmnopqrstuvwxyz";
+	$max = strlen($pattern)-1;
+	for($i = 0; $i < $length; $i++){
+		$key .= substr($pattern, mt_rand(0,$max), 1);
+	}
+	return $key;
 }
 
 function informarErrorAlUsuario($linea, $error){

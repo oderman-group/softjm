@@ -61,7 +61,9 @@ include("includes/head.php");
 		<div class="container-fluid">
             <?php include("includes/notificaciones.php");?>
             <p>
+						<?php if (Modulos::validarRol([174], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
             	<a href="combos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+						<?php } ?>
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -78,7 +80,7 @@ include("includes/head.php");
 								<th>Imagen</th>
                                 <th>Nombre</th>
 								<th>Precio</th>
-								<?php if($datosUsuarioActual['usr_tipo']==1){?>
+								<?php if(Modulos::validarRol([390], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 								<th>Dcto.</th>
 								<th>Dcto. Dealer</th>
 								<?php }?>
@@ -123,7 +125,7 @@ include("includes/head.php");
 								</td>
                                 <td><?=$res['combo_nombre'];?></td>
 								<td>$<?=number_format($precioCombo,0,".",".");?></td>
-								<?php if($datosUsuarioActual['usr_tipo']==1){?>
+								<?php if(Modulos::validarRol([390], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 									<td><?=$res['combo_descuento'];?>%</td>
 									<td><?=$res['combo_descuento_dealer'];?>%</td>
 								<?php }?>
@@ -134,12 +136,15 @@ include("includes/head.php");
 								
                                 <td><h4>
 									
+										<?php if (Modulos::validarRol([173], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 										<a href="combos-ver.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Ver"><i class="icon-eye-open"></i></a>
-									
-									<?php if($datosUsuarioActual['usr_tipo']==1){?>
+										<?php } ?>
+										<?php if (Modulos::validarRol([175], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 										<a href="combos-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+										<?php } ?>						
+										<?php if (Modulos::validarRol([218], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 										<a href="bd_delete/combos-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-									<?php }?>
+										<?php } ?>						
                                 </h4>
 								</td>
 							</tr>

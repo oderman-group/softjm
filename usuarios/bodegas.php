@@ -98,8 +98,14 @@ include("includes/head.php");
 			<div class="container-fluid">
 				<?php include("includes/notificaciones.php"); ?>
 				<p>
-					<a href="bodegas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-					<a href="bodegas-transferir.php" class="btn btn-success"><i class="icon-random"></i> Transferir productos</a>
+					<?php
+						if (Modulos::validarRol([143], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+							echo '<a href="bodegas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a> ';
+						}
+						if (Modulos::validarRol([147], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+							echo '<a href="bodegas-transferir.php" class="btn btn-success"><i class="icon-random"></i> Transferir productos</a> ';
+						}
+					?>				
 				</p>
 				<div class="row-fluid">
 					<div class="span12">
@@ -125,7 +131,7 @@ include("includes/head.php");
 										$consulta = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".bodegas 
 										INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=bod_ciudad
 										INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
-										");
+										WHERE bod_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 											$consultaProductosBodegas=$conexionBdPrincipal->query("SELECT * FROM productos_bodegas WHERE prodb_bodega='".$res[0]."'");
@@ -139,10 +145,14 @@ include("includes/head.php");
 												<td><a href="bodegas-productos.php?bod=<?=$res[0];?>"><?= $cantProd; ?></a></td>
 												<td>
 													<h4>
-													<?php if($res[0] != 1){?>	
-														<a href="bodegas-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-														<a href="bd_delete/bodegas-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-													<?php }?>
+													<?php if($res[0] != 1){
+														if (Modulos::validarRol([144], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+															echo '<a href="bodegas-editar.php?id='.$res[0].'" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a> ';
+														}
+														if (Modulos::validarRol([222], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+															echo '<a href="bd_delete/bodegas-eliminar.php?id='.$res[0].'" onClick="if(!confirm("Desea eliminar el registro?")){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a> ';
+														}									
+													}?>
 													</h4>
 												</td>
 											</tr>

@@ -4,7 +4,7 @@ $idPagina = 159;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consulta = $conexionBdPrincipal->query("SELECT * FROM configuracion WHERE conf_id=1");
+$consulta = $conexionBdPrincipal->query("SELECT * FROM configuracion WHERE conf_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
@@ -86,7 +86,10 @@ include("includes/js-formularios.php");
 
 
                                     <div class="form-actions">
+                                    <?php if(Modulos::validarRol([159], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+                                    ?>
                                         <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+                                        <?php } ?>
                                         <button type="button" class="btn btn-danger">Cancelar</button>
                                     </div>
                                 </form>

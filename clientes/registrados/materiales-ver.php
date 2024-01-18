@@ -1,14 +1,11 @@
 <?php 
 include("sesion.php");
 
-$tituloPagina = "Ver Productos";
-
 include("head.php");
 
-$producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_GET["pdto"]."'"), MYSQLI_BOTH);
+$producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_GET["pdto"]."' AND prod_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
 ?>
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 <link href="css/tablecloth.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
@@ -91,7 +88,7 @@ $producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM 
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
                         <li><a href="materiales.php">Materiales</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?> de <b><?=$producto['prod_nombre'];?></b></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?> de <b><?=$producto['prod_nombre'];?></b></li>
 					</ul>
 				</div>
 			</div>
@@ -100,7 +97,7 @@ $producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM 
 				<div class="span12">
 					<div class="content-widgets light-gray">
 						<div class="widget-head green">
-							<h3><?=$tituloPagina;?> de <b><?=$producto['prod_nombre'];?></b></h3>
+							<h3><?=$paginaActual['pag_nombre'];?> de <b><?=$producto['prod_nombre'];?></b></h3>
 						</div>
 						<div class="widget-container">
 							<p>
@@ -108,7 +105,9 @@ $producto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM 
                             </p>
 							
                             <?php
-							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_materiales WHERE ppmt_producto='".$_GET["pdto"]."'");
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_materiales
+							INNER JOIN productos ON prod_id=ppmt_producto AND prod_id_empresa={$_SESSION['id_empresa']} 
+							WHERE ppmt_producto='".$_GET["pdto"]."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								switch($res[2]){

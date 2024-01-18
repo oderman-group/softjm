@@ -1,17 +1,13 @@
-<?php include("sesion.php");?>
 <?php
+include("sesion.php");
+
 $idPagina = 119;
-$paginaActual['pag_nombre'] = "Avances";
-?>
-<?php include("includes/verificar-paginas.php");?>
-<?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$proyecto = mysql_fetch_array(mysql_query("SELECT * FROM proyectos 
-WHERE proy_id='".$_GET["proy"]."'",$conexion));
+include("includes/verificar-paginas.php");
+include("includes/head.php");
+
+$consultaProyecto = mysqli_query($conexionBdPrincipal, "SELECT * FROM proyectos 
+WHERE proy_id='".$_GET["proy"]."'");
+$proyecto = mysqli_fetch_array($consultaProyecto, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
@@ -140,12 +136,6 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?>:  <strong><?=$proyecto['proy_titulo'];?></strong></h3>
-						<ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -217,20 +207,20 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
 							<tbody>
                             <?php
 							
-								$consulta = mysql_query("SELECT * FROM proyectos_tareas
+								$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM proyectos_tareas
 								INNER JOIN usuarios ON usr_id=ptar_responsable
 								WHERE ptar_id_proyecto='".$_GET["proy"]."'
 								LIMIT $inicio, $limite
-								",$conexion);
+								");
 							
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
 								
-								$numeros = mysql_fetch_array(mysql_query("
+								$numeros = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "
 								SELECT
 								(SELECT count(ptar_id) FROM proyectos_tareas WHERE ptar_id_proyecto='".$res['proy_id']."')
-								",$conexion));
+								"), MYSQLI_BOTH);
 								
 								$color1='#FFF';
 								if($numeros[0]==0){$color1='#FFF090';}
@@ -246,7 +236,7 @@ WHERE proy_id='".$_GET["proy"]."'",$conexion));
                                     <h4 style="margin-top:5px;">
                                         <a href="proyectos-tareas-editar.php?id=<?=$res['ptar_id'];?>&proy=<?=$_GET["proy"];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
 										
-                                        <a href="sql.php?get=36&id=<?=$res['ptar_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                        <a href="bd_delete/proyectos-avances-eliminar.php?get=36&id=<?=$res['ptar_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
                                 	</h4>
                                 </td>
 								

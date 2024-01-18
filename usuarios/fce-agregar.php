@@ -61,12 +61,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -83,7 +77,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="bd_create/facturas-compra-guardar.php">
                             <input type="hidden" name="idSql" value="84">
 							<input type="hidden" name="fce" value="1">
                             <input type="hidden" name="preferencia" value="3"> 
@@ -103,7 +97,7 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores");
+											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores WHERE prov_id_empresa='".$idEmpresa."'");
 											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>"><?=$resOp['prov_nombre'];?></option>
@@ -166,6 +160,7 @@ include("includes/js-formularios.php");
 												<?php
 												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria
+												WHERE prod_id_empresa='".$idEmpresa."'
 												ORDER BY prod_nombre
 												");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){

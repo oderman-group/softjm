@@ -2,12 +2,9 @@
 include("sesion.php");
 include("sesion-documentos.php");
 
-$tituloPagina = "Historial de equipos";
-
 include("head.php");
 ?>
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 <link href="css/tablecloth.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
@@ -72,7 +69,7 @@ include("head.php");
 				<div class="span12">
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -81,14 +78,14 @@ include("head.php");
 				<div class="span12">
 					<div class="content-widgets light-gray">
 						<div class="widget-head green">
-							<h3><?=$tituloPagina;?></h3>
+							<h3><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
 							
 							<p>
                             <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-							<a href="historial-equipos-informe.php?cte=<?=$_SESSION["id"];?>" class="btn btn-info" target="_blank"><i class="icon-print"></i> Imprimir</a>
-							<a href="exportar-historial-equipos.php?cte=<?=$_SESSION["id"];?>" class="btn btn-success"><i class="icon-file"></i> Exportar</a>
+							<a href="historial-equipos-informe.php?cte=<?=$_SESSION["id_cliente"];?>" class="btn btn-info" target="_blank"><i class="icon-print"></i> Imprimir</a>
+							<a href="exportar-historial-equipos.php?cte=<?=$_SESSION["id_cliente"];?>" class="btn btn-success"><i class="icon-file"></i> Exportar</a>
                             </p>
 							
 							<table class="table table-striped table-bordered" id="data-table">
@@ -107,8 +104,8 @@ include("head.php");
 							<tbody>
                             <?php
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones
-							INNER JOIN usuarios ON usr_id=rem_asesor
-							WHERE rem_cliente='".$_SESSION["id"]."'
+							INNER JOIN usuarios ON usr_id=rem_asesor AND usr_id_empresa={$_SESSION['id_empresa']}
+							WHERE rem_cliente='".$_SESSION["id_cliente"]."'
 							");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){

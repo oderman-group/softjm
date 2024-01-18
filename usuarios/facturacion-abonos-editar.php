@@ -5,15 +5,12 @@ $paginaActual['pag_nombre'] = "Editar abonos a Factura";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
+
 <?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
-<?php
-$resultadoD = mysql_fetch_array(mysql_query("SELECT * FROM facturacion_abonos 
+$resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM facturacion_abonos 
 INNER JOIN usuarios ON usr_id=fpab_responsable_registro
-WHERE fpab_id='".$_GET["id"]."'",$conexion));
-$usuarioMod = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$resultadoD[9]."'",$conexion));
+WHERE fpab_id='".$_GET["id"]."'"),MYSQLI_BOTH);
+$usuarioMod = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$resultadoD[9]."'"),MYSQLI_BOTH);
 ?>
 <!-- styles -->
 
@@ -67,12 +64,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -93,7 +84,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
+							<form class="form-horizontal" method="post" action="bd_update/abonos-facturas-actualizar.php" enctype="multipart/form-data">
                             <input type="hidden" name="idSql" value="42">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
                             <input type="hidden" name="fact" value="<?=$_GET["fact"];?>">
@@ -121,14 +112,15 @@ include("includes/js-formularios.php");
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span3" tabindex="2" name="medio">
 											<option value=""></option>
-                                            <option value="1" <?php if($resultadoD['fpab_medio_pago']==1){echo "selected";}?>>Consignación</option>
-                                            <option value="2" <?php if($resultadoD['fpab_medio_pago']==2){echo "selected";}?>>Transferencia</option>
-                                            <option value="3" <?php if($resultadoD['fpab_medio_pago']==3){echo "selected";}?>>P. Web</option>
-                                            <option value="4" <?php if($resultadoD['fpab_medio_pago']==4){echo "selected";}?>>Efectivo</option>
-                                            <option value="5" <?php if($resultadoD['fpab_medio_pago']==5){echo "selected";}?>>Cheque</option>
-                                            <option value="6" <?php if($resultadoD['fpab_medio_pago']==6){echo "selected";}?>>Efecty</option>
-                                            <option value="7" <?php if($resultadoD['fpab_medio_pago']==7){echo "selected";}?>>Gana</option>
-                                            <option value="8" <?php if($resultadoD['fpab_medio_pago']==8){echo "selected";}?>>Otro medio</option>
+																		<option value="<?= FPAB_MEDIO_CONSIG ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_CONSIG){echo "selected";} ?>>Consignación</option>
+																		<option value="<?= FPAB_MEDIO_TRANSF ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_TRANSF){echo "selected";} ?>>Transferencia</option>
+																		<option value="<?= FPAB_MEDIO_WEB ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_WEB){echo "selected";} ?>>P. Web</option>
+																		<option value="<?= FPAB_MEDIO_EFECTIVO ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_EFECTIVO){echo "selected";} ?>>Efectivo</option>
+																		<option value="<?= FPAB_MEDIO_CHEQUE ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_CHEQUE){echo "selected";} ?>>Cheque</option>
+																		<option value="<?= FPAB_MEDIO_EFECTY ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_EFECTY){echo "selected";} ?>>Efecty</option>
+																		<option value="<?= FPAB_MEDIO_GANA ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_GANA){echo "selected";} ?>>Gana</option>
+																		<option value="<?= FPAB_MEDIO_OTRO ?>" <?php if($resultadoD['fpab_medio_pago'] == FPAB_MEDIO_OTRO){echo "selected";} ?>>Otro medio</option>
+
                                     	</select>
                                     </div>
                                </div>

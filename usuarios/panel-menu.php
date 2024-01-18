@@ -58,7 +58,7 @@ $(function() {
         });
       });
 	  
-$(function(){
+//$(function(){
 		// global setting override
         /*
 		$.extend($.gritter.options, {
@@ -277,86 +277,11 @@ FLOT PIE CHART
 	<div class="main-wrapper">
 		<div class="container-fluid">
 			
-			<?php if(isset($_GET["p"])){if($_GET["p"]==1){?>
-			<h2>CRM</h2>
-			<div class="row-fluid">
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #4086f4;">
-						<a href="clientes.php"><span class="widget-icon icon-group"></span><span class="widget-label">Clientes</span></a>
-					</div>
-				</div>
-				
-				<div class="span3" >
-					<div class="board-widgets small-widget" style="background-color: #eb4132;">
-						<a href="cotizaciones.php"><span class="widget-icon icon-file-alt"></span><span class="widget-label">Cotización</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #31a952;">
-						<a href="clientes-tikets.php?tipo=1"><span class="widget-icon icon-briefcase"></span><span class="widget-label">Negociación</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #fbbd01;">
-						<a href="clientes-seguimiento.php"><span class="widget-icon icon-file"></span><span class="widget-label">Seguimientos</span></a>
-					</div>
-				</div>
-				
-				
-			</div>
-			
-			<div class="row-fluid">
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #fbbd01;">
-						<a href="clientes-filtro.php"><span class="widget-icon icon-phone"></span><span class="widget-label">Mercadeo</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #4086f4;">
-						<a href="pedidos.php"><span class="widget-icon icon-truck"></span><span class="widget-label">Pedido</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #eb4132;">
-						<a href="panel-menu.php?p=1.1"><span class="widget-icon icon-th"></span><span class="widget-label">Productos</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #31a952;">
-						<a href="servicios.php"><span class="widget-icon icon-briefcase"></span><span class="widget-label">Servicios</span></a>
-					</div>
-				</div>
-				
-				
-			</div>
-			
-			<div class="row-fluid">
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #31a952;">
-						<a href="calendario.php?id=<?=$_SESSION["id"];?>"><span class="widget-icon icon-calendar"></span><span class="widget-label">Mi calendario</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #fbbd01;">
-						<a href="proyectos.php"><span class="widget-icon icon-list-ul"></span><span class="widget-label">Proyectos</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #4086f4;">
-						<a href="viaticos/index.php"><span class="widget-icon icon-money"></span><span class="widget-label">Gastos asesores</span></a>
-					</div>
-				</div>
-			</div>
-			
-			
+			<?php 
+		if(isset($_GET["p"])) {
+				if($_GET["p"]==1){
+			?>
+			<h2>CRM</h2>		
 			
 			<?php
 			$tikets = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
@@ -397,7 +322,7 @@ FLOT PIE CHART
 								if($pahoy[0]<>0) continue;
 								?>
 									<li>
-										<a href="sql.php?get=28&id=<?=$llamada['cseg_id'];?>" title="Completar tarea"><i class="icon-ok-sign"></i></a>
+										<a href="bd_update/cliente-seguimiento-estado-update.php?get=28&id=<?=$llamada['cseg_id'];?>" title="Completar tarea"><i class="icon-ok-sign"></i></a>
 										<a href="clientes-seguimiento-editar.php?id=<?=$llamada['cseg_id'];?>&idTK=<?=$llamada['cseg_tiket'];?>" title="Ver detalles" target="_blank"><i class="icon-reorder"></i></a>
 										
 										LLamar a <a href="clientes-editar.php?id=<?=$llamada['cli_id'];?>" id="add-regular"><?=$llamada['cli_nombre']." (".$llamada['cli_telefono']." - ".$llamada['cli_celular'].")";?></a> 
@@ -434,7 +359,7 @@ FLOT PIE CHART
 								if($pahoy[0]<>0) continue;
 								?>
 									<li>
-										<a href="sql.php?get=28&id=<?=$llamada['cseg_id'];?>" title="Completar tarea"><i class="icon-ok-sign"></i></a>
+										<a href="bd_update/cliente-seguimiento-estado-update.php?get=28&id=<?=$llamada['cseg_id'];?>" title="Completar tarea"><i class="icon-ok-sign"></i></a>
 										<a href="clientes-seguimiento-editar.php?id=<?=$llamada['cseg_id'];?>&idTK=<?=$llamada['cseg_tiket'];?>" title="Ver detalles" target="_blank"><i class="icon-reorder"></i></a>
 										
 										Reunión con <a href="clientes-editar.php?id=<?=$llamada['cli_id'];?>" id="add-regular"><?=$llamada['cli_nombre']." (".$llamada['cli_telefono']." - ".$llamada['cli_celular'].")";?></a> 
@@ -460,14 +385,14 @@ FLOT PIE CHART
 					<?php
 					$ConsultaNumTikets=$conexionBdPrincipal->query("SELECT * FROM clientes_tikets
 					INNER JOIN clientes ON cli_id=tik_cliente
-					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado=1 
+					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado='".TIK_ESTADO_ABIERTO."'
 					ORDER BY tik_tipo_tiket DESC
 					");
 					$NumtiketsI = $ConsultaNumTikets->num_rows;
 
 					$tiketsI = $conexionBdPrincipal->query("SELECT * FROM clientes_tikets
 					INNER JOIN clientes ON cli_id=tik_cliente
-					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado=1 
+					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado='".TIK_ESTADO_ABIERTO."' 
 					ORDER BY tik_tipo_tiket DESC
 					LIMIT 0,5
 					");
@@ -483,7 +408,7 @@ FLOT PIE CHART
 								<span style='color:gray; font-size:10px;'>Creado en: ".$tkResI['tik_fecha_creacion']."</span>";?>
 								</li>
 								
-								<p><a href="sql.php?get=29&id=<?=$tkResI['tik_id'];?>" onClick="if(!confirm('Desea cerrar este ticket?')){return false;}" style="text-decoration: underline;">Cerrar Ticket</a></p>
+								<p><a href="bd_update/clientes-tikets-actualizar-estado.php?get=29&id=<?=$tkResI['tik_id'];?>" onClick="if(!confirm('Desea cerrar este ticket?')){return false;}" style="text-decoration: underline;">Cerrar Ticket</a></p>
 							</ul>
                             <?php $i++;}?>
                             
@@ -541,7 +466,7 @@ FLOT PIE CHART
                                                 <!--<a href="#" onClick='window.open("clientes-tikets-editar.php?id=<?=$tkRes['tik_id'];?>","EditarTiket","width=1200,height=800,menubar=no")' class="btn "><i class=" icon-edit"></i> Editar</a>-->
 											</div>
 											<div class="btn-group pull-right">
-												<a href="sql.php?id=<?=$tkRes['cseg_id'];?>&get=28" class="btn"><i class="icon-ok-circle"></i> Completar tarea</a>
+												<a href="bd_update/cliente-seguimiento-estado-update.php?id=<?=$tkRes['cseg_id'];?>&get=28" class="btn"><i class="icon-ok-circle"></i> Completar tarea</a>
 											</div>
 										</div>
 									</div>
@@ -605,147 +530,10 @@ FLOT PIE CHART
               </div>
 			
 			
-			<?php }}?>
-			
-			<?php if(isset($_GET["p"])){if($_GET["p"]==1.1){?>
-			<h2>SUBMÓDULO DE PRODUCTOS</h2>
-			<div class="row-fluid">
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #fbbd01;">
-						<a href="categoriasp.php"><span class="widget-icon icon-th-large"></span><span class="widget-label">Categorias</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #eb4132;">
-						<a href="productos.php"><span class="widget-icon icon-th"></span><span class="widget-label">Productos</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #4086f4;">
-						<a href="combos.php"><span class="widget-icon icon-gift"></span><span class="widget-label">Combos</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #31a952;">
-						<a href="marcas.php"><span class="widget-icon icon-tags"></span><span class="widget-label">Marcas</span></a>
-					</div>
-				</div>
-				
-			</div>
-			<?php }}?>
-			
-			
-			<?php if(isset($_GET["p"])){if($_GET["p"]==2){?>
-			<h2>ADMINISTRATIVO</h2>
-			<div class="row-fluid">
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #4086f4;">
-						<a href="#"><span class="widget-icon icon-th"></span><span class="widget-label">Inventario</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #eb4132;">
-						<a href="proveedores.php"><span class="widget-icon icon-group"></span><span class="widget-label">Proveedores</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #fbbd01;">
-						<a href="#compras.php"><span class="widget-icon icon-file"></span><span class="widget-label">Compras</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #31a952;">
-						<a href="#"><span class="widget-icon icon-file-alt"></span><span class="widget-label">Devoluciones</span></a>
-					</div>
-				</div>
-			</div>
-			
-			<div class="row-fluid">
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #4086f4;">
-						<a href="facturas.php"><span class="widget-icon icon-money"></span><span class="widget-label">Facturación</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #eb4132;">
-						<a href="#"><span class="widget-icon icon-credit-card"></span><span class="widget-label">F. Electrónica</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #fbbd01;">
-						<a href="#"><span class="widget-icon icon-file"></span><span class="widget-label">Pedidos</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #31a952;">
-						<a href="#"><span class="widget-icon icon-file-alt"></span><span class="widget-label">Remisión</span></a>
-					</div>
-				</div>
-			</div>
-			<?php }}?>
-
-			
-			<?php if(isset($_GET["p"])){if($_GET["p"]==3){?>
-			<h2>MÓDULO DE SOPORTE OPERATIVO</h2>
-			<div class="row-fluid">
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #4086f4;">
-						<a href="clientes-tikets.php?tipo=3"><span class="widget-icon icon-file"></span><span class="widget-label">Tickets</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #eb4132;">
-						<a href="facturacion.php"><span class="widget-icon icon-th-large"></span><span class="widget-label">Productos a clientes</span></a>
-					</div>
-				</div>
-				
-			</div>
-			<?php }}?>
-			
-			
-			<?php if(isset($_GET["p"])){if($_GET["p"]==4){?>
-			<h2>CONFIGURACIÓN/PERSONALIZACIÓN</h2>
-			<div class="row-fluid">
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #4086f4;">
-						<a href="usuarios.php"><span class="widget-icon icon-group"></span><span class="widget-label">Usuarios</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #31a952;">
-						<a href="roles.php"><span class="widget-icon icon-th-large"></span><span class="widget-label">Roles</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #eb4132;">
-						<a href="areas.php"><span class="widget-icon icon-folder-open"></span><span class="widget-label">Áreas</span></a>
-					</div>
-				</div>
-				
-				<div class="span3">
-					<div class="board-widgets small-widget" style="background-color: #fbbd01;">
-						<a href="zonas.php"><span class="widget-icon icon-th"></span><span class="widget-label">Zonas</span></a>
-					</div>
-				</div>
-				
-			</div>
-			<?php }}?>
-			
-			
-
-			
+			<?php 
+			}
+		}
+		?>
 			
                 </div>
 			</div>

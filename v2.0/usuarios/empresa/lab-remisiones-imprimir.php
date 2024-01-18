@@ -2,7 +2,7 @@
 include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 248;
-$tituloPagina = "Cotización";
+
 //include("verificar-paginas.php");
 
 $consultaRemision=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
@@ -10,12 +10,17 @@ INNER JOIN clientes ON cli_id=rem_cliente
 INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
 INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_GET["id"]."'");
+WHERE rem_id='".$_GET["id"]."' AND rem_id_empresa='".$idEmpresa."'");
 $remision = mysqli_fetch_array($consultaRemision, MYSQLI_BOTH);
 
 $consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$remision['rem_contacto']."'");
 $contacto = mysqli_fetch_array($consultaContacto, MYSQLI_BOTH);
 
+$consulta=$conexionBdAdmin->query("SELECT * FROM documentos_configuracion 
+																		WHERE dconf_id_empresa= '".$idEmpresa."' 
+																		AND dconf_id_documento='".ID_DOC_REMISION."';");
+$configuracionDoc = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+$fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', $configuracionDoc["dconf_estilo_letra"]) . "&display=swap";
 switch($_GET['estado']){
 	case 1: 
 		$letra = "E";
@@ -26,7 +31,7 @@ switch($_GET['estado']){
 		
 		$mensaje1 = "TIEMPO DE ENTREGA: <strong>".$remision['rem_dias_entrega']."</strong>";
 		
-		$mensaje2 = "El cliente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>JMENDOZA EQUIPOS</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
+		$mensaje2 = "El cliente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>{$_SESSION["dataAdicional"]['nombre_empresa']}</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
 		
 		$fecha = $remision['rem_fecha_registro'];
 	break;
@@ -40,7 +45,7 @@ switch($_GET['estado']){
 		
 		$mensaje1 = "A partir de la fecha el cliente cuenta con un plazo de <strong>".$remision['rem_dias_reclamar']." días</strong> para presentar cualquier inconformidad con respecto al ajuste del equipo, si pasado este tiempo no se recibe ningún reporte se asumirá que trabaja en óptimas condiciones.";
 		
-		$mensaje2 = "El ciente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>JMENDOZA EQUIPOS</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
+		$mensaje2 = "El ciente tendrá <strong>".$remision['rem_dias_reclamar']." días calendario</strong>  para reclamar su equipo, después de que el técnico le informe que el equipo está listo, pasado este tiempo <strong>{$_SESSION["dataAdicional"]['nombre_empresa']}</strong> no se hará responsable por daño o pérdida del instrumento. A demás de cobrar un bodegaje de 5.000 pesos semanales por estación o 3.000 pesos por teodolito y nivel.";
 		
 		$fecha = $remision['rem_fecha_salida'];
 	break;	
@@ -51,6 +56,7 @@ switch($_GET['estado']){
 	<link rel="stylesheet" type="text/css" href="../../assets/libs/select2/dist/css/select2.min.css">
     <!-- Custom CSS -->
     <link href="../../dist/css/style.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="<?php echo $fontLink;?>">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -59,7 +65,7 @@ switch($_GET['estado']){
 <![endif]-->
 </head>
 
-<body style="color: black;">
+<body style="font-family:<?php echo $configuracionDoc['dconf_estilo_letra'] ?? 'Verdana, sans-serif'; ?>; font-size:<?php echo $configuracionDoc['dconf_tamano_letra'] ?? '11'; ?>px; color: black;">
 	
 	<table style="width:90%; height: 120px;" border="0" align="center">
 		<tr>
@@ -116,7 +122,7 @@ switch($_GET['estado']){
 				</table>	
 			</td>
 			
-			<td style="width: 30%; border-radius: 10px; background-color: lightgray;" align="center";>
+			<td style="width: 30%; border-radius: 10px; background-color:<?php echo $configuracionDoc['dconf_estilo'] ?? 'lightgray'; ?>;" align="center";>
 				<h3>REMISIÓN<br>
 				NO. <?=$letra."".$remision['rem_id'];?></h3></td>
 		</tr>
@@ -125,7 +131,7 @@ switch($_GET['estado']){
 	<p>&nbsp;</p>
 	
 	<table style="width:90%;" border="1" rules="all" align="center">
-		<tr style="background-color: lightgray">
+		<tr style="background-color: <?php echo $configuracionDoc['dconf_estilo'] ?? 'lightgray'; ?>;">
 			<td align="center"><strong>DETALLE</strong></td>
 		</tr> 
 		<tr style="height: 100%;">
@@ -142,7 +148,7 @@ switch($_GET['estado']){
 	
 	
 	<table style="width:90%" border="1" rules="all" align="center">
-		<tr style="background-color: lightgray">
+		<tr style="background-color: <?php echo $configuracionDoc['dconf_estilo'] ?? 'lightgray'; ?>;">
 			<td><strong>OBSERVACIONES:</strong></td>
 			<td><strong>DATOS DEL CONTACTO:</strong></td>
 		</tr>
@@ -151,7 +157,7 @@ switch($_GET['estado']){
 			<td width="65%">
 				<div style="padding-bottom: 100px; padding-left:10px;  position: inherit;">
 					<?php
-					$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+					$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$idEmpresa."'");
 					while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 						
 						$consultaOpciones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios 
@@ -201,7 +207,7 @@ switch($_GET['estado']){
 		<tr>
 			<td>
 				<!--<img src="../../assets/images/firmaAlex2.png">--><br>
-				JMENDOZA EQUIPOS S.A.S<br>
+				<?=$_SESSION["dataAdicional"]['nombre_empresa'];?><br>
 				NIT: 900.374.255-1
 			</td>
 			<td><div style="border: thin; border-top-style: solid; width: 250px;"></div></td>
@@ -223,7 +229,7 @@ switch($_GET['estado']){
 				
 			<td>
 				<!--<img src="../../assets/images/firmaAlex2.png">--><br>
-				JMENDOZA EQUIPOS S.A.S<br>
+				<?=$_SESSION["dataAdicional"]['nombre_empresa'];?><br>
 				NIT: 900.374.255-1
 			</td>	
 			

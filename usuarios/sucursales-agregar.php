@@ -43,12 +43,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -76,7 +70,7 @@ include("includes/js-formularios.php");
                                
 								<div class="form-actions">
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-									<button type="button" class="btn btn-danger">Cancelar</button>
+									<a href="javascript:window.history.go(-1);" class="btn btn-danger">Cancelar</a>
 								</div>
 							</form>
 						</div>

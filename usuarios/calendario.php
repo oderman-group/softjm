@@ -40,7 +40,7 @@ $eventos = substr($eventos,0,-1);
 
 
 $proyectos = mysqli_query($conexionBdPrincipal, "SELECT proy_id, proy_titulo, proy_descripcion, proy_inicio, proy_fin, proy_responsable_principal, proy_estado, DAY(proy_fin) as dia, MONTH(proy_fin) as mes, YEAR(proy_fin) as agno FROM proyectos 
-WHERE proy_responsable_principal='".$usuarioID."' AND YEAR(proy_fin)>='".date("Y")."' AND MONTH(proy_fin)>='".date("m")."'
+WHERE proy_responsable_principal='".$usuarioID."' AND YEAR(proy_fin)>='".date("Y")."' AND MONTH(proy_fin)>='".date("m")."' AND proy_id_empresa={$_SESSION['dataAdicional']['id_empresa']}
 LIMIT 0,8
 ");
 
@@ -73,13 +73,19 @@ $i=1;
 while($age = mysqli_fetch_array($agenda, MYSQLI_BOTH)){
 	
 	$age["mes"]--;
+
+	$url = '';
+	if( Modulos::validarRol(['117'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) { 
+		$url = "url: 'calendario-editar.php?id=".$age["age_id"]."'";
+	}
+
 	
 		$eventos .= '
 			{
 				title: "'.$age["age_id"].": ".$age["age_evento"].'",
 				start: new Date('.$age["agno"].', '.$age["mes"].', '.$age["dia"].', 6, 0),
 				backgroundColor: "black",
-				url: "calendario-editar.php?id='.$age["age_id"].'"
+				'.$url.'
 			},
 
 		'; 
@@ -184,19 +190,15 @@ $eventos .= '
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?>: <?=$usuarioCalendario["usr_nombre"];?></h3>
-						<ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
 					</div>
 				</div>
 			</div>
 			<div class="row-fluid">
 				<div class="span12">
 					
-					<p><a href="calendario-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar evento</a></p>
+					<?php if( Modulos::validarRol(['116'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+						<p><a href="calendario-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar evento</a></p>
+					<?php }?>
 					
 					<div class="content-widgets gray">
 						<div class="widget-head orange">

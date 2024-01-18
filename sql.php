@@ -83,7 +83,7 @@ if ($_POST["idSql"] == 1) {
 				$mail->Port       = 465;                                    // TCP port to connect to
 
 				//Recipients
-				$mail->setFrom($configuracion['conf_email'], 'JMEQUIPOS');
+				$mail->setFrom($configuracion['conf_email'], 'ORION');
 				$mail->addAddress($emailD['usr_email'], $emailD['usr_nombre']);     // Add a recipient
 
 

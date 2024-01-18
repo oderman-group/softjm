@@ -2,7 +2,6 @@
 require_once("../sesion.php");
 
 $idPagina = 177;
-include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 validarReferencia('perfil-editar.php');
 
@@ -17,8 +16,7 @@ if ($_FILES['foto']['name'] != "") {
     $conexionBdPrincipal->query("UPDATE usuarios SET usr_foto='" . $foto . "' WHERE usr_id='" . $_SESSION["id"] . "'");
 }
 
-$conexionBdPrincipal->query("UPDATE usuarios SET 
-usr_login='" . $_POST["usuario"] . "', 
+$conexionBdPrincipal->query("UPDATE usuarios SET
 usr_nombre='" . htmlspecialchars ($_POST["nombre"]) . "', 
 usr_email='" . $_POST["email"] . "' 
 WHERE usr_id='" . $_SESSION["id"] . "'");

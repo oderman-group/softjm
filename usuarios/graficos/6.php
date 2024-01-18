@@ -1,4 +1,7 @@
-<?php include("../sesion.php");?>
+<?php 
+include("../sesion.php");
+$idPagina = 356;
+?>
 <?php include("../../conexion.php");?>
 <html>
 <head>
@@ -108,8 +111,8 @@ $usuarios = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_
 while($usr = mysqli_fetch_array($usuarios)){
 	$cte = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 	SELECT
-	(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_estado=1 AND tik_usuario_responsable='".$usr['usr_id']."'),
-	(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_estado=2 AND tik_usuario_responsable='".$usr['usr_id']."')"));
+	(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_estado='".TIK_ESTADO_ABIERTO."' AND tik_usuario_responsable='".$usr['usr_id']."'),
+	(SELECT COUNT(tik_id) AS cant FROM clientes_tikets WHERE tik_estado='".TIK_ESTADO_CERRADO."' AND tik_usuario_responsable='".$usr['usr_id']."')"));
 	
 	if($cte[0]==0 and $cte[1]==0) continue;
 	$cotizacionesResultados .= "['".strtoupper($usr['usr_seudonimo'])."', '".$cte[0]."', '".$cte[1]."'],";	

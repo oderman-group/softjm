@@ -5,7 +5,7 @@ $idPagina = 42;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consulta = $conexionBdPrincipal->query("SELECT * FROM configuracion WHERE conf_id=1");
+$consulta = $conexionBdPrincipal->query("SELECT * FROM configuracion WHERE conf_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
@@ -415,12 +415,23 @@ include("includes/js-formularios.php");
                                             </div>
                                         </div>
 
+                                        <div class="control-group">
+                                            <label class="control-label">Terminos y condiciones</label>
+                                            <div class="controls">
+                                            <textarea rows="10" cols="70" style="width: 50%" name="terminos">
+                                               <?php echo $resultadoD['conf_terminos_condiciones'] ?>
+                                            </textarea>
+                                            </div>
+                                        </div>
 
 
                                     </fieldset>
 
                                     <div class="form-actions">
+                                   <?php if(Modulos::validarRol([265], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+                                    ?>
                                         <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+                                    <?php } ?>
                                         <button type="button" class="btn btn-danger">Cancelar</button>
                                     </div>
                                 </form>

@@ -7,7 +7,7 @@ require '../../librerias/phpmailer/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
+$idPagina = 365;
 $asesor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $_SESSION["id"] . "'"));
 
 
@@ -20,7 +20,7 @@ if ($numero > 0) {
 	$contador = 0;
 	while ($contador < $numero) {
 		
-		$portafolios .= '<a href="https://softjm.com/usuarios/files/portafolios/' . $_POST["portafolios"][$contador] . '.pdf">' . $portafNombres[$_POST["portafolios"][$contador]] . '</a><br>';
+		$portafolios .= '<a href="'.REDIRECT_ROUTE.'/usuarios/files/portafolios/' . $_POST["portafolios"][$contador] . '.pdf">' . $portafNombres[$_POST["portafolios"][$contador]] . '</a><br>';
 		$contador++;
 	}
 }
@@ -95,7 +95,7 @@ if ($numero > 0) {
 
 					// Content
 					$mail->isHTML(true);                                  // Set email format to HTML
-					$mail->Subject = "PORTAFOLIO JMEQUIPOS SAS";
+					$mail->Subject = "PORTAFOLIO ".$_SESSION["dataAdicional"]['nombre_empresa'];
 					$mail->Body = $fin;
 					$mail->CharSet = 'UTF-8';
 

@@ -1,12 +1,9 @@
 <?php
 include("sesion.php");
 
-$tituloPagina = "Seguimiento de los equipos";
-
 include("head.php");
 ?>
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 <link href="css/tablecloth.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
@@ -71,7 +68,7 @@ include("head.php");
 				<div class="span12">
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -80,7 +77,7 @@ include("head.php");
 				<div class="span12">
 					<div class="content-widgets light-gray">
 						<div class="widget-head green">
-							<h3><?=$tituloPagina;?></h3>
+							<h3><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
 							<p>
@@ -99,6 +96,7 @@ include("head.php");
 							<tbody>
                             <?php
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_seguimiento
+							INNER JOIN remisiones ON rem_id=remseg_id_remisiones AND rem_id_empresa={$_SESSION['id_empresa']} 
 							WHERE remseg_id_remisiones='".$_GET["id"]."'
 							");
 							$no = 1;

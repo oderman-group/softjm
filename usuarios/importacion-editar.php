@@ -2,14 +2,14 @@
 include("sesion.php");
 
 $idPagina = 135;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
 $consultaResultadoD = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones 
 INNER JOIN proveedores ON prov_id=imp_proveedor
 LEFT JOIN facturas ON factura_id=imp_fce
-WHERE imp_id='" . $_GET["id"] . "'");
+WHERE imp_id='" . $_GET["id"] . "'
+AND imp_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consultaResultadoD, MYSQLI_BOTH);
 
 //Moneda a multiplicar
@@ -33,7 +33,7 @@ $valorCostosFletes = mysqli_fetch_array($valorCostosFletes, MYSQLI_BOTH);
 
 $valorFletes = mysqli_query($conexionBdPrincipal, "SELECT SUM(czpp_valor) FROM cotizacion_productos
 INNER JOIN productos ON prod_id=czpp_producto AND prod_no_inventariable=1
-WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4");
+WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo='".CZPP_TIPO_FACT."'");
 $valorFletes = mysqli_fetch_array($valorFletes, MYSQLI_BOTH);
 
 $totalFlete = ($valorFletes[0] * $trmMultFlete);
@@ -48,7 +48,7 @@ if (!empty($resultadoD['imp_otros_gastos']) && !empty($totalFlete)) {
 
 $valorTotalProductosImpConsulta = mysqli_query($conexionBdPrincipal, "SELECT SUM((czpp_cantidad*czpp_valor)) FROM cotizacion_productos
 INNER JOIN productos ON prod_id=czpp_producto AND prod_no_inventariable='0'
-WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo=4");
+WHERE czpp_cotizacion='".$resultadoD['imp_fce']."' AND czpp_tipo='".CZPP_TIPO_FACT."'");
 $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MYSQLI_BOTH);
 ?>
 
@@ -225,7 +225,9 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 
 
 				<p>
+				<?php if (Modulos::validarRol([134], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<a href="importacion-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+				<?php } ?>
 					<a href="#reportes/formato-remision-1.php?id=<?= $_GET["id"]; ?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
 
 					<!--
@@ -277,8 +279,9 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 											</select>
 										</div>
 
-
+										<?php if (Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 										<a href="proveedores-editar.php?id=<?= $resultadoD['imp_proveedor']; ?>" class="btn btn-info" target="_blank">Editar proveedor</a>
+										<?php } ?>		
 
 
 									</div>
@@ -299,7 +302,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 											<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="fce" required>
 												<option value=""></option>
 												<?php
-												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas WHERE factura_extranjera=1 AND factura_proveedor='" . $resultadoD['imp_proveedor'] . "'");
+												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas WHERE factura_extranjera=1 AND factura_proveedor='" . $resultadoD['imp_proveedor'] . "' AND factura_id_empresa='".$idEmpresa."'");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['imp_fce'] == $resOp[0]) echo "selected"; ?>>#<?= $resOp['factura_id'] . " - " . $resOp['factura_concepto']; ?></option>
@@ -309,7 +312,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 											</select>
 										</div>
 
-										<?php if ($resultadoD['imp_fce'] != "") { ?>
+										<?php if ($resultadoD['imp_fce'] != "" && Modulos::validarRol([132], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 											<a href="fce-editar.php?id=<?= $resultadoD['imp_fce']; ?>" class="btn btn-info" target="_blank">Detalles de la factura</a>
 										<?php } ?>
 
@@ -372,7 +375,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="facturas[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas WHERE factura_tipo=2 AND factura_preferencia='0'
+												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas WHERE factura_tipo=2 AND factura_preferencia='0' AND factura_id_empresa='".$idEmpresa."'
 												");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 													$facturasNConsulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones_facturas 
@@ -398,7 +401,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 												<?php
 												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
 												LEFT JOIN proveedores ON prov_id=factura_proveedor  
-												WHERE factura_tipo=2 AND factura_preferencia=1
+												WHERE factura_tipo='".FACTURA_TIPO_COMPRA."' AND factura_preferencia=1 AND factura_id_empresa='".$idEmpresa."'
 												");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 													$facturasNConsulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM importaciones_facturas 
@@ -478,7 +481,8 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 										$no = 1;
 										$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM productos 
 										INNER JOIN productos_categorias ON catp_id=prod_categoria
-										INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $resultadoD['imp_fce'] . "' AND czpp_tipo=4
+										INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $resultadoD['imp_fce'] . "' AND czpp_tipo='".CZPP_TIPO_FACT."'
+										WHERE prod_id_empresa='".$idEmpresa."'
 										ORDER BY prod_no_inventariable DESC, czpp_orden");
 										while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 											$dcto = 0;
@@ -517,7 +521,9 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 												<td><input type="number" title="czpp_orden" name="<?= $prod['czpp_id']; ?>" value="<?= $prod['czpp_orden']; ?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
 												<td style="background-color: <?= $colorPNI; ?>;">
 													<a href="sql.php?get=43&idItem=<?= $prod['czpp_id']; ?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+													<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 													<a href="productos-editar.php?id=<?= $prod['prod_id']; ?>" target="_blank"><?= $prod['prod_nombre']; ?></a>
+													<?php } ?>
 												</td>
 												<td><input type="number" title="czpp_cantidad" name="<?= $prod['czpp_id']; ?>" value="<?= $prod['czpp_cantidad']; ?>" onChange="productos(this)" style="width: 50px; text-align: center;" disabled></td>
 												<td><input type="text" title="czpp_valor" name="<?= $prod['czpp_id']; ?>" value="<?= $prod['czpp_valor']; ?>" onChange="productos(this)" style="width: 200px;" disabled></td>
@@ -574,7 +580,9 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 												<td><?= $no; ?></td>
 												<td>-</td>
 												<td style="background-color: yellow;">
+												<?php if (Modulos::validarRol([130], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 													<a href="facturas-compra-editar.php?id=<?= $fact['factura_id']; ?>#productos" target="_blank"><?= $fact['factura_concepto']; ?></a>
+												<?php } ?>
 												</td>
 												<td>-</td>
 												<?php if($fact['factura_preferencia']!=1){?>

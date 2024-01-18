@@ -57,12 +57,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -86,7 +80,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="responsable">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['usr_nombre'];?></option>
@@ -103,7 +97,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="vendedor">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['usr_nombre'];?></option>
@@ -137,7 +131,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="cliente">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['cli_nombre'];?></option>

@@ -5,10 +5,7 @@ $paginaActual['pag_nombre'] = "Notificaciones";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
+
 <!-- styles -->
 
 
@@ -109,12 +106,6 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 				<div class="span12">
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						<ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
@@ -162,31 +153,32 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							</thead>
 							<tbody>
                             <?php
-							if(!isset($_GET["estNot"]) or !is_numeric($_GET["estNot"])){$estadoNot = 'AND not_estado=1';}
+							if(!isset($_GET["estNot"]) or !is_numeric($_GET["estNot"])){$estadoNot = 'AND not_estado=' . NOT_ESTADO_PENDIENTE;}
 							else{
 								switch($_GET["estNot"]){
-									case 1: $estadoNot = 'AND not_estado=1'; break;
-									case 2: $estadoNot = 'AND not_estado=2'; break;
-									case 3: $estadoNot = 'AND (not_estado=1 OR not_estado=2)'; break;
+									case 1: $estadoNot = 'AND not_estado=' . NOT_ESTADO_PENDIENTE; break;
+									case 2: $estadoNot = 'AND not_estado=' . NOT_ESTADO_COMPLETA; break;
+									case 3: $estadoNot = $estadoNot = 'AND (not_estado=' . NOT_ESTADO_PENDIENTE . ' OR not_estado=' . NOT_ESTADO_COMPLETA . ')';
+									break;
 								}
 							}
-							mysql_query("UPDATE notificaciones SET not_visto=1 WHERE not_usuario='".$_SESSION["id"]."' AND not_varios IS NULL",$conexion);
+							mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_usuario='".$_SESSION["id"]."' AND not_varios IS NULL");
 								
 							if(is_numeric($_GET["idNot"])){
-								mysql_query("UPDATE notificaciones SET not_visto=1 WHERE not_id='".$_GET["idNot"]."'",$conexion);
-								if(mysql_errno()!=0){echo mysql_error(); exit();}
-								mysql_query("DELETE FROM notificaciones WHERE not_seguimiento='".$_GET["idSeg"]."' AND not_id!='".$_GET["idNot"]."'",$conexion);
-								if(mysql_errno()!=0){echo mysql_error(); exit();}
-								mysql_query("UPDATE cliente_seguimiento SET cseg_usuario_encargado='".$_SESSION["id"]."' WHERE cseg_id='".$_GET["idSeg"]."'",$conexion);
-								if(mysql_errno()!=0){echo mysql_error(); exit();}
+								mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_id='".$_GET["idNot"]."'");
+								
+								mysqli_query($conexionBdPrincipal,"DELETE FROM notificaciones WHERE not_seguimiento='".$_GET["idSeg"]."' AND not_id!='".$_GET["idNot"]."'");
+								
+								mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_usuario_encargado='".$_SESSION["id"]."' WHERE cseg_id='".$_GET["idSeg"]."'");
+								
 							}	
 								
-							$consulta = mysql_query("SELECT * FROM notificaciones 
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM notificaciones 
 							INNER JOIN clientes ON cli_id=not_cliente 
 							WHERE not_usuario='".$_SESSION["id"]."' $estadoNot
-							ORDER BY not_id DESC",$conexion);
+							ORDER BY not_id DESC");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								switch($res['not_estado']){
 									case 1: $estado = 'Pendiente'; $etiquetaE='important'; break;
 									case 2: $estado = 'Completado'; $etiquetaE='success'; break;
@@ -208,12 +200,12 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
                                 <td><?=$res['not_asunto'];?></td>
                                 <td><?=$res['cli_nombre'];?></td>
                                 <td><?=$res['cli_telefono'];?></td>
-                                <td><a href="sql.php?get=20&id=<?=$res['not_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Cambiar de estado"><span class="label label-<?=$etiquetaE;?>"><?=$estado;?></span></a></td>
+                                <td><a href="bd_update/notificaciones-estado-actualizar.php?get=20&id=<?=$res['not_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Cambiar de estado"><span class="label label-<?=$etiquetaE;?>"><?=$estado;?></span></a></td>
                                 <td>	
 								<h4>
                                 	<a href="clientes-seguimiento.php?cte=<?=$res['cli_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Seguimiento del cliente" target="new"><i class="icon-list-ol"></i></a>
                                     <a href="clientes-contactos.php?cte=<?=$res['cli_id'];?>&emg=1" data-toggle="tooltip" title="Contactos del cliente" target="new"><i class="icon-group"></i></a>
-                                    <a href="sql.php?id=<?=$res['not_id'];?>&get=16" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar notificación"><i class="icon-remove-sign"></i></a>
+                                    <a href="bd_delete/notificaciones-eliminar.php?id=<?=$res['not_id'];?>&get=16" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar notificación"><i class="icon-remove-sign"></i></a>
                                 </h4>	
 								</td>
 								

@@ -5,14 +5,12 @@ $idPagina = 35;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-
-$consulta=$conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id='".$_GET["id"]."'");
+$consulta=$conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id='".$_GET["id"]."' AND mar_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <!-- styles -->
 <link href="css/chosen.css" rel="stylesheet">
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -52,7 +50,9 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
+					<?php if (Modulos::validarRol([173], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
             <p><a href="marcas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+					<?php } ?>
             <?php include("includes/notificaciones.php");?>
 			<div class="row-fluid">
 				<div class="span12">

@@ -139,7 +139,11 @@ include("includes/head.php");
             <?php include("includes/notificaciones.php");?>
             <p>
                 <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                <a href="proyectos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+								<?php
+									if (Modulos::validarRol([109], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+										echo ' <a href="proyectos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>';
+									}
+								?>               
             </p>
 
             
@@ -161,8 +165,8 @@ include("includes/head.php");
                         
 						<?php
 								$SQL = "SELECT * FROM proyectos
-									INNER JOIN usuarios ON usr_id=proy_responsable_principal
-								";
+									INNER JOIN usuarios ON usr_id=proy_responsable_principal WHERE proy_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'"
+								;
 						?>
 						
 						<div class="widget-container">
@@ -199,7 +203,7 @@ include("includes/head.php");
                             <?php
 							
 								$consulta = $conexionBdPrincipal->query("SELECT * FROM proyectos
-								INNER JOIN usuarios ON usr_id=proy_responsable_principal
+								INNER JOIN usuarios ON usr_id=proy_responsable_principal WHERE proy_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'
 								LIMIT $inicio, $limite
 								");
 							
@@ -249,7 +253,13 @@ include("includes/head.php");
 								
 								<td><?=$res['usr_nombre'];?></td>
 								
-								<td align="center" style="background:<?=$color1;?>;"><a href="proyectos-tareas.php?proy=<?=$res['proy_id'];?>"><?=$numeros[0];?></a></td>
+								<td align="center" style="background:<?=$color1;?>;">
+									<?php
+										if (Modulos::validarRol([273], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+											echo '<a href="proyectos-tareas.php?proy='.$res["proy_id"].'">'.$numeros[0].'</a>';
+										}
+									?>    
+								</td>
 								
 								<td><?=$numeros[1];?>%</td>
 							</tr>

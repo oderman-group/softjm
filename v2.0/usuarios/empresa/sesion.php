@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once($_SERVER['DOCUMENT_ROOT']."/softjm/constantes.php");
 if($_SESSION["id"]=="")
 header("Location:../../controlador/salir.php");
 else

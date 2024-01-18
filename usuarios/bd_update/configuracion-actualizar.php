@@ -9,42 +9,42 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 		$destino = RUTA_PROYECTO."/usuarios/files";
 		$archivo = subirArchivosAlServidor($_FILES['logo'], 'logo', $destino);
 
-		$conexionBdPrincipal->query("UPDATE configuracion SET conf_logo='" . $archivo . "' WHERE conf_id=1");
+		$conexionBdPrincipal->query("UPDATE configuracion SET conf_logo='" . $archivo . "' WHERE conf_id_empresa= '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 	}
 
 	$destino = RUTA_PROYECTO."/usuarios/images";
 	if ($_FILES['encabezadoCotizacion']['name'] != "") {
 		$archivo = subirArchivosAlServidor($_FILES['encabezadoCotizacion'], 'ec', $destino);
 
-		$conexionBdPrincipal->query("UPDATE configuracion SET conf_encabezado_cotizacion='" . $archivo . "' WHERE conf_id=1");
+		$conexionBdPrincipal->query("UPDATE configuracion SET conf_encabezado_cotizacion='" . $archivo . "' WHERE conf_id_empresa= '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 	}
 
 	if ($_FILES['pieCotizacion']['name'] != "") {
 		$archivo = subirArchivosAlServidor($_FILES['pieCotizacion'], 'pc', $destino);
 
-		$conexionBdPrincipal->query("UPDATE configuracion SET conf_pie_cotizacion='" . $archivo . "' WHERE conf_id=1");
+		$conexionBdPrincipal->query("UPDATE configuracion SET conf_pie_cotizacion='" . $archivo . "' WHERE conf_id_empresa= '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 	}
 
 	if ($_FILES['encabezadoCotizacion2']['name'] != "") {
 		$archivo2 = subirArchivosAlServidor($_FILES['encabezadoCotizacion2'], 'ec2', $destino);
 
-		$conexionBdPrincipal->query("UPDATE configuracion SET conf_encabezado2_cotizacion='" . $archivo2 . "' WHERE conf_id=1");
+		$conexionBdPrincipal->query("UPDATE configuracion SET conf_encabezado2_cotizacion='" . $archivo2 . "' WHERE conf_id_empresa= '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 	}
 
 	$destino = RUTA_PROYECTO."/usuarios/images";
 	if ($_FILES['encabezadoPedido']['name'] != "") {
 		$archivo = subirArchivosAlServidor($_FILES['encabezadoPedido'], 'ep', $destino);
-		$conexionBdPrincipal->query("UPDATE configuracion SET conf_encabezado_pedido='" . $archivo . "' WHERE conf_id=1");
+		$conexionBdPrincipal->query("UPDATE configuracion SET conf_encabezado_pedido='" . $archivo . "' WHERE conf_id_empresa= '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 	}
 
 	if ($_FILES['piePedido']['name'] != "") {
 		$archivo = subirArchivosAlServidor($_FILES['piePedido'], 'pp', $destino);
-		$conexionBdPrincipal->query("UPDATE configuracion SET conf_pie_pedido='" . $archivo . "' WHERE conf_id=1");
+		$conexionBdPrincipal->query("UPDATE configuracion SET conf_pie_pedido='" . $archivo . "' WHERE conf_id_empresa= '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 	}
 
 	if ($_FILES['encabezadoPedido2']['name'] != "") {
 		$archivo2 = subirArchivosAlServidor($_FILES['encabezadoPedido2'], 'ep2', $destino);
-		$conexionBdPrincipal->query("UPDATE configuracion SET conf_encabezado2_pedido='" . $archivo2 . "' WHERE conf_id=1");
+		$conexionBdPrincipal->query("UPDATE configuracion SET conf_encabezado2_pedido='" . $archivo2 . "' WHERE conf_id_empresa= '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 	}
 
 	$conexionBdPrincipal->query("UPDATE configuracion SET
@@ -73,8 +73,8 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     conf_comision_vendedores='" . $_POST["comisionVendedores"] . "', 
     conf_coreo_puntos='" . $_POST["correoPuntos"] . "', 
     conf_vencimiento_puntos='" . $_POST["fechaVencimientoSaldo"] . "', 
-    conf_cliente_imprimir_certificado='" . $_POST["clientesImprimir"] . "' 
-    WHERE conf_id=1");
+    conf_cliente_imprimir_certificado='" . $_POST["clientesImprimir"] . "', conf_terminos_condiciones='".$_POST["terminos"]."'
+    WHERE conf_id_empresa= '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 	
 	include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 	

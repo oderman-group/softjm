@@ -8,7 +8,7 @@ $paginaActual['pag_nombre'] = "FACTURA #".$_GET["id"];
 include("includes/head.php");
 $consultaD=mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas 
 INNER JOIN proveedores ON prov_id=factura_proveedor
-WHERE factura_id='".$_GET["id"]."'");
+WHERE factura_id='".$_GET["id"]."' AND factura_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consultaD, MYSQLI_BOTH);
 ?>
 
@@ -91,12 +91,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -111,8 +105,12 @@ include("includes/js-formularios.php");
 			
 			
 			<p>
+				<?php if (Modulos::validarRol([129], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="facturas-compra-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+				<?php } ?>
+				<?php if (Modulos::validarRol([376], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="#reportes/formato-remision-1.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
+				<?php } ?>
 				
 				<!--
 				<a href="sql.php?get=44&id=<?=$_GET["id"];?>" class="btn btn-warning" onClick="if(!confirm('Desea Enviar este mensaje al correo del contacto?')){return false;}"><i class="icon-envelope"></i> Enviar por correo</a>
@@ -127,7 +125,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="bd_update/facturas-compra-actualizar.php">
                             <input type="hidden" name="idSql" value="85">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
 							<input type="hidden" name="monedaActual" value="<?=$resultadoD['factura_moneda'];?>">
@@ -161,7 +159,7 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores");
+											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores WHERE prov_id_empresa='".$idEmpresa."'");
 											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>" <?php if($resultadoD['factura_proveedor']==$resOp[0]) echo "selected";?>><?=$resOp['prov_nombre'];?></option>
@@ -171,8 +169,9 @@ include("includes/js-formularios.php");
 										 </select>
 									 </div>
 									
-									
+									 		<?php if (Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 											<a href="proveedores-editar.php?id=<?=$resultadoD['factura_proveedor'];?>" class="btn btn-info" target="_blank">Editar proveedor</a>
+											<?php } ?>
 									
 									
 								</div>
@@ -241,11 +240,11 @@ include("includes/js-formularios.php");
 
 												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria 
-												WHERE prod_id=prod_id
+												WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."'
 												ORDER BY prod_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 													$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
-													WHERE czpp_producto='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['factura_id']."' AND czpp_tipo=4");
+													WHERE czpp_producto='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['factura_id']."' AND czpp_tipo='".CZPP_TIPO_FACT."'");
 													$productoN = mysqli_num_rows($consultaProducto);
 												?>
 													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_id'].". ".$resOp['prod_referencia']." ".$resOp['prod_nombre']." - [HAY ".$resOp['prod_existencias']."]";?></option>
@@ -312,7 +311,8 @@ include("includes/js-formularios.php");
 							$no = 1;
 							$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 							INNER JOIN productos_categorias ON catp_id=prod_categoria
-							INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='".$_GET["id"]."' AND czpp_tipo=4
+							INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='".$_GET["id"]."' AND czpp_tipo='".CZPP_TIPO_FACT."'
+							WHERE prod_id_empresa='".$idEmpresa."'
 							ORDER BY czpp_orden");
 							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 								$dcto = 0;
@@ -337,10 +337,14 @@ include("includes/js-formularios.php");
 							<tr>
 								<td><?=$no;?></td>
 								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-                                <td>
+                                <td> <?php //el codigo 43 no se encontro en el archivo sql ?> 
 									<a href="sql.php?get=43&idItem=<?=$prod['czpp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
-									<a href="sql.php?get=64&idItem=<?=$prod['czpp_id'];?>" onClick="if(!confirm('Desea replicar este producto?')){return false;}"><i class="icon-retweet"></i></a>
+									<?php if (Modulos::validarRol([215], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<a href="bd_create/replicar-productos-guardar.php?get=64&idItem=<?=$prod['czpp_id'];?>" onClick="if(!confirm('Desea replicar este producto?')){return false;}"><i class="icon-retweet"></i></a>
+									<?php } ?>
+									<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_nombre'];?></a><br>
+									<?php } ?>
 									
 									<span style="font-size: 9px; color: darkblue;"><?=$prod['prod_descripcion_corta'];?></span><br>
 										
@@ -350,7 +354,7 @@ include("includes/js-formularios.php");
 									<select data-placeholder="Escoja una opción..." class="chzn-select" tabindex="2" title="czpp_bodega" name="<?=$prod['czpp_id'];?>" onChange="productos(this)">
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM bodegas", $conexion);
+                                                $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM bodegas WHERE bod_id_empresa='".$idEmpresa."'", $conexion);
                                                 while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 													$consultaPpb=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_bodegas WHERE prodb_producto='".$prod['prod_id']."' AND prodb_bodega='".$resOp[0]."'");
 													$numPpb = mysqli_fetch_array($consultaPpb, MYSQLI_BOTH);
@@ -407,7 +411,7 @@ include("includes/js-formularios.php");
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									
 									
-										
+									
 									<a href="#reportes/formato-remision-1.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
 								</div>
 							</form>

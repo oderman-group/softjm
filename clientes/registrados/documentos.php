@@ -2,13 +2,10 @@
 include("sesion.php");
 include("sesion-documentos.php");
 
-$tituloPagina = "Mis Documentos";
-
 include("head.php");
 ?>
 
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 <link href="css/tablecloth.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
@@ -73,13 +70,13 @@ include("head.php");
 				<div class="span12">
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
             <?php include("notificaciones.php");?>
 			
-			<p><a href="sql.php?get=1" class="btn btn-warning"> Salir de documentos</a></p>
+			<p><a href="documentos-salir.php?get=1" class="btn btn-warning"> Salir de documentos</a></p>
 			
 			
 			
@@ -128,22 +125,22 @@ include("head.php");
 								
 							
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion
-							INNER JOIN clientes ON cli_id=cotiz_cliente
-							INNER JOIN usuarios ON usr_id=cotiz_creador
-							WHERE cotiz_cliente='".$_SESSION["id"]."'
+							INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id_empresa={$_SESSION['id_empresa']}
+							INNER JOIN usuarios ON usr_id=cotiz_creador AND usr_id_empresa={$_SESSION['id_empresa']}
+							WHERE cotiz_cliente='".$_SESSION["id_cliente"]."'
 							");
 							
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								
-								$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."'"), MYSQLI_BOTH);
+								$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."' AND usr_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
 								
 								$fondoCotiz = '';
 								if($res['cotiz_vendida']==1){
 									$fondoCotiz = 'aquamarine';
 								}
 								
-								$vencimiento = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT DATEDIFF(cotiz_fecha_vencimiento, now()) FROM cotizacion WHERE cotiz_id='".$res['cotiz_id']."'"), MYSQLI_BOTH);
+								$vencimiento = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT DATEDIFF(cotiz_fecha_vencimiento, now()) FROM cotizacion WHERE cotiz_id='".$res['cotiz_id']."' AND cotiz_id_empresa={$_SESSION['id_empresa']}"), MYSQLI_BOTH);
 								
 								if($vencimiento[0]<0){continue;}
 							?>
@@ -154,7 +151,7 @@ include("head.php");
 								<td>
 									<?php
 										$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
-										INNER JOIN productos ON prod_id=czpp_producto
+										INNER JOIN productos ON prod_id=czpp_producto AND prod_id_empresa={$_SESSION['id_empresa']}
 										WHERE czpp_cotizacion='".$res['cotiz_id']."'
 										");
 										$i = 1;
@@ -172,7 +169,7 @@ include("head.php");
 										</button>
 										<ul class="dropdown-menu">
 											
-											<li><a href="https://softjm.com/usuarios/reportes/formato-cotizacion-1.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
+											<li><a href="<?=REDIRECT_ROUTE?>/usuarios/reportes/formato-cotizacion-1.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
 											
 											
 										</ul>
@@ -201,12 +198,10 @@ include("head.php");
 							
                             <?php
 							$consultaC = mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
-							WHERE rem_cliente='".$_SESSION["id"]."' AND rem_fecha_certificado!=''
+							WHERE rem_cliente='".$_SESSION["id_cliente"]."' AND rem_fecha_certificado!=''
 							ORDER BY rem_id DESC
 							");
 							$no = 1;
-							$meses = array("","ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE");	
-							$estadosCertificados = array("","Vigente","Vencido","Provisional");
 							$labCert = array("","success","important","warning");
 							while($resC = mysqli_fetch_array($consultaC, MYSQLI_BOTH)){
 								$camposRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT 
@@ -225,7 +220,7 @@ include("head.php");
                                 <b>Equipo:</b> <?=$resC['rem_equipo'];?><br>
 								<b>Serial:</b> <?=$resC['rem_serial'];?><br>
 									
-									<?php if($resC['rem_estado_certificado']!=2){?>
+									<?php if($resC['rem_estado_certificado']!= REM_ESTADO_CERTIFICADO_VENCIDO){?>
 										<!--
 										<a href="http://softjm.com/v2.0/usuarios/empresa/lab-certificado-imprimir.php?id=<?=$resC['rem_id'];?>" target="_blank">Imprimir</a>
 										-->
@@ -233,7 +228,7 @@ include("head.php");
 										
 
 										<?php if($configu['conf_cliente_imprimir_certificado']==1){?>
-											<a href="https://softjm.com/v2.0/usuarios/empresa/lab-certificado-imprimir.php?id=<?=$resC['rem_id'];?>&cp=1" class="btn btn-danger" target="_blank">Imprimir certificado</a><br>
+											<a href="<?=REDIRECT_ROUTE?>/v2.0/usuarios/empresa/lab-certificado-imprimir.php?id=<?=$resC['rem_id'];?>&cp=1" class="btn btn-danger" target="_blank">Imprimir certificado</a><br>
 										<?php }else{?>
 											<a href="solicitud.php?id=<?=$resC['rem_id'];?>" class="btn btn-info">Solicitar copia</a>
 										<?php }?>

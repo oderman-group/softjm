@@ -4,7 +4,7 @@ $idPagina = 11;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET["id"]."'");
+$consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET["id"]."' AND cli_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
@@ -66,9 +66,14 @@ include("includes/js-formularios.php");
 				</div>
 			</div>
             <p>
+						<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="clientes-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+						<?php } ?>
 
+						<?php if (Modulos::validarRol([368], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="enviar_correos/clientes-enviar-credenciales.php?id=<?=$_GET["id"];?>" class="btn btn-info" onClick="if(!confirm('Desea ejecutar esta accion?')){return false;}"><i class="icon-envelope"></i> Enviar credenciales</a>
+						<?php } ?>
+
 			</p>
 
             <?php include("includes/notificaciones.php");?>
@@ -98,7 +103,7 @@ include("includes/js-formularios.php");
 
 												<input type="hidden" name="id" value="<?=$_GET["id"];?>">
 													<?php
-													if($datosUsuarioActual['usr_tipo']==1){$campoC = "text";} else{$campoC = "password";}
+													if(Modulos::validarRol([386], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){$campoC = "text";} else{$campoC = "password";}
 													?>
 													<fieldset class="default">
 														<legend>Datos básicos</legend>
@@ -118,6 +123,13 @@ include("includes/js-formularios.php");
 														<label class="control-label">Documento</label>
 														<div class="controls">
 															<input type="text" class="span4" name="usuarioCliente" value="<?=$resultadoD['cli_usuario'];?>" autocomplete="off" placeholder="Documento" title="Documento">
+														</div>
+													</div>
+
+													<div class="control-group">
+														<label class="control-label">Usuario de acceso</label>
+														<div class="controls">
+															<input type="text" class="span4" value="<?=$resultadoD['cli_usuario_acceso'];?>"  readonly name="usuarioAcceso" autocomplete="off">
 															Contraseña
 															<input type="<?php echo $campoC;?>" class="span4" name="claveCliente" value="<?=$resultadoD['cli_clave'];?>" autocomplete="off" placeholder="Contraseña" title="Contraseña">
 														</div>
@@ -239,7 +251,7 @@ include("includes/js-formularios.php");
 															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="zona" disabled>
 																<option value=""></option>
 																<?php
-																$conOp = $conexionBdPrincipal->query("SELECT * FROM zonas");
+																$conOp = $conexionBdPrincipal->query("SELECT * FROM zonas WHERE zon_id_empresa='".$idEmpresa."'");
 																while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 																?>
 																	<option value="<?=$resOp['zon_id'];?>" <?php if($resultadoD['cli_zona']==$resOp['zon_id']){echo "selected";}?>><?=$resOp['zon_nombre'];?></option>
@@ -258,9 +270,9 @@ include("includes/js-formularios.php");
 														<div class="controls">
 															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="categoria">
 																<option value=""></option>
-																<option value="1" <?php if($resultadoD['cli_categoria']==1){echo "selected";}?>>Prospecto</option>
-																<option value="2" <?php if($resultadoD['cli_categoria']==2){echo "selected";}?>>Cliente</option>
-																<option value="3" <?php if($resultadoD['cli_categoria']==3){echo "selected";}?>>Dealer</option>
+																<option value="<?= CLI_CATEGORIA_PROSPECTO ?>" <?php if($resultadoD['cli_categoria'] == CLI_CATEGORIA_PROSPECTO){echo "selected";} ?>>Prospecto</option>
+																<option value="<?= CLI_CATEGORIA_CLIENTE ?>" <?php if($resultadoD['cli_categoria'] == CLI_CATEGORIA_CLIENTE){echo "selected";} ?>>Cliente</option>
+																<option value="<?= CLI_CATEGORIA_DEALER ?>" <?php if($resultadoD['cli_categoria'] == CLI_CATEGORIA_DEALER){echo "selected";} ?>>Dealer</option>
 															</select>
 														</div>
 												   </div>
@@ -347,7 +359,7 @@ include("includes/js-formularios.php");
 															<select data-placeholder="Escoja una opción..." class="chzn-select span8" multiple tabindex="2" name="grupos[]">
 																<option value=""></option>
 																<?php
-																$conOp = $conexionBdPrincipal->query("SELECT * FROM dealer");
+																$conOp = $conexionBdPrincipal->query("SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
 																while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 																	$consulta = $conexionBdPrincipal->query("SELECT * FROM clientes_categorias WHERE cpcat_cliente='".$resultadoD['cli_id']."' AND cpcat_categoria='".$resOp[0]."'");
 																	$numD = $consulta->num_rows;
@@ -378,7 +390,7 @@ include("includes/js-formularios.php");
 															<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="asesor">
 																<option value=""></option>
 																<?php
-																$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre");
+																$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre AND usr_id_empresa='".$idEmpresa."'");
 																while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 																	$conultaAsociacion = $conexionBdPrincipal->query("SELECT * FROM clientes_usuarios WHERE cliu_usuario='".$resOp[0]."' AND cliu_cliente='".$_GET["id"]."'");
 																	$asociacion = $conultaAsociacion->num_rows;
@@ -445,7 +457,9 @@ include("includes/js-formularios.php");
 							<h3>Sucursales</h3>
 						</div>
 						<div class="widget-container">
-							<p><a href="clientes-sucursales-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar sucursal</a></p>
+							<?php if (Modulos::validarRol([84], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<p><a href="clientes-sucursales-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar sucursal</a></p>
+							<?php } ?>
 							<table class="table table-striped table-bordered" id="data-table">
 							<thead>
 							<tr>
@@ -460,9 +474,9 @@ include("includes/js-formularios.php");
                             <?php
 							$consulta = $conexionBdPrincipal->query("SELECT * FROM sucursales
 							INNER JOIN clientes ON cli_id=sucu_cliente_principal 
-							INNER JOIN localidad_ciudades ON ciu_id=sucu_ciudad 
-							INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
-							WHERE sucu_cliente_principal='".$_GET["id"]."'");
+							INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=sucu_ciudad 
+							INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
+							WHERE sucu_cliente_principal='".$_GET["id"]."' AND cli_id_empresa='".$idEmpresa."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 							?>
@@ -491,7 +505,9 @@ include("includes/js-formularios.php");
 															<h3>Contactos</h3>
 														</div>
 														<div class="widget-container">
+														<?php if (Modulos::validarRol([45], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<p><a href="clientes-contactos-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar contacto</a></p>
+														<?php } ?>
 														
 															<table class="table table-striped table-bordered" id="data-table">
 															<thead>
@@ -527,7 +543,9 @@ include("includes/js-formularios.php");
 																<td><?=$res['cont_email'];?></td>
 																<td><?=$sucursalNombre;?></td>
 																<td><h4>
+																<?php if (Modulos::validarRol([46], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																	<a href="clientes-contactos-editar.php?id=<?=$res[0];?>&cte=<?=$_GET["id"];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>
+																<?php } ?>
 																</h4></td>
 															</tr>
 															<?php $no++;}?>
@@ -549,7 +567,9 @@ include("includes/js-formularios.php");
 														</div>
 														<div class="widget-container">
 															<p>
+															<?php if (Modulos::validarRol([89], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																<a href="clientes-tikets-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar ticket</a>
+															<?php } ?>
 															</p>
 															<table class="table table-striped table-bordered" id="data-table">
 															<thead>
@@ -603,9 +623,15 @@ include("includes/js-formularios.php");
 																<td><?=$res['usr_nombre'];?></td>
 																<td><span class="label label-<?=$etiquetaE;?>"><?=$estado;?></span></td>
 																<td><span class="label label-<?=$etiquetaP;?>"><?=$prioridad;?></span></td>
-																<td><a href="clientes-seguimiento.php?idTK=<?=$res[0];?>" target="_blank"><span class="label label-info"><?=$numSeg;?></span><b></b></td>
+																<td>
+																	<?php if (Modulos::validarRol([12], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																		<a href="clientes-seguimiento.php?idTK=<?=$res[0];?>" target="_blank"><span class="label label-info"><?=$numSeg;?></span><b></b></td>
+																	<?php } ?>
 																<td><h4>
+																<?php if (Modulos::validarRol([90], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																	<a href="clientes-tikets-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>
+																<?php } ?>
+																	<!– codigo 24 no se encontro en el archivo sql.php–>
 																	<a href="sql.php?id=<?=$res[0];?>&get=24" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 																</h4></td>
 															</tr>
@@ -628,7 +654,9 @@ include("includes/js-formularios.php");
 														</div>
 														<div class="widget-container">
 															<p>
+															<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="clientes-seguimiento-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar seguimiento</a>
+															<?php } ?>	
 															</p>
 															<table class="table table-striped table-bordered" id="data-table">
 															<thead>
@@ -648,12 +676,12 @@ include("includes/js-formularios.php");
 															WHERE cseg_cliente='".$_GET["id"]."'");
 															$no = 1;
 															while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-																$consultaEncargado = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['cseg_usuario_encargado']."'");
+																$consultaEncargado = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['cseg_usuario_encargado']."' AND usr_id_empresa='".$idEmpresa."'");
 																$encargado = mysqli_fetch_array($consultaEncargado, MYSQLI_BOTH);
 
 																$consultaContacto = $conexionBdPrincipal->query("SELECT * FROM contactos WHERE cont_id='".$res['cseg_contacto']."'");
 																$contacto = mysqli_fetch_array($consultaContacto, MYSQLI_BOTH);
-																if($datosUsuarioActual[3]!=1){
+																if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 																	$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'");
 																	$numZ = $consultaNumZ->num_rows;
 																	if($numZ ==0 ) continue;
@@ -668,7 +696,7 @@ include("includes/js-formularios.php");
 
 																switch($res['cseg_realizado']){
 																	case 1: $html = '<span class="label label-success">Completado</span>'; break;
-																	default: $html = '<a href="sql.php?id='.$res['cseg_id'].'&get=28" class="label label-important">Pendiente</a>'; break;
+																	default: $html = '<a href="bd_update/cliente-seguimiento-estado-update.php?id='.$res['cseg_id'].'&get=28" class="label label-important">Pendiente</a>'; break;
 																}
 															?>
 															<tr>
@@ -686,8 +714,13 @@ include("includes/js-formularios.php");
 																	<?php if(isset($res['cont_email'])) echo "<br><b>Email:</b> ". $res['cont_email'];?>
 																	
 																	<h4 style="margin-top:10px;">
+																			<?php if (Modulos::validarRol([14], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<a href="clientes-seguimiento-editar.php?id=<?=$res[0];?>&cte=<?=$_GET["id"];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
+																			<?php } ?>
+																			<?php if (Modulos::validarRol([382], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<a href="sql.php?id=<?=$res[0];?>&get=4" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																			<?php // codigo 4 no se encontro en el archivo sql.php ?>
+																			<?php } ?>
 																	</h4>
 																</td>
 																<td <?=$fondoColor;?>>
@@ -722,7 +755,9 @@ include("includes/js-formularios.php");
 														</div>
 														<div class="widget-container">
 															<p>
+															<?php if (Modulos::validarRol([78], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="cotizaciones-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar cotización</a>
+															<?php } ?>
 															</p>
 															<table class="table table-striped table-bordered" id="data-table">
 															<thead>
@@ -740,10 +775,11 @@ include("includes/js-formularios.php");
 															$consulta = $conexionBdPrincipal->query("SELECT * FROM cotizacion
 															INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='".$_GET["id"]."'
 															INNER JOIN usuarios ON usr_id=cotiz_creador
+															WHERE cotiz_id_empresa='".$idEmpresa."'
 															");
 															$no = 1;
 															while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-																$consultaVendedor = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."'");
+																$consultaVendedor = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."' AND usr_id_empresa='".$idEmpresa."'");
 																$vendedor = mysqli_fetch_array($consultaVendedor, MYSQLI_BOTH);
 																
 																$fondoCotiz = '';
@@ -776,17 +812,24 @@ include("includes/js-formularios.php");
 																		</button>
 																		<ul class="dropdown-menu">
 																			<?php if($_SESSION["id"]==$res['cotiz_creador'] or $_SESSION["id"]==$res['cotiz_vendedor'] or $datosUsuarioActual[3]==1){?>
+																			<?php if (Modulos::validarRol([79], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<li><a href="cotizaciones-editar.php?id=<?=$res['cotiz_id'];?>#productos"> Editar</a></li>
+																			<?php } ?>
 
 																			<li><a href="sql.php?id=<?=$res['cotiz_id'];?>&get=22" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
-																			<?php }?>
-
+																			<?php } //el codigo 22 no se encontro en el archivo sql?>
+																			<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<li><a href="reportes/formato-cotizacion-1.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
-
+																			<?php } ?>
+																			
+																			<?php if (Modulos::validarRol([380], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<li><a href="sql.php?get=46&id=<?=$res['cotiz_id'];?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
-
+																			<?php } ?>		
+																			<?php //el codigo 46 no se encontro en el archivo sql ?> 
+																			<?php if (Modulos::validarRol([381], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<li><a href="sql.php?get=48&id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
-
+																			<?php } ?>		
+																			<?php //el codigo 48 no se encontro en el archivo sql ?> 
 																		</ul>
 																	</div>
 																</td>
@@ -809,7 +852,9 @@ include("includes/js-formularios.php");
 														</div>
 														<div class="widget-container">
 															<p>
+															<?php if (Modulos::validarRol([260], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="facturacion-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar factura</a>
+															<?php } ?>
 															</p>
 															<table class="table table-striped table-bordered" id="data-table">
 															<thead>
@@ -827,9 +872,9 @@ include("includes/js-formularios.php");
 															<?php
 															$consulta = $conexionBdPrincipal->query("SELECT * FROM facturacion
 															INNER JOIN clientes ON cli_id=fact_cliente
-															INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-															INNER JOIN localidad_departamentos ON dep_id=ciu_departamento
-															WHERE fact_cliente='".$_GET["id"]."'");
+															INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+															INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
+															WHERE fact_cliente='".$_GET["id"]."' AND fact_id_empresa='".$idEmpresa."'");
 															$no = 1;
 															while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 																$consultaAbonos = $conexionBdPrincipal->query("SELECT sum(fpab_valor) FROM facturacion_abonos WHERE fpab_factura='".$res['fact_id']."'");
@@ -870,13 +915,22 @@ include("includes/js-formularios.php");
 																	<b>Descuento:</b> $<?=number_format($descuento,0,",",".")." (".$res['fact_descuento']."%)";?><br>
 																</td>
 																<td><h4 style="margin-top:10px;">
+																<?php if (Modulos::validarRol([261], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                 	<a href="facturacion-editar.php?id=<?=$res['fact_id'];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
-                                    <a href="sql.php?id=<?=$res['fact_id'];?>&get=6" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;
+																<?php } ?>
+                                    <?php //el codigo 6 no se encontro en el archivo sql ?> 
+									<a href="sql.php?id=<?=$res['fact_id'];?>&get=6" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;
+																<?php if (Modulos::validarRol([92], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="#" onClick='window.open("facturacion-abonos.php?fact=<?=$res['fact_id'];?>","abonos","width=1200,height=800,menubar=no")' data-toggle="tooltip" title="Abonos"><i class="icon-money"></i></a>&nbsp;
+																<?php } ?>
+																<?php if (Modulos::validarRol([367], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="reportes/formato-factura-1.php?id=<?=$res['fact_id'];?>" data-toggle="tooltip" title="Imprimir factura" target="_blank"><i class="icon-print"></i></a>&nbsp;
-                                    <a href="sql.php?get=19&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea replicar este registro?')){return false;}" title="Replicar factura"><i class="icon-repeat"></i></a>&nbsp;
-                                    <?php if($saldoFinal>0){?>
-                                    <a href="sql.php?get=26&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea generar un abono automático por el saldo pendiente de esta factura?')){return false;}" title="Abono automático y saldar factura"><i class="icon-retweet"></i></a>
+																<?php } ?>
+																<?php if (Modulos::validarRol([311], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+                                    <a href="bd_create/replicar-factura-guardar.php?get=19&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea replicar este registro?')){return false;}" title="Replicar factura"><i class="icon-repeat"></i></a>&nbsp;
+																<?php } ?>
+                                    <?php if($saldoFinal>0 && Modulos::validarRol([299], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+                                    <a href="bd_create/abono-automatico-agregar.php?get=26&id=<?=$res['fact_id'];?>" data-toggle="tooltip" onClick="if(!confirm('Desea generar un abono automático por el saldo pendiente de esta factura?')){return false;}" title="Abono automático y saldar factura"><i class="icon-retweet"></i></a>
                                     <?php }?>
                                 </h4></td>
 															</tr>

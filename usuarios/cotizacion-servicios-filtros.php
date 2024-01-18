@@ -2,7 +2,6 @@
 include("sesion.php");
 
 $idPagina = 274;
-$tituloPagina = "Filtro de cotizaciones con servicios";
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
@@ -58,20 +57,14 @@ include("includes/js-formularios.php");
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
 						<li><a href="informes-todos.php">Informes</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -79,7 +72,7 @@ include("includes/js-formularios.php");
 				<div class="span12">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> <?=$tituloPagina;?></h3>
+							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="reportes/informe-cotizaciones-servicios.php" target="_blank">  
@@ -89,7 +82,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="responsable">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['usr_nombre'];?></option>
@@ -106,7 +99,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="vendedor">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['usr_nombre'];?></option>
@@ -140,7 +133,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="cliente">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['cli_nombre'];?></option>

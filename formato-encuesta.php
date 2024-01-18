@@ -1,4 +1,7 @@
-<?php include("usuarios/sesion.php");?>
+<?php 
+include("usuarios/sesion.php");
+$idPagina = 346;
+?>
 <?php
 $resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM encuesta_satisfaccion
 INNER JOIN clientes ON cli_id=encs_cliente

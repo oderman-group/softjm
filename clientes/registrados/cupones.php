@@ -1,12 +1,9 @@
 <?php 
 include("sesion.php");
 
-$tituloPagina = "Mis Cupones";
-
 include("head.php");
 ?>
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 <link href="css/tablecloth.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
@@ -71,7 +68,7 @@ include("head.php");
 				<div class="span12">
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -80,7 +77,7 @@ include("head.php");
 				<div class="span12">
 					<div class="content-widgets light-gray">
 						<div class="widget-head green">
-							<h3><?=$tituloPagina;?></h3>
+							<h3><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
 							<p>
@@ -100,8 +97,7 @@ include("head.php");
 							</thead>
 							<tbody>
                             <?php
-							$opcionesSINO = array("NO","SI");
-							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones WHERE cupo_cliente='".$_SESSION["id"]."'");
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM cupones WHERE cupo_cliente='".$_SESSION["id_cliente"]."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta)){
 							?>

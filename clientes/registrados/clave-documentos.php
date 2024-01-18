@@ -2,17 +2,15 @@
 include("sesion.php");
 
 $idPagina = 256;
-$tituloPagina = "Acceso a documentos";
 
 include("verificar-paginas.php");
 include("head.php");
 
 $resultadoD = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes 
-WHERE cli_id='".$_SESSION["id"]."'"), MYSQLI_BOTH);
+WHERE cli_id='".$_SESSION["id_cliente"]."'"), MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <link href="css/styles.css" rel="stylesheet">
-<link href="css/theme-wooden.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->
 <link rel="shortcut icon" href="ico/favicon.ico">
@@ -145,12 +143,12 @@ WHERE cli_id='".$_SESSION["id"]."'"), MYSQLI_BOTH);
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
                         
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -159,7 +157,7 @@ WHERE cli_id='".$_SESSION["id"]."'"), MYSQLI_BOTH);
 				<div class="span12">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> <?=$tituloPagina;?></h3>
+							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="autentico-documentos.php">
@@ -192,7 +190,7 @@ WHERE cli_id='".$_SESSION["id"]."'"), MYSQLI_BOTH);
 							
 							<p style="color: red;">La clave será enviada al correo administrativo.</p>
 							
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="recordar-clave-acceso-documentos.php">
                             	<input type="hidden" name="idSql" value="2">
 								
                                 <div class="control-group">

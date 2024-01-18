@@ -61,12 +61,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -83,7 +77,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="bd_create/factura-venta-guardar.php">
                             <input type="hidden" name="idSql" value="83">  
 
 
@@ -100,9 +94,9 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" onChange="clientes(this)" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-												if($datosUsuarioActual[3]!=1){
+												if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
 													$numZ = mysqli_num_rows($consultaZonas);
 													if($numZ==0) continue;
@@ -115,7 +109,7 @@ include("includes/js-formularios.php");
                                     	</select>
                                     </div>
 								   
-								   <?php if(is_numeric($_GET['cte'])){?>
+								   <?php if(is_numeric($_GET['cte']) && Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 								   		<a href="clientes-editar.php?id=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Editar cliente</a>
 								   <?php }?>
 								   
@@ -141,7 +135,7 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" onChange="provee(this)" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores");
+											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores WHERE prov_id_empresa='".$idEmpresa."'");
 											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>" <?php if(isset($_GET["prov"]) and $_GET["prov"]!="" and $_GET["prov"]==$resOp[0]) echo "selected";?>><?=$resOp['prov_nombre'];?></option>
@@ -151,7 +145,7 @@ include("includes/js-formularios.php");
 										 </select>
 									 </div>
 									
-									<?php if(is_numeric($_GET['prov'])){?>
+									<?php if(is_numeric($_GET['prov']) && Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 											<a href="proveedores-editar.php?id=<?=$_GET["prov"];?>" class="btn btn-info" target="_blank">Editar proveedor</a>
 									<?php }?>
 									
@@ -164,7 +158,7 @@ include("includes/js-formularios.php");
 								
 								<?php
 								$consultaInfo=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes 
-								WHERE cli_id='".$_GET['cte']."'");
+								WHERE cli_id='".$_GET['cte']."' AND cli_id_empresa='".$idEmpresa."'");
 								$clienteInfo = mysqli_fetch_array($consultaInfo, MYSQLI_BOTH);
 								?>
 								<div class="control-group">
@@ -191,7 +185,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([128], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="clientes-sucursales.php?cte=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Ver sucursales</a>
+									<?php } ?>        
                                </div>
 								
 								<div class="control-group">
@@ -218,7 +214,9 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
+									<?php if (Modulos::validarRol([128], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="clientes-contactos.php?cte=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Ver contactos</a>
+									<?php } ?>
                                </div>	
                                
 								<div class="control-group">
@@ -227,7 +225,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1 ORDER BY usr_nombre");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=strtoupper($resOp[4])." (".$resOp[5].")";?></option>
@@ -302,7 +300,7 @@ include("includes/js-formularios.php");
 
 												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria
-												WHERE prod_id=prod_id $filtroProd
+												WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' $filtroProd
 												ORDER BY prod_nombre
 												");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
@@ -321,7 +319,7 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="combo[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos 
+												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos WHERE combo_id_empresa='".$idEmpresa."'
 												ORDER BY combo_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												?>
@@ -339,7 +337,7 @@ include("includes/js-formularios.php");
 											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="servicio[]" multiple>
 												<option value=""></option>
 												<?php
-												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios 
+												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$idEmpresa."'
 												ORDER BY serv_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												?>

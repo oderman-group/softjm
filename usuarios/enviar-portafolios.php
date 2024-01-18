@@ -3,12 +3,11 @@ include("sesion.php");
 
 $idPagina = 110;
 $paginaActual['pag_nombre'] = "Enviar portafolios";
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
 if($_GET["em"]==3){
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_estado_mercadeo=3, cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='".$_SESSION["id"]."' WHERE cli_id='".$_GET["cte"]."'");	
+	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_estado_mercadeo=3, cli_estado_mercadeo_fecha=now(), cli_estado_mercadeo_usuario='".$_SESSION["id"]."' WHERE cli_id='".$_GET["cte"]."'  AND cli_id_empresa='".$idEmpresa."'");	
 }	
 ?>
 <!-- styles -->
@@ -63,7 +62,7 @@ include("includes/js-formularios.php");
                                             <select data-placeholder="Escoja varias opciones..." class="chzn-select span8" multiple tabindex="2" name="clientes[]">
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+                                                $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes  WHERE cli_id_empresa='".$idEmpresa."'");
                                                 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
                                                 ?>
                                                     <option value="<?=$resOp[0];?>" <?php if($resOp[0]==$_GET["cte"]){echo "selected";}?>><?=$resOp[1]." (".$resOp['cli_email'].")";?></option>
@@ -104,8 +103,11 @@ include("includes/js-formularios.php");
                                 
                                
 								<div class="form-actions">
+                                <?php if(Modulos::validarRol([365], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+                                    ?>
 									<button type="submit" class="btn btn-info"><i class="icon-envelope"></i> Enviar Portafolios</button>
-								</div>
+								<?php } ?>
+                                </div>
 							</form>
 						</div>
 					</div>

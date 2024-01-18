@@ -70,7 +70,11 @@ include("includes/head.php");
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span>
 							</button>
 							<ul class="dropdown-menu">
-                            	<li><a href="historial-acciones-filtro.php">Imprimir informe</a></li>
+							<?php
+								if (Modulos::validarRol([66], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+									echo '<li><a href="historial-acciones-filtro.php">Imprimir informe</a></li> ';
+								}
+							?>	               	
 							</ul>
 						</div>
             </p>
@@ -96,7 +100,7 @@ include("includes/head.php");
 							$consulta = $conexionBdPrincipal->query("SELECT * FROM ".BDADMIN.".historial_acciones
 							INNER JOIN ".MAINBD.".usuarios ON usr_id=hil_usuario
 							INNER JOIN ".BDADMIN.".paginas ON pag_id=hil_id_pagina
-							ORDER BY hil_id DESC
+							WHERE hil_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'ORDER BY hil_id DESC
 							LIMIT 0,300
 							");
 							$no = 1;

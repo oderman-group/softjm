@@ -5,8 +5,7 @@ $idPagina = 41;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-
-$consulta=$conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_id='".$_GET["id"]."'");
+$consulta=$conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_id='".$_GET["id"]."' AND catp_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
@@ -52,7 +51,9 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
+					<?php if (Modulos::validarRol([173], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
             <p><a href="categoriasp-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+					<?php } ?>
             <?php include("includes/notificaciones.php");?>
 			<div class="row-fluid">
 				<div class="span12">

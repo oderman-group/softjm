@@ -172,7 +172,7 @@ if($_POST["idSql"]==7){
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 	
 	if($_POST["cerrarTK"]==1){
-		mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado=2 WHERE tik_id='".$_POST["IDticket"]."'");
+		mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado='".TIK_ESTADO_CERRADO."' WHERE tik_id='".$_POST["IDticket"]."'");
 		
 	}
 	
@@ -366,7 +366,7 @@ if($_POST["idSql"]==10){
 }
 //AGREGAR FACTURAS
 if($_POST["idSql"]==11){
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_categoria=2, cli_fecha_ingreso=now() WHERE cli_id='".$_POST["cliente"]."' AND cli_categoria=1");
+	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_categoria='".CLI_CATEGORIA_CLIENTE."', cli_fecha_ingreso=now() WHERE cli_id='".$_POST["cliente"]."' AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."'");
 	
 	if($_POST["valor"]=="") $_POST["valor"]=0; if($_POST["descuento"]=="") $_POST["descuento"]=0; if($_POST["impuestos"]=="") $_POST["impuestos"]=0; if($_POST["retencion"]=="") $_POST["retencion"]=0;
 	mysqli_query($conexionBdPrincipal,"INSERT INTO facturacion(fact_cliente, fact_fecha, fact_valor, fact_estado, fact_usuario_responsable, fact_descripcion, fact_observacion, fact_descuento, fact_numero_fisica, fact_usuario_influyente, fact_fecha_real, fact_fecha_vencimiento, fact_tipo, fact_impuestos, fact_retencion)VALUES('".$_POST["cliente"]."',now(),'".$_POST["valor"]."','".$_POST["estado"]."','".$_SESSION["id"]."','".$_POST["descripcion"]."','".$_POST["observacion"]."','".$_POST["descuento"]."','".$_POST["numFisica"]."','".$_POST["influyente"]."','".$_POST["fechaFactura"]."','".$_POST["fechaVencimiento"]."','".$_POST["tipo"]."','".$_POST["impuestos"]."','".$_POST["retencion"]."')");
@@ -395,7 +395,7 @@ if($_POST["idSql"]==11){
 }
 //EDITAR FACTURAS
 if($_POST["idSql"]==12){
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_categoria=2, cli_fecha_ingreso=now() WHERE cli_id='".$_POST["cliente"]."' AND cli_categoria=1");
+	mysqli_query($conexionBdPrincipal,"UPDATE clientes SET cli_categoria='".CLI_CATEGORIA_CLIENTE."', cli_fecha_ingreso=now() WHERE cli_id='".$_POST["cliente"]."' AND cli_categoria='".CLI_CATEGORIA_PROSPECTO."'");
 	
 	if($_POST["valor"]=="") $_POST["valor"]=0; if($_POST["descuento"]=="") $_POST["descuento"]=0; if($_POST["impuestos"]=="") $_POST["impuestos"]=0; if($_POST["retencion"]=="") $_POST["retencion"]=0;
 	mysqli_query($conexionBdPrincipal,"UPDATE facturacion SET fact_cliente='".$_POST["cliente"]."', fact_valor='".$_POST["valor"]."', fact_descripcion='".$_POST["descripcion"]."', fact_estado='".$_POST["estado"]."', fact_observacion='".$_POST["observacion"]."', fact_ultima_modificacion=now(), fact_usuario_modificacion='".$_SESSION["id"]."', fact_descuento='".$_POST["descuento"]."', fact_numero_fisica='".$_POST["numFisica"]."', fact_usuario_influyente='".$_POST["influyente"]."', fact_fecha_real='".$_POST["fechaFactura"]."', fact_fecha_vencimiento='".$_POST["fechaVencimiento"]."', fact_tipo='".$_POST["tipo"]."', fact_impuestos='".$_POST["impuestos"]."', fact_retencion='".$_POST["retencion"]."' WHERE fact_id='".$_POST["id"]."'");
@@ -906,7 +906,7 @@ if($_POST["idSql"]==47){
 	
 	if(trim($_POST["nombreCliente"])!="" and trim($_POST["usuarioCliente"])!="" and trim($_POST["ciudadCliente"])!=""){
 		
-		$clienteV = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_usuario='".trim($_POST["usuarioCliente"])."'"));
+		$clienteV = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_usuario='".trim($_POST["usuarioCliente"])."' AND cli_id_empresa='".$idEmpresa."'"));
 		if($clienteV>0){
 			echo "<div style='font-family:arial; text-align:center'>Ya existe un cliente con este n&uacute;mero de NIT. Verifique para que no lo registre nuevamente.<br><br>
 			<a href='javascript:history.go(-1);'>[P&aacute;gina anterior]</a></span> | <a href='clientes.php'>[Ir a clientes]</a></div>";
@@ -915,7 +915,7 @@ if($_POST["idSql"]==47){
 		
 		$zona = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM ".BDADMIN.".localidad_ciudades WHERE ciu_id='".$_POST["ciudadCliente"]."'"));
 		
-		mysqli_query($conexionBdPrincipal,"INSERT INTO clientes(cli_nombre, cli_categoria, cli_email, cli_ciudad, cli_usuario, cli_clave, cli_zona, cli_fecha_registro, cli_fecha_ingreso, cli_celular, cli_responsable)VALUES('".$_POST["nombreCliente"]."',2,'".$_POST["emailCliente"]."','".$_POST["ciudadCliente"]."','".trim($_POST["usuarioCliente"])."','".$_POST["usuarioCliente"]."','".$zona[2]."',now(),now(),'".$_POST["celularCliente"]."','".$_SESSION["id"]."')");
+		mysqli_query($conexionBdPrincipal,"INSERT INTO clientes(cli_nombre, cli_categoria, cli_email, cli_ciudad, cli_usuario, cli_clave, cli_zona, cli_fecha_registro, cli_fecha_ingreso, cli_celular, cli_responsable, cli_id_empresa)VALUES('".$_POST["nombreCliente"]."',2,'".$_POST["emailCliente"]."','".$_POST["ciudadCliente"]."','".trim($_POST["usuarioCliente"])."','".$_POST["usuarioCliente"]."','".$zona[2]."',now(),now(),'".$_POST["celularCliente"]."','".$_SESSION["id"]."', '".$idEmpresa."')");
 		
 		$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 		
@@ -969,7 +969,7 @@ if($_POST["idSql"]==47){
 		move_uploaded_file($_FILES['imagen']['tmp_name'], $destino ."/".$archivo);
 	}
 	
-	mysqli_query($conexionBdPrincipal,"INSERT INTO remisiones(rem_fecha, rem_cliente, rem_equipo, rem_referencia, rem_serial, rem_descripcion, rem_estado, rem_asesor, rem_detalles, rem_dias_entrega, rem_dias_reclamar, rem_marca, rem_tipo_equipo, rem_precision_angular, rem_precision_distancia, rem_observacion_salida, rem_contacto, rem_fecha_registro, rem_tiempo_certificado, rem_archivo, rem_tipos_equipos)VALUES(now(), '".$_POST["cliente"]."', '".$_POST["equipo"]."', '".$_POST["referencia"]."', '".$_POST["serial"]."', '".$_POST["descripcion"]."', 1, '".$_SESSION["id"]."', '".$_POST["detalles"]."', '".$_POST["tiempoEntrega"]."', '".$_POST["tiempoReclamar"]."', '".$_POST["marca"]."', '".$_POST["tipoEquipo"]."', '".$_POST["pAngular"]."', '".$_POST["pDistancia"]."', '".$_POST["obsSalida"]."', '".$_POST["contacto"]."', now(), '".$_POST["vigenciaCerificado"]."', '".$archivo."', '".$_POST["tiposEquipos"]."')");
+	mysqli_query($conexionBdPrincipal,"INSERT INTO remisiones(rem_fecha, rem_cliente, rem_equipo, rem_referencia, rem_serial, rem_descripcion, rem_estado, rem_asesor, rem_detalles, rem_dias_entrega, rem_dias_reclamar, rem_marca, rem_tipo_equipo, rem_precision_angular, rem_precision_distancia, rem_observacion_salida, rem_contacto, rem_fecha_registro, rem_tiempo_certificado, rem_archivo, rem_tipos_equipos, rem_id_empresa)VALUES(now(), '".$_POST["cliente"]."', '".$_POST["equipo"]."', '".$_POST["referencia"]."', '".$_POST["serial"]."', '".$_POST["descripcion"]."', 1, '".$_SESSION["id"]."', '".$_POST["detalles"]."', '".$_POST["tiempoEntrega"]."', '".$_POST["tiempoReclamar"]."', '".$_POST["marca"]."', '".$_POST["tipoEquipo"]."', '".$_POST["pAngular"]."', '".$_POST["pDistancia"]."', '".$_POST["obsSalida"]."', '".$_POST["contacto"]."', now(), '".$_POST["vigenciaCerificado"]."', '".$archivo."', '".$_POST["tiposEquipos"]."', '".$idEmpresa."')");
 	
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 	$numero =(count($_POST["servicios"]));
@@ -1008,7 +1008,7 @@ if($_POST["idSql"]==48){
 		case 16: $_POST["equipo"] = 'Estuche'; break;	
 	}
 	
-	mysqli_query($conexionBdPrincipal,"UPDATE remisiones SET rem_tipo_equipo='".$_POST["tipoEquipo"]."', rem_equipo='".$_POST["equipo"]."', rem_referencia='".$_POST["referencia"]."', rem_serial='".$_POST["serial"]."', rem_descripcion='".$_POST["descripcion"]."', rem_detalles='".$_POST["detalles"]."', rem_dias_entrega='".$_POST["tiempoEntrega"]."', rem_dias_reclamar='".$_POST["tiempoReclamar"]."', rem_precision_angular='".$_POST["pAngular"]."', rem_precision_distancia='".$_POST["pDistancia"]."', rem_observacion_salida='".$_POST["obsSalida"]."', rem_marca='".$_POST["marca"]."', rem_fecha='".$_POST["fecha"]."', rem_tiempo_certificado='".$_POST["vigenciaCerificado"]."', rem_tipos_equipos='".$_POST["tiposEquipos"]."',
+	mysqli_query($conexionBdPrincipal,"UPDATE remisiones SET rem_tipo_equipo='".$_POST["tipoEquipo"]."', rem_equipo='".$_POST["equipo"]."', rem_referencia='".$_POST["referencia"]."', rem_serial='".$_POST["serial"]."', rem_descripcion='".$_POST["descripcion"]."', rem_detalles='".$_POST["detalles"]."', rem_dias_entrega='".$_POST["tiempoEntrega"]."', rem_dias_reclamar='".$_POST["tiempoReclamar"]."', rem_precision_angular='".$_POST["pAngular"]."', rem_precision_distancia='".$_POST["pDistancia"]."', rem_observacion_salida='".$_POST["obsSalida"]."', rem_marca='".$_POST["marca"]."', rem_fecha='".$_POST["fecha"]."', rem_tiempo_certificado='".$_POST["vigenciaCerificado"]."', rem_tipos_equipos='".$_POST["tiposEquipos"]."', rem_supervisor='".$_POST["supervisor"]."',
 	
 	rem_p1vd_grados='".$_POST["p1vd_grados"]."',
 	rem_p1vd_minutos='".$_POST["p1vd_minutos"]."',
@@ -1035,6 +1035,16 @@ if($_POST["idSql"]==48){
 	rem_p2hi_grados='".$_POST["p2hi_grados"]."',
 	rem_p2hi_minutos='".$_POST["p2hi_minutos"]."',
 	rem_p2hi_segundos='".$_POST["p2hi_segundos"]."',
+	
+	rem_n1_patron='".$_POST["n1_patron"]."',
+	rem_n1_equipo='".$_POST["n1_equipo"]."',
+	rem_n1_diferencia='".$_POST["n1_diferencia"]."',
+	rem_n2_patron='".$_POST["n2_patron"]."',
+	rem_n2_equipo='".$_POST["n2_equipo"]."',
+	rem_n2_diferencia='".$_POST["n2_diferencia"]."',
+	rem_n3_patron='".$_POST["n3_patron"]."',
+	rem_n3_equipo='".$_POST["n3_equipo"]."',
+	rem_n3_diferencia='".$_POST["n3_diferencia"]."',
 	
 	rem_l1a='".$_POST["l1a"]."',
 	rem_l1b='".$_POST["l1b"]."',
@@ -1087,7 +1097,6 @@ if($_POST["idSql"]==49){
 		$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='".$_POST["contacto"]."'"));
 		$remision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones WHERE rem_id='".$_POST["id"]."'"));
 		
-		$meses = array("","ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE");
 		$fechaHoy = date("d")." de ".$meses[date("m")]." del ".date("Y");
 			
 		$fin =  '<html><body style="background-color:'.$configuracion["conf_fondo_boletin"].';">';
@@ -1096,7 +1105,7 @@ if($_POST["idSql"]==49){
 						<p align="center"><img src="'.$configuracion["conf_url_encuestas"].'/usuarios/files/'.$configuracion["conf_logo"].'" width="350"></p>
 						<div style="font-family:arial; background:'.$configuracion["conf_fondo_mensaje"].'; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
 							
-							<h3 align="center" style="background:darkblue; color:white;">Notificación servicio técnico - JMEQUIPOS</h3>
+							<h3 align="center" style="background:darkblue; color:white;">Notificación servicio técnico - '.$_SESSION["dataAdicional"]['nombre_empresa'].'</h3>
 							
 							<p style="color:'.$configuracion["conf_color_letra"].';">
 							'.$fechaHoy.'<br><br>
@@ -1104,7 +1113,7 @@ if($_POST["idSql"]==49){
 							'.strtoupper($cliente['cli_nombre']).'.<br>
 							'.strtoupper($contacto['cont_nombre']).'.<br><br>
 							Cordial saludo,<br><br>
-							El departamento técnico de JMEQUIPOS SAS le informa que su equipo se encuentra en el siguiente estado:<br>
+							El departamento técnico de '.$_SESSION["dataAdicional"]['nombre_empresa'].' SAS le informa que su equipo se encuentra en el siguiente estado:<br>
 							<b>Fecha de entrada:</b> '.$remision["rem_fecha"].'<br>
 							<b>Equipo:</b> '.$remision["rem_equipo"].'<br>
 							<b>Referencia:</b> '.$remision["rem_referencia"].'<br>
@@ -1112,7 +1121,7 @@ if($_POST["idSql"]==49){
 							<b>NOTA:</b><br>
 							Para revisar este pendiente ingresa a nuestro sistema ORIÓN con tus datos de acceso, mediante el siguiente link.</p>
 							
-							<p align="center"><a href="https://softjm.com/clientes/index.php?idseg='.$idInsertU.'" target="_blank" style="color:'.$configuracion["conf_color_link"].';">VER EL SEGUIMIENTO</a></p>
+							<p align="center"><a href="'.REDIRECT_ROUTE.'/clientes/index.php?idseg='.$idInsertU.'" target="_blank" style="color:'.$configuracion["conf_color_link"].';">VER EL SEGUIMIENTO</a></p>
 							
 							<p align="center" style="color:'.$configuracion["conf_color_letra"].';">
 								<img src="'.$configuracion["conf_url_encuestas"].'/usuarios/files/'.$configuracion["conf_logo"].'" width="80"><br>
@@ -1128,7 +1137,7 @@ if($_POST["idSql"]==49){
 		$fin .=  '<html><body>';							
 		$sfrom="auxlaboratorio@jmequipos.com"; //LA CUETA DEL QUE ENVIA EL MENSAJE			
 		$sdestinatario=$contacto['cont_email'].", ".$cliente['cli_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-		$ssubject="Notificación servicio técnico - JMEQUIPOS"; //ASUNTO DEL MENSAJE 				
+		$ssubject="Notificación servicio técnico - ".$_SESSION["dataAdicional"]['nombre_empresa']; //ASUNTO DEL MENSAJE 				
 		$shtml=$fin; //MENSAJE EN SI			
 		$sheader="From:".$sfrom."\nReply-To:".$sfrom."\n"; 			
 		$sheader=$sheader."X-Mailer:PHP/".phpversion()."\n"; 			
@@ -1471,7 +1480,7 @@ if($_GET["get"]==28){
 }
 if($_GET["get"]==29){
 	//$idPagina = 100; include("verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado=2 WHERE tik_id='".$_GET["id"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_estado='".TIK_ESTADO_CERRADO."' WHERE tik_id='".$_GET["id"]."'");
 	
 	echo '<script type="text/javascript">window.location.href="'.$_SERVER['HTTP_REFERER'].'";</script>';
 	exit();
@@ -1487,43 +1496,8 @@ if($_GET["get"]==30){
 //Generar certificado
 if($_GET["get"]==31){
 	//$idPagina = 100; include("verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"UPDATE remisiones SET rem_generar_certificado=1, rem_fecha_certificado=now(), rem_estado_certificado=1, rem_fecha=now() WHERE rem_id='".$_GET["id"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE remisiones SET rem_generar_certificado=1, rem_fecha_certificado=now(), rem_estado_certificado='".REM_ESTADO_CERTIFICADO_VIGENTE."', rem_fecha=now() WHERE rem_id='".$_GET["id"]."'");
 	
-		/*
-		$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'"));
-		$fin =  '<html><body style="background-color:'.$configuracion["conf_fondo_boletin"].';">';
-		$fin .= '
-					<center>
-						<p align="center"><img src="'.$configuracion["conf_url_encuestas"].'/usuarios/files/'.$configuracion["conf_logo"].'" width="350"></p>
-						<div style="font-family:arial; background:'.$configuracion["conf_fondo_mensaje"].'; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
-							
-							<p style="color:'.$configuracion["conf_color_letra"].';">'.strtoupper($cliente['cli_nombre']).',<br>
-							Le informamos que su equipo está listo para ser entregado. El certificado <b>No. C'.$_GET["id"].'</b> ya fue generado.<br>
-							Agradecemos acercarse a las oficinas de <strong>JMENDOZA EQUIPOS</strong> a reclamar su equipo.
-							</p>
-							
-							<p align="center" style="color:'.$configuracion["conf_color_letra"].';">
-								<img src="'.$configuracion["conf_url_encuestas"].'/usuarios/files/'.$configuracion["conf_logo"].'" width="80"><br>
-								'.$configuracion["conf_mensaje_pie"].'<br>
-								<a href="'.$configuracion["conf_web"].'" style="color:'.$configuracion["conf_color_link"].';">'.$configuracion["conf_web"].'</a>
-							</p>
-							
-						</div>
-					</center>
-					<p>&nbsp;</p>
-				';	
-		$fin .='';						
-		$fin .=  '<html><body>';							
-		$sfrom=$configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
-		$sdestinatario=$cliente['cli_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-		$ssubject="Su equipo está listo para reclamar"; //ASUNTO DEL MENSAJE 				
-		$shtml=$fin; //MENSAJE EN SI			
-		$sheader="From:".$sfrom."\nReply-To:".$sfrom."\n"; 			
-		$sheader=$sheader."X-Mailer:PHP/".phpversion()."\n"; 			
-		$sheader=$sheader."Mime-Version: 1.0\n"; 		
-		$sheader=$sheader."Content-Type: text/html; charset=UTF-8\r\n"; 			
-		@mail($sdestinatario,$ssubject,$shtml,$sheader);
-		*/
 ?>
 		
 <?php
@@ -1555,7 +1529,7 @@ if($_GET["get"]==32){
 							<b>Equipo:</b> '.$remision["rem_equipo"].'<br>
 							<b>Referencia:</b> '.$remision["rem_referencia"].'<br>
 							<b>Serial:</b> '.$remision['rem_serial'].'<br>
-							<b>LINK DE DESCARGA:</b><br> https://softjm.com/v2.0/usuarios/empresa/lab-remisiones-imprimir.php?id='.$_GET["id"].'&estado='.$remision["rem_estado"].'<br>
+							<b>LINK DE DESCARGA:</b><br> '.REDIRECT_ROUTE.'/v2.0/usuarios/empresa/lab-remisiones-imprimir.php?id='.$_GET["id"].'&estado='.$remision["rem_estado"].'<br>
 							</p>
 							
 							<p align="center" style="color:'.$configuracion["conf_color_letra"].';">
@@ -1572,7 +1546,7 @@ if($_GET["get"]==32){
 		$fin .=  '<html><body>';							
 		$sfrom=$configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
 		$sdestinatario=$contacto['cont_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-		$ssubject="Remisión de su equipo - JMEQUIPOS"; //ASUNTO DEL MENSAJE 				
+		$ssubject="Remisión de su equipo - ".$_SESSION["dataAdicional"]['nombre_empresa']; //ASUNTO DEL MENSAJE 				
 		$shtml=$fin; //MENSAJE EN SI			
 		$sheader="From:".$sfrom."\nReply-To:".$sfrom."\n"; 			
 		$sheader=$sheader."X-Mailer:PHP/".phpversion()."\n"; 			

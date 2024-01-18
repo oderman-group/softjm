@@ -47,14 +47,14 @@ if ($_POST["liquidada"]) {
 
     //Cantidad de productos asociados
     $productoNum = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT SUM(czpp_cantidad) FROM cotizacion_productos
-    WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=5"));
+    WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo='".CZPP_TIPO_IMPORTACION."'"));
     
 
     $valorRepartido = ($facturasValor[0] / $productoNum[0]);
 
     //Consulto productos
     $productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
-    WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo=5");
+    WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_tipo='".CZPP_TIPO_IMPORTACION."'");
     
 
     //Actualizo el costo y las cantidades en la bodega general

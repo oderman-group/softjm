@@ -2,12 +2,12 @@
 include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 245;
-$tituloPagina = "Editar remisión";
+
 include("verificar-paginas.php");
 
 $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones 
 INNER JOIN usuarios ON usr_id=rem_asesor
-WHERE rem_id='".$_GET["id"]."'");
+WHERE rem_id='".$_GET["id"]."' AND rem_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 $consultaAnulado = mysqli_query($conexionBdPrincipal,"SELECT * FROM certificados_anulados WHERE certanu_id_certificado='".$_GET["id"]."'");
@@ -15,7 +15,6 @@ $numAnulado=mysqli_num_rows($consultaAnulado);
 $version="";
 if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 	$version='
-	<div class="row">
 		<div class="col-sm-12 col-lg-6">
 			<div class="form-group row">
 				<label for="fname" class="col-sm-3 text-right control-label col-form-label">Versión del certificado</label>
@@ -24,7 +23,6 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 				</div>
 			</div>
 		</div>
-	</div>
 	';
 }
 ?>
@@ -72,7 +70,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-5 align-self-center">
-                        <h4 class="page-title"><?=$tituloPagina;?></h4>
+                        <h4 class="page-title"><?=$paginaActual['pag_nombre'];?></h4>
                     </div>
                     <div class="col-7 align-self-center">
                         <div class="d-flex align-items-center justify-content-end">
@@ -81,7 +79,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
                                     <li class="breadcrumb-item">
                                         <a href="lab-remisiones.php">Remisiones</a>
                                     </li>
-                                    <li class="breadcrumb-item active" aria-current="page"><?=$tituloPagina;?></li>
+                                    <li class="breadcrumb-item active" aria-current="page"><?=$paginaActual['pag_nombre'];?></li>
                                 </ol>
                             </nav>
                         </div>
@@ -102,7 +100,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
+                            <form class="form-horizontal" method="post" action="lab-remisiones-actualizar.php" enctype="multipart/form-data">
 								<input type="hidden" name="idSql" value="48">
 								<input type="hidden" name="id" value="<?=$_GET["id"];?>">
 								
@@ -124,13 +122,13 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 											}
 											if($resultadoD['rem_generar_certificado']==1 and $resultadoD['rem_estado']==1){
 										?>
-										<a href="sql.php?get=30&id=<?=$resultadoD['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Remisión salida</a>
+										<a href="salida-remision-actualizar.php?get=30&id=<?=$resultadoD['rem_id'];?>" onClick="if(!confirm('Desea generar salida a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Remisión salida</a>
 										<?php 
 											}
 											$disabled="";
 											if($resultadoD['rem_generar_certificado']!=1){
 										?>
-										<a href="sql.php?get=31&id=<?=$resultadoD['rem_id'];?>&cte=<?=$resultadoD['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Generar Certificado</a>
+										<a href="generar-certificado.php?get=31&id=<?=$resultadoD['rem_id'];?>&cte=<?=$resultadoD['rem_cliente'];?>" onClick="if(!confirm('Desea generar certificado a este equipo?')){return false;}" target="_blank" class="btn btn-success waves-effect waves-light">Generar Certificado</a>
 										<?php 
 											}else{
 												$disabled="disabled";
@@ -150,7 +148,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 								
                                 <div class="card-body">
 									
-									<?php if($resultadoD['rem_archivo']!=""){echo '<p><a href="sql.php?get=33&id='.$resultadoD["rem_id"].'" title="Eliminar">X</a> <img src="../../../usuarios/files/adjuntos/'.$resultadoD["rem_archivo"].'" width="50"></p>';}?>
+									<?php if($resultadoD['rem_archivo']!=""){ echo '<p><a href="quitar-imagen-remision.php?get=33&id='.$resultadoD["rem_id"].'" title="Eliminar">X</a> <img src="../../../usuarios/files/adjuntos/'.$resultadoD["rem_archivo"].'" width="50"></p>';}?>
 									
 										<h4 class="card-title">Datos básicos</h4>
 									
@@ -276,8 +274,8 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 													<div class="col-sm-9">
 														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="tiposEquipos" <?=$disabled;?>>
 															<option value="2">--</option>
-															<option value="1" <?php if($resultadoD['rem_tipos_equipos']==1){echo "selected";} ?>>Nuevo</option>
-															<option value="2" <?php if($resultadoD['rem_tipos_equipos']==2){echo "selected";} ?>>Usado</option>
+															<option value="<?= REM_TIPOS_EQUIPOS_NUEVO?>" <?php if($resultadoD['rem_tipos_equipos']==REM_TIPOS_EQUIPOS_NUEVO){echo "selected";} ?>>Nuevo</option>
+															<option value="<?= REM_TIPOS_EQUIPOS_USADO?>" <?php if($resultadoD['rem_tipos_equipos']==REM_TIPOS_EQUIPOS_USADO){echo "selected";} ?>>Usado</option>
 														</select>
 													</div>
 												</div>
@@ -352,7 +350,18 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 										</div>
 									</div>
 									
-									<?=$version;?>
+									<div class="row">
+										<?=$version;?>
+
+										<div class="col-sm-12 col-lg-6">
+											<div class="form-group row">
+												<label for="fname" class="col-sm-3 text-right control-label col-form-label">Supervisor de Laboratorio</label>
+												<div class="col-sm-9">
+													<input type="text" class="form-control" id="fname" name="supervisor" value="<?=$resultadoD['rem_supervisor'];?>" <?=$disabled;?>>
+												</div>
+											</div>
+										</div>
+									</div>
 									
 									
 									
@@ -464,7 +473,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 													<tr align="center">
 														<td><input value="<?=$resultadoD['rem_p2vd_grados'];?>" name="p2vd_grados" style="text-align: center;" <?=$disabled;?>></td>
 														<td><input value="<?=$resultadoD['rem_p2vd_minutos'];?>" name="p2vd_minutos" style="text-align: center;" <?=$disabled;?>></td>
-														<td><input value="<?=$resultadoD['rem_p2vd_segundos'];?>" name="p2vd_segundos" style="text-align: center;"></td>
+														<td><input value="<?=$resultadoD['rem_p2vd_segundos'];?>" name="p2vd_segundos" style="text-align: center;" <?=$disabled;?>></td>
 													</tr>
 													<tr align="center">
 														<td><input value="<?=$resultadoD['rem_p2hd_grados'];?>" name="p2hd_grados" style="text-align: center;" <?=$disabled;?>></td>
@@ -515,6 +524,59 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 											</td>
 										</tr>
 									</table>
+									<p>&nbsp;</p>
+
+									<h4 style="color: darkblue;">MENSURADO<br>N°1 PRISMA; N°2 LASERA; N°3 DIANA</h4>
+									<table style="width:100%; padding: 10px; margin-top: 30px;" border="0">
+										<tr>
+											<td>
+												<table style="width:100%; padding: 10px;" border="1" rules="all">
+													<tr style="color: darkblue;" align="center">
+														<td>MENSURADO</td>
+														<td>PATRON</td>
+														<td>EQUIPO AJUSTADO</td>
+														<td>DIFERENCIA</td>
+													</tr>
+													<?php
+														$valor="";
+														$valorN1P="11.591";
+														$valorN2P="11.620";
+														$valorN3P="11.605";
+														$disabledM="";
+														$mensaje="";
+														if ($resultadoD['rem_tipo_equipo'] == 2) {
+															$valor="N/A";
+															$valorN1P="N/A";
+															$valorN2P="N/A";
+															$valorN3P="N/A";
+															$disabledM="disabled";
+															$mensaje="<span>Nota: NO Aplica en este equipo (N/A)</span>";
+														}
+													?>
+													<tr align="center">
+														<td>Nº1</td>
+														<td><input name="n1_patron" style="text-align: center;" disabled value="<?=$valorN1P;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n1_equipo'];?>" name="n1_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n1_diferencia'];?>" name="n1_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+													</tr>
+													<tr align="center">
+														<td>Nº2</td>
+														<td><input name="n2_patron" style="text-align: center;" disabled value="<?=$valorN2P;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n2_equipo'];?>" name="n2_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n2_diferencia'];?>" name="n2_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+													</tr>
+													<tr align="center">
+														<td>Nº3</td>
+														<td><input name="n3_patron" style="text-align: center;" disabled value="<?=$valorN3P;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n3_equipo'];?>" name="n3_equipo" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+														<td><input value="<?=$resultadoD['rem_n3_diferencia'];?>" name="n3_diferencia" style="text-align: center;" <?=$disabled;?> <?=$disabledM;?> value="<?=$valor;?>"></td>
+													</tr>
+												</table>
+												<?=$mensaje;?>
+											</td>
+										</tr>
+									</table>
+									<p>&nbsp;</p>
 									
 									<?php }?>
 									
@@ -600,7 +662,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 													<div class="col-sm-9">	
 														<select class="select2 form-control custom-select" multiple="multiple" style="width: 100%; height:36px;" name="servicios[]" <?=$disabled;?>>
 																	<?php
-																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios");
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios WHERE serv_id_empresa='".$idEmpresa."'");
 																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																		
 																		$consultaOpciones=mysqli_query($conexionBdPrincipal,"SELECT * FROM remisiones_servicios WHERE remxs_id_remision='".$_GET["id"]."' AND remxs_id_servicio='".$datosSelect[0]."'");
@@ -620,7 +682,7 @@ if($numAnulado>0 && $resultadoD['rem_generar_certificado']==1){
 														<select class="select2 form-control custom-select" style="width: 100%; height:36px;" name="cliente" <?=$disabled;?>>
 															<option>Cliente</option>
 																	<?php
-																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes");
+																	$consultaSelect = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 																	while($datosSelect = mysqli_fetch_array($consultaSelect, MYSQLI_BOTH)){
 																		
 																		//Solo Vendedores externos

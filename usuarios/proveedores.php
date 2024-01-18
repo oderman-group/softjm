@@ -1,7 +1,6 @@
 <?php include("sesion.php");
 
 $idPagina = 123;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
@@ -131,8 +130,12 @@ include("includes/head.php");
             <?php include("includes/notificaciones.php");?>
             <p>
                 <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+                <?php if (Modulos::validarRol([124], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                 <a href="proveedores-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+                <?php } ?>
+                <?php if (Modulos::validarRol([236], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="proveedores-importar.php" class="btn btn-success"><i class="icon-upload"></i> Carga masiva</a>
+                <?php } ?>
             </p>
 
             
@@ -147,10 +150,10 @@ include("includes/head.php");
 					<div class="widget-container">
                 <a href="proveedores.php" style="margin-bottom:10px;">TODOS</a><br>
                 <?php
-                if($datosUsuarioActual[3]==1){
+                if(Modulos::validarRol([387], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 					$departamentos = mysqli_query($conexionBdAdmin,"SELECT * FROM localidad_departamentos ORDER BY dep_nombre");
 				}else{
-					$departamentos = mysqli_query($conexionBdAdmin,"SELECT * FROM localidad_departamentos
+					$departamentos = mysqli_query($conexionBdPrincipal,"SELECT * FROM ".BDADMIN.".localidad_departamentos
 					INNER JOIN zonas_usuarios ON zpu_usuario='".$_SESSION["id"]."' AND zpu_zona=dep_id
 					ORDER BY dep_nombre
 					");
@@ -160,7 +163,8 @@ include("includes/head.php");
 					
                     $consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores 
 					INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=prov_ciudad
-					INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$deptos[0]."'");
+					INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$deptos[0]."'
+                    WHERE  prov_id_empresa='".$idEmpresa."'");
 					$contarClientes = mysqli_num_rows($consultaClientes);
                 ?>
                     <a href="proveedores.php?dpto=<?=$deptos[0];?>" style="margin-bottom:10px; color:<?=$color;?>"><?=$deptos[1]." (".$contarClientes.")";?></a><br>
@@ -227,7 +231,7 @@ include("includes/head.php");
                                 LEFT JOIN ".BDADMIN.".localidad_paises ON pais_id=prov_pais
 								LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=prov_ciudad
 								LEFT JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento $filtroDepto
-								WHERE prov_eliminado='0' ".$filtro."
+								WHERE prov_eliminado='0'  AND prov_id_empresa='".$idEmpresa."' ".$filtro."
 								LIMIT $inicio, $limite
 								");
 							$no = 1;
@@ -251,8 +255,12 @@ include("includes/head.php");
 									<?php if($res['prov_direccion']!="") echo "<br><b>Dirección:</b> ". $res['prov_direccion'];?>
 									
                                     <h4 style="margin-top:5px;">
+                                    <?php if (Modulos::validarRol([125], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                         <a href="proveedores-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
+                                    <?php } ?>
+                                    <?php if (Modulos::validarRol([404], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                         <a href="bd_delete/proveedores-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+                                    <?php } ?>
                                 	</h4>
                                 </td>
 								<td>

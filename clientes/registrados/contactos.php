@@ -1,8 +1,6 @@
 <?php 
 include("sesion.php");
 
-$tituloPagina = "Mis Contactos";
-
 include("head.php");
 
 $cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'"), MYSQLI_BOTH);
@@ -71,11 +69,11 @@ $cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM c
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$tituloPagina;?></h3>
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$tituloPagina;?></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
 			</div>
@@ -88,7 +86,7 @@ $cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM c
 				<div class="span12">
 					<div class="content-widgets light-gray">
 						<div class="widget-head green">
-							<h3><?=$tituloPagina;?></h3>
+							<h3><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
 							<p></p>
@@ -107,10 +105,10 @@ $cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM c
 							<tbody>
                             <?php
 							$roles = array("","Topógrafo", "Administrativo", "Otro");
-							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$_SESSION["id"]."'");
+							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$_SESSION["id_cliente"]."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-								$sucursal = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_id='".$res['cont_sucursal']."'"), MYSQLI_BOTH);
+								$sucursal = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM sucursales WHERE sucu_id='".$res['cont_sucursal']."' AND sucu_cliente_principal={$_SESSION["id_cliente"]}"), MYSQLI_BOTH);
 							?>
 							<tr>
 								<td><?=$no;?></td>

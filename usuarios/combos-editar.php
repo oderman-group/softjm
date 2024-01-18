@@ -9,7 +9,7 @@ $consultaCombos=$conexionBdPrincipal->query("SELECT * FROM combos WHERE combo_id
 $resultadoD = mysqli_fetch_array($consultaCombos, MYSQLI_BOTH);
 
 $disabled="disabled";
-if($datosUsuarioActual['usr_tipo']==1){
+if(Modulos::validarRol([388], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 	$disabled="";
 }
 ?>
@@ -188,7 +188,7 @@ include("includes/js-formularios.php");
  
 								<div class="form-actions">
 
-									<?php if($datosUsuarioActual['usr_tipo'] == 1){?>
+									<?php if(Modulos::validarRol([217], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									<?php }?>
 									
@@ -255,10 +255,14 @@ include("includes/js-formularios.php");
 							<tr>
 								<td><?=$no;?></td>
                                 <td>
-									<?php if ($datosUsuarioActual['usr_tipo'] == 1 ) { ?>
-										<a href="sql.php?get=55&idItem=<?=$prod['copp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
+									<?php if (Modulos::validarRol([305], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+										<a href="bd_delete/combo-productos-eliminar.php?get=55&idItem=<?=$prod['copp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
 									<?php } ?>
+									<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_id']." - ".$prod['prod_nombre'];?></a>
+									<?php } else {?>
+									<span><?=$prod['prod_id']." - ".$prod['prod_nombre'];?></span>
+									<?php } ?>
 								</td>
                                 <td><input type="number" title="copp_cantidad" name="<?=$prod['copp_id'];?>" value="<?=$prod['copp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;" <?=$disabled;?>></td>
                                 <td>$<?=number_format($prod['copp_precio'],0,",",".");?></td>

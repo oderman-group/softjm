@@ -61,12 +61,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -84,7 +78,7 @@ include("includes/js-formularios.php");
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="sql.php" enctype="multipart/form-data">
-                            <input type="hidden" name="idSql" value="11">
+                            <input type="hidden" name="idSql" value="11"> <?php //el codigo 11 no se encontro en el archivo sql ?> 
                             <input type="hidden" name="observacion" value="">
                             <input type="hidden" name="influyente" value="0">
                             <input type="hidden" name="descuento" value="0">

@@ -59,12 +59,6 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
-                        <ul class="top-right-toolbar">
-							<li><a data-toggle="dropdown" class="dropdown-toggle blue-violate" href="#" title="Users"><i class="icon-user"></i></a>
-							</li>
-							<li><a href="#" class="green" title="Upload"><i class=" icon-upload-alt"></i></a></li>
-							<li><a href="#" class="bondi-blue" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
                         
 					</div>
 					<ul class="breadcrumb">
@@ -74,7 +68,11 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
-            <p><a href="encuesta-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
+					<?php
+							if (Modulos::validarRol([230], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+								echo '<p><a href="encuesta-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>';
+							}
+						?>	   
             <?php include("includes/notificaciones.php");?>
 			<div class="row-fluid">
 				<div class="span12">
@@ -83,7 +81,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="sql.php">
+							<form class="form-horizontal" method="post" action="bd_update/encuestas-actualizar.php">
                             <input type="hidden" name="idSql" value="29">
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
   
@@ -117,7 +115,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="usuario">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['usr_id'];?>" <?php if($resultadoD['encs_atendido']==$resOp[0]){echo "selected";}?>><?=$resOp['usr_nombre'];?></option>
@@ -135,7 +133,7 @@ include("includes/js-formularios.php");
 											<option value="0"></option>
                                             <option value="0">Ninguno</option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp['prod_id'];?>" <?php if($resultadoD['encs_producto']==$resOp[0]){echo "selected";}?>><?=$resOp['prod_nombre'];?></option>

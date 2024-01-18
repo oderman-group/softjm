@@ -1,3 +1,6 @@
+<?php 
+include("logica-menu.php");
+?>	
 <div class="loader"></div>
 
 <?php if( $datosUsuarioActual['usr_tipo']==1 || isset($_SESSION['admin']) ){?>
@@ -23,173 +26,74 @@
 require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 ?>
 
-
-
 <div class="navbar navbar-inverse top-nav">
 		<div class="navbar-inner">
 			<div class="container">
 				<span class="home-link"><a href="index.php" class="icon-home"></a></span>
 				<div class="nav-collapse">
 					<ul class="nav">
+					<li><a style="font-weight: bold; color: yellow; font-size: 14px;"><?= $_SESSION["dataAdicional"]["nombre_empresa"]; ?></a></li>
+					<?php foreach ($menu as $menu_item) : ?>
+						<li class="dropdown">
+							<?php if (Modulos::validarAccesoModulo($configuracion['conf_id_empresa'], $menu_item['mod_id'], $conexionBdAdmin, $datosUsuarioActual)) { ?>
+								<?php if (!empty($menu_item['ruta_pagina'])) : ?>
+									<a href="<?= REDIRECT_ROUTE . '/' . $menu_item['ruta_pagina']; ?>">
+										<i class="<?= $menu_item['mod_icon']; ?>"></i> <?= $menu_item['mod_nombre']; ?>
+									</a>
+								<?php else : ?>
+									<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+										<i class="<?= $menu_item['mod_icon']; ?>"></i> <?= $menu_item['mod_nombre']; ?> <b class="icon-angle-down"></b>
+									</a>
+								<?php endif; ?>
+							<?php } ?>
 
-						<li><a style="font-weight: bold; color: yellow; font-size: 14px;"><?=$_SESSION["dataAdicional"]["nombre_empresa"];?></a></li>
-
-						<?php if(validarAccesoModulo($configuracion['conf_id_empresa'], 1)){?>
-							<li class="dropdown"><a href="index.php"><i class="icon-dashboard"></i> Escritorio</a></li>
-						<?php }?>
-
-						<?php if(validarAccesoModulo($configuracion['conf_id_empresa'], 2)){?>
-							<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Sistema <b class="icon-angle-down"></b></a>
-							<div class="dropdown-menu">
-								<ul>
-								<?php if(validarAccesoModulo($configuracion['conf_id_empresa'], 8)){?>
-									<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Parametrización</a>
-										<div class="dropdown-menu">
-											<ul>
-												<li><a href="configuracion.php"><i class=" icon-file-alt"></i> Configuración</a></li>
-												<li><a href="configuracion-color-encabezado.php"><i class=" icon-file-alt"></i> Configuración Encabezado</a></li>
-												<?php if($_SESSION["id"]==7 or $_SESSION["id"]==15){?>
-													<li><a href="metricas.php?id=1"><i class="icon-cogs"></i> Métricas </a></li>
-												<?php }?>
-												<li><a href="estructura-mensajes.php"><i class=" icon-file-alt"></i> Estructura de mensajes</a></li>
-											</ul>
-										</div>
-									</li>
-								<?php }?>
-									<li><a href="modulos.php"><i class=" icon-unlock"></i>Módulos</a></li>
-									<li><a href="paginas.php"><i class="icon-file"></i> Páginas</a></li>
-									<li><a href="buzon.php"><i class="icon-envelope"></i> Buzón de salida </a></li>
-
-									<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Documentación</a>
-									<div class="dropdown-menu">
-										<ul>
-											<li><a href="tutoriales.php"><i class="icon-facetime-video"></i> Tutoriales</a></li>
-											<li><a href="https://www.loom.com/share/308bdd148ddc4bffb2af76e27e3d5139" target="_blank"><i class="icon-facetime-video"></i> Tutorial Completo</a></li>
-										</ul>
-									</div>
-									</li>
-								</ul>
-							</div>
-							</li>
-						<?php }?>
-
-						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Administración <b class="icon-angle-down"></b></a>
-						<div class="dropdown-menu">
-							<ul>
-								<li><a href="roles.php"><i class=" icon-unlock"></i>Roles</a></li>
-								<li><a href="areas.php"><i class=" icon-unlock"></i>Áreas</a></li>
-								<li><a href="zonas.php"><i class=" icon-unlock"></i>Zonas</a></li>
-								<li><a href="sucursales.php"><i class=" icon-unlock"></i>Mis sucursales</a></li>
-								<li><a href="bodegas.php"><i class=" icon-unlock"></i>Bodegas</a></li>
-                                <li><a href="usuarios.php"><i class="icon-file"></i> Usuarios</a></li>
-								<li><a href="historial-acciones.php"><i class="icon-time"></i> Historial de acciones </a></li>
-								<li><a href="proyectos.php"><i class="icon-ok-sign"></i> Proyectos </a></li>
-								<li><a href="encuesta.php"><i class="icon-file"></i> Encuestas </a></li>
-															
-								<?php if($_SESSION["bd"]=='odermancom_jm_crm' and $datosUsuarioActual['usr_tipo']==1){?>
-									<li class="divider"></li>
-									<li><a href="clientes-orion.php"><i class="icon-group"></i> CLientes ORION </a></li>
-								<?php }?>
-								<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Informes</a>
+							<?php if (!empty($menu_item['submenus']) || !empty($menu_item['paginas'])) : ?>
 								<div class="dropdown-menu">
 									<ul>
-										<li><a href="#"><i class=" icon-file-alt"></i> Informes planos</a></li>
-										<li><a href="#"><i class=" icon-file-alt"></i> Excel</a></li>
-										<li><a href="#"><i class=" icon-file-alt"></i> Gráficos</a></li>
-										<li><a href="estadisticas.php"><i class="icon-bar-chart"></i> Estadisticas</a></li>
+										<?php foreach ($menu_item['submenus'] as $submenu) : ?>
+											<?php if (!empty($submenu['paginas']) && Modulos::validarAccesoModulo($configuracion['conf_id_empresa'], $submenu['mod_id'], $conexionBdAdmin, $datosUsuarioActual)) : ?>
+												<li class="dropdown-submenu">
+													<a href="#">
+														<i class="<?= $submenu['mod_icon']; ?>"></i> <?= $submenu['mod_nombre']; ?>
+													</a>
+													<div class="dropdown-menu">
+														<ul>
+															<?php foreach ($submenu['paginas'] as $pagina) : ?>
+																<?php if (Modulos::validarRol([$pagina['mod_id_pagina']], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+																	<li>
+																		<a href="<?= REDIRECT_ROUTE . '/' . $pagina['ruta_pagina']; ?>">
+																			<i class="<?= $pagina['mod_icon']; ?>"></i> <?= $pagina['mod_nombre']; ?>
+																		</a>
+																	</li>
+																<?php } ?>
+															<?php endforeach; ?>
+														</ul>
+													</div>
+												</li>
+											<?php endif; ?>
+										<?php endforeach; ?>
+										<?php foreach ($menu_item['paginas'] as $pagina) : ?>
+											<?php if (Modulos::validarRol([$pagina['mod_id_pagina']], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+												<li>
+													<a href="<?= REDIRECT_ROUTE . '/' .  $pagina['ruta_pagina']; ?>">
+														<i class="<?= $pagina['mod_icon']; ?>"></i> <?= $pagina['mod_nombre']; ?>
+													</a>
+												</li>
+											<?php } ?>
+										<?php endforeach; ?>
 									</ul>
 								</div>
-								</li>
-							</ul>
-						</div>
+							<?php endif; ?>
 						</li>
-
-						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-file-alt"></i> Comercial <b class="icon-angle-down"></b></a>
-						<div class="dropdown-menu">
-							<ul>
-							<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Clientes</a>
-								<div class="dropdown-menu">
-									<ul>
-										<li><a href="clientes.php"><i class=" icon-file-alt"></i> Clientes</a></li>
-										<li><a href="dealer.php"><i class=" icon-file-alt"></i> Grupos</a></li>
-										<li><a href="clientes-filtro.php"><i class=" icon-file-alt"></i> Mercadeo</a></li>
-										<li><a href="enviar-portafolios.php"><i class="icon-list-ul"></i> Enviar portafolios </a></li>
-										<li class="divider"></li>
-										<li><a href="publicidad.php"><i class=" icon-file-alt"></i> Publicidad</a></li>
-										<li><a href="cupones.php"><i class=" icon-file-alt"></i> Cupones</a></li>
-									</ul>
-								</div>
-							</li>
-							<li><a href="clientes-tikets.php?tipo=1"><i class=" icon-unlock"></i>Tickets/Negociación</a></li>
-							<li><a href="clientes-seguimiento.php"><i class=" icon-unlock"></i>Seguimientos</a></li>	
-							<li class="dropdown-submenu"><a href="#"><i class="icon-minus-sign"></i> Productos</a>
-								<div class="dropdown-menu">
-									<ul>
-										<li><a href="productos.php"><i class=" icon-file-alt"></i> Productos</a></li>
-										<li><a href="combos.php"><i class=" icon-file-alt"></i> Combos</a></li>
-										<li><a href="categoriasp.php"><i class=" icon-file-alt"></i>Categorías</a></li>
-										<li><a href="marcas.php"><i class=" icon-file-alt"></i>Marcas</a></li>
-									</ul>
-								</div>
-							</li>
-											
-								<li><a href="proveedores.php"><i class=" icon-unlock"></i>Proveedores</a></li>
-								<li><a href="servicios.php"><i class=" icon-unlock"></i>Servicios</a></li>
-                                <li><a href="cotizaciones.php"><i class="icon-file"></i> Cotización</a></li>
-								<li><a href="pedidos.php"><i class=" icon-unlock"></i>Pedido</a></li>
-								<li><a href="remisionbdg.php"><i class=" icon-unlock"></i>Remisión</a></li>
-								<li><a href="facturas.php"><i class=" icon-unlock"></i>Factura</a></li>
-								<li><a href="importacion.php"><i class=" icon-unlock"></i>Importación</a></li>
-								<li class="divider"></li>
-								<li><a href="store-pedidos.php"><i class=" icon-unlock"></i>Tienda virtual</a></li>
-								
-							</ul>
-						</div>
-						</li>
-						
-						
-						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-desktop"></i> Soporte Operativo <b class="icon-angle-down"></b></a>
-						<div class="dropdown-menu">
-							<ul>
-								<li><a href="clientes-tikets.php?tipo=3"><i class="icon-group"></i> Tickets </a></li>
-								<li><a href="productos-sop.php"><i class="icon-tasks"></i> Productos soporte</a></li>
-                                <li><a href="facturacion.php"><i class="icon-list-ol"></i> Productos a clientes</a></li>
-							</ul>
-						</div>
-						</li>
-						
-						
-                        
-                        
-                        <li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-suitcase"></i> Soporte técnico <b class="icon-angle-down"></b></a>
-						<div class="dropdown-menu">
-							<ul>
-								<li><a href="remisiones.php"><i class="icon-ok-sign"></i> Soporte técnico </a></li>	
-								<li><a href="tipos-equipos.php"><i class="icon-list-ol"></i> Tipos de equipos</a></li>
-							</ul>
-						</div>
-						</li>
-
-						<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-user"></i> Mi Cuenta <b class="icon-angle-down"></b></a>
-						<div class="dropdown-menu">
-							<ul>
-								<li><a href="perfil-editar.php"><i class="icon-user"></i> Editar perfil </a></li>
-								<li><a href="mis-ventas.php"><i class="icon-shopping-cart"></i> Mis ventas </a></li>
-								<li><a href="calendario.php"><i class="icon-envelope"></i> Mi calendario</a></li>
-                                <li><a href="../salir.php"><i class="icon-lock"></i> Salir </a></li>
-							</ul>
-						</div>
-						</li>
-	
-
-					</ul>
+					<?php endforeach; ?>
+				</ul>
 				</div>
 				<div class="btn-toolbar pull-right notification-nav">
 					
 
 					<div class="btn-group">
 						<div class="dropdown">
-							<a href="../salir.php" class="btn btn-notification"><i class="icon-lock"></i></a>
+							<a href="../salir.php" class="btn btn-notification"><i class="icon-signout"></i></a>
 						</div>
 					</div>
 

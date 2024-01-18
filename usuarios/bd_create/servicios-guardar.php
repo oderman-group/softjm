@@ -5,7 +5,7 @@
 
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     
-    $conexionBdPrincipal->query("INSERT INTO servicios(serv_nombre, serv_precio)VALUES('" . $_POST["nombre"] . "','" . $_POST["precio"] . "')");
+    $conexionBdPrincipal->query("INSERT INTO servicios(serv_nombre, serv_precio,serv_id_empresa)VALUES('" . $_POST["nombre"] . "','" . $_POST["precio"] . "','".$idEmpresa."')");
 
     $idInsertU = mysqli_insert_id($conexionBdPrincipal);
 

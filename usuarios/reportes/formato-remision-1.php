@@ -1,7 +1,7 @@
 <?php
 session_start();
 include("../../conexion.php");
-
+$idPagina = 376;
 if(!empty($_GET["cte"]) AND $_GET["cte"] == 1){
 	$_GET["id"] = base64_decode($_GET["id"]);
 }else{
@@ -13,7 +13,6 @@ if(!empty($_GET["cte"]) AND $_GET["cte"] == 1){
 $monedas = array("","COP","USD");
 $simbolosMonedas = array("","$","USD");
 
-
 $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"), MYSQLI_BOTH);
 
 $resultado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg
@@ -21,7 +20,7 @@ INNER JOIN clientes ON cli_id=remi_cliente
 INNER JOIN sucursales ON sucu_id=remi_sucursal
 INNER JOIN contactos ON cont_id=remi_contacto
 INNER JOIN usuarios ON usr_id=remi_vendedor
-WHERE remi_id='".$_GET["id"]."'"), MYSQLI_BOTH);
+WHERE remi_id='".$_GET["id"]."' AND remi_id_empresa='".$idEmpresa."'"), MYSQLI_BOTH);
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
@@ -101,6 +100,7 @@ $formaPago = array("","CONTADO","CRÉDITO");
 		$no = 1;
 		$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos
 		INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='".$_GET["id"]."'
+		WHERE combo_id_empresa='".$idEmpresa."'
 		ORDER BY czpp_orden");
 
 
@@ -154,6 +154,7 @@ $formaPago = array("","CONTADO","CRÉDITO");
 						$productosCombo = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 						INNER JOIN productos_categorias ON catp_id=prod_categoria
 						INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='" . $prod['combo_id'] . "'
+						WHERE prod_id_empresa='".$idEmpresa."'
 						ORDER BY copp_id");
 						$c = 1;
 						while ($prodCombo = mysqli_fetch_array($productosCombo, MYSQLI_BOTH)) {
@@ -181,6 +182,7 @@ $formaPago = array("","CONTADO","CRÉDITO");
 		// $no = 1;
 		$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos
 		INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='".$_GET["id"]."'
+		WHERE prod_id_empresa='".$idEmpresa."'
 		ORDER BY czpp_orden");
 		while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 			$dcto = 0;
@@ -232,6 +234,7 @@ $formaPago = array("","CONTADO","CRÉDITO");
 		// $no = 1;
 		$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios
 		INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='".$_GET["id"]."'
+		WHERE serv_id_empresa='".$idEmpresa."'
 		ORDER BY czpp_orden");
 		while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 			$dcto = 0;

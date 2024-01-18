@@ -2,7 +2,7 @@
 include("sesion.php");
 include("../compartido/head.php");
 $idPagina = 238;
-$tituloPagina = "Escritorio";
+
 include("verificar-paginas.php");
 ?>
 

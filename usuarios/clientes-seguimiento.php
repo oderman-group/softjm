@@ -3,13 +3,12 @@ include("sesion.php");
 
 $idPagina = 12;
 $paginaActual['pag_nombre'] = "Seguimiento de clientes";
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
 $nombreCliente="";
 if(!empty($_GET["cte"])){
-	$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."'");
+	$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."' AND cli_id_empresa='".$idEmpresa."'");
 	$cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 	$nombreCliente=" de <b>".$cliente['cli_nombre']."</b>";
 
@@ -98,7 +97,9 @@ if(!empty($_GET["idTK"])){
 				<?php include("includes/notificaciones.php");?>
 				<p>
 					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+					<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<a href="clientes-seguimiento-agregar.php?idTK=<?= $_GET["idTK"]; ?>&cte=<?= $_GET["cte"]; ?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+					<?php } ?>
 				</p>
 
 				<div class="alert alert-info">
@@ -123,12 +124,11 @@ if(!empty($_GET["idTK"])){
 				<div align="center" style="margin:10px; font-size:18px;">
 					<?php
 					$m = 1;
-					$meses = array("", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic");
 					while ($m <= 12) {
 						if ($m == $_GET["m"])
-							echo '<a style="font-weight:bold;">' . $meses[$m] . '</a>&nbsp;&nbsp;&nbsp;';
+							echo '<a style="font-weight:bold;">' . $mesesAbre[$m] . '</a>&nbsp;&nbsp;&nbsp;';
 						else
-							echo '<a href="clientes-seguimiento.php?m=' . $m . '&a=' . $_GET["a"] . '&u=' . $_GET["u"] . '">' . $meses[$m] . '</a>&nbsp;&nbsp;&nbsp;';
+							echo '<a href="clientes-seguimiento.php?m=' . $m . '&a=' . $_GET["a"] . '&u=' . $_GET["u"] . '">' . $mesesAbre[$m] . '</a>&nbsp;&nbsp;&nbsp;';
 						$m++;
 					}
 					?>
@@ -268,11 +268,10 @@ if(!empty($_GET["idTK"])){
 										}
 
 
-										$opcionesSino = array("NO", "SI");
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
-											$consultaEncargado=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $res['cseg_usuario_encargado'] . "'");
+											$consultaEncargado=mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $res['cseg_usuario_encargado'] . "'  AND usr_id_empresa='".$idEmpresa."'");
 											$encargado = mysqli_fetch_array($consultaEncargado, MYSQLI_BOTH);
 
 											$consultaContacto=mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos 
@@ -280,7 +279,7 @@ if(!empty($_GET["idTK"])){
 											WHERE cont_id='" . $res['cseg_contacto'] . "'");
 											$contacto = mysqli_fetch_array($consultaContacto, MYSQLI_BOTH);
 
-											if ($datosUsuarioActual[3] != 1) {
+											if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$consultaNumZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
 												$numZ = mysqli_num_rows($consultaNumZonas);
 												if ($numZ == 0) continue;
@@ -296,7 +295,7 @@ if(!empty($_GET["idTK"])){
 													$html = '<span class="label label-success">Completado</span>';
 													break;
 												default:
-													$html = '<a href="sql.php?id=' . $res['cseg_id'] . '&get=28" class="label label-important">Pendiente</a>';
+													$html = '<a href="bd_update/cliente-seguimiento-estado-update.php?id=' . $res['cseg_id'] . '&get=28" class="label label-important">Pendiente</a>';
 													break;
 											}
 
@@ -313,9 +312,15 @@ if(!empty($_GET["idTK"])){
 													<?php echo "<br><b>Ciudad:</b> " . $res['ciu_nombre']; ?>
 
 													<h4 style="margin-top:10px;">
+														<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="clientes-seguimiento-agregar.php?idTK=<?= $res['cseg_tiket']; ?>" data-toggle="tooltip" title="Nuevo Seguimiento"><i class="icon-plus"></i></a>
+														<?php } ?>
+														<?php if (Modulos::validarRol([14], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="clientes-seguimiento-editar.php?id=<?= $res[0]; ?>&idTK=<?= $_GET["idTK"]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
+														<?php } ?>
+														<?php if (Modulos::validarRol([56], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="bd_delete/clientes-seguimiento-eliminar.php?id=<?=$res[0]; ?>&cte=<?=$_GET["cte"];?>&idTK=<?= $_GET["idTK"]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+														<?php } ?>
 
 													</h4>
 												</td>

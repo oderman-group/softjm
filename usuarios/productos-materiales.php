@@ -7,7 +7,7 @@ $paginaActual['pag_nombre'] = "Materiales";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec WHERE prod_id='".$_GET["pdto"]."'");
+$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_soptec WHERE prod_id='".$_GET["pdto"]."' AND prod_id_empresa='".$idEmpresa."'");
 $producto = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
 ?>
 <!-- styles -->
@@ -96,7 +96,9 @@ $producto = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
             
             <p>
             	<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                <a href="productos-materiales-agregar.php?pdto=<?=$_GET["pdto"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+				<?php if( Modulos::validarRol(['69'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+                	<a href="productos-materiales-agregar.php?pdto=<?=$_GET["pdto"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+				<?php }?>
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -135,8 +137,12 @@ $producto = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
                                 <td><?=$categ;?></td>
                                 <td><?=$res[3];?></td>
                                 <td><h4>
+								<?php if( Modulos::validarRol(['70'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
                                     <a href="productos-materiales-editar.php?id=<?=$res[0];?>&pdto=<?=$_GET["pdto"];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+								<?php }?>
+								<?php if( Modulos::validarRol(['71'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
                                     <a href="bd_delete/productos-materiales-eliminar.php?id=<?=$res[0];?>&pdto=<?=$_GET["pdto"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+								<?php }?>
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>

@@ -2,11 +2,10 @@
 include("sesion.php");
 
 $idPagina = 156;
-
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consultasServicios=$conexionBdPrincipal->query("SELECT * FROM servicios WHERE serv_id='".$_GET["id"]."'");
+$consultasServicios=$conexionBdPrincipal->query("SELECT * FROM servicios WHERE serv_id='".$_GET["id"]."' AND serv_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consultasServicios, MYSQLI_BOTH);
 ?>
 <!-- styles -->

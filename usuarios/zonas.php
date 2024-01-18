@@ -77,7 +77,11 @@ include("includes/head.php");
 			</div>
             <?php include("includes/notificaciones.php");?>
             <p>
-            	<a href="zonas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
+							<?php
+								if (Modulos::validarRol([48], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+									echo '<a href="zonas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>';
+								}
+							?>			
             </p>
 			<div class="row-fluid">
 				<div class="span12">
@@ -97,7 +101,7 @@ include("includes/head.php");
 							</thead>
 							<tbody>
                             <?php
-							$consulta = $conexionBdPrincipal->query("SELECT * FROM zonas");
+							$consulta = $conexionBdPrincipal->query("SELECT * FROM zonas WHERE zon_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 							?>
@@ -105,8 +109,16 @@ include("includes/head.php");
 								<td><?=$no;?></td>
                                 <td><?=$res['zon_nombre'];?></td>
                                 <td><h4>
-                                    <a href="zonas-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-                                    <a href="bd_delete/zonas-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																	<?php
+																		if (Modulos::validarRol([49], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																			echo '<a href="zonas-editar.php?id='.$res[0].'" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a> ';
+																		}
+																		if (Modulos::validarRol([63], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+																			echo '<a href="bd_delete/zonas-eliminar.php?id='.$res[0].'" onClick="if(!confirm("Desea eliminar el registro?")){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a> ';
+																		}
+																	?>
+                                   
+                                    
                                 </h4></td>
 							</tr>
                             <?php $no++;}?>
