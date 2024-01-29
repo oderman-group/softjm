@@ -182,7 +182,8 @@ $(function(){
 						
                     </li>
 					  
-					  <?php }?>
+					  <?php }
+					  }?>
 					  
                   </ul>
                 </div>
