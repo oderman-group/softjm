@@ -5,7 +5,7 @@
 
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-	$conexionBdPrincipal->query("INSERT INTO productos_categorias(catp_nombre, catp_grupo)VALUES('" . $_POST["nombre"] . "', '" . $_POST["grupo"] . "')");
+	$conexionBdPrincipal->query("INSERT INTO productos_categorias(catp_nombre, catp_grupo, catp_id_empresa)VALUES('" . $_POST["nombre"] . "', '" . $_POST["grupo"] . "', '" . $_SESSION["dataAdicional"]["id_empresa"] . "')");
     
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
