@@ -9,7 +9,8 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 $infoEliminar = [
     'tabla'          => 'sucursales_propias',
     'clave_primaria' => 'sucp_id',
-    'id_registro'    => $_GET["id"]
+    'id_registro'    => $_GET["id"],
+    'sucp_id_empresa'  => $_SESSION["dataAdicional"]["id_empresa"]
 ];
 
 BaseDatos::eliminarRegistro($infoEliminar);

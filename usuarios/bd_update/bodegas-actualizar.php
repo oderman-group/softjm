@@ -5,7 +5,7 @@
 
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     
-    $conexionBdPrincipal->query("UPDATE bodegas SET bod_nombre='" . $_POST["nombre"] . "', bod_ciudad='" . $_POST["ciudad"] . "' WHERE bod_id='" . $_POST["id"] . "'");
+    $conexionBdPrincipal->query("UPDATE bodegas SET bod_nombre='" . $_POST["nombre"] . "', bod_ciudad='" . $_POST["ciudad"] . "' WHERE bod_id='" . $_POST["id"] . "' AND bod_id_empresa='" . $_SESSION["dataAdicional"]["id_empresa"] . "'");
 
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 

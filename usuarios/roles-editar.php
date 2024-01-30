@@ -4,7 +4,7 @@ $idPagina = 7;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consulta=$conexionBdPrincipal->query("SELECT * FROM usuarios_tipos WHERE utipo_id='".$_GET["id"]."' AND utipo_id_empresa={$idEmpresa}");
+$consulta=$conexionBdPrincipal->query("SELECT * FROM usuarios_tipos WHERE utipo_id='".$_GET["id"]."' AND utipo_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 if(empty($resultadoD)) {
 	echo '<script type="text/javascript">window.location.href="index.php?error=Unauthorized";</script>';
