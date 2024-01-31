@@ -57,10 +57,10 @@ include("includes/head.php");
 		<div class="main-wrapper">
 			<div class="container-fluid">
 				<div class="row-fluid ">
-				<?php if(Modulos::validarRol([320], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+				<?php if(Modulos::validarRol([320], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $idEmpresa == ID_COMPANY_OWNER) {
                 ?>
 					<p><a href="documentos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
-					<?php } ?>
+				<?php } ?>
 					<?php include("includes/notificaciones.php");?>
 					<div class="row-fluid">
 						<div class="span12">
@@ -81,7 +81,7 @@ include("includes/head.php");
 										</thead>
 										<tbody>
 											<?php
-											$consulta = $conexionBdAdmin->query("SELECT * FROM documentos WHERE doc_id_empresa = '". $_SESSION["dataAdicional"]["id_empresa"]."'");
+											$consulta = $conexionBdAdmin->query("SELECT * FROM documentos");
 											
 											$no = 1;
 											while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
@@ -92,17 +92,23 @@ include("includes/head.php");
 												<td><?=$res['doc_nombre'];?></td>
 												
 												<td><h4>
-												<?php if(Modulos::validarRol([322], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+												<?php 
+												if(Modulos::validarRol([322], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $idEmpresa == ID_COMPANY_OWNER) {
                									 ?>
 													<a href="documento-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-													<?php } if(Modulos::validarRol([323], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
-                									?>
+												<?php 
+												} 
+												if(Modulos::validarRol([323], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+                								?>
 													<a href="documento-configuracion.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Configuración"><span class="widget-icon icon-cogs"></span></a>
-													<?php} if(Modulos::validarRol([327], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
-                									?>
+												<?php 
+												} 
+												if(Modulos::validarRol([327], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $idEmpresa == ID_COMPANY_OWNER) {
+                								
+												?>
 													<a href="bd_delete/documento-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 													</h4></td>
-													<?php } ?>
+												<?php } ?>
 											</tr>
 											<?php $no++;}?>
 										</tbody>
