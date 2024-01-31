@@ -59,3 +59,6 @@ define('REM_ESTADO_CERTIFICADO_ACTUALIZADO', 4);
 // Constantes para 'remisiones'
 define('REM_TIPOS_EQUIPOS_NUEVO', 1);
 define('REM_TIPOS_EQUIPOS_USADO', 2);
+
+// TIPOS USUARIOS
+define('ADMIN', 1);
