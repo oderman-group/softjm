@@ -37,7 +37,7 @@ class CotizacionesEditar {
         $totalCantidad += $prod['czpp_cantidad'];
 
         $utilidadDealer = $prod['prod_descuento2'] / 100;
-        $precioDealer = $prod['prod_costo'] + ($prod['prod_costo'] * $utilidadDealer);
+        $precioDealer = !empty($prod['prod_costo']) ? $prod['prod_costo'] + ($prod['prod_costo'] * $utilidadDealer) : 0;
 
         $sumaUtilidad += ($prod['czpp_valor'] - $prod['prod_costo']);
 
