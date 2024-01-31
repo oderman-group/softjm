@@ -104,7 +104,7 @@ include("includes/head.php");
 										$filtro .= " AND cotiz_descuentos_especiales=1";
 									}
 								}
-								if(Modulos::validarRol([385], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+								if($datosUsuarioActual['usr_tipo'] != ADMIN){
 									$filtro.='AND cli_ciudad!="1122"';
 								}
 
