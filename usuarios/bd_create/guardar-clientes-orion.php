@@ -24,4 +24,6 @@
     }
 
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
+
+    echo '<script type="text/javascript">window.location.href="../clientes-orion.php?msg=1";</script>';
     exit();
