@@ -1,7 +1,7 @@
 <?php
 require_once("../sesion.php");
 
-mysqli_query($conexionBdPrincipal,"INSERT INTO dealer(deal_nombre)VALUES('" . $_POST["nombre"] . "')");
+mysqli_query($conexionBdPrincipal,"INSERT INTO dealer(deal_nombre, deal_id_empresa)VALUES('" . $_POST["nombre"] ."', '".$_SESSION["dataAdicional"]["id_empresa"]."')");
 	
 $idInsertU = mysqli_insert_id($conexionBdPrincipal);
 mysqli_query($conexionBdPrincipal,"DELETE FROM clientes_categorias WHERE cpcat_categoria='" . $idInsertU . "'");
