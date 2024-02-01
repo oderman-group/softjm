@@ -10,7 +10,7 @@
 		$fileName = subirArchivosAlServidor($_FILES['foto'], 'comb', $destino);
 	}
 
-	$conexionBdPrincipal->query("INSERT INTO combos(combo_nombre, combo_descripcion, combo_imagen, combo_descuento, combo_estado, combo_fecha_registro, combo_actualizaciones, combo_descuento_maximo, combo_descuento_dealer)VALUES('" . $_POST["nombre"] . "', '" . $_POST["descripcion"] . "', '" . $fileName . "', '" . $_POST["dcto"] . "', '" . $_POST["estado"] . "', now(), 0, '" . $_POST["descuentoMax"] . "', '" . $_POST["dctoDealer"] . "')");
+	$conexionBdPrincipal->query("INSERT INTO combos(combo_nombre, combo_descripcion, combo_imagen, combo_descuento, combo_estado, combo_fecha_registro, combo_actualizaciones, combo_descuento_maximo, combo_descuento_dealer, combo_id_empresa)VALUES('" . $_POST["nombre"] . "', '" . $_POST["descripcion"] . "', '" . $fileName . "', '" . $_POST["dcto"] . "', '" . $_POST["estado"] . "', now(), 0, '" . $_POST["descuentoMax"] . "', '" . $_POST["dctoDealer"] ."', '".$_SESSION["dataAdicional"]["id_empresa"]."')");
 	$idInsert = mysqli_insert_id($conexionBdPrincipal);
 
     if(isset($_POST["producto"])){
