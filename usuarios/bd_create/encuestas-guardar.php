@@ -5,7 +5,7 @@ $idPagina = 283;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-mysqli_query($conexionBdPrincipal,"INSERT INTO encuesta_satisfaccion(encs_fecha, encs_cliente, encs_atendido, encs_producto, encs_contacto)VALUES(now(),'" . $_POST["cliente"] . "','" . $_POST["usuario"] . "','" . $_POST["producto"] . "','" . $_POST["contacto"] . "')");
+mysqli_query($conexionBdPrincipal,"INSERT INTO encuesta_satisfaccion(encs_fecha, encs_cliente, encs_atendido, encs_producto, encs_contacto, encs_id_empresa)VALUES(now(),'" . $_POST["cliente"] . "','" . $_POST["usuario"] . "','" . $_POST["producto"] . "','" . $_POST["contacto"] . "', '" . $_SESSION["dataAdicional"]["id_empresa"] . "')");
 	
 	$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
