@@ -351,7 +351,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 											<?php } ?>
 											<th>Grupo 2</th>
 											<th>Marca</th>
-											<?php if ($Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>P. Fábrica<br>USD</th>
 												<th>Flete<br>USD</th>
 												<th>Aduana<br>USD</th>
