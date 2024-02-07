@@ -6,13 +6,7 @@ $idPagina = 114;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-$infoEliminar = [
-    'tabla'          => 'proyectos',
-    'clave_primaria' => 'proy_id',
-    'id_registro'    => $_GET["id"]
-];
-
-BaseDatos::eliminarRegistro($infoEliminar);
+$conexionBdPrincipal->query("DELETE FROM proyectos WHERE proy_id='" . $_GET["id"] ."' AND proy_id_empresa='" . $_SESSION["dataAdicional"]["id_empresa"]."'");
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
