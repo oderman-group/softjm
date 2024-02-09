@@ -172,6 +172,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 						</ul>
 					</div>
 				</div>
+				<?php include("includes/notificaciones.php");?>
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="content-widgets gray">
