@@ -5,8 +5,7 @@ require_once("../class/BaseDatos.php");
 
 $idPagina = 295;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
-	mysqli_query($conexionBdPrincipal,"DELETE FROM encuesta_satisfaccion WHERE encs_id='" . $_GET["id"] . "'");
-	
+	mysqli_query($conexionBdPrincipal,"DELETE FROM encuesta_satisfaccion WHERE encs_id='" . $_GET["id"] . "' AND encs_id_empresa='" . $_SESSION["dataAdicional"]["id_empresa"]."'");
 	
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");

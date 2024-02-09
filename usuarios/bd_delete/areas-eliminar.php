@@ -6,14 +6,7 @@ $idPagina = 226;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-$infoEliminar = [
-    'tabla'          => 'areas',
-    'clave_primaria' => 'ar_id',
-    'id_registro'    => $_GET["id"],
-    'ar_id_empresa'  => $_SESSION["dataAdicional"]["id_empresa"]
-];
-
-BaseDatos::eliminarRegistro($infoEliminar);
+$conexionBdPrincipal->query("DELETE FROM areas WHERE ar_id='".$_GET["id"]."' AND ar_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
