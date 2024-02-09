@@ -9,7 +9,8 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 $infoActualizar = [
     'tabla'          => 'sucursales_propias',
     'clave_primaria' => 'sucp_id',
-    'id_registro'    => $_POST["id"]
+    'id_registro'    => $_POST["id"],
+    'sucp_id_empresa'=> $_POST["sucp_id_empresa"]
 ];
 
 BaseDatos::actualizarRegistro($infoActualizar, $_POST);
