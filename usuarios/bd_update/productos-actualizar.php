@@ -4,7 +4,7 @@
     $idPagina = 202;
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-    $consultaProductos=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='".$_POST["id"]."'");
+    $consultaProductos=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='".$_POST["id"]."' AND prod_id_empresa={$idEmpresa}");
     $datos = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH);
 
 	$origen = 0;
@@ -24,10 +24,9 @@
 		$destino = RUTA_PROYECTO."/usuarios/files/productos";
 		$fileName = subirArchivosAlServidor($_FILES['foto'], 'prod', $destino);
 
-		$conexionBdPrincipal->query("UPDATE productos SET prod_foto='" . $fileName . "' WHERE prod_id='" . $_POST["id"] . "'");
+		$conexionBdPrincipal->query("UPDATE productos SET prod_foto='" . $fileName . "' WHERE prod_id='" . $_POST["id"] ."' AND prod_id_empresa={$idEmpresa}");
 	}
-
-	$utilidad = $_POST["utilidad"] / 100;
+	$utilidad=!empty($resultadoD['utilidad']) ? $resultadoD['utilidad']/100 : 0;
 	$precio1 = $_POST["costo"] + ($_POST["costo"] * $utilidad);
 	
 	if($origen > 0){
@@ -52,7 +51,7 @@
     prod_existencias='" . $_POST["cant"] . "', 
     prod_proveedor='" . $_POST["proveedor"] . "', 
     prod_descripcion_larga='" . $conexionBdPrincipal->real_escape_string($_POST["descripcionLarga"]) . "' 
-    WHERE prod_id='" . $_POST["id"] . "'");
+    WHERE prod_id='" . $_POST["id"] . "' AND prod_id_empresa={$idEmpresa}");
 
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
