@@ -5,7 +5,7 @@
 
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-	$conexionBdPrincipal->query("UPDATE productos_categorias SET catp_nombre='" . $_POST["nombre"] . "' WHERE catp_id='" . $_POST["id"] . "'");
+	$conexionBdPrincipal->query("UPDATE productos_categorias SET catp_nombre='" . $_POST["nombre"] . "' WHERE catp_id='" . $_POST["id"] . "' AND catp_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 

@@ -8,7 +8,7 @@
 		$destino = RUTA_PROYECTO."/usuarios/files/combos";
 		$fileName = subirArchivosAlServidor($_FILES['foto'], 'comb', $destino);
 
-        $conexionBdPrincipal->query("UPDATE combos SET combo_imagen='" . $fileName . "' WHERE combo_id='" . $_POST["id"] . "'");
+        $conexionBdPrincipal->query("UPDATE combos SET combo_imagen='" . $fileName . "' WHERE combo_id='" . $_POST["id"] . "' AND combo_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
     }
 
     $conexionBdPrincipal->query("UPDATE combos SET 
@@ -20,7 +20,7 @@
     combo_estado='" . $_POST["estado"] . "', 
     combo_descuento_maximo='" . $_POST["descuentoMax"] . "', 
     combo_descuento_dealer='" . $_POST["dctoDealer"] . "' 
-    WHERE combo_id='" . $_POST["id"] . "'");
+    WHERE combo_id='" . $_POST["id"] . "' AND combo_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
     if(isset($_POST["producto"])){
 
