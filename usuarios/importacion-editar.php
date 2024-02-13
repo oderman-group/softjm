@@ -269,7 +269,7 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 												<option value=""></option>
 												<?php
-												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM proveedores");
+												$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM proveedores WHERE prov_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['imp_proveedor'] == $resOp[0]) echo "selected"; ?>><?= $resOp['prov_nombre']; ?></option>

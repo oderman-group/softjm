@@ -22,7 +22,7 @@ cotiz_observaciones='" . $conexionBdPrincipal->real_escape_string($_POST["notas"
 cotiz_envio='" . $_POST["envio"] . "', 
 cotiz_ocultar_descuento_combo='" . $_POST["dctoCombos"] . "', 
 cotiz_descuentos_especiales='" . $_POST["dctoEspecial"] . "' 
-WHERE cotiz_id='" . $_POST["id"] . "' ");
+WHERE cotiz_id='" . $_POST["id"] . "' AND  cotiz_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
     
     require('actualizar-productos-cotizacion.php');
 
