@@ -5,7 +5,7 @@
 
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-	$conexionBdPrincipal->query("DELETE FROM combos WHERE combo_id='" . $_GET["id"] . "'");
+	$conexionBdPrincipal->query("DELETE FROM combos WHERE combo_id='" . $_GET["id"] . "' AND combo_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
     $conexionBdPrincipal->query("DELETE FROM combos_productos WHERE copp_combo='" . $_GET["id"] . "'");
 
 	include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
