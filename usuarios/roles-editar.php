@@ -77,59 +77,91 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?> (NUEVO)</h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="bd_update/actualizar-roles.php" name="roles" id="roles">
-                            <input type="hidden" name="id" value="<?=$_GET["id"];?>">
-                                
-                                <div class="control-group">
-									<label class="control-label">Nombre</label>
-									<div class="controls">
-										<input type="text" class="span4" name="nombre" id="nombre" value="<?=$resultadoD['utipo_nombre'];?>">
+
+
+									<ul class="nav nav-tabs" id="myTab1">
+										<?php
+										$queryModulos = "SELECT * FROM modulos WHERE mod_padre IS NULL";
+										$resultModulos = $conexionBdAdmin->query($queryModulos);
+										$conta = 1;
+										while ($rowModulos = $resultModulos->fetch_assoc()) {
+										?>
+											<li <?php if($conta == 1) echo 'class="active"';?>><a href="#mod<?=$rowModulos['mod_id'];?>"><i class="icon-tasks"></i> <?=$rowModulos['mod_nombre'];?></a></li>
+										<?php
+											$conta ++;
+										}
+										?>
+									</ul>
+
+									<div class="tab-content">
+										<?php
+										$queryModulos2 = "SELECT * FROM modulos WHERE mod_padre IS NULL";
+										$resultModulos2 = $conexionBdAdmin->query($queryModulos2);
+										$cont2 = 1;
+										while ($rowModulos2 = $resultModulos2->fetch_assoc()) {
+										?>
+										<div class="tab-pane <?php if($cont2 == 1) echo 'active';?>" id="mod<?=$rowModulos2['mod_id'];?>">
+
+											<form class="form-horizontal" method="post" action="bd_update/actualizar-roles.php" name="roles" id="roles">
+												<input type="hidden" name="id" value="<?=$_GET["id"];?>">
+												
+												<div class="control-group">
+													<label class="control-label">Nombre</label>
+													<div class="controls">
+														<input type="text" class="span4" name="nombre" id="nombre" value="<?=$resultadoD['utipo_nombre'];?>">
+													</div>
+												</div> 
+												
+												<table class="table table-striped table-bordered" id="data-table">
+														<thead>
+																<tr>
+																		<th>ID</th>
+																		<th>Nombre</th>
+																		<th>Seleccionar <input type="checkbox" id="selectAll"> </th>
+																		
+																</tr>
+														</thead>
+														<tbody>
+																<?php
+																$query = "SELECT p.pag_id, p.pag_nombre, p.pag_id_modulo, pp.pper_id 
+																FROM paginas p 
+																LEFT JOIN ".MAINBD.".paginas_perfiles pp ON p.pag_id = pp.pper_pagina 
+																AND pp.pper_tipo_usuario = '" . $resultadoD['utipo_id'] . "'
+																WHERE pag_id_modulo = '".$rowModulos2['mod_id']."'
+																";
+																$result = $conexionBdAdmin->query($query);
+																$no=1;
+																while ($row = $result->fetch_assoc()) {
+																		$isChecked = $row['pper_id'] ? "checked" : "";
+																?>
+																		<tr>
+																				<td><?= $row['pag_id'];?></td>
+																				<td><?= $row['pag_nombre']; ?></td>
+																				<td>
+																					<input class="selectCheckbox" type="checkbox" value="<?= $row['pag_id']; ?>" <?= $isChecked; ?>>
+																					<span style="display: none;"> <?= $isChecked; ?> </span>
+																				</td>
+																		</tr>
+																<?php
+																$no++;
+																}
+																?>
+														</tbody>
+													</table>  
+												
+												<select id="paginasSeleccionadas"  name="paginasP[]" multiple  style="display: none;"></select>                 
+											
+												<div class="form-actions">
+													<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+													<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+												</div>
+											</form>
+										</div>
+										<?php 
+											$cont2 ++;
+										}
+										?>
 									</div>
-								</div> 
-                                
-								<table class="table table-striped table-bordered" id="data-table">
-										<thead>
-												<tr>
-														<th>ID</th>
-														<th>Nombre</th>
-														<th>Seleccionar <input type="checkbox" id="selectAll"> </th>
-														
-												</tr>
-										</thead>
-										<tbody>
-												<?php
-												$query = "SELECT p.pag_id, p.pag_nombre, pp.pper_id 
-																	FROM paginas p 
-																	LEFT JOIN ".MAINBD.".paginas_perfiles pp 
-																	ON p.pag_id = pp.pper_pagina 
-																	AND pp.pper_tipo_usuario = '" . $resultadoD['utipo_id'] . "'";
-												$result = $conexionBdAdmin->query($query);
-												$no=1;
-												while ($row = $result->fetch_assoc()) {
-														$isChecked = $row['pper_id'] ? "checked" : "";
-												?>
-														<tr>
-																<td><?= $row['pag_id'];?></td>
-																<td><?= $row['pag_nombre']; ?></td>
-																<td>
-																	<input class="selectCheckbox" type="checkbox" value="<?= $row['pag_id']; ?>" <?= $isChecked; ?>>
-																	<span style="display: none;"> <?= $isChecked; ?> </span>
-																</td>
-														</tr>
-												<?php
-												$no++;
-												}
-												?>
-										</tbody>
-									</table>  
-                                
-								<select id="paginasSeleccionadas"  name="paginasP[]" multiple  style="display: none;"></select>                 
-                               
-								<div class="form-actions">
-									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                                    <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-								</div>
-							</form>
 						</div>
 					</div>
 				</div>
