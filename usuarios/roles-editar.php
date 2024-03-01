@@ -37,10 +37,6 @@ if(empty($resultadoD)) {
 include("includes/js-formularios.php");
 ?>
 
-<script type="text/javascript">
-							document.getElementById("solo").innerHTML='hola';
-                        </script>
-
 <?php include("includes/funciones-js.php");?>
 </head>
 <body>
@@ -65,7 +61,7 @@ include("includes/js-formularios.php");
 			</div>
 				<?php
 					if (Modulos::validarRol([6], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
-						echo '<p><a href="roles-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a> <div id="solo"></div></p>';
+						echo '<p><a href="roles-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>';
 					}
 				?>	
             
@@ -78,90 +74,49 @@ include("includes/js-formularios.php");
 						</div>
 						<div class="widget-container">
 
+							<ul class="nav nav-tabs" id="myTab1">
+								<?php
+								$queryModulos = "SELECT * FROM modulos 
+								INNER JOIN modulos_empresa ON mxe_id_modulo=mod_id AND mxe_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' 
+								WHERE mod_padre IS NULL";
+								$resultModulos = $conexionBdAdmin->query($queryModulos);
+								$conta = 1;
+								while ($rowModulos = $resultModulos->fetch_assoc()) {
+								?>
+									<li <?php if($conta == 1) echo 'class="active"';?> id="mod<?=$rowModulos['mod_id'];?>"><a onclick="mostrarPaginas(<?=$rowModulos['mod_id'];?>, <?=$_GET['id'];?>)"><i class="icon-tasks"></i> <?=$rowModulos['mod_nombre'];?></a></li>
+								<?php
+									$conta ++;
+								}
+								?>
+							</ul>
 
-									<ul class="nav nav-tabs" id="myTab1">
-										<?php
-										$queryModulos = "SELECT * FROM modulos WHERE mod_padre IS NULL";
-										$resultModulos = $conexionBdAdmin->query($queryModulos);
-										$conta = 1;
-										while ($rowModulos = $resultModulos->fetch_assoc()) {
-										?>
-											<li <?php if($conta == 1) echo 'class="active"';?>><a href="#mod<?=$rowModulos['mod_id'];?>"><i class="icon-tasks"></i> <?=$rowModulos['mod_nombre'];?></a></li>
-										<?php
-											$conta ++;
-										}
-										?>
-									</ul>
-
-									<div class="tab-content">
-										<?php
-										$queryModulos2 = "SELECT * FROM modulos WHERE mod_padre IS NULL";
-										$resultModulos2 = $conexionBdAdmin->query($queryModulos2);
-										$cont2 = 1;
-										while ($rowModulos2 = $resultModulos2->fetch_assoc()) {
-										?>
-										<div class="tab-pane <?php if($cont2 == 1) echo 'active';?>" id="mod<?=$rowModulos2['mod_id'];?>">
-
-											<form class="form-horizontal" method="post" action="bd_update/actualizar-roles.php" name="roles" id="roles">
-												<input type="hidden" name="id" value="<?=$_GET["id"];?>">
-												
-												<div class="control-group">
-													<label class="control-label">Nombre</label>
-													<div class="controls">
-														<input type="text" class="span4" name="nombre" id="nombre" value="<?=$resultadoD['utipo_nombre'];?>">
-													</div>
-												</div> 
-												
-												<table class="table table-striped table-bordered" id="data-table">
-														<thead>
-																<tr>
-																		<th>ID</th>
-																		<th>Nombre</th>
-																		<th>Seleccionar <input type="checkbox" id="selectAll"> </th>
-																		
-																</tr>
-														</thead>
-														<tbody>
-																<?php
-																$query = "SELECT p.pag_id, p.pag_nombre, p.pag_id_modulo, pp.pper_id 
-																FROM paginas p 
-																LEFT JOIN ".MAINBD.".paginas_perfiles pp ON p.pag_id = pp.pper_pagina 
-																AND pp.pper_tipo_usuario = '" . $resultadoD['utipo_id'] . "'
-																WHERE pag_id_modulo = '".$rowModulos2['mod_id']."'
-																";
-																$result = $conexionBdAdmin->query($query);
-																$no=1;
-																while ($row = $result->fetch_assoc()) {
-																		$isChecked = $row['pper_id'] ? "checked" : "";
-																?>
-																		<tr>
-																				<td><?= $row['pag_id'];?></td>
-																				<td><?= $row['pag_nombre']; ?></td>
-																				<td>
-																					<input class="selectCheckbox" type="checkbox" value="<?= $row['pag_id']; ?>" <?= $isChecked; ?>>
-																					<span style="display: none;"> <?= $isChecked; ?> </span>
-																				</td>
-																		</tr>
-																<?php
-																$no++;
-																}
-																?>
-														</tbody>
-													</table>  
-												
-												<select id="paginasSeleccionadas"  name="paginasP[]" multiple  style="display: none;"></select>                 
-											
-												<div class="form-actions">
-													<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-													<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-												</div>
-											</form>
+							<form class="form-horizontal" method="post" action="bd_update/actualizar-roles.php">
+								<input type="hidden" name="id" value="<?=$_GET["id"];?>">
+								<div class="tab-content">
+									<div class="control-group">
+										<label class="control-label">Nombre</label>
+										<div class="controls">
+											<input type="text" class="span4" name="nombre" id="nombre" value="<?=$resultadoD['utipo_nombre'];?>">
 										</div>
-										<?php 
-											$cont2 ++;
-										}
-										?>
-									</div>
+									</div> 
+									
+									<div id="divTablePaginas"></div>
+								</div>
+											
+								<select id="paginasSeleccionadas"  name="paginasP[]" multiple  style="display: none;">
+									<?php
+									$consultaPagina = $conexionBdPrincipal->query("SELECT * FROM paginas_perfiles  WHERE pper_tipo_usuario= '".$_GET["id"]."'");
+									while ($page = $consultaPagina->fetch_assoc()) {
+										echo '<option value="' . $page["pper_pagina"] . '" id="pag-' . $page["pper_pagina"] . '" selected >' . $page["pper_pagina"] . '</option>';
+									}
+									?>
+								</select>                 
+							
+								<div class="form-actions">
+									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+								</div>
+							</form>
 						</div>
 					</div>
 				</div>
@@ -173,42 +128,8 @@ include("includes/js-formularios.php");
 	<?php include("includes/pie.php");?>
 </div>
 </body>
+<script src="js/Roles.js" ></script>
 <script type="text/javascript">
-	let dataTable = $('#data-table').DataTable()
-	    function actualizarPaginasSeleccionadas(dataTable) {
-        let paginasSeleccionadas = [];
-				dataTable.$('.selectCheckbox').each(function() {
-            if ($(this).prop('checked')) {
-                paginasSeleccionadas.push($(this).val());
-            }
-        });
-
-				$('#selectAll').change(function() {
-				let isChecked = $(this).prop('checked');	
-				dataTable.$('.selectCheckbox').each(function() {
-								$(this).prop('checked',isChecked)
-                paginasSeleccionadas.push($(this).val());
-        });
-			});
-			
-				let selectElement = $('#paginasSeleccionadas');
-        selectElement.find('option').remove(); 
-				for (let i = 0; i < paginasSeleccionadas.length; i++) {
-						selectElement.append($('<option>', {
-								value: paginasSeleccionadas[i]
-						}));
-				}
-				selectElement.val(paginasSeleccionadas);
-
-    }
-
-    $(document).ready(function() {
-        actualizarPaginasSeleccionadas(dataTable);
-
-        $(document).on('change', 'input[type="checkbox"]', function() {
-            actualizarPaginasSeleccionadas(dataTable);
-        });
-    });
-		
+	$(document).ready(mostrarPaginas(1, <?=$_GET['id'];?>));
 </script>
 </html>
