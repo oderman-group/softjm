@@ -10,7 +10,7 @@ if ($_FILES['foto']['name'] != "") {
 
     $conexionBdPrincipal->query("UPDATE usuarios SET usr_foto='" . $fileName . "' WHERE usr_id='" . $_POST["id"] . "' AND usr_id_empresa='" . $_SESSION["dataAdicional"]["id_empresa"] . "'");
 }
-$usuario = $_POST["usuario"] . $_POST["dominio"];
+$usuario = $_POST["usuario"] . $_SESSION["dataAdicional"]["dominio_empresa"];
 $conexionBdPrincipal->query("UPDATE usuarios SET usr_login='" . $usuario . "', usr_nombre='" . $_POST["nombre"] . "', usr_email='" . $_POST["email"] . "', usr_ciudad='" . $_POST["ciudad"] . "', usr_area='" . $_POST["area"] . "', usr_bloqueado='" . $_POST["bloqueado"] . "', usr_intentos_fallidos='" . $_POST["fallidos"] . "', usr_sucursal='" . $_POST["sucursal"] . "', usr_meta_ventas='" . $_POST["metaVentas"] . "'
 WHERE usr_id='" . $_POST["id"] . "' AND usr_id_empresa='" . $_SESSION["dataAdicional"]["id_empresa"] . "'");
 
