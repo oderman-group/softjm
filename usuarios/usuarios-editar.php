@@ -71,7 +71,7 @@ include("includes/js-formularios.php");
             </p>
             
             <?php include("includes/notificaciones.php");?>
-            
+			<span style="color: blue; font-size: 15px;" id="respuestaUsuario"></span>
 			<div class="row-fluid">
 				<div class="span8">
 
@@ -100,7 +100,7 @@ include("includes/js-formularios.php");
                       $usuarioCompleto = $resultadoD['usr_login'];
                       list($nombreUsuario, $dominioOrganizacion) = explode('@', $usuarioCompleto, 2);
                     ?>
-                      <input type="text" class="span4" name="usuario" value="<?= $nombreUsuario; ?>" required>
+                      <input type="text" class="span4" name="usuario" id="usuario" pattern="[A-Za-z0-9]+" data-id-usuario="<?=$_GET["id"];?>" oninput="validarUsuario(this)" autofocus  value="<?= $nombreUsuario; ?>" required>
                       <input type="text" class="span3" value="<?=  '@' . $dominioOrganizacion; ?>" readonly
                         name="dominio">
 									</div>
@@ -229,7 +229,7 @@ include("includes/js-formularios.php");
                                
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                                    <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+                                    <button id="btnEnviar" type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 								</div>
 							</form>
 						</div>
@@ -266,6 +266,7 @@ include("includes/js-formularios.php");
 
 		</div>
 	</div>
+	<script src="js/Usuarios.js" ></script>
 	<?php include("includes/pie.php");?>
 </div>
 </body>
