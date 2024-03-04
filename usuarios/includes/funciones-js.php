@@ -1,4 +1,3 @@
-
 <script type="application/javascript">
 function notificaciones(){
 	var usuario = <?=$_SESSION["id"];?>;
@@ -8,7 +7,7 @@ function notificaciones(){
 				"&consulta="+(consulta);
 		$.ajax({
 		   type: "POST",
-		   url: "ajax-notificaciones.php",
+		   url: "ajax/ajax-notificaciones.php",
 		   data: datos,
 		   success: function(data){
 			   $('#notificaciones').empty().hide().html(data).show(1);

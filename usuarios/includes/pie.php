@@ -3,10 +3,6 @@
 	<script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>	
 
-
-	
-	<script type="text/javascript" src="chat.js"></script>
-
 <div class="copyright">
 		<p>
 			 &copy; 2017 - Todos los derechos reservados
