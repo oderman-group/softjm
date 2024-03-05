@@ -119,6 +119,66 @@ $(document).ready(function () {
         });
     }
     actulizarTablacombos()
+    
+    let serviciosSelect = $("#servicios-select").select2({
+        placeholder: "Escoja una opción...",
+        multiple: true,
+        minimumInputLength: 3,
+        ajax: {
+            type: "GET",
+            url: "ajax/ajax-buscar-servicio.php",
+            dataType: "json",
+            processResults: function (items) {
+                return {
+                    results: items.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.text,
+                        };
+                    })
+                };
+            }
+        }
+    });
+
+    serviciosSelect.on("change", function (e) {
+        const servicio = serviciosSelect.val() || [];
+        const url = new URL(window.location.href);
+        const id = url.searchParams.get("id");
+        $.ajax({
+            type: "POST",
+            url: "ajax/ajax-actualizar-servicios-cotizacion.php",
+            data: {
+                servicio,
+                id
+            },
+            success: function (response) {
+                actulizarTablaservicios()
+            }
+        });
+    });
+
+    serviciosSelect.on("select2:clear", function (e) {
+        console.log("clear")
+    });
+
+    function actulizarTablaservicios() {
+        $.ajax({
+            type: "POST",
+            url: "",
+            data: {
+                action: "generarTablaServicios"
+            },
+            success: function (response) {
+                let bodyStart = response.indexOf('<body>');
+                let bodyEnd = response.indexOf('</body>');
+                let bodyContent = response.slice(bodyStart + 6, bodyEnd);
+                $('#tableBody .servicio').remove();
+                $('#tableBody').append(bodyContent);
+            }
+        });
+    }
+    actulizarTablaservicios()
 });
 
 // Función para recalcular totales
@@ -214,6 +274,21 @@ $(document).on("click", ".delete-combo", function (e) {
     const idItem = $(this).data("id");
     console.log(idItem);
     const select2Element = $("#combos-select");
+    const currentSelectedValues = select2Element.val();
+    const newSelectedValues = currentSelectedValues.filter(value => value != idItem);
+
+    select2Element.val(newSelectedValues || []);
+    select2Element.trigger("change");
+});
+
+$(document).on("click", ".delete-servicios", function (e) {
+    e.preventDefault();
+    if (!confirm('¿Desea eliminar este registro?')) {
+        return;
+    }
+    const idItem = $(this).data("id");
+    console.log(idItem);
+    const select2Element = $("#servicios-select");
     const currentSelectedValues = select2Element.val();
     const newSelectedValues = currentSelectedValues.filter(value => value != idItem);
 
