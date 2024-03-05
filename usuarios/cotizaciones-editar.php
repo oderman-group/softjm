@@ -88,15 +88,21 @@ include("includes/js-formularios.php");
 <?php }?>
 <?php
 		require '../usuarios/class/CotizacionesEditar.php';
-		if (isset($_POST['action']) && $_POST['action'] === 'generarTablaProductos') {
+		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaProductos') {
 			$htmlTablaProductos = CotizacionesEditar::generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas);
 			echo $htmlTablaProductos;
 			exit; 
 		}
 
-		if (isset($_POST['action']) && $_POST['action'] === 'generarTablacombos') {
+		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablacombos') {
 			$htmlTablaCombos = CotizacionesEditar::generarTablacombos($conexionBdPrincipal, $resultadoD,$simbolosMonedas);
 			echo $htmlTablaCombos;
+			exit; 
+		}
+
+		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaServicios') {
+			$htmlTablaServicios = CotizacionesEditar::generarTablaServicios($conexionBdPrincipal, $resultadoD,$simbolosMonedas);
+			echo $htmlTablaServicios;
 			exit; 
 		}
 ?>
@@ -448,7 +454,7 @@ include("includes/js-formularios.php");
 											<?php
             									$consultaProductos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad FROM cotizacion_productos
 												INNER JOIN productos ON prod_id=czpp_producto AND prod_id_empresa='".$idEmpresa."'
-												WHERE czpp_cotizacion='" . $_GET["id"] . "' ORDER BY czpp_orden");
+												WHERE czpp_cotizacion='" . $_GET["id"] . "' ORDER BY prod_nombre");
 
 												while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
 												?>
@@ -463,17 +469,16 @@ include("includes/js-formularios.php");
 									<div class="control-group">
 										<label class="control-label">Servicios</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="servicio[]" multiple>
+											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="servicio[]" multiple id="servicios-select">
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT serv_id, serv_nombre FROM servicios WHERE serv_id_empresa='".$idEmpresa."'
+												$conOp = $conexionBdPrincipal->query("SELECT czpp_servicio, czpp_cotizacion, serv_id, serv_nombre FROM cotizacion_productos
+												INNER JOIN servicios ON serv_id=czpp_servicio AND serv_id_empresa='".$idEmpresa."' 
+												WHERE czpp_cotizacion='".$resultadoD['cotiz_id']."'
 												ORDER BY serv_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-													
-													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_servicio, czpp_cotizacion FROM cotizacion_productos WHERE czpp_servicio='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."'");
-													$productoN = $consultaCotizacionP->num_rows;
 												?>
-													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['serv_id'];?>"><?=$resOp['serv_id'].". ".$resOp['serv_nombre'];?></option>
+													<option selected value="<?=$resOp['serv_id'];?>"><?=$resOp['serv_id'].". ".$resOp['serv_nombre'];?></option>
 												<?php
 												}
 												?>
@@ -570,76 +575,14 @@ include("includes/js-formularios.php");
                                 <th>SUBTOTAL</th>
 							</tr>
 							</thead>
-							<tbody id="tableBody">
-								
-								<!-- SERVICIOS -->
-							<?php
-							$productos = $conexionBdPrincipal->query("SELECT * FROM servicios
-							INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='".$_GET["id"]."'
-							WHERE serv_id_empresa='".$idEmpresa."'
-							ORDER BY czpp_orden");
-							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
-								$dcto = 0;
-								$valorTotal = 0;
-
-								$valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
-
-								if($prod['czpp_cantidad']>0 and $prod['czpp_descuento']>0){
-									$dcto = ($valorTotal * ($prod['czpp_descuento']/100));
-									$totalDescuento += $dcto;	
-								}
-
-								$valorConDcto = $valorTotal - $dcto;
-
-								$totalIva += ($valorConDcto * ($prod['czpp_impuesto']/100));
-
-								$subtotal +=$valorTotal;	
-								
-								
-								$totalCantidad += $prod['czpp_cantidad'];
-							?>
-							<tr>
-								<td><?=$no;?></td>
-								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-                                <td>
-									<?php if (Modulos::validarRol([371], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-									<a href="bd_delete/cotizaciones-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
-									<?php } ?>
-									<?php if (Modulos::validarRol([156], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-									<a href="servicios-editar.php?id=<?=$prod['serv_id'];?>" target="_blank"><?=$prod['serv_nombre'];?></a>
-									<?php } ?>
-										
-									<p><textarea title="czpp_observacion" name="<?=$prod['czpp_id'];?>" onChange="productos(this)" style="width: 300px;" rows="4"><?=$prod['czpp_observacion'];?></textarea></p>
-								</td>
-                                <td><input type="number" title="czpp_cantidad" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-                                <td><input type="text" title="czpp_valor" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_valor'];?>" onChange="productos(this)" style="width: 200px;"></td>
-                                <td><input type="text" title="czpp_impuesto" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_impuesto'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-								<td><input type="text" title="czpp_descuento" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-								<?php if($resultadoD['cotiz_descuentos_especiales'] == 1){?>
-									<td><input type="text" title="czpp_descuento_especial" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento_especial'];?>" onChange="combos(this)" style="width: 50px; text-align: center;"></td>
-								<?php }?>
-									<td>
-											<span class="moneda-simbolo"><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?></span>
-											<span class="valor-numerico"><?=number_format($valorTotal, 0, ",", ".");?></span>
-									</td>
-							</tr>
-							<?php 
-								$no ++;
-							}
-							?>
-							
-							<?php
-							if($resultadoD['cotiz_envio']==''){$envio=0;}else{$envio=$resultadoD['cotiz_envio'];}
-							$total = $subtotal- $totalDescuento + $totalIva + $envio;
-							?>	
-							</tbody>
+							<tbody id="tableBody"></tbody>
 							<tfoot>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">SUBTOTAL</td>
 									<td id="subtotal">
 									<span class="moneda-simbolo">
 										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-										<span class="valor-numerico"><?=number_format($subtotal,0,",",".");?>
+										<span class="valor-numerico"><?=!empty($subtotal) ? number_format($subtotal,0,",",".") : 0;?>
 										</span>
 									</td>
 								</tr>
@@ -647,26 +590,26 @@ include("includes/js-formularios.php");
 									<td style="text-align: right;" colspan="<?=$colspan;?>">DESCUENTO</td>
 									<td id="totalDiscount"><span class="moneda-simbolo">
 										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-										<span class="valor-numerico"><?=number_format($totalDescuento,0,",",".");?>
+										<span class="valor-numerico"><?=!empty($totalDescuento) ? number_format($envio,0,",",".") : 0;?>
 										</span></td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">IVA</td>
 									<td id="totalIva"><span class="moneda-simbolo">
 										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-										<span class="valor-numerico"><?=number_format($totalIva,0,",",".");?>
+										<span class="valor-numerico"><?=!empty($totalIva) ? number_format($totalIva,0,",",".") : 0;?>
 										</span></td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">ENVÍO</td>
-									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($envio,0,",",".");?>
+									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=!empty($envio) ? number_format($envio,0,",",".") : 0;?>
 										</td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
 									<td style="text-align: right;" colspan="<?=$colspan;?>">TOTAL NETO</td>
 									<td id="total"><span class="moneda-simbolo">
 										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-										<span class="valor-numerico"><?=number_format($subtotal,0,",",".");?>
+										<span class="valor-numerico"><?=!empty($subtotal) ? number_format($subtotal,0,",",".") : 0;?>
 										</span></td>
 								</tr>
 							</tfoot>	
@@ -676,7 +619,7 @@ include("includes/js-formularios.php");
 							<?php
 							if(Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 
-								<p style="color: black; background-color: <?=$colorCredito;?>; padding: 15px; font-weight: bold; font-size: 16px;">Esta cotización deja una utilidad aproximada de $<?=number_format( ($sumaUtilidad) ,0,",",".");?></p>
+								<p style="color: black; background-color: <?=$colorCredito;?>; padding: 15px; font-weight: bold; font-size: 16px;">Esta cotización deja una utilidad aproximada de $<?=!empty($sumaUtilidad) ? number_format( ($sumaUtilidad) ,0,",",".") : 0;?></p>
 							<?php }?>
 							
 							
