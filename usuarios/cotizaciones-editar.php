@@ -48,44 +48,42 @@ include("includes/js-formularios.php");
 <?php if($resultadoD['cotiz_vendida']!=1){?>
 
 	<script type="text/javascript">
-	  function productos(enviada){
-	  	
-	  	var tipoCliente = enviada.alt;
-
-		  var campo = enviada.title;
-		  var producto = enviada.name;
-		  var proceso = 2;
-		  var valor = enviada.value;
-		  
-		  $('#resp').empty().hide().html("Esperando...").show(1);
-			datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&tipoCliente="+(tipoCliente);
-				   $.ajax({
-					   type: "POST",
-					   url: "ajax/ajax-productos.php",
-					   data: datos,
-					   success: function(data){
-					   $('#resp').empty().hide().html(data).show(1);
-					   }
-				   });
-	}
+		function productos(enviada){
+			var tipoCliente = enviada.alt;
+			var campo = enviada.title;
+			var producto = enviada.name;
+			var proceso = 2;
+			var valor = enviada.value;
+			
+			$('#resp').empty().hide().html("Esperando...").show(1);
+				datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&tipoCliente="+(tipoCliente);
+					$.ajax({
+						type: "POST",
+						url: "ajax/ajax-productos.php",
+						data: datos,
+						success: function(data){
+						$('#resp').empty().hide().html(data).show(1);
+						}
+					});
+		}
 
 
-	function combos(enviada){
-		  var campo = enviada.title;
-		  var producto = enviada.name;
-		  var proceso = 11;
-		  var valor = enviada.value;
-		  $('#resp').empty().hide().html("Esperando...").show(1);
-			datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo);
-				   $.ajax({
-					   type: "POST",
-					   url: "ajax/ajax-productos.php",
-					   data: datos,
-					   success: function(data){
-					   $('#resp').empty().hide().html(data).show(1);
-					   }
-				   });
-	}	
+		function combos(enviada){
+			var campo = enviada.title;
+			var producto = enviada.name;
+			var proceso = 11;
+			var valor = enviada.value;
+			$('#resp').empty().hide().html("Esperando...").show(1);
+				datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo);
+					$.ajax({
+						type: "POST",
+						url: "ajax/ajax-productos.php",
+						data: datos,
+						success: function(data){
+						$('#resp').empty().hide().html(data).show(1);
+						}
+					});
+		}	
 	</script>
 <?php }?>
 <?php
@@ -463,69 +461,6 @@ include("includes/js-formularios.php");
 											</select>
 										</div>
 									</div>
-									<script>
-										$(document).ready(function () {
-												let productSelect = $("#product-select").select2({
-														placeholder: "Escoja una opción...",
-														multiple: true,
-														minimumInputLength: 3,
-														ajax: {
-																type: "GET",
-																url: "../usuarios/ajax/ajax-buscar-productos.php",
-																dataType: "json",
-																processResults: function (items) {
-																		return {
-																				results: items.map(function (item) {
-																						return {
-																								id: item.id,
-																								text: item.text,
-																						};
-																				})
-																		};
-																}
-														}
-												});
-												
-												productSelect.on("change", function (e) {
-														const producto = productSelect.val() || [];
-														const url = new URL(window.location.href);
-														const id = url.searchParams.get("id");
-														$.ajax({
-																type: "POST",
-																url: "../usuarios/ajax/ajax-actualizar-productos-cotizacion.php",
-																data: {
-																	producto,
-																	id
-																},
-																success: function (response) {
-																		actulizarTablaProductos()	
-																}
-														});
-												});
-
-												productSelect.on("select2:clear", function (e) {
-														console.log("clear")
-												});
-
-											function actulizarTablaProductos(){
-												$.ajax({
-														type: "POST",
-														url: "", 
-														data: {
-																action: "generarTablaProductos"
-                    					},
-														success: function(response) {
-															let bodyStart = response.indexOf('<body>');
-															let bodyEnd = response.indexOf('</body>');
-															let bodyContent = response.slice(bodyStart + 6, bodyEnd);
-															$('#tableBody .producto').remove();
-															$('#tableBody').append(bodyContent);
-                    				}
-                					});
-											}
-											actulizarTablaProductos()	
-										});
-									</script>
 								
 									<div class="control-group">
 										<label class="control-label">Servicios</label>
@@ -941,102 +876,7 @@ include("includes/js-formularios.php");
 		</div>
 	</div>
 	<?php include("includes/pie.php");?>
-	<script>
-  // Función para recalcular totales
-  function recalculate() {
-    let subtotal = 0;
-    let totalDiscount = 0;
-    let totalIva = 0;
-
-    $("#data-table tbody tr").each(function () {
-      let quantity = parseInt($(this).find("input[title='czpp_cantidad']").val()) || 0;
-      let value = parseFloat($(this).find("input[title='czpp_valor']").val()) || 0;
-      let discount = parseFloat($(this).find("input[title='czpp_descuento']").val()) || 0;
-      let subtotalRow = quantity * value;
-      let discountAmount = (subtotalRow * discount) / 100;
-      let rowTotal = subtotalRow - discountAmount;
-      let rowIva = (rowTotal * parseFloat($(this).find("input[title='czpp_impuesto']").val())) / 100;
-
-      subtotal += subtotalRow;
-      totalDiscount += discountAmount;
-      totalIva += rowIva;
-    });
-
-    $("#subtotal .valor-numerico").text(subtotal.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
-    $("#totalDiscount .valor-numerico").text(totalDiscount.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
-    $("#totalIva .valor-numerico" ).text(totalIva.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
-
-    let envio = parseFloat($("input[name='envio']").val()) || 0;
-    let total = subtotal - totalDiscount + totalIva + envio;
-    $("#total .valor-numerico").text(total.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
-  }
-
-  $("#data-table tbody").on("input", "input[title='czpp_cantidad'], input[title='czpp_valor'], input[title='czpp_descuento'], input[title='czpp_impuesto']", recalculate);
-
-  $("input[name='envio']").on("input", recalculate);
-
-  let observer = new MutationObserver(function (mutations) {
-    recalculate();
-  });
-
-  let tbody = document.getElementById("data-table").getElementsByTagName("tbody")[0];
-
-  let config = { childList: true };
-
-  observer.observe(tbody, config);
-
-  recalculate();
-</script>
-
-<script>
-    // Función para actualizar una subtotal parcial específica
-    function updatePartialSubtotal(row) {
-        let cantidad = parseFloat(row.find("input[title='czpp_cantidad']").val()) || 0;
-        let valor = parseFloat(row.find("input[title='czpp_valor']").val()) || 0;
-        let descuento = parseFloat(row.find("input[title='czpp_descuento']").val()) || 0;
-        let iva = parseFloat(row.find("input[title='czpp_iva']").val()) || 0;
-
-        let subtotalParcial = cantidad * valor;
-        // let subtotalParcial = cantidad * valor - (cantidad * valor * descuento / 100);
-        let ivaAmount = (subtotalParcial * iva / 100);
-        subtotalParcial += ivaAmount;
-        let valorNumeric = row.find('.valor-numerico');
-        valorNumeric.text(subtotalParcial.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
-    }
-
-
-    function recalculatePartialSubtotals() {
-        $('#data-table tbody tr').each(function () {
-            let row = $(this);
-            updatePartialSubtotal(row);
-        });
-    }
-    $('#data-table tbody').on('input', 'input[title^="czpp_"]', function () {
-        let row = $(this).closest('tr');
-        updatePartialSubtotal(row);
-    });
-    recalculatePartialSubtotals();
-</script>
-
-<script>
-	// Controlador de eventos para hacer clic en los enlaces de eliminación
-	$(document).on("click", ".delete-product", function (e) {
-	    e.preventDefault(); 
-	    if (!confirm('¿Desea eliminar este registro?')) {
-	        return;
-	    }
-	  const idItem = $(this).data("id"); 
-
-	  const select2Element = $("#product-select"); 
-		
-		const currentSelectedValues = select2Element.val();
-
-		const newSelectedValues = currentSelectedValues.filter(value => value != idItem);
-
-		select2Element.val(newSelectedValues|| []);
-		select2Element.trigger("change");
-	});
-</script>
+	<script src="js/Cotizaciones.js"></script>
 </div>
 </body>
 </html>
