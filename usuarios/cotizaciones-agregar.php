@@ -6,6 +6,7 @@ include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
 <link href="css/chosen.css" rel="stylesheet">
+<link href="../assets-login/plugins/select2/css/select2.css" rel="stylesheet" />
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -22,6 +23,7 @@ include("includes/head.php");
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+<script src="../assets-login/plugins/select2/js/select2.js"></script>
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
@@ -280,72 +282,30 @@ include("includes/js-formularios.php");
                                     </div>
 							   </div>
 							   
-
-
-							   
-							   
-
+								
+								<div class="control-group">
+										<label class="control-label">Combos</label>
+										<div class="controls">
+											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="combo[]" multiple id="combos-select">
+											</select>
+										</div>
+								   </div>
 								
 								<div class="control-group">
 										<label class="control-label">Productos</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="producto[]" multiple>
-												<option value=""></option>
-												<?php
-												$filtroProd = '';
-												if(is_numeric($_GET["prov"])){ $filtroProd .=" AND prod_proveedor='".$_GET["prov"]."'";}
-
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' $filtroProd ORDER BY prod_nombre ");
-												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-													
-													if($resOp['prod_categoria'] == 28 and !Modulos::validarRol([392], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ){
-														continue;
-													}
-												?>
-													<option value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_id'].". ".$resOp['prod_referencia']." ".strtoupper($resOp['prod_nombre'])." - [HAY ".$resOp['prod_existencias']."]";?></option>
-												<?php
-												}
-												?>
+											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="producto[]" multiple id="product-select">
 											</select>
 										</div>
-								   </div>
-								
-									<div class="control-group">
-										<label class="control-label">Combos</label>
-										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="combo[]" multiple>
-												<option value=""></option>
-												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM combos WHERE combo_id_empresa='".$idEmpresa."' ORDER BY combo_nombre");
-												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-												?>
-													<option value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>
-												<?php
-												}
-												?>
-											</select>
-										</div>
-								   </div>
+									</div>
 								
 									<div class="control-group">
 										<label class="control-label">Servicios</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="servicio[]" multiple>
-												<option value=""></option>
-												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM servicios WHERE serv_id_empresa='".$idEmpresa."' ORDER BY serv_nombre");
-												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-												?>
-													<option value="<?=$resOp['serv_id'];?>"><?=$resOp['serv_id'].". ".$resOp['serv_nombre'];?></option>
-												<?php
-												}
-												?>
+											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="servicio[]" multiple id="servicios-select">
 											</select>
 										</div>
 								   </div>
-								
-								
-									
 								
 									<div class="control-group">
 										<label class="control-label">Observaciones</label>
@@ -370,6 +330,7 @@ include("includes/js-formularios.php");
 		</div>
 	</div>
 	<?php include("includes/pie.php");?>
+	<script src="js/Cotizaciones.js"></script>
 </div>
 </body>
 </html>

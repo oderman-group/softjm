@@ -201,7 +201,7 @@ include("includes/js-formularios.php");
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="bd_update/cotizaciones-actualizar.php">
-                            <input type="hidden" name="id" value="<?=$_GET["id"];?>">
+                            <input type="hidden" name="id" id="id" value="<?=$_GET["id"];?>">
 							<input type="hidden" name="monedaActual" value="<?=$resultadoD['cotiz_moneda'];?>">
                             	   
                                <script type="application/javascript">
