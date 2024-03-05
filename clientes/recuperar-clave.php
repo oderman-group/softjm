@@ -1,8 +1,6 @@
-<?php
-	include("../conexion.php");
-?>
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
@@ -23,76 +21,62 @@
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <script src="https://kit.fontawesome.com/e84fa1cf78.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
   <div class="container-scroller">
     <div class="container-fluid page-body-wrapper full-page-wrapper">
       <div class="content-wrapper d-flex align-items-stretch auth auth-img-bg">
         <div class="row flex-grow">
+
+        
           <div class="col-lg-6 d-flex align-items-center justify-content-center">
+
           
+
             <div class="auth-form-transparent text-left p-3">
+
+            <?php 
+              if(!empty($_GET["msg"])){
+                if($_GET["msg"]==1){
+            ?>
+              <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <i class="icon-ok"></i><strong>Exito!</strong> Tus credenciales de acceso han sido enviadas al correo electrónico proporcionado. Verifica por favor.
+              </div>
+            <?php
+              }
+              if($_GET["msg"]==2){
+            ?>
+              <div class="alert alert-danger">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <i class="icon-exclamation-sign"></i><strong>Error!</strong> No fue encontrado un registro de usuario con el correo electrónico proporcionado.
+              </div>
+            <?php }}?>
               <div class="brand-logo">
                 <img src="../usuarios/files/orion-600.png" alt="Logo Orion">
               </div>
-              <h4>Bienvenido a ORION</h4>
-              <h6 class="font-weight-light">Ingreso al Área de Clientes</h6>
-              <form class="pt-3" action="autentico.php" method="post" id="demo-form">
-
-                <input type="hidden" name="idseg" value="<?= $idSeguimiento; ?>">
-
-                <input type="hidden" name="bd" value="<?=MAINBD;?>">
+              <h4>Recuperar contraseña</h4>
+              <h6 class="font-weight-light">Ingresa tu usuarios o email registrado</h6>
+              <form class="pt-3" action="recuperar-clave-guardar.php" method="post" id="demo-form">
 
                 <div class="form-group">
-                  <label for="exampleInputEmail">Usuario</label>
+                  <label for="exampleInputEmail">Usuarios o Email</label>
                   <div class="input-group">
                     <div class="input-group-prepend bg-transparent">
                       <span class="input-group-text bg-transparent border-right-0">
                         <i class="fa fa-user text-primary"></i>
                       </span>
                     </div>
-                    <input type="text" class="form-control form-control-lg border-left-0" placeholder="Usuario" name="Usuario">
+                    <input type="text" class="form-control form-control-lg border-left-0" placeholder="Usuarios o Email" name="email">
                   </div>
                 </div>
-
-                <div class="form-group">
-                  <label for="exampleInputPassword">Contraseña</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend bg-transparent">
-                      <span class="input-group-text bg-transparent border-right-0">
-                        <i class="fa fa-lock text-primary"></i>
-                      </span>
-                    </div>
-                    <input type="password" class="form-control form-control-lg border-left-0" placeholder="Contraseña" name="Clave" id="passwordInput">
-                    <div class="input-group-prepend bg-transparent" onclick="mostrarClave()">
-                      <span class="input-group-text bg-transparent border-left-0">
-                      <i class="fa-solid fa-eye" id="icoVer"></i>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <script>
-                    function mostrarClave() {
-                        var campo = document.getElementById("passwordInput");
-                        var icoVer = document.getElementById("icoVer");
-
-                        if (campo.type === "password") {
-                            campo.type = "text";
-                            icoVer.classList.remove("fa-eye");
-                            icoVer.classList.add("fa-eye-slash");
-                        } else {
-                            campo.type = "password";
-                            icoVer.classList.remove("fa-eye-slash");
-                            icoVer.classList.add("fa-eye");
-                        }
-                    }
-                </script>
 
                 <div class="my-2 d-flex justify-content-between align-items-center">
-                  <a href="recuperar-clave.php" class="auth-link text-black">Olvidaste tu clave?</a>
+                  <a href="index.php" class="auth-link text-black">Volver al inicio</a>
                 </div>
 
                 <div class="my-3">
-                  <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">ENTRAR</button>
+                  <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">RECUPERAR CLAVE</button>
                 </div>
               </form>
             </div>
@@ -119,4 +103,6 @@
   <script src="assets-login/js/todolist.js"></script>
   <!-- endinject -->
 </body>
+
+
 </html>
