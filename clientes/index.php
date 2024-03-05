@@ -86,6 +86,11 @@
                         }
                     }
                 </script>
+
+                <div class="my-2 d-flex justify-content-between align-items-center">
+                  <a href="recuperar-clave.php" class="auth-link text-black">Olvidaste tu clave?</a>
+                </div>
+
                 <div class="my-3">
                   <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">ENTRAR</button>
                 </div>
