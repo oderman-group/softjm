@@ -260,8 +260,8 @@ include("includes/head.php");
 													?>
 
 												</td>
-												<td><?= strtoupper($res['usr_nombre']); ?></td>
-												<td><?= strtoupper($vendedor['usr_nombre']); ?></td>
+												<td><?=!empty($res['usr_nombre']) ? strtoupper($res['usr_nombre']) : ""; ?></td>
+												<td><?=!empty($vendedor['usr_nombre']) ? strtoupper($vendedor['usr_nombre']) : ""; ?></td>
 												<td>
 													<div class="btn-group">
 														<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span>

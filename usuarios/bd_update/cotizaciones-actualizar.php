@@ -23,12 +23,6 @@ cotiz_envio='" . $_POST["envio"] . "',
 cotiz_ocultar_descuento_combo='" . $_POST["dctoCombos"] . "', 
 cotiz_descuentos_especiales='" . $_POST["dctoEspecial"] . "' 
 WHERE cotiz_id='" . $_POST["id"] . "' AND  cotiz_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
-    
-    require('actualizar-productos-cotizacion.php');
-
-    require('actualizar-combos-cotizacion.php');
-
-    require('actualizar-servicios-cotizacion.php');
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
