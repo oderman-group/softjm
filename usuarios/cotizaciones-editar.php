@@ -93,6 +93,12 @@ include("includes/js-formularios.php");
 			echo $htmlTablaProductos;
 			exit; 
 		}
+
+		if (isset($_POST['action']) && $_POST['action'] === 'generarTablacombos') {
+			$htmlTablaCombos = CotizacionesEditar::generarTablacombos($conexionBdPrincipal, $resultadoD,$simbolosMonedas);
+			echo $htmlTablaCombos;
+			exit; 
+		}
 ?>
 </head>
 <body>
@@ -418,17 +424,16 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 										<label class="control-label">Combos</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="combo[]" multiple>
+											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="combo[]" multiple id="combos-select">
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT combo_id, combo_nombre FROM combos WHERE combo_id_empresa='".$idEmpresa."'
+												$conOp = $conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo, combo_id, combo_nombre FROM cotizacion_productos
+												INNER JOIN combos ON combo_id=czpp_combo AND combo_id_empresa='".$idEmpresa."'
+												WHERE czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo='".CZPP_TIPO_COTZ."'
 												ORDER BY combo_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-
-													$consultaCotizacionP=$conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo  FROM cotizacion_productos WHERE czpp_combo='".$resOp[0]."' AND czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo='".CZPP_TIPO_COTZ."'");
-													$productoN = $consultaCotizacionP->num_rows;
 												?>
-													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>
+													<option selected value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>
 												<?php
 												}
 												?>
@@ -439,22 +444,15 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 										<label class="control-label">Productos</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción1..." class="span10" tabindex="2" name="producto[]" multiple id="product-select">
+											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="producto[]" multiple id="product-select">
 											<?php
-            						$consultaProductos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, 
-																																			czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad
-                                                            FROM productos
-                                                            INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "'
-																														WHERE prod_id_empresa='".$idEmpresa."'
-                                                            ORDER BY czpp_orden");
+            									$consultaProductos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad FROM cotizacion_productos
+												INNER JOIN productos ON prod_id=czpp_producto AND prod_id_empresa='".$idEmpresa."'
+												WHERE czpp_cotizacion='" . $_GET["id"] . "' ORDER BY czpp_orden");
 
 												while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
-														$productoN = !empty($resProducto['czpp_id']) ? 1 : 0;
 												?>
-													<option <?php if ($productoN > 0) {
-														echo "selected";
-												} ?>
-													value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
+													<option selected value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
 												<?php
 													}
 												?>
@@ -573,176 +571,6 @@ include("includes/js-formularios.php");
 							</tr>
 							</thead>
 							<tbody id="tableBody">
-								
-							<!-- COMBOS -->
-							<?php
-							$no = 1;
-							$productos = $conexionBdPrincipal->query("SELECT * FROM combos
-							INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='".$_GET["id"]."'
-							WHERE combo_id_empresa='".$idEmpresa."'
-							ORDER BY czpp_orden");
-							$sumaUtilidad = 0;
-							$totalIva = 0;
-							$subtotal=0;
-							$totalDescuento=0;
-							$totalCantidad=0;
-							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
-								$dcto = 0;
-								$valorTotal = 0;
-
-								$valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
-
-								if($prod['czpp_cantidad']>0 and $prod['czpp_descuento']>0){
-									$dcto = ($valorTotal * ($prod['czpp_descuento']/100));
-									$totalDescuento += $dcto;	
-								}
-
-								$valorConDcto = $valorTotal - $dcto;
-
-								$totalIva += ($valorConDcto * ($prod['czpp_impuesto']/100));
-
-								$subtotal +=$valorTotal;
-								
-								
-								$totalCantidad += $prod['czpp_cantidad'];
-
-								$consultaPreciosCombos=$conexionBdPrincipal->query("SELECT SUM(copp_cantidad*prod_precio) FROM combos_productos
-								INNER JOIN productos ON prod_id=copp_producto
-								WHERE copp_combo='".$prod['combo_id']."'");
-								$precioNormalCombo = mysqli_fetch_array($consultaPreciosCombos, MYSQLI_BOTH);
-
-								$productosDelCombo = $conexionBdPrincipal->query("SELECT * FROM combos_productos
-								INNER JOIN productos ON prod_id=copp_producto
-								WHERE copp_combo='".$prod['combo_id']."'
-								");
-
-								$sumaCostosProductosCombos = 0;
-								$precioDealer = 0;
-								while($pdCombo = mysqli_fetch_array($productosDelCombo, MYSQLI_BOTH)){
-
-									$sumaCostosProductosCombos += $pdCombo['prod_costo'];
-
-									$utilidadDealer = $pdCombo['prod_descuento2'] / 100;
-									$precioDealer = $pdCombo['prod_costo'] + ($pdCombo['prod_costo'] * $utilidadDealer);
-									$subtotalDealer = ($precioDealer * $pdCombo['copp_cantidad']);
-									$totalDealer +=$subtotalDealer;
-
-								}
-
-								$sumaUtilidad += ($prod['czpp_valor'] - $sumaCostosProductosCombos);
-
-								
-							?>
-							<tr>
-								<td><?=$no;?></td>
-								<td><input type="number" title="czpp_orden" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_orden'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-                                <td>
-									<?php if (Modulos::validarRol([371], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-									<a href="bd_delete/cotizaciones-productos-eliminar.php?idItem=<?=$prod['czpp_id'];?>&id=<?=$_GET["id"];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
-									<?php } ?>
-									<?php if (Modulos::validarRol([175], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-									<a href="combos-editar.php?id=<?=$prod['combo_id'];?>" target="_blank"><?=$prod['combo_nombre'];?></a><br>
-									<?php } ?>
-									<?php if($prod['combo_descuento']!="" and $resultadoD['cotiz_ocultar_descuento_combo']=='0'){?>
-										<span><b>Precio Normal:</b> $<?=number_format($precioNormalCombo[0],0,".",".");?></span><br>
-										<span><b>Descuento:</b> <?=$prod['combo_descuento'];?>%</span><br>
-									<?php }?>
-									<span style="font-size: 9px; color: darkblue;"><?=$prod['combo_descripcion'];?></span><br>
-									<span style="font-size: 9px; color: teal;">
-									<?php
-									$productosCombo = $conexionBdPrincipal->query("SELECT copp_id, copp_combo, copp_producto, copp_cantidad,
-										prod_id, prod_nombre
-									   FROM productos
-									INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='".$prod['combo_id']."'
-									WHERE prod_id_empresa='".$idEmpresa."'
-									ORDER BY copp_id");
-									while($prodCombo = mysqli_fetch_array($productosCombo, MYSQLI_BOTH)){
-										echo $prodCombo['prod_nombre']." (".$prodCombo['copp_cantidad']." Unds.).<br>";
-									}
-									?>
-									</span>
-										
-									<p><textarea title="czpp_observacion" name="<?=$prod['czpp_id'];?>" onChange="productos(this)" style="width: 300px;" rows="4"><?=$prod['czpp_observacion'];?></textarea></p>
-								</td>
-                                <td><input type="number" title="czpp_cantidad" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-                                <td>
-									<?php
-									if($resultadoD['cli_categoria']== CLI_CATEGORIA_DEALER and Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
-										echo "<b>Precio Dealer: $".number_format($totalDealer, 0, ",", ".")."</b><br>";
-									}
-									?>
-                                	<input type="text" title="czpp_valor" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_valor'];?>" onChange="productos(this)" style="width: 200px;" disabled><br>
-                                	<?php
-									if(Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
-										echo "
-										<b>Costo: $".number_format($sumaCostosProductosCombos, 0, ",", ".")."</b><br>
-										<b>Valor Utilidad: $".number_format(($prod['czpp_valor'] - $sumaCostosProductosCombos), 0, ",", ".")."</b><br>
-										";
-									}
-									?>
-                                </td>
-                                <td><input type="text" title="czpp_impuesto" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_impuesto'];?>" onChange="productos(this)" style="width: 50px; text-align: center;"></td>
-                                <td><input type="text" title="czpp_descuento" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento'];?>" onChange="combos(this)" style="width: 50px; text-align: center;"></td>
-
-                                <?php if($resultadoD['cotiz_descuentos_especiales'] == 1){?>
-									<td>
-										<input type="text" title="czpp_descuento_especial" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento_especial'];?>" onChange="combos(this)" style="width: 50px; text-align: center;">
-
-									<?php if (Modulos::validarRol([57], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-										<br><a href="bd_update/descuentos-cotizaciones-actualizar.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
-									<?php } ?>
-
-
-									<?php 
-									$consultaDctoEspecial=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']." AND usr_id_empresa='".$idEmpresa."''");
-									$usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
-									?>
-
-									<br><span style="font-size:10px; color:gray;">
-
-										<?=$prod['czpp_aprobado_fecha'];?><br>
-										<?=$usuarioDctoEspecialAprobar['usr_nombre'];?>
-											
-										</span>
-										
-									</td>
-								<?php }?>
-
-								<td>
-										<span class="moneda-simbolo"><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?></span>
-										<span class="valor-numerico"><?=number_format($valorTotal, 0, ",", ".");?></span>
-								</td>
-
-								<?php if($resultadoD['cotiz_descuentos_especiales'] == 1){?>
-									<td><input type="text" title="czpp_descuento_especial" name="<?=$prod['czpp_id'];?>" value="<?=$prod['czpp_descuento_especial'];?>" onChange="combos(this)" style="width: 50px; text-align: center;">
-
-									<?php if (Modulos::validarRol([57], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-										<br><a href="bd_update/descuentos-cotizaciones-actualizar.php?get=70&idItem=<?=$prod['czpp_id'];?>" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>
-									<?php } ?>
-
-
-									<?php 
-									$consultaDctoEspecial=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='".$prod['czpp_aprobado_usuario']."'");
-									$usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
-									?>
-
-									<br><span style="font-size:10px; color:gray;">
-
-										<?=$prod['czpp_aprobado_fecha'];?><br>
-										<?=$usuarioDctoEspecialAprobar['usr_nombre'];?>
-											
-										</span>
-
-									</td>
-									
-
-								<?php }?>
-                                <td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=number_format($valorTotal,0,",",".");?></td>
-							</tr>
-							<?php 
-								$no ++;
-							}
-							?>	
 								
 								<!-- SERVICIOS -->
 							<?php
