@@ -1,9 +1,9 @@
 <?php include("sesion.php");?>
 <?php
-$notificaciones = mysql_query("SELECT * FROM notificaciones
-INNER JOIN clientes ON cli_id=not_cliente
-WHERE not_usuario='".$_SESSION["id"]."' AND not_visto=0 LIMIT 0,5",$conexion);
-$numNotf = mysql_num_rows($notificaciones);
+$notificaciones = mysqli_query($conexionBdPrincipal, "SELECT * FROM notificaciones
+INNER JOIN clientes ON cli_id=not_cliente AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+WHERE not_usuario='".$_SESSION["id"]."' AND not_visto=0 AND not_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' LIMIT 0,5");
+$numNotf = mysqli_num_rows($notificaciones);
 ?>
 
 
@@ -11,7 +11,7 @@ $numNotf = mysql_num_rows($notificaciones);
 							<div class="dropdown-menu pull-right">
 								<span class="notify-h"> Tienes <?=$numNotf;?> notificaciones</span>
                                 <?php 
-								while($notf = mysql_fetch_array($notificaciones)){
+								while($notf = mysqli_fetch_array($notificaciones)){
 									$color = 'black';
 									if($notf['not_varios']==1){$color = 'red';}
 								?>

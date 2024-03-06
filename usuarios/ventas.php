@@ -1,4 +1,4 @@
-	<?php include("sesion.php"); ?>
+<?php include("sesion.php"); ?>
 	<?php
 	$idPagina = 170;
 	$paginaActual['pag_nombre'] = "Ventas";
@@ -6,16 +6,11 @@
 	<?php include("includes/verificar-paginas.php"); ?>
 	<?php include("includes/head.php"); ?>
 	<?php
-	mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('" . $_SESSION["id"] . "', '" . $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] . "', '" . $idPagina . "', now(),'" . $_SERVER['HTTP_REFERER'] . "')", $conexion);
-	if (mysql_errno() != 0) {
-		echo mysql_error();
-		exit();
-	}
 	$suc = 1;
-	if(isset($_GET['suc'])){
+	if(!empty($_GET['suc'])){
 		$suc = $_GET['suc'];
 	}
-	$metricas = mysql_fetch_array(mysql_query("SELECT * FROM metricas WHERE met_id='".$suc."'", $conexion));
+	$metricas = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM metricas WHERE met_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'"));
 	?>
 	<!-- styles -->
 	<link href="css/jquery.gritter.css" rel="stylesheet">
@@ -175,8 +170,8 @@
 					<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Sucursales <b class="caret"></b></a>
 						<ul class="dropdown-menu">
 							<?php
-							$sucursales = mysql_query("SELECT * FROM sucursales_propias",$conexion);
-							while($sucu = mysql_fetch_array($sucursales)){
+							$sucursales = mysqli_query($conexionBdPrincipal, "SELECT * FROM sucursales_propias");
+							while($sucu = mysqli_fetch_array($sucursales)){
 							?>
 								<li><a href="ventas.php?suc=<?=$sucu['sucp_id'];?>"><?=$sucu['sucp_nombre'];?></a></li>
 							<?php }?>
@@ -214,10 +209,10 @@
 							<select data-placeholder="Escoja una opción..." class="chzn-select span12" tabindex="2" name="vendedor">
 								<option value="">Todos</option>
 								<?php
-								$conOp = mysql_query("SELECT * FROM usuarios",$conexion);
-								while($resOp = mysql_fetch_array($conOp)){
+								$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios");
+								while($resOp = mysqli_fetch_array($conOp)){
 									?>
-									<option value="<?=$resOp[0];?>" <?php if($resOp[0] == $_GET["vendedor"]) echo "selected";?> ><?=$resOp['usr_nombre'];?></option>
+									<option value="<?=$resOp[0];?>" <?php if(!empty($_GET['vendedor']) && $resOp[0] == $_GET["vendedor"]) echo "selected";?> ><?=$resOp['usr_nombre'];?></option>
 									<?php
 								}
 								?>
@@ -231,10 +226,10 @@
 							<select data-placeholder="Escoja una opción..." class="chzn-select span12" tabindex="2" name="asesor">
 								<option value="">Todos</option>
 								<?php
-								$conOp = mysql_query("SELECT * FROM usuarios",$conexion);
-								while($resOp = mysql_fetch_array($conOp)){
+								$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios");
+								while($resOp = mysqli_fetch_array($conOp)){
 									?>
-									<option value="<?=$resOp[0];?>" <?php if($resOp[0] == $_GET["asesor"]) echo "selected";?> ><?=$resOp['usr_nombre'];?></option>
+									<option value="<?=$resOp[0];?>" <?php if(!empty($_GET['asesor']) && $resOp[0] == $_GET["asesor"]) echo "selected";?> ><?=$resOp['usr_nombre'];?></option>
 									<?php
 								}
 								?>
@@ -245,14 +240,14 @@
 					<div class="control-group">
 						<label class="control-label">Desde</label>
 						<div class="controls">
-							<input type="date" class="span12" name="desde" value="<?=$_GET['desde'];?>">
+							<input type="date" class="span12" name="desde" value="<?=!empty($_GET['desde']) ? $_GET['desde'] : "";?>">
 						</div>
 					</div>
 
 					<div class="control-group">
 						<label class="control-label">Hasta</label>
 						<div class="controls">
-							<input type="date" class="span12" name="hasta" value="<?=$_GET['hasta'];?>">
+							<input type="date" class="span12" name="hasta" value="<?=!empty($_GET['hasta']) ? $_GET['hasta'] : "";?>">
 						</div>
 					</div>
 
@@ -263,10 +258,10 @@
 										<select data-placeholder="Escoja una opción..." class="chzn-select span12" tabindex="2" name="ciudad">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM localidad_ciudades INNER JOIN localidad_departamentos ON dep_id=ciu_departamento ORDER BY ciu_nombre",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdAdmin, "SELECT * FROM localidad_ciudades INNER JOIN localidad_departamentos ON dep_id=ciu_departamento ORDER BY ciu_nombre");
+											while($resOp = mysqli_fetch_array($conOp)){
 											?>
-                                            	<option value="<?=$resOp['ciu_id'];?>" <?php if($resOp['ciu_id'] == $_GET['ciudad']){echo "selected";}?>><?=$resOp['ciu_nombre'].", ".$resOp['dep_nombre'];?></option>
+                                            	<option value="<?=$resOp['ciu_id'];?>" <?php if(!empty($_GET['ciudad']) && $resOp['ciu_id'] == $_GET['ciudad']){echo "selected";}?>><?=$resOp['ciu_nombre'].", ".$resOp['dep_nombre'];?></option>
                                             <?php
 											}
 											?>
@@ -278,7 +273,7 @@
 					<div class="control-group">
 						<label class="control-label">ID factura</label>
 						<div class="controls">
-							<input type="text" class="span6" name="factura" value="<?=$_GET['factura'];?>">
+							<input type="text" class="span6" name="factura" value="<?=!empty($_GET['factura']) ? $_GET['factura'] : "";?>">
 						</div>
 					</div>
 
@@ -317,56 +312,38 @@
 						</thead>
 						<tbody>
 							<?php
-											/*$consulta = mysql_query("SELECT czpp_cotizacion, czpp_producto, czpp_valor, czpp_cantidad,
-											(czpp_valor*czpp_cantidad) as total,
-											(czpp_descuento/100) as dcto,
-											(czpp_valor*czpp_cantidad) * (czpp_descuento/100) as vlrDcto,
-											(czpp_valor*czpp_cantidad) - ((czpp_valor*czpp_cantidad) * (czpp_descuento/100)) as totalConDcto,
-											(czpp_impuesto/100) as iva,
-											((czpp_valor*czpp_cantidad) - ((czpp_valor*czpp_cantidad) * (czpp_descuento/100))) * (czpp_impuesto/100) as vlrIva,
-											(czpp_valor*czpp_cantidad) - ((czpp_valor*czpp_cantidad) * (czpp_descuento/100)) + ((czpp_valor*czpp_cantidad) - ((czpp_valor*czpp_cantidad) * (czpp_descuento/100))) * (czpp_impuesto/100) as totalNeto
-
-											FROM cotizacion_productos
-
-											where czpp_tipo IN(4);
-												", $conexion);
-												*/
 												$no = 1;
-
 												$filtroFactura = '';
 												$filtroRemision = '';
-												//$_GET["desde"] = date("Y-m")."-01";
-												//$_GET["hasta"] = date("Y-m-d");
-												if($_GET["desde"]!="" or $_GET["hasta"]!=""){
+												$filtroCliente = '';
+												if(!empty($_GET["desde"]) || !empty($_GET["hasta"])){
 													$filtroFactura .= " AND factura_fecha_propuesta BETWEEN '".$_GET["desde"]."' AND '".$_GET["hasta"]."'";
 													$filtroRemision .= " AND rem_fecha BETWEEN '".$_GET["desde"]."' AND '".$_GET["hasta"]."'";
 												}
 
-												if($_GET["vendedor"]!=""){
+												if(!empty($_GET["vendedor"])){
 													$filtroFactura .= " AND factura_vendedor='".$_GET["vendedor"]."'";
 													$filtroRemision .= " AND rem_asesor='".$_GET["vendedor"]."'";
 												}
 
-												if($_GET["asesor"]!=""){
+												if(!empty($_GET["asesor"])){
 													$filtroFactura .= " AND factura_creador='".$_GET["asesor"]."'";
-													//$filtroRemision .= " AND rem_asesor='".$_GET["vendedor"]."'";
 												}
 
-												if($_GET["factura"]!=""){
+												if(!empty($_GET["factura"])){
 													$filtroFactura .= " AND factura_id='".$_GET["factura"]."'";
 												}
 
-												if($_GET["ciudad"]!=""){
+												if(!empty($_GET["ciudad"])){
 													$filtroCliente .= " AND cli_ciudad='".$_GET["ciudad"]."'";
 												}
 
 
-												$consultaTotal = mysql_query("SELECT * FROM cotizacion_productos
-													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_tipo='".FACTURA_TIPO_VENTA."' $filtroFactura
-													INNER JOIN clientes ON cli_id=factura_cliente $filtroCliente
-													WHERE czpp_tipo IN('".CZPP_TIPO_FACT."') AND czpp_valor>0 AND czpp_cantidad>0
-													GROUP BY czpp_id
-													",$conexion);
+												$consultaTotal = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
+													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_tipo=".FACTURA_TIPO_VENTA." {$filtroFactura} AND factura_id_empresa=".$_SESSION["dataAdicional"]["id_empresa"]."
+													INNER JOIN clientes ON cli_id=factura_cliente {$filtroCliente} AND cli_id_empresa=".$_SESSION["dataAdicional"]["id_empresa"]."
+													WHERE czpp_tipo IN (".CZPP_TIPO_FACT.") AND czpp_valor>0 AND czpp_cantidad>0
+													GROUP BY czpp_id");
 
 												$total = 0;
 												$sumaTotal = 0;
@@ -379,24 +356,24 @@
 												$totalFinal = 0;
 												$sumaTotalFinal = 0;
 
-												while($datos = mysql_fetch_array($consultaTotal)){
+												while($datos = mysqli_fetch_array($consultaTotal)){
 
 													$total = ($datos['czpp_valor'] * $datos['czpp_cantidad']);
 													$sumaTotal += $total;
 
-													$VlrDcto = ($total * ($datos['czpp_descuento']/100));
+													$VlrDcto = !empty($datos['czpp_descuento']) ? ($total * ($datos['czpp_descuento']/100)) : 0;
 													$SumaDcto += $VlrDcto;
 
 													$totalConDcto = ($total - $VlrDcto);
 													$sumaTotalConDcto += $totalConDcto;
 
-													$VlrIva = ($totalConDcto * ($datos['czpp_impuesto']/100));
+													$VlrIva = !empty($datos['czpp_impuesto']) ? ($totalConDcto * ($datos['czpp_impuesto']/100)) : 0;
 													$sumaTotalIva += $VlrIva;
 
 													$totalFinal = $totalConDcto + $VlrIva;
 													$sumaTotalFinal += $totalFinal;
 
-													$porcentajeGral = ($sumaTotal / $metricas['met_meta_venta_mes']) * 100;
+													$porcentajeGral = !empty($metricas['met_meta_venta_mes']) ? ($sumaTotal / $metricas['met_meta_venta_mes']) * 100 : 0;
 
 												}
 												?>
@@ -406,21 +383,12 @@
 													<td>Ventas Totales</td>
 													<td>$<?= number_format($sumaTotal, 2, ",", "."); ?></td>
 													<td>
-															<?=number_format($porcentajeGral, 2, ",", ".");?>%<br>
-															<div class="progress progress-info progress-striped">
-																<div class="bar" style="width: <?=$porcentajeGral;?>%">
-																</div>
+														<?=number_format($porcentajeGral, 2, ",", ".");?>%<br>
+														<div class="progress progress-info progress-striped">
+															<div class="bar" style="width: <?=$porcentajeGral;?>%">
 															</div>
-														</td>
-													<!--
-													<td>
-														<div class="btn-group">
-															<button class="btn btn-info" data-original-title="Edit"><i class="icon-edit"></i></button><div class="tooltip-arrow"></div></div>
-															<button class="btn btn-danger" data-original-title="Delete"><i class="icon-remove"></i></button>
-															<button class="btn btn-success" data-original-title="Publish"><i class=" icon-ok"></i></button>
 														</div>
 													</td>
-												-->
 												</tr>
 
 												<tr>
@@ -496,29 +464,29 @@
 
 												$ventasMejores = 0;
 
-												$consultaVendedores = mysql_query("SELECT factura_vendedor, UCASE(usr_nombre) AS vendedor, sum( (czpp_valor*czpp_cantidad) ) AS sumaTotal, AVG( (czpp_valor*czpp_cantidad) ) AS promVentas, SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(*) AS numVentas, sucp_nombre, usr_id, usr_meta_ventas
+												$consultaVendedores = mysqli_query($conexionBdPrincipal, "SELECT factura_vendedor, UCASE(usr_nombre) AS vendedor, sum( (czpp_valor*czpp_cantidad) ) AS sumaTotal, AVG( (czpp_valor*czpp_cantidad) ) AS promVentas, SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(*) AS numVentas, sucp_nombre, usr_id, usr_meta_ventas
 													FROM cotizacion_productos
-													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_tipo='".FACTURA_TIPO_VENTA."' $filtroFactura
-													INNER JOIN usuarios ON usr_id=factura_vendedor
-													INNER JOIN sucursales_propias ON sucp_id=usr_sucursal
-													INNER JOIN clientes ON cli_id=factura_cliente $filtroCliente
+													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_tipo='".FACTURA_TIPO_VENTA."' $filtroFactura AND factura_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+													INNER JOIN usuarios ON usr_id=factura_vendedor AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+													INNER JOIN sucursales_propias ON sucp_id=usr_sucursal AND sucp_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+													INNER JOIN clientes ON cli_id=factura_cliente $filtroCliente AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 													WHERE czpp_tipo='".CZPP_TIPO_FACT."' AND czpp_cantidad>0
 													GROUP BY factura_vendedor
 													ORDER BY sumaTotal DESC
-													",$conexion);
+													");
 
-												while($datosVendedores = mysql_fetch_array($consultaVendedores)){
+												while($datosVendedores = mysqli_fetch_array($consultaVendedores)){
 													$sumaTotalVendedores += $datosVendedores['sumaTotal'];
 													$sumaVentas += $datosVendedores['numVentas'];
 
 													if($no == 1){
-														mysql_query("UPDATE usuarios SET usr_mejor_vendedor=0",$conexion);
+														mysqli_query($conexionBdPrincipal, "UPDATE usuarios SET usr_mejor_vendedor=0 WHERE usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
-														mysql_query("UPDATE usuarios SET usr_mejor_vendedor=1 WHERE usr_id='".$datosVendedores['usr_id']."'",$conexion);
+														mysqli_query($conexionBdPrincipal, "UPDATE usuarios SET usr_mejor_vendedor=1 WHERE usr_id='".$datosVendedores['usr_id']."' AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 														$ventasMejores = 	$datosVendedores['sumaTotal'];
 													}
 
-													$porcentaje = ($datosVendedores['sumaTotal'] / $datosVendedores['usr_meta_ventas']) * 100;
+													$porcentaje = !empty($datosVendedores['sumaTotal']) && !empty($datosVendedores['usr_meta_ventas']) ? ($datosVendedores['sumaTotal'] / $datosVendedores['usr_meta_ventas']) * 100 : 0;
 													
 													?>
 
@@ -526,13 +494,13 @@
 														<td><?=$no;?></td>
 														<td><?=$datosVendedores['vendedor'];?></td>
 														<td><?=$datosVendedores['sucp_nombre'];?></td>
-														<td><a href="facturas.php?usuario=<?=$datosVendedores['usr_id'];?>&desde=<?=$_GET['desde'];?>&hasta=<?=$_GET['hasta'];?>" target="_blank">$<?= number_format($datosVendedores['sumaTotal'], 2, ",", "."); ?></a></td>
+														<td><a href="facturas.php?usuario=<?=$datosVendedores['usr_id'];?>&desde=<?=!empty($_GET['desde']) ? $_GET['desde'] : "";?>&hasta=<?=!empty($_GET['hasta']) ? $_GET['hasta'] : "";?>" target="_blank">$<?= number_format($datosVendedores['sumaTotal'], 2, ",", "."); ?></a></td>
 														<td align="center"><?= $datosVendedores['numVentas']; ?></td>
 														<td>$<?= number_format($datosVendedores['promVentas'], 2, ",", "."); ?></td>
 
 														<td><?=$datosVendedores['Totaldctos'];?>%</td>
 														<td><?=number_format($datosVendedores['promDcto'], 2, ",", ".");?>%</td>
-														<td>$<?=number_format($datosVendedores['usr_meta_ventas'], 2, ",", ".");?></td>
+														<td>$<?=!empty($datosVendedores['usr_meta_ventas']) ? number_format($datosVendedores['usr_meta_ventas'], 2, ",", ".") : 0;?></td>
 														<td>
 															<?=number_format($porcentaje, 2, ",", ".");?>%<br>
 															<div class="progress progress-info progress-striped">
@@ -586,20 +554,20 @@
 
 												$no = 1;
 												$sumaTotalSucursales = 0;
-												$consultaSucursales = mysql_query("SELECT factura_vendedor, sum( (czpp_valor*czpp_cantidad) ) AS sumaTotal,
+												$consultaSucursales = mysqli_query($conexionBdPrincipal, "SELECT factura_vendedor, sum( (czpp_valor*czpp_cantidad) ) AS sumaTotal,
 												AVG( (czpp_valor*czpp_cantidad) ) AS promVentas, SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(*) AS numVentas,
 												sucp_nombre
 												FROM cotizacion_productos
-													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_tipo='".FACTURA_TIPO_VENTA."' $filtroFactura
-													INNER JOIN usuarios ON usr_id=factura_vendedor
-                          							INNER JOIN sucursales_propias ON sucp_id=usr_sucursal
-                          							INNER JOIN clientes ON cli_id=factura_cliente $filtroCliente
+													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_tipo='".FACTURA_TIPO_VENTA."' $filtroFactura AND factura_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+													INNER JOIN usuarios ON usr_id=factura_vendedor AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+                          							INNER JOIN sucursales_propias ON sucp_id=usr_sucursal AND sucp_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+                          							INNER JOIN clientes ON cli_id=factura_cliente $filtroCliente AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 													WHERE czpp_tipo='".CZPP_TIPO_FACT."' AND czpp_cantidad>0
 													GROUP BY  sucp_id
 													ORDER BY sumaTotal DESC
-													",$conexion);
+													");
 
-												while($datosSucursales = mysql_fetch_array($consultaSucursales)){
+												while($datosSucursales = mysqli_fetch_array($consultaSucursales)){
 													$sumaTotalSucursales += $datosSucursales['sumaTotal'];
 													?>
 
@@ -649,12 +617,10 @@
 											<tbody>
 												<?php
 												$no = 1;
-												$consultaRemisiones = mysql_query("SELECT COUNT(*) as totalRem
-												FROM remisiones
-													WHERE rem_id=rem_id $filtroRemision
-													",$conexion);
+												$consultaRemisiones = mysqli_query($conexionBdPrincipal, "SELECT COUNT(*) as totalRem
+												FROM remisiones WHERE rem_id=rem_id $filtroRemision AND rem_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
-												$datosRemisiones = mysql_fetch_array($consultaRemisiones);
+												$datosRemisiones = mysqli_fetch_array($consultaRemisiones);
 													?>
 
 													<tr>
@@ -692,7 +658,7 @@
 				</div>
 
 				<?php
-				$mejorVendedor = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_mejor_vendedor=1 LIMIT 0,1",$conexion));	
+				$mejorVendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_mejor_vendedor=1 AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' LIMIT 0,1"));	
 				?>
 
 <!-- Modal -->
@@ -718,16 +684,6 @@
 									</div>
 								</div>
 							</div>
-
-							<script>
-		/*
-	$( document ).ready(function() {
-	    $('#exampleModal').modal('toggle')
-	});*/
-
-</script>
-
-
 				<?php include("includes/pie.php"); ?>
 			</div>
 		</body>
