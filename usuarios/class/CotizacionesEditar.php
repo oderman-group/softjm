@@ -137,8 +137,8 @@ class CotizacionesEditar {
 
                 $sumaCostosProductosCombos += $pdCombo['prod_costo'];
 
-                $utilidadDealer = $pdCombo['prod_descuento2'] / 100;
-                $precioDealer = $pdCombo['prod_costo'] + ($pdCombo['prod_costo'] * $utilidadDealer);
+                $utilidadDealer = !empty($pdCombo['prod_descuento2']) ? $pdCombo['prod_descuento2'] / 100 : 0;
+                $precioDealer = !empty($pdCombo['prod_costo']) ? $pdCombo['prod_costo'] + ($pdCombo['prod_costo'] * $utilidadDealer) : 0;
                 $subtotalDealer = ($precioDealer * $pdCombo['copp_cantidad']);
                 $totalDealer +=$subtotalDealer;
 
