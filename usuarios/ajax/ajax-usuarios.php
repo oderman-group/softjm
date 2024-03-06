@@ -4,8 +4,7 @@
 //METAS DE VENTAS
 if($_POST["proceso"]==1){
 
-	mysql_query("UPDATE usuarios SET usr_meta_ventas='".$_POST["valorActual"]."' WHERE usr_id='".$_POST["idUsuario"]."'",$conexion);
-	if(mysql_errno()!=0){echo mysql_error(); exit();}
+	mysqli_query($conexionBdPrincipal, "UPDATE usuarios SET usr_meta_ventas='".$_POST["valorActual"]."' WHERE usr_id='".$_POST["idUsuario"]."'");
 	
 }
 ?>

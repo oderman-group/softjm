@@ -61,19 +61,19 @@
 							if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtro .= " AND (cli_fecha_registro>='".$_GET["desde"]."')";}
 							if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro .= " AND (cli_fecha_registro<='".$_GET["hasta"]."')";}
 								
-							$consulta = mysql_query("SELECT * FROM clientes
-							INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-							INNER JOIN localidad_departamentos ON dep_id=ciu_departamento 
+							$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM clientes
+							INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+							INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento 
 							$filtro2
 							$filtro3
-							WHERE cli_id=cli_id $filtro
+							WHERE cli_id=cli_id $filtro AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 							ORDER BY ".$_GET['orden']." ".$_GET['formaOrden']."
-							",$conexion);
+							");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta)){
 								
 								if($datosUsuarioActual[3]!=1){
-									$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'",$conexion));
+									$numZ = mysqli_num_rows(mysqli_query($conexionBdPrincipal, "SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'"));
 									if($numZ==0) continue;
 								}
 								
@@ -86,11 +86,11 @@
 									case 2: $categ = 'Cliente'; break;
 								}
 								
-								$numContac = mysql_num_rows(mysql_query("SELECT * FROM contactos WHERE cont_cliente_principal='".$res['cli_id']."'",$conexion));
+								$numContac = mysqli_num_rows(mysqli_query($conexionBdPrincipal, "SELECT * FROM contactos WHERE cont_cliente_principal='".$res['cli_id']."'"));
 								
-								$usuarioMod = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['cli_usuario_modificacion']."'",$conexion));
+								$usuarioMod = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='".$res['cli_usuario_modificacion']."'"));
 								
-								$usuarioMercadeo = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['cli_estado_mercadeo_usuario']."'",$conexion));
+								$usuarioMercadeo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='".$res['cli_estado_mercadeo_usuario']."'"));
 								
 								
 							?>

@@ -5,10 +5,6 @@ $paginaActual['pag_nombre'] = "Notificaciones enviadas";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
 <!-- styles -->
 
 
@@ -137,13 +133,13 @@ if(mysql_errno()!=0){echo mysql_error(); exit();}
 							</thead>
 							<tbody>
                             <?php
-							$consulta = mysql_query("SELECT * FROM notificaciones
-							INNER JOIN clientes ON cli_id=not_cliente
+							$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM notificaciones
+							INNER JOIN clientes ON cli_id=not_cliente AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 							INNER JOIN cliente_seguimiento ON cseg_id=not_seguimiento AND cseg_usuario_responsable='".$_SESSION["id"]."'
-							INNER JOIN usuarios ON usr_id=cseg_usuario_encargado
-							",$conexion);
+							INNER JOIN usuarios ON usr_id=cseg_usuario_encargado AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+							WHERE not_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta)){
 								switch($res['not_visto']){
 									case 0: $estado = 'Pendiente'; $etiquetaE='important'; break;
 									case 1: $estado = 'Visto'; $etiquetaE='success'; break;

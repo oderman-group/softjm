@@ -8,7 +8,7 @@
 		$destino = RUTA_PROYECTO."/usuarios/files/contratos";
 		$fileName = subirArchivosAlServidor($_FILES['contrato'], 'cont', $destino);
 
-		mysql_query("UPDATE clientes_orion SET clio_contrato='" . $contrato . "' WHERE clio_id='" . $_POST["id"] . "'");
+		mysqli_query($conexionBdAdmin, "UPDATE clientes_orion SET clio_contrato='" . $contrato . "' WHERE clio_id='" . $_POST["id"] . "'");
     }
 
 	$conexionBdAdmin->query("UPDATE clientes_orion SET  clio_empresa='" . $_POST["nombre"] . "', clio_email='" . $_POST["email"] . "', clio_telefono='" . $_POST["telefono"] . "', clio_contacto_principal='" . $_POST["contacto"] . "', clio_fecha_inicio='" . $_POST["inicio"] . "', clio_fecha_fin='" . $_POST["fin"] . "' WHERE clio_id='" . $_POST["id"] . "'");

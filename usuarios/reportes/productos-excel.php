@@ -84,17 +84,17 @@ $campos = array(
 								$filtro2 .= ")";
 							}	
 								
-							$consulta = mysql_query("SELECT * FROM productos
+							$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM productos
 							INNER JOIN productos_categorias ON catp_id=prod_categoria 
-							WHERE prod_id=prod_id 
+							WHERE prod_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 							$filtro
 							$filtro2
 							ORDER BY ".$_POST['orden']." ".$_POST['formaOrden']."
-							",$conexion);
+							");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
-								$grupo1 = mysql_fetch_array(mysql_query("SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'
-								",$conexion));
+							while($res = mysqli_fetch_array($consulta)){
+								$grupo1 = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'
+								"));
 							?>
 							<tr style="height: 20px;">
 								<td align="center"><?=$no;?></td>
