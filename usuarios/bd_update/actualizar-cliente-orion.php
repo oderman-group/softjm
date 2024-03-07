@@ -4,9 +4,9 @@
     $idPagina = 189;
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     
-    if ($_FILES['contrato']['name'] != "") {
+    if (!empty($_FILES['contrato']['name'])) {
 		$destino = RUTA_PROYECTO."/usuarios/files/contratos";
-		$fileName = subirArchivosAlServidor($_FILES['contrato'], 'cont', $destino);
+		$contrato = subirArchivosAlServidor($_FILES['contrato'], 'cont', $destino);
 
 		mysqli_query($conexionBdAdmin, "UPDATE clientes_orion SET clio_contrato='" . $contrato . "' WHERE clio_id='" . $_POST["id"] . "'");
     }
