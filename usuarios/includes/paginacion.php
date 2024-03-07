@@ -38,22 +38,42 @@ if($limite > 0) {
 ?>
 <!--<div class="pagination pagination-right">-->
 <div class="pagination">
+	<div style="text-align:center">
     <ul>
 		<?php
         if(isset($_GET["inicio"]) and $_GET["inicio"]>1 and $paginas>1)
         	echo '<li><a href="'.$_SERVER['PHP_SELF'].'?inicio='.($_GET["inicio"]-1).'&dpto='.$dpto.'&busqueda='.$busqueda.'&q='.$q.'&cte='.$cte.'">Anterior</a></li>';
         else
         	echo '<li class="disabled"><a href="#">Anterior</a></li>';
-        for($i=1; $i<=$paginas; $i++){
-			if(isset($_GET["inicio"]) and $i==$_GET["inicio"])
-				echo '<li class="active"><a href="#">'.$i.'</a></li>';
-			else
-				echo '<li><a href="'.$_SERVER['PHP_SELF'].'?inicio='.$i.'&dpto='.$dpto.'&busqueda='.$busqueda.'&q='.$q.'&cte='.$cte.'">'.$i.'</a></li>';
-        }
+        
+		for ($i = 1; $i <= $paginas; $i++) {
+			if ($i == 1 || $i == $paginas || ($i >= $_GET["inicio"] - 2 && $i <= $_GET["inicio"] + 2)) {
+				if ($i == $_GET["inicio"]) {
+	?>
+		<li class="active" style="padding-left: 5px!important;">
+			<a><?=$i?></a>
+		</li>
+	<?php       } else { ?>
+		<li style="padding-left: 5px!important;">
+			<a href="<?=$_SERVER['PHP_SELF']?>?inicio=<?=$i?>&dpto=<?=$dpto?>&busqueda=<?=$busqueda?>&q=<?=$q?>&cte=<?=$cte?>"><?=$i?></a>
+		</li>
+	<?php
+				}
+			} elseif (($i == 2 && $_GET["inicio"] > 3) || ($i == $paginas - 1 && $_GET["inicio"] < $paginas - 2)) {
+	?>
+		<li style="padding-left: 5px!important;">
+			<span>...</span>
+		</li>
+	<?php
+			}
+		}
+
+
         if(isset($_GET["inicio"]) and $_GET["inicio"]<$paginas)
         	echo '<li><a href="'.$_SERVER['PHP_SELF'].'?inicio='.($_GET["inicio"]+1).'&dpto='.$dpto.'&busqueda='.$busqueda.'&q='.$q.'&cte='.$cte.'">Siguiente</a></li>';
         else
         	echo '<li class="disabled"><a href="#">Siguiente</a></li>';
         ?>
     </ul>
+	</div>
 </div>
