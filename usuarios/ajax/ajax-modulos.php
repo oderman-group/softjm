@@ -26,7 +26,7 @@ if (mysqli_num_rows($result) > 0) {
                 <td><?= $row['mod_id'];?></td>
                 <td><?= $row['mod_nombre']; ?></td>
                 <td>
-                    <input class="selectCheckbox check" type="checkbox" id="check-<?= $row['mod_id']; ?>" value="<?= $row['mod_id']; ?>" onchange="seleccionarPagina(this)" <?= $isChecked; ?>>
+                    <input class="selectCheckbox check" type="checkbox" id="check-<?= $row['mod_id']; ?>" value="<?= $row['mod_id']; ?>" onchange="seleccionarModulo(this)" <?= $isChecked; ?>>
                     <span style="display: none;"> <?= $isChecked; ?> </span>
                 </td>
         </tr>
@@ -49,24 +49,24 @@ if (mysqli_num_rows($result) > 0) {
 </table> 
 <script>
     /**
-     * Esta función es para marcar o desmarcar todas la paginas y tambien la agrega o elimina a la seleción
+     * Esta función es para marcar o desmarcar todas los Modulos y tambien la agrega o elimina a la seleción
      */
 	var checkboxes = document.querySelectorAll('.check');
     var marcarTodosCheckbox = document.getElementById('all');
     marcarTodosCheckbox.onchange = function() {
         var isChecked = this.checked;
         checkboxes.forEach(function(checkElement) {
-            var page = checkElement.value;  
+           var page = checkElement.value;  
             if (isChecked) {
                 if(checkElement.checked){
                     checkElement.checked = false;
-                    eliminarPagina(page);
+                    eliminarModulo(page);
                 }
                 checkElement.checked = true;
-                agregarPagina(page);
-            } else {
+                agregarModulo(page);
+                } else {
                 checkElement.checked = false;
-                eliminarPagina(page);
+                eliminarModulo(page);
             }
         });
     };

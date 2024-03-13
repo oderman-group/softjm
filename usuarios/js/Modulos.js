@@ -1,16 +1,16 @@
 /**
- * Me muestra las paginas segun el modulo seleccionado
+ * Me muestra los Sub modulos segun el modulo seleccionado
  * @param {int} modulo 
  */
 function mostrarModulos(modulo, clioId){
-    $('#divTablePaginas').empty().hide().html("").show(1);
+    $('#divTableModulos').empty().hide().html("").show(1);
     
     fetch('ajax/ajax-modulos.php?modulo=' + modulo + '&clioId=' + clioId, {
         method: 'GET'
     })
     .then(response => response.text())
     .then(data => {
-        $('#divTablePaginas').empty().hide().html(data).show(1);
+        $('#divTableModulos').empty().hide().html(data).show(1);
         
         // Inicializar DataTables después de agregar las nuevas filas
         $('#data-table').DataTable();
@@ -23,10 +23,10 @@ function mostrarModulos(modulo, clioId){
 var select = document.getElementById('ModulosSeleccionadas');
 
 /**
- * Esta función verifica si la pagina fue selecionada o no para agregar o eliminar de la seleción.
- * @param datos //Datos de la pagina selecionada
+ * Esta función verifica si el Modulo fue selecionado o no para agregar o eliminar de la seleción.
+ * @param datos //Datos de la Modulo selecionado
  */
-function seleccionarPagina(datos) {
+function seleccionarModulo(datos) {
     var page = datos.value;
     var all = document.getElementById('all'); 
     if (datos.checked) {
@@ -39,20 +39,20 @@ function seleccionarPagina(datos) {
         if(cont==checkboxes.length){
             all.checked=true;
         }
-        agregarPagina(page);
+        agregarModulo(page);
     } else {
         if(all.checked){
             all.checked=false;
         }
-        eliminarPagina(page);
+        eliminarModulo(page);
     }
 }
 
 /**
- * Esta función agrega una pagina a la seleción cuando es selecionada.
+ * Esta función agrega un Modulo a la seleción cuando es selecionada.
  * @param page
  */
-function agregarPagina(page) {
+function agregarModulo(page) {
     var nuevaOpcion = document.createElement('option');
     nuevaOpcion.value = page;
     nuevaOpcion.id = "pag-"+page;
@@ -62,10 +62,10 @@ function agregarPagina(page) {
 }
 
 /**
- * Esta función elimina una pagina de la seleción cuando deja de estar selecionada.
+ * Esta función elimina una modulo de la seleción cuando deja de estar selecionada.
  * @param page 
  */
-function eliminarPagina(page) {
+function eliminarModulo(page) {
     var opcionAEliminar = document.getElementById('pag-'+page);
     if (opcionAEliminar) {
         select.removeChild(opcionAEliminar);
