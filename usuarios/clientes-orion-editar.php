@@ -181,15 +181,15 @@ include("includes/js-formularios.php");
 				<form class="form-horizontal" method="post" action="bd_update/actualizar-modulos-cliente.php">
 					<input type="hidden" name="id" value="<?=$resultadoD['clio_id'];?>">
 					<div class="tab-content">
-						<div id="divTablePaginas"></div>
+						<div id="divTableModulos"></div>
 					</div>
 								
 					<select id="ModulosSeleccionadas"  name="ModulosS[]" multiple  style="display: none;">
 						<?php
-						$consultaPagina = $conexionBdAdmin->query("SELECT m.mod_id, m.mod_nombre, me.mxe_id FROM modulos m 
-						LEFT JOIN modulos_empresa me ON me.mxe_id_modulo = m.mod_id and me.mxe_id_empresa = '".$resultadoD['clio_id']."';");
-						while ($page = $consultaPagina->fetch_assoc()) {
-							$isChecked = $page['mxe_id'] ? "checked" : "";
+						$consultaModulo = $conexionBdAdmin->query("SELECT m.mod_id, m.mod_nombre, me.mxe_id FROM modulos m 
+						LEFT JOIN modulos_empresa me ON me.mxe_id_modulo = m.mod_id WHERE me.mxe_id_empresa = '".$resultadoD['clio_id']."' AND me.mxe_id IS NOT NULL;");
+						while ($page = $consultaModulo->fetch_assoc()) {
+							$isChecked = $page['mxe_id'] ? "selected" : "";
 							echo '<option value="' . $page["mod_id"] . '" id="pag-' . $page["mod_id"] . '" '.$isChecked.' >' . $page["mod_id"] . '</option>';
 						}
 						?>
