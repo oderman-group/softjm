@@ -145,7 +145,7 @@ include("includes/js-formularios.php");
 
 
 									<div class="form-actions">
-										<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+										<a href="clientes-orion.php;" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
 										<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									</div>
 										</form>
@@ -196,7 +196,7 @@ include("includes/js-formularios.php");
 					</select>                 
 
 					<div class="form-actions">
-						<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+						<a href="clientes-orion.php" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
 						<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 					</div>
 				</form>
