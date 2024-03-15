@@ -286,7 +286,7 @@ include("includes/head.php");
 									<p style="margin: 10px;"><?php include("includes/paginacion.php");?></p>
 									</p>
 								</div>
-								<table class="table table-striped table-bordered" id="data-table">
+								<table class="table table-striped table-bordered">
 									<thead>
 										<tr>
 											<th>No</th>
