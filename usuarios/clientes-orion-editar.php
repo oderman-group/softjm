@@ -166,7 +166,9 @@ include("includes/js-formularios.php");
 
 					<ul class="nav nav-tabs" id="myTab1">
 						<?php
-						$queryModulos = "SELECT * FROM modulos WHERE mod_padre IS NULL";
+						$queryModulos = "SELECT * FROM modulos_empresa
+						INNER JOIN modulos ON mod_id=mxe_id_modulo AND mod_padre IS NULL
+						WHERE mxe_id_empresa= '".$resultadoD['clio_id']."'";
 						$resultModulos = $conexionBdAdmin->query($queryModulos);
 						$conta = 1;
 						while ($rowModulos = $resultModulos->fetch_assoc()) {
@@ -186,11 +188,9 @@ include("includes/js-formularios.php");
 								
 					<select id="ModulosSeleccionadas"  name="ModulosS[]" multiple  style="display: none;">
 						<?php
-						$consultaModulo = $conexionBdAdmin->query("SELECT m.mod_id, m.mod_nombre, me.mxe_id FROM modulos m 
-						LEFT JOIN modulos_empresa me ON me.mxe_id_modulo = m.mod_id WHERE me.mxe_id_empresa = '".$resultadoD['clio_id']."' AND me.mxe_id IS NOT NULL;");
+						$consultaModulo = $conexionBdAdmin->query("SELECT mxe_id_modulo FROM modulos_empresa WHERE mxe_id_empresa = '".$resultadoD['clio_id']."'");
 						while ($page = $consultaModulo->fetch_assoc()) {
-							$isChecked = $page['mxe_id'] ? "selected" : "";
-							echo '<option value="' . $page["mod_id"] . '" id="pag-' . $page["mod_id"] . '" '.$isChecked.' >' . $page["mod_id"] . '</option>';
+							echo '<option value="' . $page["mxe_id_modulo"] . '" id="pag-' . $page["mxe_id_modulo"] . '" selected>' . $page["mxe_id_modulo"] . '</option>';
 						}
 						?>
 					</select>                 
