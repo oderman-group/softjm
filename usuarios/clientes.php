@@ -317,17 +317,17 @@ include("includes/head.php");
 			function buscar(){
 				var valor = document.getElementById('btn_buscar').value;
 				var tbody = document.getElementById('clientes_buscar');
-				var grupos = document.getElementById('bun_grupos');
 				tbody.innerHTML='';
-				console.log(valor);
-				
-				$.ajax({
-					type: 'GET',
-					url: "fetch-buscar-clientes.php?buscar="+valor+"&inicio=<?=$inicio?>&limite=<?=$limite?>&tipoDoc=<?=$tipoDoc?>&dpto=<?=$dpto?>&filtroGrupos=<?=$filtroGrupos?>",
-					
-					success: function(response) {
-						tbody.innerHTML=response;
-					}
+    
+				fetch('fetch-buscar-clientes.php?buscar='+valor+'&inicio=<?=$inicio?>&limite=<?=$limite?>&tipoDoc=<?=$tipoDoc?>&dpto=<?=$dpto?>&filtroGrupos=<?=$filtroGrupos?>', {
+					method: 'GET'
+				})
+				.then(response => response.text())
+				.then(data => {
+					tbody.innerHTML=data;
+				})
+				.catch(error => {
+					console.error('Error:', error);
 				});						
 			}
 		</script>
