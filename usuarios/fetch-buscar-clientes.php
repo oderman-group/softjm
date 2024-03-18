@@ -1,13 +1,13 @@
 <?php
 include("sesion.php");
 include("includes/head.php");
+
 $filtro = "";
 $dpto="";
-
+$inicio = isset($_GET["inicio"]) && $_GET["inicio"] != "" ? $_GET["inicio"] : $inicio;
+$limite = !empty($_GET["limite"]) ? $_GET["limite"] : $limite;
 if (isset($_GET["buscar"]) and $_GET["buscar"] != "") {
 	$filtro .= " AND (cli_usuario LIKE '%" . $_GET["buscar"] . "%' OR cli_nombre LIKE '%" . $_GET["buscar"] . "%')"; 
-	$inicio=$_GET["inicio"];
-	$limite=$_GET["limite"];
 	
 }
 $tipoDoc="";
@@ -24,9 +24,9 @@ if (isset($_GET["dpto"]) and $_GET["dpto"] != "") {
 	$consulta = $conexionBdPrincipal->query("SELECT * FROM " . MAINBD . ".clientes
 								LEFT JOIN " . BDADMIN . ".localidad_ciudades ON ciu_id=cli_ciudad
 								INNER JOIN " . BDADMIN . ".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='" . $_GET["dpto"] . "'
-								$filtroGrupos
-								WHERE cli_id=cli_id " . $filtro . " AND cli_id_empresa='" . $idEmpresa . "'
-								LIMIT $inicio, $limite
+								{$filtroGrupos}
+								WHERE cli_id_empresa='" . $idEmpresa . "' {$filtro}
+								LIMIT {$inicio}, {$limite}
 								");
 								
 								
@@ -34,9 +34,9 @@ if (isset($_GET["dpto"]) and $_GET["dpto"] != "") {
 	$sql="SELECT * FROM " . MAINBD . ".clientes
 	LEFT JOIN " . BDADMIN . ".localidad_ciudades ON ciu_id=cli_ciudad
 	INNER JOIN " . BDADMIN . ".localidad_departamentos ON dep_id=ciu_departamento
-	$filtroGrupos
-	WHERE cli_id=cli_id " . $filtro . " AND cli_id_empresa='" . $idEmpresa . "'	LIMIT $inicio, $limite";
-
+	{$filtroGrupos}
+	WHERE cli_id_empresa='" . $idEmpresa . "' {$filtro} 
+	LIMIT {$inicio}, {$limite}";
 	$consulta = $conexionBdPrincipal->query($sql);
 	
 }
