@@ -22,13 +22,7 @@ cotiz_observaciones='" . $conexionBdPrincipal->real_escape_string($_POST["notas"
 cotiz_envio='" . $_POST["envio"] . "', 
 cotiz_ocultar_descuento_combo='" . $_POST["dctoCombos"] . "', 
 cotiz_descuentos_especiales='" . $_POST["dctoEspecial"] . "' 
-WHERE cotiz_id='" . $_POST["id"] . "' ");
-    
-    require('actualizar-productos-cotizacion.php');
-
-    require('actualizar-combos-cotizacion.php');
-
-    require('actualizar-servicios-cotizacion.php');
+WHERE cotiz_id='" . $_POST["id"] . "' AND  cotiz_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 

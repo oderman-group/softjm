@@ -95,8 +95,10 @@ include("includes/head.php");
 															echo '<a href="roles-editar.php?id='.$res[0].'" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a> ';
 														}
 														if($res['utipo_id']!=1){
-															if (Modulos::validarRol([54], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { 
-																echo '<a href="bd_delete/roles-eliminar.php?id='.$res[0].'" onClick="if(!confirm("Desea eliminar el registro?")){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a> ';
+															if (Modulos::validarRol([54], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+														?>
+																<a href="bd_delete/roles-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+														<?php
 															} 
 														}
 												?>

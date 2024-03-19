@@ -5,10 +5,6 @@ $paginaActual['pag_nombre'] = "Agregar factura rápida";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
 <!-- styles -->
 
 <!--[if IE 7]>
@@ -92,10 +88,10 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="cliente">
 											<option value=""></option>
                                             <?php
-											$conOp = mysql_query("SELECT * FROM clientes",$conexion);
-											while($resOp = mysql_fetch_array($conOp)){
+											$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM clientes WHERE cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
+											while($resOp = mysqli_fetch_array($conOp)){
 												if($datosUsuarioActual[3]!=1){
-													$numZ = mysql_num_rows(mysql_query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'",$conexion));
+													$numZ = mysqli_num_rows(mysqli_query($conexionBdPrincipal, "SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'"));
 													if($numZ==0) continue;
 												}
 											?>

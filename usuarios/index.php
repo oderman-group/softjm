@@ -139,8 +139,7 @@ include("includes/head.php");
 
 
 				<div class="row-fluid">
-					<?php if ($_SESSION["id"] == 128 or $_SESSION["id"] == 15 or $_SESSION["id"] == 17) { ?>
-
+					<?php if (Modulos::validarRol([170], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 						<div class="span3">
 							<div class="board-widgets small-widget" style="background-color: dimgray;">
 								<a href="ventas.php"><span class="widget-icon icon-folder-close"></span><span class="widget-label">Ventas</span></a>

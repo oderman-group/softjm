@@ -1,7 +1,9 @@
 <?php
-$sql = "SELECT m.*, p.pag_ruta AS ruta_pagina
-				FROM modulos m
-				LEFT JOIN paginas p ON m.mod_id_pagina = p.pag_id";
+$sql = "SELECT m.*, p.pag_ruta AS ruta_pagina FROM modulos_empresa
+        INNER JOIN modulos m ON mod_id=mxe_id_modulo
+				LEFT JOIN paginas p ON m.mod_id_pagina = p.pag_id
+        WHERE mxe_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+        ORDER BY mxe_posicion";
 
 $result = $conexionBdAdmin->query($sql);
 $menu = array();

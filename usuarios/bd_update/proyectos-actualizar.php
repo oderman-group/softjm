@@ -4,12 +4,13 @@ require_once("../class/BaseDatos.php");
 
 $idPagina = 282;
 
-include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
+//include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 $infoActualizar = [
     'tabla'          => 'proyectos',
     'clave_primaria' => 'proy_id',
-    'id_registro'    => $_POST["id"]
+    'id_registro'    => $_POST["id"],
+    'proy_id_empresa'=> $_POST["proy_id_empresa"]
 ];
 
 $_POST["proy_ultima_modificacion"]  = date('Y-m-d H:i:s');

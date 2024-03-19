@@ -48,47 +48,47 @@
 							if(isset($_GET["desde"]) and $_GET["desde"]!=""){$filtroSeg2 .= " AND (cseg_fecha_proximo_contacto>='".$_GET["desde"]."')";}
 							if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtroSeg2 .= " AND (cseg_fecha_proximo_contacto<='".$_GET["hasta"]."')";}	
 								
-							$consulta = mysql_query("SELECT * FROM usuarios 
-							WHERE usr_bloqueado=0 $filtro
-							",$conexion);
+							$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios 
+							WHERE usr_bloqueado=0 AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' $filtro
+							");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta)){
 
-								$numeros = mysql_fetch_array(mysql_query("
+								$numeros = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "
 								SELECT
 								
 								(SELECT count(cseg_id) FROM cliente_seguimiento 
-								INNER JOIN clientes_tikets ON tik_id=cseg_tiket
-								INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
+								INNER JOIN clientes_tikets ON tik_id=cseg_tiket AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+								INNER JOIN usuarios ON usr_id=cseg_usuario_responsable AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 								WHERE cseg_usuario_responsable='".$res['usr_id']."' AND (cseg_canal=3 OR cseg_canal=4) AND (cseg_realizado=1) $filtroSeg),
 								
 								(SELECT count(cseg_id) FROM cliente_seguimiento 
-								INNER JOIN clientes_tikets ON tik_id=cseg_tiket 
-								INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
+								INNER JOIN clientes_tikets ON tik_id=cseg_tiket AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+								INNER JOIN usuarios ON usr_id=cseg_usuario_responsable AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 								WHERE cseg_usuario_responsable='".$res['usr_id']."' AND (cseg_canal=8) AND (cseg_realizado=1) $filtroSeg),
 								
 								(SELECT count(cseg_id) FROM cliente_seguimiento 
-								INNER JOIN clientes_tikets ON tik_id=cseg_tiket
-								INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
+								INNER JOIN clientes_tikets ON tik_id=cseg_tiket AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+								INNER JOIN usuarios ON usr_id=cseg_usuario_responsable AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 								WHERE cseg_usuario_responsable='".$res['usr_id']."' AND (cseg_canal=5) AND (cseg_realizado=1) $filtroSeg),
 								
 								
 								
 								(SELECT count(cseg_id) FROM cliente_seguimiento 
-								INNER JOIN clientes_tikets ON tik_id=cseg_tiket
-								INNER JOIN usuarios ON usr_id=cseg_usuario_encargado
+								INNER JOIN clientes_tikets ON tik_id=cseg_tiket AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+								INNER JOIN usuarios ON usr_id=cseg_usuario_encargado AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 								WHERE cseg_usuario_encargado='".$res['usr_id']."' AND (cseg_canal=3 OR cseg_canal=4) AND (cseg_realizado IS NULL OR cseg_realizado=0) $filtroSeg2),
 								
 								(SELECT count(cseg_id) FROM cliente_seguimiento 
-								INNER JOIN clientes_tikets ON tik_id=cseg_tiket
-								INNER JOIN usuarios ON usr_id=cseg_usuario_encargado
+								INNER JOIN clientes_tikets ON tik_id=cseg_tiket AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+								INNER JOIN usuarios ON usr_id=cseg_usuario_encargado AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 								WHERE cseg_usuario_encargado='".$res['usr_id']."' AND (cseg_canal=8) AND (cseg_realizado IS NULL OR cseg_realizado=0) $filtroSeg2),
 								
 								(SELECT count(cseg_id) FROM cliente_seguimiento 
-								INNER JOIN clientes_tikets ON tik_id=cseg_tiket
-								INNER JOIN usuarios ON usr_id=cseg_usuario_encargado
+								INNER JOIN clientes_tikets ON tik_id=cseg_tiket AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+								INNER JOIN usuarios ON usr_id=cseg_usuario_encargado AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 								WHERE cseg_usuario_encargado='".$res['usr_id']."' AND (cseg_canal=5) AND (cseg_realizado IS NULL OR cseg_realizado=0) $filtroSeg2)
-								",$conexion));
+								"));
 								
 								$color1='#FFF';	$color2='#FFF';	$color3='#FFF'; $color4='#FFF'; $color5='#FFF'; $color6='#FFF';
 								if($numeros[0]==0){$color1='#FFF090';}
@@ -152,31 +152,31 @@
 							if(is_numeric($_GET["m"])){$filtro .= " AND MONTH(cseg_fecha_reporte)='".$_GET["m"]."'"; $filtroUsuario='';}	
 							
 							if($_GET["inf"]==1){
-								$consulta = mysql_query("SELECT * FROM cliente_seguimiento
-								INNER JOIN clientes ON cli_id=cseg_cliente
-								INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-								INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
+								$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM cliente_seguimiento
+								INNER JOIN clientes ON cli_id=cseg_cliente AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+								INNER JOIN usuarios ON usr_id=cseg_usuario_responsable AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 								WHERE cseg_usuario_responsable='".$_GET["usuario"]."' AND cseg_fecha_reporte>='".$_GET["desde"]."' AND cseg_fecha_reporte<='".$_GET["hasta"]."' AND (cseg_canal='".$_GET["canal"]."' OR cseg_canal='".$_GET["canalDos"]."') AND (cseg_realizado=1)
-								",$conexion);
+								");
 							}
 							elseif($_GET["inf"]==2){
-								$consulta = mysql_query("SELECT * FROM cliente_seguimiento
-								INNER JOIN clientes ON cli_id=cseg_cliente
-								INNER JOIN localidad_ciudades ON ciu_id=cli_ciudad
-								INNER JOIN usuarios ON usr_id=cseg_usuario_encargado
+								$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM cliente_seguimiento
+								INNER JOIN clientes ON cli_id=cseg_cliente AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+								INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
+								INNER JOIN usuarios ON usr_id=cseg_usuario_encargado AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 								WHERE cseg_usuario_encargado='".$_GET["usuario"]."' AND cseg_fecha_proximo_contacto>='".$_GET["desde"]."' AND cseg_fecha_proximo_contacto<='".$_GET["hasta"]."' AND (cseg_canal='".$_GET["canal"]."' OR cseg_canal='".$_GET["canalDos"]."') AND (cseg_realizado IS NULL OR cseg_realizado=0)
-								",$conexion);
+								");
 							}
 							
 							
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta)){
 								
-								$encargado = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['cseg_usuario_encargado']."'",$conexion));
+								$encargado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='".$res['cseg_usuario_encargado']."'"));
 								
-								$contacto = mysql_fetch_array(mysql_query("SELECT * FROM contactos 
+								$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM contactos 
 								INNER JOIN sucursales ON sucu_id=cont_sucursal
-								WHERE cont_id='".$res['cseg_contacto']."'",$conexion));
+								WHERE cont_id='".$res['cseg_contacto']."'"));
 								
 								if($res['cseg_id']==$_GET['seg']){$fondoColor = 'style="background:#99DFC6; font-weight:bold;"'; } else {$fondoColor = '';}
 								switch($res['cseg_realizado']){
@@ -184,7 +184,7 @@
 									default: $html = 'Pendiente'; break;
 								}
 								
-								$ticketR = mysql_fetch_array(mysql_query("SELECT * FROM clientes_tikets WHERE tik_id='".$res['cseg_tiket']."'",$conexion));
+								$ticketR = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM clientes_tikets WHERE tik_id='".$res['cseg_tiket']."'"));
 							?>
 							<tr>
 								<td <?=$fondoColor;?>><?=$no;?></td>

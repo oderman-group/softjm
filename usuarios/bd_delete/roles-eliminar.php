@@ -6,7 +6,7 @@
 
 	$conexionBdPrincipal->query("DELETE FROM paginas_perfiles WHERE pper_tipo_usuario='" . $_GET["id"] . "'");
 	$conexionBdPrincipal->query("DELETE FROM usuarios WHERE usr_tipo='" . $_GET["id"] . "'");
-	$conexionBdPrincipal->query("DELETE FROM usuarios_tipos WHERE utipo_id='" . $_GET["id"] . "'");
+	$conexionBdPrincipal->query("DELETE FROM usuarios_tipos WHERE utipo_id='".$_GET["id"]."' AND utipo_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 

@@ -13,7 +13,7 @@ remi_moneda='" . $_POST["moneda"] . "',
 remi_ultima_modificacion=now(), 
 remi_usuario_modificacion='" . $_SESSION["id"] . "', 
 remi_observaciones='" . $conexionBdPrincipal->real_escape_string($_POST["notas"]) . "'
-WHERE remi_id='" . $_POST["id"] . "' ");
+WHERE remi_id='" . $_POST["id"] . "' AND  remi_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
 require('actualizar-productos-cotizacion.php');
 

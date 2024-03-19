@@ -6,13 +6,7 @@ $idPagina = 276;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-$infoEliminar = [
-    'tabla'          => 'sucursales_propias',
-    'clave_primaria' => 'sucp_id',
-    'id_registro'    => $_GET["id"]
-];
-
-BaseDatos::eliminarRegistro($infoEliminar);
+$conexionBdPrincipal->query("DELETE FROM sucursales_propias WHERE sucp_id='".$_GET["id"]."' AND sucp_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 

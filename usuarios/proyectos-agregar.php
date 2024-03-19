@@ -59,7 +59,7 @@ include("includes/js-formularios.php");
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="bd_create/proyectos-guardar.php">
-
+							<input type="hidden" class="span6" value="<?=$_SESSION["dataAdicional"]["id_empresa"]?>" name="proy_id_empresa">
 							<input type="hidden" name="proy_creada_usuario" value="<?=$_SESSION["id"];?>"> 
 								
 								<div class="control-group">

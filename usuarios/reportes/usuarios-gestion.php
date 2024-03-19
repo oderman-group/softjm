@@ -40,11 +40,11 @@
 							}
 							
 								
-							$consulta = mysql_query("SELECT * FROM usuarios 
-							WHERE usr_bloqueado=0 $filtro
-							",$conexion);
+							$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios 
+							WHERE usr_bloqueado=0 AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' $filtro
+							");
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){
+							while($res = mysqli_fetch_array($consulta)){
 
 								
 								
@@ -54,14 +54,14 @@
                                 <td><?=strtoupper($res['usr_nombre']);?></td>
 								<?php 
 								for($d=1; $d<=31; $d++) {
-									$gestion = mysql_fetch_array(mysql_query("
+									$gestion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "
 									SELECT
 									(SELECT count(cli_id) FROM clientes
-									WHERE cli_terminado_por='".$res['usr_id']."' AND cli_terminado=1 AND MONTH(cli_terminado_fecha)='".date("m")."' AND DAY(cli_terminado_fecha)='".$d."'),
+									WHERE cli_terminado_por='".$res['usr_id']."' AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' AND cli_terminado=1 AND MONTH(cli_terminado_fecha)='".date("m")."' AND DAY(cli_terminado_fecha)='".$d."'),
 									
 									(SELECT count(cli_id) FROM clientes
-									WHERE cli_papelera_por='".$res['usr_id']."' AND cli_papelera=1 AND MONTH(cli_papelera_fecha)='".date("m")."' AND DAY(cli_papelera_fecha)='".$d."')
-									",$conexion));
+									WHERE cli_papelera_por='".$res['usr_id']."' AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' AND cli_papelera=1 AND MONTH(cli_papelera_fecha)='".date("m")."' AND DAY(cli_papelera_fecha)='".$d."')
+									"));
 									
 									$color1 = 'white';
 									if($gestion[0]==0){$color1 = 'khaki';}

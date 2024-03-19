@@ -6,7 +6,7 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 $conexionBdPrincipal->query("UPDATE zonas SET 
 zon_nombre='" . $_POST["nombre"] . "', 
 zon_observaciones='" . $_POST["observaciones"] . "' 
-WHERE zon_id='" . $_POST["id"] . "'");
+WHERE zon_id='" . $_POST["id"] ."' AND  zon_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 	
 echo '<script type="text/javascript">window.location.href="../zonas-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
 exit();

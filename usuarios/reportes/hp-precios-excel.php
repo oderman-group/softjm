@@ -8,8 +8,6 @@ include("../../conexion.php");
 ?>
 
 <?php include("../head.php"); ?>
-
-<?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1",$conexion));?>
 </head>
 
 <body>
@@ -41,23 +39,23 @@ include("../../conexion.php");
 			//if(isset($_GET["hasta"]) and $_GET["hasta"]!=""){$filtro .= " AND (php_fecha_cambio<='".$_GET["hasta"]."')";}
 
 			$no = 1;
-			$consulta = mysql_query("SELECT * FROM productos_historial_precios 
-							INNER JOIN productos ON prod_id=php_producto
-							INNER JOIN usuarios ON usr_id=php_usuario
+			$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM productos_historial_precios 
+							INNER JOIN productos ON prod_id=php_producto AND prod_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+							INNER JOIN usuarios ON usr_id=php_usuario AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 							WHERE php_id=php_id $filtro
 							GROUP BY php_producto
 							ORDER BY php_id DESC
-							", $conexion);
+							");
 
-			while ($res = mysql_fetch_array($consulta)) {
+			while ($res = mysqli_fetch_array($consulta)) {
 
-				$cambios = mysql_num_rows(mysql_query("SELECT * FROM productos_historial_precios WHERE php_producto='".$res['prod_id']."'",$conexion));
+				$cambios = mysqli_num_rows(mysqli_query($conexionBdPrincipal, "SELECT * FROM productos_historial_precios WHERE php_producto='".$res['prod_id']."'"));
 
-				$precios = mysql_fetch_array(mysql_query("SELECT * FROM productos_historial_precios 
+				$precios = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM productos_historial_precios 
 					WHERE php_producto='".$res['prod_id']."'
 					ORDER BY php_id DESC
 					LIMIT 0,1
-					",$conexion));
+					"));
 			?>
 				<tr>
 					<td align="center"><?= $no; ?></td>

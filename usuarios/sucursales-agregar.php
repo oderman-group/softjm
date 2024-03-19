@@ -60,7 +60,7 @@ include("includes/js-formularios.php");
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="bd_create/sucursales-guardar.php">
-                                
+							<input type="hidden" class="span6" value="<?=$_SESSION["dataAdicional"]["id_empresa"]?>" name="sucp_id_empresa">
                                 <div class="control-group">
 									<label class="control-label">Nombre</label>
 									<div class="controls">

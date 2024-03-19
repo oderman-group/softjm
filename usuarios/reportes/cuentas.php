@@ -1,6 +1,6 @@
 <?php include("../sesion.php");?>
 <?php include("../../conexion.php");?>
-<?php $configuracion = mysql_fetch_array(mysql_query("SELECT * FROM configuracion WHERE conf_id=1",$conexion));?>
+<?php $configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM configuracion WHERE conf_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'"));?>
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
@@ -47,17 +47,16 @@
 							if(isset($_POST["hastaF"]) and $_POST["hastaF"]!=""){$filtro .= " AND (fact_fecha_real<='".$_POST["hastaF"]."')";}
 							if(isset($_POST["desdeV"]) and $_POST["desdeV"]!=""){$filtro .= " AND (fact_valor>='".$_POST["desdeV"]."')";}
 							if(isset($_POST["hastaV"]) and $_POST["hastaV"]!=""){$filtro .= " AND (fact_valor<='".$_POST["hastaV"]."')";}
-							$consulta = mysql_query("SELECT * FROM facturacion
+							$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturacion
 							INNER JOIN clientes ON cli_id=fact_cliente
 							INNER JOIN usuarios ON usr_id=fact_usuario_responsable
-							WHERE fact_id=fact_id ".$filtro."
-							ORDER BY ".$_POST["orden"]." ".$_POST["formaOrden"]
-							,$conexion);
+							WHERE fact_id=fact_id ".$filtro." AND fact_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+							ORDER BY ".$_POST["orden"]." ".$_POST["formaOrden"]);
 							$no = 1;
-							while($res = mysql_fetch_array($consulta)){	
-								$inf = mysql_fetch_array(mysql_query("SELECT * FROM usuarios WHERE usr_id='".$res['fact_usuario_influyente']."'",$conexion));
+							while($res = mysqli_fetch_array($consulta)){	
+								$inf = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='".$res['fact_usuario_influyente']."'"));
 								
-								$abonos = mysql_fetch_array(mysql_query("SELECT sum(fpab_valor) FROM facturacion_abonos WHERE fpab_factura='".$res['fact_id']."'",$conexion));
+								$abonos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT sum(fpab_valor) FROM facturacion_abonos WHERE fpab_factura='".$res['fact_id']."'"));
 								
 								$totalValor += $res['fact_valor'];
 								$totalAbonos += $abonos[0];

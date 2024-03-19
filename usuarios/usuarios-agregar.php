@@ -56,6 +56,7 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
+			<span style="color: blue; font-size: 15px;" id="respuestaUsuario"></span>
 			<div class="row-fluid">
 				<div class="span12">
 					<div class="content-widgets gray">
@@ -67,7 +68,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Usuario</label>
 									<div class="controls">
-										<input type="text" class="span2" name="usuario" required>
+										<input type="text" class="span2" name="usuario" id="usuario" pattern="[A-Za-z0-9]+" data-id-usuario="0" oninput="validarUsuario(this)" autofocus required>
 										<input type="text" class="span2 mr-0" value="<?= $dominio; ?>" readonly name="dominio">
 									</div>
 								</div>                
@@ -181,7 +182,7 @@ include("includes/js-formularios.php");
                                
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                                    <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+                                    <button id="btnEnviar" type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 								</div>
 							</form>
 						</div>
@@ -191,6 +192,7 @@ include("includes/js-formularios.php");
 			
 		</div>
 	</div>
+	<script src="js/Usuarios.js" ></script>
 	<?php include("includes/pie.php");?>
 </div>
 </body>

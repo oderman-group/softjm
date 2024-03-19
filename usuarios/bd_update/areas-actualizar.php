@@ -5,7 +5,7 @@ $idPagina = 228;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-$conexionBdPrincipal->query("UPDATE areas SET ar_nombre='" . $_POST["nombre"] . "' WHERE ar_id='" . $_POST["id"] . "'");
+$conexionBdPrincipal->query("UPDATE areas SET ar_nombre='" . $_POST["nombre"] . "' WHERE ar_id='" . $_POST["id"] ."' AND ar_id_empresa={$idEmpresa}");
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 

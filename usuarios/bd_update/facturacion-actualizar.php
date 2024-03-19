@@ -1,7 +1,7 @@
 <?php
 require_once("../sesion.php");
 
-mysqli_query($conexionBdPrincipal,"UPDATE facturacion SET fact_cliente='" . $_POST["cliente"] . "',  fact_ultima_modificacion=now(), fact_usuario_modificacion='" . $_SESSION["id"] . "',  fact_fecha_real='" . $_POST["fechaFactura"] . "'  WHERE fact_id='" . $_POST["id"] . "'");
+mysqli_query($conexionBdPrincipal,"UPDATE facturacion SET fact_cliente='" . $_POST["cliente"] . "',  fact_ultima_modificacion=now(), fact_usuario_modificacion='" . $_SESSION["id"] . "',  fact_fecha_real='" . $_POST["fechaFactura"] . "'  WHERE fact_id='" . $_POST["id"] . "' AND  fact_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 	
 
 $numero = (count($_POST["producto"]));

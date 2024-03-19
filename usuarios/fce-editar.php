@@ -153,7 +153,7 @@ include("includes/js-formularios.php");
 										 <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="proveedor" required>
 											 <option value=""></option>
 											 <?php
-											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores");
+											 $conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM proveedores WHERE prov_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 											 while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											 ?>
 												 <option value="<?=$resOp[0];?>" <?php if($resultadoD['factura_proveedor']==$resOp[0]) echo "selected";?>><?=$resOp['prov_nombre'];?></option>
@@ -252,7 +252,7 @@ include("includes/js-formularios.php");
 
 												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria 
-												WHERE prod_id=prod_id
+												WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa. "'
 												ORDER BY prod_nombre");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 													$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 

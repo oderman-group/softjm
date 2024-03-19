@@ -5,10 +5,6 @@ $paginaActual['pag_nombre'] = "Enviar mensaje";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
-<?php
-mysql_query("INSERT INTO historial_acciones(hil_usuario, hil_url, hil_titulo, hil_fecha, hil_pagina_anterior)VALUES('".$_SESSION["id"]."', '".$_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING']."', '".$idPagina."', now(),'".$_SERVER['HTTP_REFERER']."')",$conexion);
-if(mysql_errno()!=0){echo mysql_error(); exit();}
-?>
 <!-- styles -->
 
 <!--[if IE 7]>
@@ -75,8 +71,8 @@ include("includes/js-formularios.php");
                                             <select data-placeholder="Escoja varias opciones..." class="chzn-select span10" multiple tabindex="2" name="zonas[]">
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = mysql_query("SELECT * FROM localidad_departamentos",$conexion);
-                                                while($resOp = mysql_fetch_array($conOp)){
+                                                $conOp = mysqli_query($conexionBdAdmin, "SELECT * FROM localidad_departamentos");
+                                                while($resOp = mysqli_fetch_array($conOp)){
                                                 ?>
                                                     <option value="<?=$resOp['dep_id'];?>"><?=$resOp['dep_nombre'];?></option>
                                                 <?php
@@ -103,8 +99,8 @@ include("includes/js-formularios.php");
                                             <select data-placeholder="Escoja varias opciones..." class="chzn-select span10" multiple tabindex="2" name="grupos[]">
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = mysql_query("SELECT * FROM dealer",$conexion);
-                                                while($resOp = mysql_fetch_array($conOp)){
+                                                $conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM dealer WHERE deal_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
+                                                while($resOp = mysqli_fetch_array($conOp)){
                                                 ?>
                                                     <option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
                                                 <?php
@@ -120,8 +116,8 @@ include("includes/js-formularios.php");
                                             <select data-placeholder="Escoja varias opciones..." class="chzn-select span10" multiple tabindex="2" name="clientes[]">
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = mysql_query("SELECT * FROM clientes",$conexion);
-                                                while($resOp = mysql_fetch_array($conOp)){
+                                                $conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM clientes WHERE cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
+                                                while($resOp = mysqli_fetch_array($conOp)){
                                                 ?>
                                                     <option value="<?=$resOp[0];?>"><?=$resOp[1]."(".$resOp['cli_email'].")";?></option>
                                                 <?php

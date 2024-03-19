@@ -58,9 +58,6 @@ include("includes/js-formularios.php");
 <body>
 	<div class="layout">
 		<?php include("includes/encabezado.php"); ?>
-
-		
-
 		<div class="main-wrapper">
 			<div class="container-fluid">
 				<div class="row-fluid ">
@@ -76,7 +73,7 @@ include("includes/js-formularios.php");
 					</div>
 				</div>
 				<div class="row-fluid">
-					<div class="span12">
+					<div class="span6">
 						<div class="content-widgets gray">
 							<div class="widget-head bondi-blue">
 								<h3> <?= $paginaActual['pag_nombre']; ?></h3>
@@ -99,9 +96,6 @@ include("includes/js-formularios.php");
 											</div>
 										</div>
 
-
-
-
 										<div class="control-group">
 											<label class="control-label">Empresa (*)</label>
 											<div class="controls">
@@ -123,27 +117,7 @@ include("includes/js-formularios.php");
 												<input type="text" class="span4" name="telefono" value="<?= $resultadoD['clio_telefono']; ?>">
 											</div>
 										</div>
-
-                                
-										<div class="control-group">
-											<label class="control-label">Modulos</label>
-											<div class="controls">
-												<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="modulo[]" multiple>
-													<option value=""></option>
-													<?php
-													$conOp = $conexionBdAdmin->query("SELECT * FROM modulos");
-													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-														$consultaModulos=$conexionBdAdmin->query("SELECT * FROM modulos_empresa WHERE mxe_id_empresa='".$resultadoD['clio_id']."' AND mxe_id_modulo='".$resOp['mod_id']."'");
-														$numZ = $consultaModulos->num_rows;
-													?>
-														<option value="<?=$resOp[0];?>"<?php if($numZ>0){echo "selected";}?> ><?=$resOp['mod_nombre'];?></option>
-													<?php
-													}
-													?>
-												</select>
-											</div>
-										</div>
-
+                                									
 										<div class="control-group">
 											<label class="control-label">Contacto principal</label>
 											<div class="controls">
@@ -166,77 +140,76 @@ include("includes/js-formularios.php");
 												<input type="date" class="span4" name="fin" style="text-transform:uppercase;" value="<?= $resultadoD['clio_fecha_fin']; ?>">
 											</div>
 										</div>
-
+									
 									</fieldset>
 
 
 									<div class="form-actions">
-										<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+										<a href="clientes-orion.php;" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
 										<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									</div>
-
+										</form>
 
 							</div>
 						</div>
 					</div>
-				</div>
+					<div class="span6">
+						<div class="content-widgets gray">
+							<div class="widget-head bondi-blue">
+								<h3> <?= $paginaActual['pag_nombre']; ?></h3>
+							</div>
+							<div class="widget-container">
 
+									<fieldset class="default">
+										<legend>Modulos</legend>
+					<div class="widget-container">
 
-				<!--
-             <div class="row-fluid">
-				<div class="span12">
-					<div class="content-widgets gray">
-						<div class="widget-head bondi-blue">
-							<h3> <?= $paginaActual['pag_nombre']; ?></h3>
-						</div>
-						<div class="widget-container">
-                                
-                                <div class="control-group">
-									<label class="control-label">Alcance</label>
-									<div class="controls">
-										<textarea rows="5" cols="80" style="width: 100%" class="tinymce-simple" name="alcance"></textarea>
-									</div>
-								</div>
-                                
-                                <div class="control-group">
-									<label class="control-label">Primera auditoría</label>
-									<div class="controls">
-										<textarea rows="5" cols="80" style="width: 100%" class="tinymce-simple" name="pa"></textarea>
-									</div>
-								</div>
-                                
-                                <div class="control-group">
-									<label class="control-label">Segunda auditoría</label>
-									<div class="controls">
-										<textarea rows="5" cols="80" style="width: 100%" class="tinymce-simple" name="sa"></textarea>
-									</div>
-								</div>
-                                
-                                <div class="control-group">
-									<label class="control-label">Renovación</label>
-									<div class="controls">
-										<textarea rows="5" cols="80" style="width: 100%" class="tinymce-simple" name="renovacion"></textarea>
-									</div>
-								</div>
+					<ul class="nav nav-tabs" id="myTab1">
+						<?php
+						$queryModulos = "SELECT * FROM modulos_empresa
+						INNER JOIN modulos ON mod_id=mxe_id_modulo AND mod_padre IS NULL
+						WHERE mxe_id_empresa= '".$resultadoD['clio_id']."'";
+						$resultModulos = $conexionBdAdmin->query($queryModulos);
+						$conta = 1;
+						while ($rowModulos = $resultModulos->fetch_assoc()) {
+						?>
+							<li <?php if($conta == 1) echo 'class="active"';?> id="mod<?=$rowModulos['mod_id'];?>"><a onclick="mostrarModulos(<?=$rowModulos['mod_id'];?>, <?=$_GET['id'];?>)"><i class="icon-tasks"></i> <?=$rowModulos['mod_nombre'];?></a></li>
+						<?php
+							$conta ++;
+						}
+						?>
+					</ul>
 
-								<div class="form-actions">
-									<a href="clientes.php" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                                    <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-								</div>
-                              
-                            </form>    
-
-						</div>
+				<form class="form-horizontal" method="post" action="bd_update/actualizar-modulos-cliente.php">
+					<input type="hidden" name="id" value="<?=$resultadoD['clio_id'];?>">
+					<div class="tab-content">
+						<div id="divTableModulos"></div>
 					</div>
+								
+					<select id="ModulosSeleccionadas"  name="ModulosS[]" multiple  style="display: none;">
+						<?php
+						$consultaModulo = $conexionBdAdmin->query("SELECT mxe_id_modulo FROM modulos_empresa WHERE mxe_id_empresa = '".$resultadoD['clio_id']."'");
+						while ($page = $consultaModulo->fetch_assoc()) {
+							echo '<option value="' . $page["mxe_id_modulo"] . '" id="pag-' . $page["mxe_id_modulo"] . '" selected>' . $page["mxe_id_modulo"] . '</option>';
+						}
+						?>
+					</select>                 
+
+					<div class="form-actions">
+						<a href="clientes-orion.php" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+						<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+					</div>
+				</form>
 				</div>
-			</div>
-            -->
 
 
-			</div>
-		</div>
-		<?php include("includes/pie.php"); ?>
-	</div>
-</body>
-
-</html>
+							</div>
+						</div>
+						<?php include("includes/pie.php"); ?>
+					</div>
+				</body>
+				<script src="js/Modulos.js" ></script>
+				<script type="text/javascript">
+					$(document).ready(mostrarModulos(1, <?=$resultadoD['clio_id'];?>));
+				</script>
+				</html>

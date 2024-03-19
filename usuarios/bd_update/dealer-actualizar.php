@@ -1,7 +1,7 @@
 <?php
 require_once("../sesion.php");
 
-mysqli_query($conexionBdPrincipal,"UPDATE dealer SET deal_nombre='" . $_POST["nombre"] . "' WHERE deal_id='" . $_POST["id"] . "'");
+mysqli_query($conexionBdPrincipal,"UPDATE dealer SET deal_nombre='" . $_POST["nombre"] . "' WHERE deal_id='" . $_POST["id"] . "' AND deal_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
 mysqli_query($conexionBdPrincipal,"DELETE FROM clientes_categorias WHERE cpcat_categoria='" . $_POST["id"] . "'");
 

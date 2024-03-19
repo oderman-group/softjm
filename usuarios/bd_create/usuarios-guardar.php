@@ -2,7 +2,7 @@
     require_once("../sesion.php");
     $idPagina = 51;
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
-    $usr_login = $_POST["usuario"] . $_POST["dominio"];
+    $usr_login = $_POST["usuario"] . $_SESSION["dataAdicional"]["dominio_empresa"];
     $conexionBdPrincipal->query("INSERT INTO usuarios(usr_login, usr_clave, usr_nombre, usr_email, usr_bloqueado, usr_ciudad, usr_area, usr_sucursal, usr_id_empresa)VALUES('" . $usr_login . "',SHA1('" . $_POST["clave"] . "'),'" . $_POST["nombre"] . "','" . $_POST["email"] . "',0,'" . $_POST["ciudad"] . "','" . $_POST["area"] . "', '" . $_POST["sucursal"] . "', '".$idEmpresa."')");
 
     $idInsertU = mysqli_insert_id($conexionBdPrincipal);

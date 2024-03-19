@@ -1,8 +1,7 @@
 <?php
 require_once("../sesion.php");
 
-mysqli_query($conexionBdPrincipal,"UPDATE importaciones SET imp_fecha='" . $_POST["fecha"] . "', imp_proveedor='" . $_POST["proveedor"] . "', imp_concepto='" . $_POST["concepto"] . "', imp_responsable='" . $_SESSION["id"] . "', imp_liquidada='" . $_POST["liquidada"] . "', imp_fce='" . $_POST["fce"] . "', imp_valor_nacionalizacion='" . $_POST["nacionalizacion"] . "', imp_otros_gastos='" . $_POST["otrosCostos"] . "' WHERE imp_id='" . $_POST["id"] . "'");
-
+mysqli_query($conexionBdPrincipal,"UPDATE importaciones SET imp_fecha='" . $_POST["fecha"] . "', imp_proveedor='" . $_POST["proveedor"] . "', imp_concepto='" . $_POST["concepto"] . "', imp_responsable='" . $_SESSION["id"] . "', imp_liquidada='" . $_POST["liquidada"] . "', imp_fce='" . $_POST["fce"] . "', imp_valor_nacionalizacion='" . $_POST["nacionalizacion"] . "', imp_otros_gastos='" . $_POST["otrosCostos"] . "' WHERE imp_id='" . $_POST["id"] . "' AND  imp_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
 
 //Facturas asociadas
