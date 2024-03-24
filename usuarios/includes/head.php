@@ -27,6 +27,8 @@
 <link href="css/bootstrap.css" rel="stylesheet">
 <link href="css/bootstrap-responsive.css" rel="stylesheet">
 <link rel="stylesheet" href="css/font-awesome.css">
+<!--alexis-->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.6.2/css/bootstrap.min.css">
 
 
 <link href="css/styles.css" rel="stylesheet">
@@ -50,6 +52,10 @@
 
   gtag('config', 'G-T5Q7PCSPK9');
 </script>
+<!--alexis-->	
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  <script src ="../assets-login/js/menu-arrastrable.js"></script>
+
 
 
 

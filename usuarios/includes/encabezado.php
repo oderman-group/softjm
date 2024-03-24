@@ -31,7 +31,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 			<div class="container">
 				<span class="home-link"><a href="index.php" class="icon-home"></a></span>
 				<div class="nav-collapse">
-					<ul class="nav">
+					<ul class="nav draggable-menu"> <!--aqui agregamos la propiedad draggable-menu-->
 					<li><a style="font-weight: bold; color: yellow; font-size: 14px;"><?= $_SESSION["dataAdicional"]["nombre_empresa"]; ?></a></li>
 					<?php foreach ($menu as $menu_item) : ?>
 						<li class="dropdown">
