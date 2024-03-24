@@ -34,7 +34,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 					<ul class="nav draggable-menu"> <!--aqui agregamos la propiedad draggable-menu-->
 					<li><a style="font-weight: bold; color: yellow; font-size: 14px;"><?= $_SESSION["dataAdicional"]["nombre_empresa"]; ?></a></li>
 					<?php foreach ($menu as $menu_item) : ?>
-						<li class="dropdown">
+						<li class="dropdown" id="<?=$menu_item['mod_id'];?>">
 							<?php if (Modulos::validarAccesoModulo($configuracion['conf_id_empresa'], $menu_item['mod_id'], $conexionBdAdmin, $datosUsuarioActual)) { ?>
 								<?php if (!empty($menu_item['ruta_pagina'])) : ?>
 									<a href="<?= REDIRECT_ROUTE . '/' . $menu_item['ruta_pagina']; ?>">
