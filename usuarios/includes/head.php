@@ -27,6 +27,8 @@
 <link href="css/bootstrap.css" rel="stylesheet">
 <link href="css/bootstrap-responsive.css" rel="stylesheet">
 <link rel="stylesheet" href="css/font-awesome.css">
+<link rel="stylesheet" href="css/tooltip.css">
+<script src="https://kit.fontawesome.com/e84fa1cf78.js" crossorigin="anonymous"></script>
 
 
 <link href="css/styles.css" rel="stylesheet">

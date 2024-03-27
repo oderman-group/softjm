@@ -84,13 +84,19 @@ include("includes/js-formularios.php");
                                     </div>
 
                                     <div class="control-group">
-                                        <label class="control-label">Email</label>
+                                        <label class="control-label">Email
+                                             <button class="tooltipp">Recuperar contraseña.</button>
+                                            <i class="fa-solid fa-circle-question"></i>
+                                        </label>
                                         <div class="controls">
                                             <input type="email" class="span4" name="email" value="<?= $resultadoD['usr_email']; ?>">
                                         </div>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label">Roles</label>
+                                        <label class="control-label">Roles
+                                            <button class="tooltipp">Funcion a cumplir en la empresa.</button>
+                                            <i class="fa-solid fa-circle-question"></i>
+                                        </label>
                                         <div class="controls">
                                             <select data-placeholder="Escoja una opción..." class="chzn-select span4" multiple tabindex="2" name="tipoU" disabled>
                                                 <option value=""></option>

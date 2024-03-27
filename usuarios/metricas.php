@@ -81,7 +81,10 @@ include("includes/js-formularios.php");
                                     <input type="hidden" name="id" value="<?=$_GET['id'];?>">
 
                                     <div class="control-group">
-                                        <label class="control-label">Meta del mes</label>
+                                        <label class="control-label">Meta del mes
+                                            <button class="tooltipp">Objetivos a cumplir por la empresa.</button>
+                                            <i class="fa-solid fa-circle-question"></i>
+                                        </label>
                                         <div class="controls">
                                             <input type="text" class="span4" name="metames" value="<?= $resultadoD['met_meta_venta_mes']; ?>" required>
                                         </div>
@@ -95,14 +98,20 @@ include("includes/js-formularios.php");
                                     </div>
 
                                     <div class="control-group">
-                                        <label class="control-label">Bonificación (Mejor asesor)</label>
+                                        <label class="control-label">Bonificación (Mejor asesor)
+                                                <button class="tooltipp">Incentivos al mejor asesor del mes.</button>
+                                                <i class="fa-solid fa-circle-question"></i>
+                                        </label>
                                         <div class="controls">
                                             <input type="text" class="span4" name="bonificacion" value="<?= $resultadoD['met_bonificacion_mes']; ?>" required>
                                         </div>
                                     </div>
 
                                     <div class="control-group">
-                                        <label class="control-label">Punto de equilibrio de la empresa</label>
+                                        <label class="control-label">Punto de equilibrio de la empresa
+                                        <button class="tooltipp">Nivel de actividad en el que los ingresos totales son iguales a los costos totales.</button>
+                                                <i class="fa-solid fa-circle-question"></i>
+                                        </label>
                                         <div class="controls">
                                             <input type="text" class="span4" name="pequilibrio" value="<?= $resultadoD['met_punto_equilibrio']; ?>" required>
                                             <span style="color:#609;">Cuánto necesita vender la empresa mensual para cubrir costos.</span>
@@ -110,7 +119,10 @@ include("includes/js-formularios.php");
                                     </div>
 
                                     <div class="control-group">
-                                        <label class="control-label">Bonificación (Cumplimiento de meta)</label>
+                                        <label class="control-label">Bonificación (Cumplimiento de meta)
+                                            <button class="tooltipp">Compensación adicional que se otorga a los empleados cuando alcanzan o superan objetivos específicos establecidos por la empresa..</button>
+                                            <i class="fa-solid fa-circle-question"></i>
+                                        </label>
                                         <div class="controls">
                                             <input type="text" class="span4" name="bonoMeta" value="<?= $resultadoD['met_bono_meta']; ?>" required>
                                         </div>

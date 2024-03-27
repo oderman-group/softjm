@@ -199,7 +199,10 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 
 										<div class="control-group">
-											<label class="control-label">DNI</label>
+											<label class="control-label">DNI
+											   <button class="tooltipp">Documento Nacional de Identidad.</button>
+										       <i class="fa-solid fa-circle-question"></i>
+											</label>
 											<div class="controls">
 												<input type="text" class="span4" name="dni" autocomplete="off" onChange="clientesVerificar(this)" value="<?= $resultadoD['prov_documento']; ?>">
 												<span style="color:#F03;">Este valor sin puntos ni espacios.</span>
@@ -217,7 +220,10 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 										</div>
 
 										<div class="control-group">
-											<label class="control-label">Régimen</label>
+											<label class="control-label">Régimen
+											    <button class="tooltipp">Tipo ya sea fiscal, laboral, contable, legal o regulatorio.</button>
+										        <i class="fa-solid fa-circle-question"></i>
+											</label>
 											<div class="controls">
 												<input type="text" class="span6" name="regimen" style="text-transform:uppercase;" value="<?= $resultadoD['prov_tipo_regimen']; ?>">
 											</div>
@@ -225,14 +231,20 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 
 										<div class="control-group">
-											<label class="control-label">Email</label>
+											<label class="control-label">Email
+											   <button class="tooltipp">Comunicacion con los proveedores.</button>
+										       <i class="fa-solid fa-circle-question"></i>
+											</label>
 											<div class="controls">
 												<input type="email" class="span8" name="email" style="text-transform:lowercase;" value="<?= $resultadoD['prov_email']; ?>">
 											</div>
 										</div>
 
 										<div class="control-group">
-											<label class="control-label">Teléfono</label>
+											<label class="control-label">Teléfono
+										    	<button class="tooltipp">Telefono del proveedor para una mejor comunicacion.</button>
+										        <i class="fa-solid fa-circle-question"></i>
+											</label>
 											<div class="controls">
 												<input type="text" class="span4" name="telefono" value="<?= $resultadoD['prov_telefono']; ?>">
 											</div>

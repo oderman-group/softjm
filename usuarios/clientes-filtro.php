@@ -172,14 +172,20 @@ include("includes/js-formularios.php");
                                </div>
 								
 								<div class="control-group">
-									<label class="control-label">Rango Desde</label>
+									<label class="control-label">Rango Desde
+									     <button class="tooltipp">Fecha de inicio.</button>
+							             <i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="date" class="span3" name="desdeMercadeo">
 									</div>
 								</div>
                                 
                                 <div class="control-group">
-									<label class="control-label">Rango Hasta</label>
+									<label class="control-label">Rango Hasta
+									    <button class="tooltipp">Fecha de caducidad.</button>
+							             <i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="date" class="span3" name="hastaMercadeo">
 									</div>
@@ -187,14 +193,20 @@ include("includes/js-formularios.php");
                                
 								<hr>
                                <div class="control-group">
-									<label class="control-label">Registrados Desde</label>
+									<label class="control-label">Registrados Desde
+									<button class="tooltipp">Fecha de inicio.</button>
+							             <i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="date" class="span3" name="desde">
 									</div>
 								</div>
                                 
                                 <div class="control-group">
-									<label class="control-label">Registrados Hasta</label>
+									<label class="control-label">Registrados Hasta
+									<button class="tooltipp">Fecha de caducidad.</button>
+							             <i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="date" class="span3" name="hasta">
 									</div>

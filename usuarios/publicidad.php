@@ -66,7 +66,10 @@ include("includes/js-formularios.php");
 									<legend>Banners publicitarios</legend>
                                 
 									<div class="control-group">
-										<label class="control-label">Banner Superior</label>
+										<label class="control-label">Banner Superior
+										<button class="tooltipp">Coloca la publicidad en la parte superio de la pagina.</button>
+							             <i class="fa-solid fa-circle-question"></i>
+										</label>
 										<div class="controls">
 											<div class="fileupload fileupload-new" data-provides="fileupload">
 												<div class="input-append">
@@ -86,14 +89,20 @@ include("includes/js-formularios.php");
 									</div>
 										
 									<div class="control-group">
-										<label class="control-label">URL banner superior</label>
+										<label class="control-label">URL banner superior
+										<button class="tooltipp">Coloca la URL en la parte superio y dirige al usuario a la URL asignada.</button>
+							             <i class="fa-solid fa-circle-question"></i>
+										</label>
 										<div class="controls">
 											<input type="url" class="span10" name="urlTop" value="<?=$resultadoD['conf_url_top'];?>">
 										</div>
 									</div>	
 										
 									<div class="control-group">
-										<label class="control-label">Banner Lateral</label>
+										<label class="control-label">Banner Lateral
+										<button class="tooltipp">Coloca la publicidad en la parte lateral de la pagina.</button>
+							             <i class="fa-solid fa-circle-question"></i>
+										</label>
 										<div class="controls">
 											<div class="fileupload fileupload-new" data-provides="fileupload">
 												<div class="input-append">
@@ -113,7 +122,10 @@ include("includes/js-formularios.php");
 									</div>
 										
 									<div class="control-group">
-										<label class="control-label">URL banner lateral</label>
+										<label class="control-label">URL banner lateral
+										<button class="tooltipp">Coloca la URL en la parte lateral y dirige al usuario a la URL asignada.</button>
+							             <i class="fa-solid fa-circle-question"></i>
+										</label>
 										<div class="controls">
 											<input type="url" class="span10" name="urlLat" value="<?=$resultadoD['conf_url_lateral'];?>">
 										</div>

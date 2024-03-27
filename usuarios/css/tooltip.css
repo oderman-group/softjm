@@ -1,0 +1,45 @@
+.control-label{
+    font-weight: normal;
+    text-decoration: none;
+    position: relative;
+}
+
+.control-label:hover{
+    text-decoration: underline;
+    
+}
+
+.control-label:hover .tooltipp{
+    display: inline-block;
+}
+
+.tooltipp{
+    display: none;
+    position: absolute;
+    background: #000;
+    line-height: 20px;
+    z-index: 500;
+    padding-bottom: 2px;
+    text-align: center;
+    color: #fff;
+    font-size: 15px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    left: 0;
+    right: 0;
+    bottom: 30px;
+
+}
+
+.tooltipp::after {
+    content: "";
+    display: block;
+    border-top: 15px solid #000;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    position: absolute;
+    bottom: -15px;
+    right: 10px;
+}
+
+

@@ -62,14 +62,22 @@ include("includes/js-formularios.php");
                                     </div>
 
                                     <div class="control-group">
-                                        <label class="control-label">Dolar compra</label>
+                                        <label class="control-label">Dolar compra
+                                        <button class="tooltipp">Precio del dolar actual.</button>
+										<i class="fa-solid fa-circle-question"></i>
+                                        </label>
+                                        
                                         <div class="controls">
                                             <input type="text" class="span4" name="dolarCompra" value="<?= $resultadoD['conf_trm_compra']; ?>" required>
                                         </div>
                                     </div>
 
                                     <div class="control-group">
-                                        <label class="control-label">Dolar venta</label>
+                                        <label class="control-label">Dolar venta
+                                        <button class="tooltipp">Precio del dolar actual.</button>
+										<i class="fa-solid fa-circle-question"></i>
+                                        </label>
+                                       
                                         <div class="controls">
                                             <input type="text" class="span4" name="dolarVenta" value="<?= $resultadoD['conf_trm_venta']; ?>" required>
 
@@ -140,7 +148,10 @@ include("includes/js-formularios.php");
                                         </div>
 
                                         <div class="control-group">
-                                            <label class="control-label">Clave del Email</label>
+                                            <label class="control-label">Clave del Email
+                                              <button class="tooltipp">Clave asignada al correo para iniciar seción.</button>
+										      <i class="fa-solid fa-circle-question"></i>
+                                            </label>
                                             <div class="controls">
                                                 <input type="text" class="span4" name="claveEmail" value="<?= $resultadoD['conf_clave_correo']; ?>" required>
                                             </div>
@@ -161,7 +172,10 @@ include("includes/js-formularios.php");
                                         </div>
 
                                         <div class="control-group">
-                                            <label class="control-label">URL del CRM</label>
+                                            <label class="control-label">URL del CRM
+                                              <button class="tooltipp">Dirección web o la ubicación en línea donde se encuentra alojado el sistema CRM.</button>
+										      <i class="fa-solid fa-circle-question"></i>
+                                            </label>
                                             <div class="controls">
                                                 <input type="url" class="span4" name="urlEncuestas" value="<?= $resultadoD['conf_url_encuestas']; ?>" required>
                                             </div>
@@ -245,7 +259,10 @@ include("includes/js-formularios.php");
                                         <legend>Configuración general</legend>
 
                                         <div class="control-group">
-                                            <label class="control-label">Asociar proveedores en cotización</label>
+                                            <label class="control-label">Asociar proveedores en cotización
+                                              <button class="tooltipp">Elija los proveedores que desea hacer la cotización.</button>
+										      <i class="fa-solid fa-circle-question"></i>
+                                            </label>
                                             <div class="controls">
                                                 <select name="proveedorCotizacion">
                                                     <option value="1" <?php if($resultadoD['conf_proveedor_cotizacion'] == 1){echo "selected";}?>>SI</option>
@@ -364,7 +381,10 @@ include("includes/js-formularios.php");
 
 
                                         <div class="control-group">
-                                            <label class="control-label">Paginación</label>
+                                            <label class="control-label">Paginación
+                                              <button class="tooltipp">Escoja el numero de paginas que desea ver.</button>
+										      <i class="fa-solid fa-circle-question"></i>
+                                            </label>
                                             <div class="controls">
                                                 <input type="text" class="span2" name="paginacion" value="<?= $resultadoD['conf_paginacion']; ?>">
                                                 <span style="color:#F00;">Son los registros que mostrará por cada página</span>
@@ -372,7 +392,10 @@ include("includes/js-formularios.php");
                                         </div>
 
                                         <div class="control-group">
-                                            <label class="control-label">Porcentaje para clientes (Compras)</label>
+                                            <label class="control-label">Porcentaje para clientes (Compras)
+                                              <button class="tooltipp">Descuentos a los clientes por las compras o paquetes.</button>
+										      <i class="fa-solid fa-circle-question"></i>
+                                            </label>
                                             <div class="controls">
                                                 <input type="text" class="span2" name="porcentajeClientes" value="<?= $resultadoD['conf_porcentaje_clientes']; ?>">
                                                 <span style="color:#F00;">Lo que se le dará al cliente por cada compra</span>
@@ -380,7 +403,10 @@ include("includes/js-formularios.php");
                                         </div>
 
                                         <div class="control-group">
-                                            <label class="control-label">Porcentaje comisión ventas</label>
+                                            <label class="control-label">Porcentaje comisión ventas
+                                              <button class="tooltipp">Comision para los vendedores.</button>
+										      <i class="fa-solid fa-circle-question"></i>
+                                            </label>
                                             <div class="controls">
                                                 <input type="text" class="span2" name="comisionVendedores" value="<?= $resultadoD['conf_comision_vendedores']; ?>">
                                                 <span style="color:#F00;">Lo que se le dará al vendedor por cada venta</span>
@@ -388,7 +414,10 @@ include("includes/js-formularios.php");
                                         </div>
 
                                         <div class="control-group">
-                                            <label class="control-label">Saldo para enviar correo</label>
+                                            <label class="control-label">Saldo para enviar correo
+                                              <button class="tooltipp">Monto pendiente a cancelar.</button>
+										      <i class="fa-solid fa-circle-question"></i>
+                                            </label>
                                             <div class="controls">
                                                 <input type="text" class="span2" name="correoPuntos" value="<?= $resultadoD['conf_coreo_puntos']; ?>">
                                                 <span style="color:#F00;">El sistema enviará un correo automático cuando los clientes acumulen este saldo.</span>
@@ -396,7 +425,10 @@ include("includes/js-formularios.php");
                                         </div>
 
                                         <div class="control-group">
-                                            <label class="control-label">Próximo vencimiento</label>
+                                            <label class="control-label">Próximo vencimiento
+                                              <button class="tooltipp">Fecha de vencimiento del bono del cliente.</button>
+										      <i class="fa-solid fa-circle-question"></i>
+                                            </label>
                                             <div class="controls">
                                                 <input type="date" class="span2" name="fechaVencimientoSaldo" value="<?= $resultadoD['conf_vencimiento_puntos']; ?>">
                                                 <span style="color:#F00;">La fecha límite próxima para que los clientes rediman su saldo acumulado.</span>
