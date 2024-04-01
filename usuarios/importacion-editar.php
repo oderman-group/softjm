@@ -322,14 +322,21 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 									<hr>
 
 									<div class="control-group">
-										<label class="control-label">TRM USD</label>
+										<label class="control-label">TRM USD
+										<button class="tooltipp">Tasa representativa del mercado dólar estadounidense.</button>
+										<i class="fa-solid fa-circle-question"></i>
+										</label>
 										<div class="controls">
 											<input type="text" class="span2" name="trmUsd" value="<?= $resultadoD['factura_trm_usd']; ?>" disabled>
 										</div>
 									</div>
 
 									<div class="control-group">
-										<label class="control-label">TRM EURO</label>
+										<label class="control-label">TRM EURO
+										<button class="tooltipp">Tasa representativa del mercado euro.</button>
+										<i class="fa-solid fa-circle-question"></i>
+
+										</label>
 										<div class="controls">
 											<input type="text" class="span2" name="trmEuro" value="<?= $resultadoD['factura_trm_euro']; ?>" disabled>
 										</div>
@@ -338,14 +345,20 @@ $valorTotalProductosImp = mysqli_fetch_array($valorTotalProductosImpConsulta, MY
 									<hr>
 
 								<div class="control-group">
-									<label class="control-label">FLETE TRM USD</label>
+									<label class="control-label">FLETE TRM USD
+									    <button class="tooltipp">Costo del transporte dólar estadounidense.</button>
+										<i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="text" class="span2" name="trmUsdFlete" value="<?=$resultadoD['factura_trm_usd_flete'];?>" disabled>
 									</div>
 								</div>
 
 								<div class="control-group">
-									<label class="control-label">FLETE TRM EURO</label>
+									<label class="control-label">FLETE TRM EURO
+									<button class="tooltipp">Costo del transporte euro.</button>
+										<i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="text" class="span2" name="trmEuroFlete" value="<?=$resultadoD['factura_trm_euro_flete'];?>" disabled>
 									</div>
