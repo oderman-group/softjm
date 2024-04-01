@@ -63,7 +63,10 @@ include("includes/js-formularios.php");
 							<form class="form-horizontal" method="post" action="bd_create/importacion-guardar.php">
 
 							<div class="control-group">
-									<label class="control-label">Concepto</label>
+									<label class="control-label">Concepto 
+									<button class="tooltipp">registrar o documentar la entrada de bienes o productos desde otro país a través de la aduana.</button>
+							             <i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="text" class="span8" name="concepto" required>
 									</div>
