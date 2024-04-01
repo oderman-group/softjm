@@ -25,7 +25,7 @@
 									</div>
 								</div>
 								<div class="stat-text progress-stat">
-                                    <span style="font-size: 17px;">$<?=number_format($datosUsuarioActual['cli_saldo'],0,",",".");?></span><br>
+                                    <span style="font-size: 17px;">$<?=!empty($datosUsuarioActual['cli_saldo']) ? number_format($datosUsuarioActual['cli_saldo'],0,",",".") : 0;?></span><br>
                                     <span style="font-size: 13px; color: darkblue;">Vence:<br> <?=$configu['conf_vencimiento_puntos'];?></span>
 								</div>
 							</div>
