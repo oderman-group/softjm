@@ -6,9 +6,9 @@ $idPagina = 4;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 $consulta=$conexionBdAdmin->query("SELECT u.*, GROUP_CONCAT(r.utipo_id) AS roles
-FROM orioncrmcom_dev_jm_crm.usuarios AS u
+FROM ".MAINBD.".usuarios AS u
 LEFT JOIN usuarios_roles AS ru ON u.usr_id = ru.upr_id_usuario 
-LEFT JOIN orioncrmcom_dev_jm_crm.usuarios_tipos AS r ON ru.upr_id_rol  = r.utipo_id 
+LEFT JOIN ".MAINBD.".usuarios_tipos AS r ON ru.upr_id_rol  = r.utipo_id 
 WHERE u.usr_id = '".$_GET["id"]."'
 GROUP BY u.usr_id;");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
