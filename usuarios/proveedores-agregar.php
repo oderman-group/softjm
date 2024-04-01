@@ -84,7 +84,10 @@ include("includes/js-formularios.php");
                                 <fieldset class="default">
                                 	<legend>Datos básicos</legend>
                                 <div class="control-group">
-									<label class="control-label">DNI</label>
+									<label class="control-label">DNI
+									    <button class="tooltipp">Documento Nacional de Identidad.</button>
+										<i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="text" class="span4" name="dni" autocomplete="off" onChange="clientesVerificar(this)">
                                         <span style="color:#F03;">Este valor sin puntos ni espacios.</span>
@@ -100,7 +103,10 @@ include("includes/js-formularios.php");
 								</div>
 									
 								 <div class="control-group">
-									<label class="control-label">Régimen</label>
+									<label class="control-label">Régimen
+									    <button class="tooltipp">Tipo ya sea fiscal, laboral, contable, legal o regulatorio.</button>
+										<i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="text" class="span6" name="regimen" style="text-transform:uppercase;">
 									</div>
@@ -108,14 +114,20 @@ include("includes/js-formularios.php");
  
                                 
                                 <div class="control-group">
-									<label class="control-label">Email</label>
+									<label class="control-label">Email
+									    <button class="tooltipp">Comunicacion con los proveedores.</button>
+										<i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="email" class="span6" name="email" style="text-transform:lowercase;">
 									</div>
 								</div>
                                 
                                 <div class="control-group">
-									<label class="control-label">Teléfono</label>
+									<label class="control-label">Teléfono
+									    <button class="tooltipp">Telefono del proveedor para una mejor comunicacion.</button>
+										<i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="text" class="span4" name="telefono">
 									</div>

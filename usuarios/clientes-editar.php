@@ -120,7 +120,10 @@ include("includes/js-formularios.php");
 												   </div>
 														
 													<div class="control-group">
-														<label class="control-label">Documento</label>
+														<label class="control-label">Documento
+																<button class="tooltipp">No dejar espacios, puntos ni letras.</button>
+															<i class="fa-solid fa-circle-question"></i>
+														</label>
 														<div class="controls">
 															<input type="text" class="span4" name="usuarioCliente" value="<?=$resultadoD['cli_usuario'];?>" autocomplete="off" placeholder="Documento" title="Documento">
 														</div>
@@ -136,7 +139,10 @@ include("includes/js-formularios.php");
 													</div>
 													
 													<div class="control-group">
-														<label class="control-label">Clave documentos</label>
+														<label class="control-label">Clave documentos
+														       <button class="tooltipp">Solo se admiten caracteres de la a-z A-Z numeros 0-9</button>
+															<i class="fa-solid fa-circle-question"></i>
+														</label>
 														<div class="controls">
 															<input type="<?php echo $campoC;?>" class="span4" name="claveDocumentos" value="<?=$resultadoD['cli_clave_documentos'];?>" autocomplete="off" required>
 														</div>
@@ -160,7 +166,10 @@ include("includes/js-formularios.php");
 													</div>
 
 													<div class="control-group">
-														<label class="control-label">Teléfono</label>
+														<label class="control-label">Teléfono
+														     <button class="tooltipp">Solo se admiten numeros 0-9.</button>
+															<i class="fa-solid fa-circle-question"></i>
+														</label>
 														<div class="controls">
 															<input type="text" class="span4" name="telefono" value="<?=$resultadoD['cli_telefono'];?>">
 														</div>
@@ -373,7 +382,10 @@ include("includes/js-formularios.php");
 												   </div>
 													   
 													   <div class="control-group">
-														<label class="control-label">Saldo disponible</label>
+														<label class="control-label">Saldo disponible
+														<button class="tooltipp">No se admiten espacios puntos ni letras.</button>
+															<i class="fa-solid fa-circle-question"></i>
+														</label>
 														<div class="controls">
 															<input type="text" class="span4" name="saldo" value="<?=$resultadoD['cli_saldo'];?>" maxlength="10">
 															<span style="color:#F03;">Este valor sin puntos ni espacios. (10000)</span>
@@ -427,7 +439,10 @@ include("includes/js-formularios.php");
 														</div>
 
 														<div class="control-group">
-															<label class="control-label">Responsables del retiro</label>
+															<label class="control-label">Responsables del retiro
+															<button class="tooltipp">Responsable jefe inmediato.</button>
+															<i class="fa-solid fa-circle-question"></i>
+															</label>
 															<div class="controls">
 																<input type="text" class="span6" name="retiroResponsable" value="<?=$resultadoD['cli_responsable_retiro'];?>">
 															</div>
