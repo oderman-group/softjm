@@ -118,24 +118,6 @@ include("includes/js-formularios.php");
 											</div>
 										</div>
 
-                                
-										<div class="control-group">
-											<label class="control-label">Modulos</label>
-											<div class="controls">
-												<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="modulo[]" multiple>
-													<option value=""></option>
-													<?php
-													$conOp = $conexionBdAdmin->query("SELECT * FROM modulos");
-													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-													?>
-														<option value="<?=$resOp[0];?>" ><?=$resOp['mod_nombre'];?></option>
-													<?php
-													}
-													?>
-												</select>
-											</div>
-										</div>
-
 
 										<div class="control-group">
 											<label class="control-label">Contacto principal</label>
@@ -157,6 +139,24 @@ include("includes/js-formularios.php");
 											<label class="control-label">Fecha fin</label>
 											<div class="controls">
 												<input type="date" class="span4" name="fin" style="text-transform:uppercase;">
+											</div>
+										</div>
+
+
+										<div class="control-group">
+											<label class="control-label">Modulos</label>
+											<div class="controls">
+												<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="modulo[]" multiple>
+													<option value=""></option>
+													<?php
+													$conOp = $conexionBdAdmin->query("SELECT * FROM modulos WHERE mod_padre IS NULL");
+													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+													?>
+														<option value="<?=$resOp[0];?>" ><?=$resOp['mod_nombre'];?></option>
+													<?php
+													}
+													?>
+												</select>
 											</div>
 										</div>
 

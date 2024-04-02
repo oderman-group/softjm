@@ -11,9 +11,6 @@ function mostrarModulos(modulo, clioId){
     .then(response => response.text())
     .then(data => {
         $('#divTableModulos').empty().hide().html(data).show(1);
-        
-        // Inicializar DataTables después de agregar las nuevas filas
-        $('#data-table').DataTable();
     })
     .catch(error => {
         console.error('Error:', error);
@@ -70,4 +67,40 @@ function eliminarModulo(page) {
     if (opcionAEliminar) {
         select.removeChild(opcionAEliminar);
     }
+}
+
+/**
+ * Este metodo me muestra los li de los modulos
+ **/
+function mostrarLi(idCliente) {
+    var ul = document.getElementById('myTab1'); // Obtener el ul
+    ul.innerHTML = ''; // Limpiar el contenido del ul
+
+    // Obtener las opciones seleccionadas
+    var selectedOptions = document.querySelectorAll('select[name="modulo[]"] option:checked');
+    
+    // Iterar sobre las opciones seleccionadas
+    selectedOptions.forEach(function(option) {
+        // Crear un nuevo elemento li
+        var li = document.createElement('li');
+    
+        // Crear un nuevo elemento a dentro del li
+        var a = document.createElement('a');
+        a.onclick = function() {
+            mostrarModulos(option.value, idCliente);
+        };
+        var i = document.createElement('i');
+        i.classList.add('icon-tasks');
+        var text = document.createTextNode(option.textContent);
+        a.appendChild(i);
+        a.appendChild(text);
+        
+        // Agregar el elemento a al li
+        li.appendChild(a);
+        
+        // Establecer un identificador único para el li (puedes usar el valor de la opción)
+        li.id = 'mod' + option.value;
+        // Agregar el li al ul
+        ul.appendChild(li);
+    });
 }
