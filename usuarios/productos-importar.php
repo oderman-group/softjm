@@ -134,14 +134,14 @@ include("includes/texto-editor.php");
 			
 			<div class="row-fluid">
 				<div class="span12">
-					<!--
+					
 					<div style="background-color: antiquewhite; padding: 5px; margin: 10px;">
 					<h2>Información importante</h2>
 						<p><b>1.</b> Descargue la plantilla de excel. <a href="productos-exportar.php" target="_blank">[Descargar plantilla]</a></p>
 						<p><b>2.</b> Llene la información de sus productos en la planilla descargada y guardela con ese mismo formato que ya trae la plantilla (Excel 97-2003).</p>
 						<p><b>3.</b> Suba la planilla de excel.</p>
 					</div>
-					-->
+					
 					
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
@@ -182,7 +182,7 @@ include("includes/texto-editor.php");
 										<label class="control-label">Coloque el número de la última fila hasta donde quiere que el archivo sea leido</label>
 										<div class="controls">
 											<input type="number" class="span3" name="filaFinal" id="filaFinal" value="200" required><br>
-											<span style="font-size: 12px; color:#6017dc;">Fila hasta donde hay información de los estudiantes y acudientes. Esto se usa para evitar que se lean filas que no tienen información.</span>
+											<span style="font-size: 12px; color:#6017dc;">Fila hasta donde hay información de los productos. Esto se usa para evitar que se lean filas que no tienen información.</span>
 										</div>
 									</div> 
                                 </fieldset>   
