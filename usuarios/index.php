@@ -129,7 +129,7 @@ include("includes/head.php");
 					<?php if ($datosUsuarioActual[3] == 1 or $datosUsuarioActual[3] == 9 or $datosUsuarioActual[3] == 10 or $datosUsuarioActual[3] == 15 or $datosUsuarioActual[3] == 14) { ?>
 						<div class="span3">
 							<div class="board-widgets small-widget" style="background-color: #eb4132;">
-								<a href="cambio-version.php?idSesion=<?= $_SESSION["id"]; ?>"><span class="widget-icon icon-cogs"></span><span class="widget-label">Servicio técnico</span></a>
+								<a href="remisiones.php"><span class="widget-icon icon-cogs"></span><span class="widget-label">Servicio técnico</span></a>
 							</div>
 						</div>
 					<?php } ?>

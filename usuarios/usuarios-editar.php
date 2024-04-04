@@ -6,9 +6,9 @@ $idPagina = 4;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 $consulta=$conexionBdAdmin->query("SELECT u.*, GROUP_CONCAT(r.utipo_id) AS roles
-FROM orioncrmcom_dev_jm_crm.usuarios AS u
+FROM ".MAINBD.".usuarios AS u
 LEFT JOIN usuarios_roles AS ru ON u.usr_id = ru.upr_id_usuario 
-LEFT JOIN orioncrmcom_dev_jm_crm.usuarios_tipos AS r ON ru.upr_id_rol  = r.utipo_id 
+LEFT JOIN ".MAINBD.".usuarios_tipos AS r ON ru.upr_id_rol  = r.utipo_id 
 WHERE u.usr_id = '".$_GET["id"]."'
 GROUP BY u.usr_id;");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
@@ -87,7 +87,10 @@ include("includes/js-formularios.php");
                             <input type="hidden" name="id" value="<?=$_GET["id"];?>">
 
                             <div class="control-group">
-                                        <label class="control-label">Foto de perfil</label>
+                                        <label class="control-label">Foto de perfil
+										    <button class="tooltipp">Elija la imagen desee para su empresa.</button>
+                                            <i class="fa-solid fa-circle-question"></i>
+										</label>
                                         <div class="controls">
                                             <input type="file" class="span4" name="foto" multiple>
                                         </div>
@@ -121,7 +124,10 @@ include("includes/js-formularios.php");
 								</div>
                                 
                                 <div class="control-group">
-									<label class="control-label">Tipo de usuario</label>
+									<label class="control-label">Tipo de usuario
+									        <button class="tooltipp">Elija el rol al cual corespende el usuario.</button>
+                                            <i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoU[]" multiple>
 											<?php
@@ -157,7 +163,10 @@ include("includes/js-formularios.php");
                                </div>
 								
 								<div class="control-group">
-									<label class="control-label">Bloqueado</label>
+									<label class="control-label">Bloqueado
+									        <button class="tooltipp">Indica si el usuario está o no bloqueado.</button>
+                                            <i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="bloqueado">
 											<option value="0"></option>
@@ -210,7 +219,10 @@ include("includes/js-formularios.php");
 
 
 								 <div class="control-group">
-									<label class="control-label">Intentos de acceso fallidos</label>
+									<label class="control-label">Intentos de acceso fallidos
+									        <button class="tooltipp">Escoja el numero de intentos permitidos.</button>
+                                            <i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="text" class="span2" name="fallidos" value="<?=$resultadoD['usr_intentos_fallidos'];?>">
 									</div>
@@ -219,7 +231,10 @@ include("includes/js-formularios.php");
 								<hr>
 
 								<div class="control-group">
-									<label class="control-label">Meta de ventas</label>
+									<label class="control-label">Meta de ventas
+									        <button class="tooltipp">Metas a cumplir para el proximo mes.</button>
+                                            <i class="fa-solid fa-circle-question"></i>
+									</label>
 									<div class="controls">
 										<input type="text" class="span4" name="metaVentas" value="<?=$resultadoD['usr_meta_ventas'];?>">
 									</div>
