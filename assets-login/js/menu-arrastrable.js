@@ -16,7 +16,16 @@ $(document).ready(function() {
           })
           .then(response => response.text()) // Convertir la respuesta a texto
           .then(data => {
-            location.reload();
+            $.toast({
+              heading: 'Redireccionando',
+              text: 'Se han modificado las posiciones de los modulos en el menú.',
+              position: 'bottom-right',
+              showHideTransition: 'slide',
+              loaderBg: '#26c281',
+              icon: 'warning',
+              hideAfter: 5000,
+              stack: 6
+          });
           })
           .catch(error => {
               // Manejar errores
