@@ -16,16 +16,20 @@ $(document).ready(function() {
           })
           .then(response => response.text()) // Convertir la respuesta a texto
           .then(data => {
-            $.toast({
-              heading: 'Redireccionando',
-              text: 'Se han modificado las posiciones de los modulos en el menú.',
-              position: 'bottom-right',
-              showHideTransition: 'slide',
-              loaderBg: '#26c281',
-              icon: 'warning',
-              hideAfter: 5000,
-              stack: 6
-          });
+            // Mostrar una notificación de éxito
+            Toastify({
+                text: "La accion ha sido realizada correctamente",
+                duration: 3000,
+                gravity: "bottom",
+                position: "right",
+                backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                stopOnFocus: true,
+                className: "toastify--fadeIn", // Aplicar el efecto fadeIn
+                style: {
+                    /* Estilos personalizados */
+                    'text-align': 'center' // Centrar el texto horizontalmente
+                }
+            }).showToast();
           })
           .catch(error => {
               // Manejar errores
