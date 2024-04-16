@@ -24,6 +24,12 @@ cotiz_ocultar_descuento_combo='" . $_POST["dctoCombos"] . "',
 cotiz_descuentos_especiales='" . $_POST["dctoEspecial"] . "' 
 WHERE cotiz_id='" . $_POST["id"] . "' AND  cotiz_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
+if($_POST["monedaActual"] != $_POST["moneda"]){
+    require('actualizar-productos-cotizacion-2.php');
+    require('actualizar-combos-cotizacion-2.php');
+    require('actualizar-servicios-cotizacion-2.php');
+}
+
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 echo '<script type="text/javascript">window.location.href="../cotizaciones-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
