@@ -46,6 +46,7 @@ include("includes/js-formularios.php");
 				   data: datos,
 				   success: function(data){
 				   $('#resp').empty().hide().html(data).show(1);
+				   document.getElementById('usuarioAcceso').value = usuario;
 				   }
 			   });
 
@@ -121,7 +122,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Usuario de acceso</label>
 									<div class="controls">
-										<input type="text" class="span2" name="usuarioAcceso" autocomplete="off">
+										<input type="text" class="span2" id="usuarioAcceso" name="usuarioAcceso" autocomplete="off">
 										<input type="text" class="span2 mr-0" value="<?= $dominio; ?>" readonly name="dominio">
                                         <span style="color:#F03;">Este será el usuario con el que ingrese el cliente al sistema.</span>
 									</div>
