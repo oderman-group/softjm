@@ -27,6 +27,8 @@
 <link href="css/bootstrap.css" rel="stylesheet">
 <link href="css/bootstrap-responsive.css" rel="stylesheet">
 <link rel="stylesheet" href="css/font-awesome.css">
+<!--drag and drop del menu-->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.6.2/css/bootstrap.min.css">
 <link rel="stylesheet" href="css/tooltip.css">
 <script src="https://kit.fontawesome.com/e84fa1cf78.js" crossorigin="anonymous"></script>
 
@@ -42,6 +44,7 @@
 <link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png">
 <link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png">
 <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png">
+<link href="node_modules/toastr/build/toastr.min.css" rel="stylesheet">
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-T5Q7PCSPK9"></script>
@@ -53,6 +56,9 @@
   gtag('config', 'G-T5Q7PCSPK9');
 </script>
 
-
-
-	
+<!--drag and drop del menu-->
+<!-- Agregar la biblioteca Toastify.js -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src ="../assets-login/js/menu-arrastrable.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
