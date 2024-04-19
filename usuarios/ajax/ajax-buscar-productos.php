@@ -3,7 +3,7 @@ include("../sesion.php");
 
 $search = $_GET["term"]; 
 
-$sql = "SELECT prod_id, prod_referencia, prod_nombre, prod_existencias FROM productos WHERE prod_nombre LIKE '%$search%' ";
+$sql = "SELECT prod_id, prod_referencia, prod_nombre, prod_existencias FROM productos WHERE prod_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' AND (prod_id LIKE '%$search%' OR prod_nombre LIKE '%$search%' OR prod_referencia LIKE '%$search%')";
 $result = mysqli_query($conexionBdPrincipal, $sql);
 
 

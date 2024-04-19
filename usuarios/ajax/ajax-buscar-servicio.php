@@ -3,7 +3,7 @@ include("../sesion.php");
 
 $search = $_GET["term"]; 
 
-$sql = "SELECT serv_id, serv_nombre FROM servicios WHERE serv_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' AND serv_nombre LIKE '%$search%' ";
+$sql = "SELECT serv_id, serv_nombre FROM servicios WHERE serv_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' AND (serv_id LIKE '%$search%' OR serv_nombre LIKE '%$search%')";
 $result = mysqli_query($conexionBdPrincipal, $sql);
 
 
