@@ -326,10 +326,10 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="encargado">
 											<option value="0"></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id_empresa='".$idEmpresa."'");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
-                                            	<option value="<?=$resOp[0];?>" <?php if($resultadoD['cseg_usuario_encargado']==$resOp[0]) echo "selected";?>><?=$resOp[4];?></option>
+                                            	<option value="<?=$resOp['usr_id'];?>" <?php if($resultadoD['cseg_usuario_encargado']==$resOp['usr_id']) echo "selected";?>><?=$resOp['usr_nombre'];?></option>
                                             <?php
 											}
 											?>
