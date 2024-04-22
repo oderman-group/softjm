@@ -43,6 +43,11 @@ switch ($remision['rem_tipo_equipo']) {
 		$pixeles2 = 1;
 		$hojas1 = 'Hoja 1 de 2';
 		break;
+	default:
+		$pixeles1 = 0;
+		$pixeles2 = 1;
+		$hojas1 = 'Hoja 1 de 2';
+		break;
 }
 ?>
 <link href="../../dist/css/style.min.css" rel="stylesheet">
@@ -84,8 +89,7 @@ switch ($remision['rem_tipo_equipo']) {
 				<?= $hojas1; ?>
 			</td>
 		</tr>
-	</table>
-	<p>&nbsp;</p>
+	</table><br>
 
 	<table style="width:100%; height: 120px;" border="0">
 		<tr>
@@ -99,8 +103,7 @@ switch ($remision['rem_tipo_equipo']) {
 			</td>
 		</tr>
 
-	</table>
-	<p>&nbsp;</p>
+	</table><br>
 
 	<table style="width:100%; font-size: 20px;" border="1" rules="all" align="center">
 		<tr>
@@ -647,7 +650,7 @@ switch ($remision['rem_tipo_equipo']) {
 	<?php
 	//PARA GPS
 	if ($remision['rem_tipo_equipo'] == 4 ) { ?>
-	<table style="width:100%; height:250px; font-size: 18px;" border="1" rules="groups" align="center">
+	<table style="width:100%; font-size: 18px;" border="1" rules="groups" align="center">
 		<tbody>
 			<tr align="center">
 				<td align="center" colspan="2">
@@ -702,8 +705,7 @@ switch ($remision['rem_tipo_equipo']) {
 					Hoja 2 de 2
 				</td>
 			</tr>
-		</table>
-		<p>&nbsp;</p>
+		</table><br>
 
 		<table style="width:100%; height: 120px;" border="0">
 			<tr>
@@ -717,8 +719,7 @@ switch ($remision['rem_tipo_equipo']) {
 				</td>
 			</tr>
 
-		</table>
-		<p>&nbsp;</p>
+		</table><br>
 
 		<table style="width:100%; font-size: 15px;" border="1" rules="all" align="center">
 			<tr>
@@ -881,9 +882,9 @@ switch ($remision['rem_tipo_equipo']) {
 		<p>&nbsp;</p>
 	<?php } ?>
 
-	<table style="width:90%; padding: 10px; font-size: 18px;" border="0" align="center">
+	<table width="100%" style="padding: 10px; font-size: 18px;" border="0" align="center">
 		<tr>
-			<td style="font-weight: bold;">
+			<td style="font-weight: bold;" width="40%">
 				<?=$_SESSION["dataAdicional"]['nombre_empresa'];?>. CERTIFICA QUE EL<br>
 				INSTRUMENTO SE ENTREGA EN OPTIMAS CONDICIONES<br>
 				DE FUNCIONAMIENTO REALIZANDO EL AJUSTE Y/O<br>
@@ -895,17 +896,14 @@ switch ($remision['rem_tipo_equipo']) {
 				ESTABLECIDOS POR EL FABRICANTE.
 			</td>
 
-			<td align="center" style="font-weight: bold;">
+			<td align="center" style="font-weight: bold;" width="60%">
 				<img src="../files/images/ok.png" width="100"><br>
-				<!--<p>&nbsp;</p><br><br>
-				GEINER CUERVO MENDOZA<br>-->
 				TÉCNICO <?=$_SESSION["dataAdicional"]['nombre_empresa'];?>
 				<p style="text-align: left;">CERTIFICADO POR:<br>
-				<?=strtoupper($remision['rem_supervisor'])?><br>
-				SUPERVISOR DE LABORATORIO &emsp;&emsp;&emsp;&emsp;&emsp;FIRMA:<span style="border-top: 1px solid #000; width: 200px; display: inline-block;"></span></p>
-				<p style="color: red; text-align: left;">Este certificado no es válido sin el simbolo de aceptación, no puede ser<br>reproducido parcialmente, excepto en su totalidad, con autorización<br>previa por escrito del servicio técnico  de <?=$_SESSION["dataAdicional"]['nombre_empresa'];?>.</p>
-				<br><br><span style="color: darkblue;">Verifique la validez de este certificado en<br>
-					<a href="https://jmequipos.com/consultar-certificados.php" target="_blank">www.jmequipos.com/consultar-certificados.php</a></span>
+				<?=!empty($remision['rem_supervisor']) ? strtoupper($remision['rem_supervisor']) : "";?><br>
+				SUPERVISOR DE LABORATORIO &emsp;&emsp;FIRMA:<span style="border-top: 1px solid #000; width: 200px; display: inline-block;"></span></p>
+				<p style="color: red; text-align: left;">Este certificado no es válido sin el simbolo de aceptación, no puede ser reproducido parcialmente,<br>excepto en su totalidad, con autorización<br>previa por escrito del servicio técnico  de <?=$_SESSION["dataAdicional"]['nombre_empresa'];?>.</p><br>
+				<span style="color: darkblue;">Verifique la validez de este certificado en<br><a href="https://jmequipos.com/consultar-certificados.php" target="_blank">www.jmequipos.com/consultar-certificados.php</a></span>
 			</td>
 		</tr>
 	</table>
