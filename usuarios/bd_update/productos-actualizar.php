@@ -26,7 +26,7 @@
 
 		$conexionBdPrincipal->query("UPDATE productos SET prod_foto='" . $fileName . "' WHERE prod_id='" . $_POST["id"] ."' AND prod_id_empresa={$idEmpresa}");
 	}
-	$utilidad=!empty($resultadoD['utilidad']) ? $resultadoD['utilidad']/100 : 0;
+	$utilidad=!empty($_POST['utilidad']) ? $_POST['utilidad']/100 : 0;
 	$precio1 = $_POST["costo"] + ($_POST["costo"] * $utilidad);
 	
 	if($origen > 0){
