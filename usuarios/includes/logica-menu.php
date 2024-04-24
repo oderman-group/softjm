@@ -22,24 +22,42 @@ if ($result && $result->num_rows > 0) {
   }
 }
 
-foreach ($menu as &$menu_item) {
-  $menu_item['submenus'] = array();
-  $menu_item['paginas'] = array();
-  foreach ($submenus as $submenu) {
-    if ($submenu['mod_padre'] == $menu_item['mod_id']) {
-      $submenu['paginas'] = array();
-      foreach ($paginas as $pagina) {
-        if ($pagina['mod_padre'] == $submenu['mod_id']) {
-          $submenu['paginas'][$pagina['mod_id']] = $pagina;
-        }
-      }
-      $menu_item['submenus'][$submenu['mod_id']] = $submenu;
-    }
-  }
-  foreach ($paginas as $pagina) {
-    if ($pagina['mod_padre'] == $menu_item['mod_id']) {
-      $menu_item['paginas'][] = $pagina;
-    }
-  }
-  unset($menu_item);
+// Ordenar los elementos dentro de cada menú según mxe_posicion
+function sortByPosition($a, $b) {
+    return $a['mxe_posicion'] - $b['mxe_posicion'];
 }
+
+// Ordenar los menús por posición
+usort($menu, 'sortByPosition');
+
+// Ordenar submenús y páginas dentro de cada menú
+foreach ($menu as &$menu_item) {
+    $menu_item['submenus'] = array();
+    $menu_item['paginas'] = array();
+
+    // Ordenar submenús por posición
+    uasort($submenus, 'sortByPosition');
+    foreach ($submenus as $submenu) {
+        if ($submenu['mod_padre'] == $menu_item['mod_id']) {
+            $submenu['paginas'] = array();
+
+            // Ordenar páginas por posición
+            uasort($paginas, 'sortByPosition');
+            foreach ($paginas as $pagina) {
+                if ($pagina['mod_padre'] == $submenu['mod_id']) {
+                    $submenu['paginas'][$pagina['mod_id']] = $pagina;
+                }
+            }
+
+            $menu_item['submenus'][$submenu['mod_id']] = $submenu;
+        }
+    }
+
+    // Agregar páginas directamente al menú principal
+    foreach ($paginas as $pagina) {
+        if ($pagina['mod_padre'] == $menu_item['mod_id']) {
+            $menu_item['paginas'][] = $pagina;
+        }
+    }
+}
+unset($menu_item);
