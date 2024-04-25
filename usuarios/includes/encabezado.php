@@ -3,7 +3,7 @@ include("logica-menu.php");
 ?>	
 <div class="loader"></div>
 
-<?php if( $datosUsuarioActual['usr_id']==7 || isset($_SESSION['admin']) ){?>
+<?php if($datosUsuarioActual['usr_id']==7 || $datosUsuarioActual['usr_id']==2 || isset($_SESSION['admin']) ){?>
 
 	<div style="height:50px; width:100%; background-color:<?=COLOR_BARRA_DEV;?>; padding:2px; color:<?=COLOR_LETRA_BARRA_DEV;?>; display:flex; justify-content: center; align-items: center; font-size:11px;">
 		<b>Sesion DB:&nbsp;</b> <?=$_SESSION["bd"]; ?>&nbsp;|&nbsp;
