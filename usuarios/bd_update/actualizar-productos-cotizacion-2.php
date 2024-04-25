@@ -15,9 +15,9 @@ if(isset($_POST["producto"])){
 
         //Si cambió a pesos colombianos
         if ($_POST["moneda"] == 1) {
-            $valorProducto = round(($productoDatos['czpp_valor'] * $configuracion['conf_trm_venta']), 0);
+            $valorProducto = !empty($productoDatos['czpp_valor']) && !empty($configuracion['conf_trm_venta']) ? round(($productoDatos['czpp_valor'] * $configuracion['conf_trm_venta']), 0) : 0;
         } else {
-            $valorProducto = productosPrecioListaUSD($productoDatos['prod_utilidad'], $productoDatos['prod_costo_dolar']);
+            $valorProducto = !empty($productoDatos['prod_utilidad']) && !empty($productoDatos['prod_costo_dolar']) ? productosPrecioListaUSD($productoDatos['prod_utilidad'], $productoDatos['prod_costo_dolar']) : 0;
         }
 
         $conexionBdPrincipal->query("UPDATE cotizacion_productos SET czpp_valor='" . $valorProducto . "' WHERE czpp_id='" . $productoDatos['czpp_id'] . "'");
