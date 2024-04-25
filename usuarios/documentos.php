@@ -101,13 +101,6 @@ include("includes/head.php");
 												if(Modulos::validarRol([323], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
                 								?>
 													<a href="documento-configuracion.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Configuración"><span class="widget-icon icon-cogs"></span></a>
-												<?php 
-												} 
-												if(Modulos::validarRol([327], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $idEmpresa == ID_COMPANY_OWNER) {
-                								
-												?>
-													<a href="bd_delete/documento-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-													</h4></td>
 												<?php } ?>
 											</tr>
 											<?php $no++;}?>

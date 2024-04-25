@@ -103,7 +103,7 @@ include("includes/head.php");
 								<td><?=$res['clio_fecha_fin'];?></td>
 								<td><?=$res['clio_aviso_previo'];?></td>
 								<td>
-									<?php if ($res['clio_contrato'] != "") { ?>
+									<?php if (!empty($res['clio_contrato']) && file_exists('files/contratos/'.$res['clio_contrato'])) { ?>
 										<a href="files/contratos/<?=$res['clio_contrato'];?>" target="_blank">Descargar</a>
 									<?php } ?>
 								</td>
