@@ -11,6 +11,10 @@
         $conexionBdPrincipal->query("UPDATE combos SET combo_imagen='" . $fileName . "' WHERE combo_id='" . $_POST["id"] . "' AND combo_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
     }
 
+    $_POST["dcto"]          = !empty($_POST["dcto"]) ? $_POST["dcto"] : 0;
+    $_POST["descuentoMax"]  = !empty($_POST["descuentoMax"]) ? $_POST["descuentoMax"] : 0;
+    $_POST["dctoDealer"]    = !empty($_POST["dctoDealer"]) ? $_POST["dctoDealer"] : 0;
+
     $conexionBdPrincipal->query("UPDATE combos SET 
     combo_nombre='" . $_POST["nombre"] . "', 
     combo_descripcion='" . $_POST["descripcion"] . "', 

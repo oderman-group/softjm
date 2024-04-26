@@ -5,10 +5,15 @@
 
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-	if ($_FILES['foto']['name'] != "") {
+    $fileName = "";
+	if (!empty($_FILES['foto']['name'])) {
 		$destino = RUTA_PROYECTO."/usuarios/files/combos";
 		$fileName = subirArchivosAlServidor($_FILES['foto'], 'comb', $destino);
 	}
+
+    $_POST["dcto"]          = !empty($_POST["dcto"]) ? $_POST["dcto"] : 0;
+    $_POST["descuentoMax"]  = !empty($_POST["descuentoMax"]) ? $_POST["descuentoMax"] : 0;
+    $_POST["dctoDealer"]    = !empty($_POST["dctoDealer"]) ? $_POST["dctoDealer"] : 0;
 
 	$conexionBdPrincipal->query("INSERT INTO combos(combo_nombre, combo_descripcion, combo_imagen, combo_descuento, combo_estado, combo_fecha_registro, combo_actualizaciones, combo_descuento_maximo, combo_descuento_dealer, combo_id_empresa)VALUES('" . $_POST["nombre"] . "', '" . $_POST["descripcion"] . "', '" . $fileName . "', '" . $_POST["dcto"] . "', '" . $_POST["estado"] . "', now(), 0, '" . $_POST["descuentoMax"] . "', '" . $_POST["dctoDealer"] ."', '".$_SESSION["dataAdicional"]["id_empresa"]."')");
 	$idInsert = mysqli_insert_id($conexionBdPrincipal);
