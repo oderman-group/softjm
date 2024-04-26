@@ -1,14 +1,13 @@
 <?php
 include("sesion.php");
+include(RUTA_PROYECTO."/usuarios/class/Utilidades.php");
 
 $idPagina = 174;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consultaCombos=$conexionBdPrincipal->query("SELECT * FROM combos");
-$numPaquetes = $consultaCombos->num_rows;
-$numPaquetes++;
+$numPaquetes = Utilidades::getNextIdSequence($conexionBdPrincipal, MAINBD, "combos");
 ?>
 <!-- styles -->
 <link href="css/chosen.css" rel="stylesheet">
