@@ -339,7 +339,7 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Observaciones</label>
 									<div class="controls">
-                                        <textarea rows="5" cols="80" style="width: 80%" name="observaciones"></textarea>
+                                        <textarea rows="5" cols="80" style="width: 80%" class="tinymce-simple" name="observaciones"></textarea>
 									</div>
 								</div>
 								

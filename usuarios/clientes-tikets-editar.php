@@ -333,7 +333,7 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Observaciones</label>
 									<div class="controls">
-                                        <textarea name="observaciones" rows="5" style="width: 80%"><?=$resultadoD['tik_observaciones'];?></textarea>
+                                        <textarea class="tinymce-simple" name="observaciones" rows="5" style="width: 80%"><?=$resultadoD['tik_observaciones'];?></textarea>
 									</div>
 								</div>
 								
