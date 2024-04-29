@@ -329,14 +329,14 @@ include("includes/js-formularios.php");
 								</div>
 								-->
                             	
-                                <!--
+                                
                                 <div class="control-group">
 									<label class="control-label">Observaciones</label>
 									<div class="controls">
                                         <textarea name="observaciones" rows="5" style="width: 80%"><?=$resultadoD['tik_observaciones'];?></textarea>
 									</div>
 								</div>
-								-->
+								
                                
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
