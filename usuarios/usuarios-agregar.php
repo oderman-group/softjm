@@ -90,7 +90,7 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Email</label>
 									<div class="controls">
-										<input type="email" class="span4" name="email">
+										<input type="email" class="span4" name="email" data-id-usuario="0" oninput="validarEmail(this)">
 									</div>
 								</div>
                                 

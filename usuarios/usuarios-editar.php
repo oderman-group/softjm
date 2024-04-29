@@ -119,7 +119,7 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Email</label>
 									<div class="controls">
-										<input type="email" class="span4" name="email" value="<?=$resultadoD['usr_email'];?>">
+										<input type="email" class="span4" name="email" value="<?=$resultadoD['usr_email'];?>" data-id-usuario="<?=$_GET["id"];?>" oninput="validarEmail(this)">
 									</div>
 								</div>
                                 

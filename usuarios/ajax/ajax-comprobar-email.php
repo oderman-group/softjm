@@ -1,7 +1,7 @@
 <?php
 include("../sesion.php");
-if(!empty($_REQUEST['usuario'])){
-    $usuario = $_REQUEST['usuario'].$_SESSION["dataAdicional"]["dominio_empresa"];
+if(!empty($_REQUEST['email'])){
+    $email = $_REQUEST['email'];
     $idUsuario = $_REQUEST['idUsuario'];
     $jsonData = array();
 
@@ -11,7 +11,7 @@ if(!empty($_REQUEST['usuario'])){
     }
 
     try {
-        $consulta = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE (usr_login = '".$usuario."' OR usr_login = '".$_REQUEST['usuario']."') {$filtro}");
+        $consulta = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_email = '".$_REQUEST['email']."' {$filtro}");
     } catch ( Exception $e) {
         echo $e;
         exit();
@@ -25,7 +25,7 @@ if(!empty($_REQUEST['usuario'])){
         $jsonData['success'] = 1;
         $jsonData['message'] = '<div class="alert alert-danger">
                                 <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                <i class="icon-exclamation-sign"></i>Este Usuario Ya Se Encuentra Registrado</div>';
+                                <i class="icon-exclamation-sign"></i>Este correo ya se encuentra registrado para otro usuario.</div>';
     }
 
     header('Content-type: application/json; charset=utf-8');
