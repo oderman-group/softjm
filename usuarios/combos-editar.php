@@ -15,6 +15,7 @@ if(Modulos::validarRol([388], $conexionBdPrincipal, $conexionBdAdmin, $datosUsua
 ?>
 <!-- styles -->
 <link href="css/chosen.css" rel="stylesheet">
+<link href="../assets-login/plugins/select2/css/select2.css" rel="stylesheet" />
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -30,6 +31,7 @@ if(Modulos::validarRol([388], $conexionBdPrincipal, $conexionBdAdmin, $datosUsua
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+<script src="../assets-login/plugins/select2/js/select2.js"></script>
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
@@ -131,19 +133,17 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 										<label class="control-label">Productos</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="chzn-select span10" tabindex="2" name="producto[]" multiple <?=$disabled;?>>
-												<option value=""></option>
+											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="producto[]" multiple id="product-select" <?=$disabled;?>>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos 
-												INNER JOIN productos_categorias ON catp_id=prod_categoria 
-												ORDER BY prod_nombre");
-												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-													$consultaNumCombosProductos=$conexionBdPrincipal->query("SELECT * FROM combos_productos WHERE copp_producto='".$resOp[0]."' AND copp_combo='".$resultadoD['combo_id']."'");
-													$productoN = $consultaNumCombosProductos->num_rows;
+            									$consultaProductos = $conexionBdPrincipal->query("SELECT * FROM combos_productos 
+												INNER JOIN productos ON prod_id=copp_producto AND prod_id_empresa='".$idEmpresa."'
+												WHERE copp_combo='".$resultadoD['combo_id']."' ORDER BY prod_nombre");
+
+												while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
 												?>
-													<option <?php if($productoN>0){echo "selected";}?> value="<?=$resOp['prod_id'];?>"><?=$resOp['prod_id'].". ".$resOp['prod_nombre']." - [HAY ".$resOp['prod_existencias']."]";?></option>
+													<option selected value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
 												<?php
-												}
+													}
 												?>
 											</select>
 										</div>
@@ -334,6 +334,7 @@ include("includes/js-formularios.php");
 		</div>
 	</div>
 	<?php include("includes/pie.php");?>
+	<script src="js/Combos.js"></script>
 </div>
 </body>
 </html>
