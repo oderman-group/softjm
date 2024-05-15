@@ -180,7 +180,7 @@ class CotizacionesEditar {
             }
             $htmlTabla .= '</td>';
             $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;"></td>';
-            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="productos(this)" style="width: 50px; text-align: center;"></td>';
+            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="combos(this)" style="width: 50px; text-align: center;"></td>';
             if ($resultadoD['cotiz_descuentos_especiales'] == 1) {
                 $htmlTabla .= '<td>';
                 $htmlTabla .= '<input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;">';
