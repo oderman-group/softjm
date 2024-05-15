@@ -84,6 +84,23 @@ include("includes/js-formularios.php");
 						}
 					});
 		}	
+
+		function servicios(enviada){
+			var campo = enviada.title;
+			var producto = enviada.name;
+			var proceso = 12;
+			var valor = enviada.value;
+			$('#resp').empty().hide().html("Esperando...").show(1);
+				datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo);
+					$.ajax({
+						type: "POST",
+						url: "ajax/ajax-productos.php",
+						data: datos,
+						success: function(data){
+						$('#resp').empty().hide().html(data).show(1);
+						}
+					});
+		}
 	</script>
 <?php }?>
 <?php

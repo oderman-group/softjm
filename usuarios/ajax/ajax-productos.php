@@ -228,6 +228,12 @@ if($_POST["proceso"]==11){
 	
 	//echo '<script type="text/javascript">location.reload();</script>';
 }
+
+//DESCUENTO DE Servicios DE LA COTIZACIÓN
+if($_POST["proceso"]==12){
+
+	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
+}
 ?>
 
 <div class="alert alert-success">
