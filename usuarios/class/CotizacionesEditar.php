@@ -68,7 +68,7 @@ class CotizacionesEditar {
                 $htmlTabla .= '<td>';
                 $htmlTabla .= '<input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;">';
                 if ($datosUsuarioActual['usr_tipo'] == 1 && $prod['czpp_aprobado_usuario'] == "" && $prod['czpp_descuento_especial'] > 0) {
-                    $htmlTabla .= '<br><a href="sql.php?get=70&idItem=' . $prod['czpp_id'] . '" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>';
+                    $htmlTabla .= '<br><a href="bd_update/descuentos-cotizaciones-actualizar.php?idItem=' . $prod['czpp_id'] . '" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>';
                 }
                 $consultaDctoEspecial = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='" . $prod['czpp_aprobado_usuario'] . "'");
                 $usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
@@ -185,7 +185,7 @@ class CotizacionesEditar {
                 $htmlTabla .= '<td>';
                 $htmlTabla .= '<input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;">';
                 if ($datosUsuarioActual['usr_tipo'] == 1 && $prod['czpp_aprobado_usuario'] == "" && $prod['czpp_descuento_especial'] > 0) {
-                    $htmlTabla .= '<br><a href="sql.php?get=70&idItem=' . $prod['czpp_id'] . '" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>';
+                    $htmlTabla .= '<br><a href="bd_update/descuentos-cotizaciones-actualizar.php?idItem=' . $prod['czpp_id'] . '" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>';
                 }
                 $consultaDctoEspecial = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='" . $prod['czpp_aprobado_usuario'] . "'");
                 $usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
