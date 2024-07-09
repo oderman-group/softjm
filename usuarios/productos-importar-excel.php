@@ -110,7 +110,7 @@ if($extension == 'xlsx'){
 						}
 						$camposActualizar=", prod_costo_dolar='".round($costoDolar,2)."'";
 
-						if($_SESSION["id"]!=7){
+						if(true){
 							$camposActualizar=", prod_referencia='".$arrayIndividual['prod_referencia']."', prod_nombre='".$arrayIndividual['prod_nombre']."', prod_grupo1='".$arrayIndividual['prod_grupo1']."', prod_categoria='".$arrayIndividual['prod_categoria']."', prod_marca='".$arrayIndividual['prod_marca']."', prod_costo='".$arrayIndividual['prod_costo']."'";
 
 							if($origen > 0){
@@ -138,7 +138,7 @@ if($extension == 'xlsx'){
 
 						$arrayTodos[$f] = $arrayIndividual;
 
-						if($_SESSION["id"]==7){
+						if(true){
 
 							$sql .= "('".$arrayIndividual['prod_id']."', '".$arrayIndividual['prod_referencia']."', '".$arrayIndividual['prod_nombre']."', '".$arrayIndividual['prod_grupo1']."', '".$arrayIndividual['prod_categoria']."', '".$arrayIndividual['prod_marca']."', '".$arrayIndividual['prod_costo']."', '".$arrayIndividual['prod_descuento1']."', '".$arrayIndividual['prod_descuento2']."', '".$arrayIndividual['prod_utilidad']."', '".$arrayIndividual['prod_precio_fabrica']."', '".$arrayIndividual['prod_flete']."', '".$arrayIndividual['prod_aduana']."', '".$arrayIndividual['prod_costo_dolar']."', 1, now(), '".$_SESSION["id"]."'),";
 
