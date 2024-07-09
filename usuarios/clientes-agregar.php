@@ -238,10 +238,10 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="pais" onChange="mostrar(this)">
 											<option value=""></option>
 											<?php
-											$service_url = 'https://restcountries.com/v3.1/all';
-											$jsonObject = json_decode(file_get_contents($service_url),true);
-											foreach ($jsonObject as $object){
-											$nombrePais=$object["name"]["common"];
+												$conPais = $conexionBdAdmin->query("SELECT * FROM localidad_paises 
+												ORDER BY pais_nombre");
+												while($resPais = mysqli_fetch_array($conPais, MYSQLI_BOTH)){
+												$nombrePais=$resPais['pais_nombre'];
 											?>
 												<option value="<?=$nombrePais;?>" <?php if($nombrePais=="Colombia"){echo "selected";}?>><?=$nombrePais;?></option>
 											<?php
