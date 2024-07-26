@@ -15,6 +15,8 @@ $excel= new Spreadsheet();
 $hojaActiva= $excel->getActiveSheet();
 $hojaActiva->setTitle("Productos");
 
+$hojaActiva->getStyle('A1:AA1')->getFont()->setBold('Bold')->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_DARKBLUE);
+
 $hojaActiva->getColumnDimension('A')->setWidth(5);
 $hojaActiva->setCellValue('A1', 'Nº');
 $hojaActiva->getColumnDimension('B')->setWidth(8);
@@ -38,43 +40,55 @@ $hojaActiva->getColumnDimension('J')->setWidth(20);
 $hojaActiva->setCellValue('J1', 'Marca');
 
 $hojaActiva->getColumnDimension('K')->setWidth(20);
-$hojaActiva->setCellValue('K1', 'Existencias');
+$hojaActiva->setCellValue('K1', 'Existencias'.PHP_EOL.'(solo lectura)');
+
 $hojaActiva->getColumnDimension('L')->setWidth(20);
-$hojaActiva->setCellValue('L1', 'Costo (COP)');
+$hojaActiva->setCellValue('L1', 'Costo (USD)');
 
 $hojaActiva->getColumnDimension('M')->setWidth(20);
-$hojaActiva->setCellValue('M1', 'Precio Lista COP');
+$hojaActiva->setCellValue('M1', 'Precio Lista USD '.PHP_EOL.'(solo lectura)');
+
 $hojaActiva->getColumnDimension('N')->setWidth(20);
-$hojaActiva->setCellValue('N1', 'Precio Lista USD');
+$hojaActiva->setCellValue('N1', 'Costo (COP)');
 
 $hojaActiva->getColumnDimension('O')->setWidth(20);
-$hojaActiva->setCellValue('O1', 'Materiales');
+$hojaActiva->setCellValue('O1', 'Utilidad (%)');
+
 $hojaActiva->getColumnDimension('P')->setWidth(20);
-$hojaActiva->setCellValue('P1', 'Facturas');
+$hojaActiva->setCellValue('P1', 'Dcto. Max. (%)');
 
-// Check_id 7 y 15
-    $hojaActiva->getColumnDimension('Q')->setWidth(20);
-    $hojaActiva->setCellValue('Q1', 'Dcto. Max. (%)');
-    $hojaActiva->getColumnDimension('R')->setWidth(20);
-    $hojaActiva->setCellValue('R1', 'Utilidad Dealer (%)');
-    $hojaActiva->getColumnDimension('S')->setWidth(20);
-    $hojaActiva->setCellValue('S1', 'Utilidad (%)');
+$hojaActiva->getColumnDimension('Q')->setWidth(20);
+$hojaActiva->setCellValue('Q1', 'Precio Lista COP');
 
-    $hojaActiva->getColumnDimension('T')->setWidth(20);
-    $hojaActiva->setCellValue('T1', 'P. Fábrica (USD)');
-    $hojaActiva->getColumnDimension('U')->setWidth(20);
-    $hojaActiva->setCellValue('U1', 'Fletes (USD)');
-    $hojaActiva->getColumnDimension('V')->setWidth(20);
-    $hojaActiva->setCellValue('V1', 'Aduana (USD)');
-    $hojaActiva->getColumnDimension('W')->setWidth(20);
-    $hojaActiva->setCellValue('W1', 'Costo (USD)');
-    
-    $hojaActiva->getColumnDimension('X')->setWidth(20);
-    $hojaActiva->setCellValue('X1', 'Precio Web');
-    
-    $hojaActiva->getColumnDimension('Y')->setWidth(20);
-    $hojaActiva->setCellValue('Y1', 'Precio predetermindo');
-    // endif-check_id 
+$hojaActiva->getColumnDimension('R')->setWidth(20);
+$hojaActiva->setCellValue('R1', 'Utilidad Dealer (%)');
+
+$hojaActiva->getColumnDimension('S')->setWidth(20);
+$hojaActiva->setCellValue('S1', 'Precio Dealer '.PHP_EOL.'(solo lectura)');
+
+$hojaActiva->getColumnDimension('T')->setWidth(20);
+$hojaActiva->setCellValue('T1', 'Descuento Web (%)');
+
+$hojaActiva->getColumnDimension('U')->setWidth(20);
+$hojaActiva->setCellValue('U1', 'Precio Web '.PHP_EOL.'(solo lectura)');
+
+$hojaActiva->getColumnDimension('V')->setWidth(20);
+$hojaActiva->setCellValue('V1', 'Materiales');
+
+$hojaActiva->getColumnDimension('W')->setWidth(20);
+$hojaActiva->setCellValue('W1', 'Facturas');
+
+$hojaActiva->getColumnDimension('X')->setWidth(20);
+$hojaActiva->setCellValue('X1', 'P. Fábrica (USD)');
+
+$hojaActiva->getColumnDimension('Y')->setWidth(20);
+$hojaActiva->setCellValue('Y1', 'Fletes (USD)');
+
+$hojaActiva->getColumnDimension('Z')->setWidth(20);
+$hojaActiva->setCellValue('Z1', 'Aduana (USD)');
+
+$hojaActiva->getColumnDimension('AA')->setWidth(20);
+$hojaActiva->setCellValue('AA1', 'Precio predetermindo');
 
 $i=2;
 $pdt = array("NO","SI");
@@ -89,7 +103,9 @@ if(!empty($_REQUEST["tipoProductos"])){
 }
 
 try{
-    $consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos INNER JOIN productos_categorias ON catp_id=prod_categoria WHERE prod_id=prod_id $filtro");
+    $consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
+    INNER JOIN productos_categorias ON catp_id=prod_categoria 
+    WHERE prod_id=prod_id $filtro");
 
 } catch (Exception $e) {
     echo 'Excepción capturada: ',  $e->getMessage(), "\n";
@@ -114,6 +130,16 @@ while($res=mysqli_fetch_array($consulta)){
 	if(!empty($res['prod_utilidad']) && !empty($res['prod_costo_dolar'])){
 		$precioListaUSD = productosPrecioListaUSD($res['prod_utilidad'], $res['prod_costo_dolar']);
 	}
+
+    $dctoDealer = 0;
+	if(!empty($res['prod_descuento2'])){
+		$dctoDealer = $res['prod_descuento2']/100;
+	}
+
+    $precioDealer = 0;
+	if(!empty($res['prod_costo'])){
+		$precioDealer = $res['prod_costo'] + ($res['prod_costo'] * $dctoDealer);
+	}
 	
 	$datosReg = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 	SELECT
@@ -132,29 +158,26 @@ while($res=mysqli_fetch_array($consulta)){
     $hojaActiva->setCellValue('H'.$i, $res['catp_nombre']);
     $hojaActiva->setCellValue('I'.$i, $marca['mar_id']);
     $hojaActiva->setCellValue('J'.$i, $marca['mar_nombre']);
-
     $hojaActiva->setCellValue('K'.$i, $res['prod_existencias']);
-    $hojaActiva->setCellValue('L'.$i, $res['prod_costo']);
 
-    $hojaActiva->setCellValue('M'.$i, $res['prod_precio']);
-    $hojaActiva->setCellValue('N'.$i, number_format($precioListaUSD,0,",","."));
+    $hojaActiva->setCellValue('L'.$i, $res['prod_costo_dolar']);
+    $hojaActiva->setCellValue('M'.$i, number_format($precioListaUSD,0,",","."));
+    $hojaActiva->setCellValue('N'.$i, $res['prod_costo']);
+    $hojaActiva->setCellValue('O'.$i, $res['prod_utilidad']);
+    $hojaActiva->setCellValue('P'.$i, $res['prod_descuento1']);
+    $hojaActiva->setCellValue('Q'.$i, $res['prod_precio']);
+    $hojaActiva->setCellValue('R'.$i, $res['prod_descuento2']);
+    $hojaActiva->setCellValue('S'.$i, $precioDealer);
+    $hojaActiva->setCellValue('T'.$i, $res['prod_descuento_web']);
+    $hojaActiva->setCellValue('U'.$i, $precioWeb);
 
-    $hojaActiva->setCellValue('O'.$i, $datosReg[0]);
-    $hojaActiva->setCellValue('P'.$i, $datosReg[1]);
+    $hojaActiva->setCellValue('V'.$i, $datosReg[0]);
+    $hojaActiva->setCellValue('W'.$i, $datosReg[1]);
+    $hojaActiva->setCellValue('X'.$i, $res['prod_precio_fabrica']);
+    $hojaActiva->setCellValue('Y'.$i, $res['prod_flete']);
+    $hojaActiva->setCellValue('Z'.$i, $res['prod_aduana']);
 
-    // Check_id 7 y 15
-        $hojaActiva->setCellValue('Q'.$i, $res['prod_descuento1']);
-        $hojaActiva->setCellValue('R'.$i, $res['prod_descuento2']);
-        $hojaActiva->setCellValue('S'.$i, $res['prod_utilidad']);
-    
-        $hojaActiva->setCellValue('T'.$i, $res['prod_precio_fabrica']);
-        $hojaActiva->setCellValue('U'.$i, $res['prod_flete']);
-        $hojaActiva->setCellValue('V'.$i, $res['prod_aduana']);
-        $hojaActiva->setCellValue('W'.$i, $res['prod_costo_dolar']);
-        
-        $hojaActiva->setCellValue('X'.$i, number_format($precioWeb,0,",","."));
-        
-        $hojaActiva->setCellValue('Y'.$i, $pdt[$res['prod_precio_predeterminado']]);
+    $hojaActiva->setCellValue('AA'.$i, $pdt[$res['prod_precio_predeterminado']]);
     // endif-check_id 
 
     $i++;
