@@ -16,6 +16,12 @@ $nombreArchivo= $destino.$fullArchivo;
 
 if($extension == 'xlsx'){
 
+	if ($_FILES['planilla']['error'] != UPLOAD_ERR_OK){
+		$message = 'Ha ocurrido un error al subir el archivo: '.$_FILES['planilla']['error'];
+		echo '<script type="text/javascript">window.location.href="productos-importar.php?error=3&message='.$message.'";</script>';
+		exit();
+	}
+
 	if (move_uploaded_file($temName, $nombreArchivo)) {		
 		
 		if ($_FILES['planilla']['error'] === UPLOAD_ERR_OK){
@@ -256,7 +262,7 @@ if($extension == 'xlsx'){
 			exit();
 		}
 	}else{
-		$message = 'El archivo enviado es invalido. Por favor vuelva a intentarlo.';
+		$message = 'El archivo enviado es invalido. Por favor vuelva a intentarlo: '.$_FILES['planilla']['error'];
 		echo '<script type="text/javascript">window.location.href="productos-importar.php?error=3&message='.$message.'";</script>';
 		exit();
 	}	
