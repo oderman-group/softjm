@@ -124,13 +124,30 @@ include("includes/texto-editor.php");
 									<input type="hidden" name="tipoProductos" value="1">
 								<?php }?>
 								<div class="form-actions">
-									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Exportar</button>
+									<button type="submit" class="btn btn-info"><i class="icon-download"></i> Exportar</button>
 								</div>
 							</form>
 						</div>
 					</div>
 				</div>
 			</div>
+
+			<script>
+			// Disable the exportar button when the form is submitted
+			document.querySelector('form').addEventListener('submit', function(event) {
+				event.preventDefault(); // Prevent form submission
+				var exportarButton = document.querySelector('button[type="submit"]');
+				exportarButton.disabled = true; // Disable the exportar button
+				exportarButton.innerHTML = '<i class="icon-refresh"></i> Exportando...'; // Change button text
+				document.querySelector('form').submit();
+				
+
+				setTimeout(function() {
+					exportarButton.disabled = false; // Enable the exportar button
+					exportarButton.innerHTML = '<i class="icon-download"></i> Exportar'; // Change button text back to original
+				}, 3000);
+			});
+			</script>
 			
 			<div class="row-fluid">
 				<div class="span12">
@@ -160,7 +177,7 @@ include("includes/texto-editor.php");
 						</div>
 
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="productos-importar-excel.php" enctype="multipart/form-data">
+							<form id="formImportar" class="form-horizontal" method="post" action="productos-importar-excel.php" enctype="multipart/form-data">
                                 <fieldset class="default" style="background:#FFC;">
                                    	<legend>Información básica</legend>
 									<div class="control-group">
@@ -171,7 +188,7 @@ include("includes/texto-editor.php");
 														<i class="icon-file fileupload-exists"></i><span class="fileupload-preview"></span>
 													</div>
 													<span class="btn btn-file"><span class="fileupload-new">Seleccionar plantilla</span><span class="fileupload-exists">Cambiar</span>
-													<input type="file" name="planilla"/>
+													<input type="file" name="planilla" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
 													</span><a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remover</a>
 												</div>
 											</div>
@@ -188,9 +205,19 @@ include("includes/texto-editor.php");
                                 </fieldset>   
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                                    <button type="submit" class="btn btn-info"><i class="icon-save"></i> Iniciar importación</button>
+                                    <button id="btnImportar" type="submit" class="btn btn-info"><i class="icon-upload"></i> Iniciar importación</button>
 								</div>
 							</form>
+
+							<script>
+								document.getElementById('formImportar').addEventListener('submit', function(event) {
+								event.preventDefault(); // Prevent form submission
+								var importarButton = document.getElementById('btnImportar');
+								importarButton.disabled = true; // Disable the exportar button
+								importarButton.innerHTML = '<i class="icon-refresh"></i> Importando...'; // Change button text
+								document.getElementById('formImportar').submit();
+							});
+							</script>
 						</div>
 					</div>
 				</div>
