@@ -49,9 +49,8 @@ function informarErrorAlUsuario($linea, $error){
 }
 
 function productosPrecioListaUSD($porcentajeUtilidad, $costoEnDolares){
-	$utilidadPrincipal = $porcentajeUtilidad / 100;
-	$utilidadDelProducto = ($costoEnDolares * $utilidadPrincipal);
-	$precioListaUSD = $costoEnDolares + $utilidadDelProducto;
+	$utilidadPrincipal   = $porcentajeUtilidad / 100;
+	$precioListaUSD      = $costoEnDolares / (1 - $utilidadPrincipal);
 
 	return $precioListaUSD;
 }

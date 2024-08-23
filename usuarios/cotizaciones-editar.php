@@ -50,10 +50,10 @@ include("includes/js-formularios.php");
 	<script type="text/javascript">
 		function productos(enviada){
 			var tipoCliente = enviada.alt;
-			var campo = enviada.title;
-			var producto = enviada.name;
-			var proceso = 2;
-			var valor = enviada.value;
+			var campo       = enviada.title;
+			var producto    = enviada.name;
+			var proceso     = 2;
+			var valor       = enviada.value;
 			
 			$('#resp').empty().hide().html("Esperando...").show(1);
 				datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&tipoCliente="+(tipoCliente);
