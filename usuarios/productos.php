@@ -57,11 +57,10 @@ include("includes/head.php");
 
 <script type="text/javascript">
 	function productos(enviada) {
-		var campo = enviada.title;
+		var campo    = enviada.title;
 		var producto = enviada.name;
-		var proceso = 1;
-		var valor = enviada.value;
-
+		var proceso  = 1;
+		var valor    = enviada.value;
 
 		if (campo == 'prod_costo') {
 
@@ -82,9 +81,9 @@ include("includes/head.php");
 		if (campo == 'prod_utilidad') {
 			document.getElementById("utilidad" + producto).value = valor;
 
-			var costo = enviada.alt;
-			var utilidad = (valor / 100);
-			var precioNuevo = (parseFloat(costo) + (parseFloat(costo) * parseFloat(utilidad)));
+			var costo          = enviada.alt;
+			var utilidad       = (valor / 100);
+			var precioNuevo    = (parseFloat(costo) / (1 - parseFloat(utilidad)));
 			var precioNuevoIva = (parseFloat(precioNuevo) + (parseFloat(precioNuevo) * 0.19));
 
 			document.getElementById("precioLista" + producto).innerHTML = "$" + precioNuevo.toLocaleString();
@@ -103,6 +102,7 @@ include("includes/head.php");
 		});
 	}
 
+	//PRODUCTOS PREDETERMINADOS
 	function pred(enviada) {
 		var valorActual = enviada.title;
 		var producto = enviada.name;
@@ -315,18 +315,27 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 									<thead>
 										<tr>
 											<th>No</th>
+
 											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>PDT</th>
 												<th>VIS. WEB</th>
 											<?php } ?>
+
 											<th>CÓDIGO</th>
 											<th>Nombre</th>
+
 											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>Costo</th>
 											<?php } ?>
+
 											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>Utilidad (%)</th>
 											<?php } ?>
+
+											<th>Precio lista</th>
+											<th>Precio lista</br>Segun dolar hoy</th>
+											<th>Precio lista (USD)</th>
+
 											<th title="Sobre el precio de lista.">Dcto. Max. (%)</th>
 
 											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
@@ -336,10 +345,6 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 												<th>Precio web</th>
 												<th title="Sobre el precio de lista.">Utilidad Dealer. (%)</th>	
 											<?php } ?>
-
-											<th>Precio lista</th>
-											<th>Precio lista</br>Segun dolar hoy</th>
-											<th>Precio lista (USD)</th>
 
 											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>Precio lista + IVA</th>
@@ -422,13 +427,20 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 											}
 										}
 
-										$consulta = $conexionBdPrincipal->query("SELECT * FROM productos LEFT JOIN productos_categorias ON catp_id=prod_categoria WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' $filtro LIMIT 0, $limite");
+										$consulta = $conexionBdPrincipal->query("SELECT * FROM productos 
+										LEFT JOIN productos_categorias ON catp_id=prod_categoria 
+										WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' 
+										$filtro 
+										LIMIT 0, $limite
+										");
+
 										$no = 1;
 										$visible = array("SI", "SI", "NO");
 										$estadoVisible = array(2, 2, 1);
 										$comision=0;
 										$precioListaUSD=0;
 										$precioWeb=0;
+
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
 											$consultaGrupo1=$conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_id='" . $res['prod_grupo1'] . "' AND catp_id_empresa='".$idEmpresa."'");
@@ -443,24 +455,26 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 											$utilidadDealer = $res['prod_descuento2'] / 100;
 
 											if(!empty($res['prod_costo'])){
-											$precioDealer = $res['prod_costo'] + ($res['prod_costo'] * $utilidadDealer);
+												$precioDealer = $res['prod_costo'] + ($res['prod_costo'] * $utilidadDealer);
 											}
 
 											$utilidadWeb = 0;
 											if(!empty($res['prod_descuento_web'])){
 												$utilidadWeb = $res['prod_descuento_web'] / 100;
 											}
+
 											if(!empty($res['prod_costo'])){
 											$precioWeb = $res['prod_costo'] + ($res['prod_costo'] * $utilidadWeb);
 											}
 
 											if(!empty($res['prod_utilidad']) AND !empty($res['prod_costo_dolar'])){
-											$precioListaUSD = productosPrecioListaUSD($res['prod_utilidad'], $res['prod_costo_dolar']);
+												$precioListaUSD = productosPrecioListaUSD($res['prod_utilidad'], $res['prod_costo_dolar']);
 											}
 
 											if(!empty($res['prod_comision'])){
-											$comision = $res['prod_comision'] / 100;
+												$comision = $res['prod_comision'] / 100;
 											}
+
 											$valorComision = ($res['prod_precio'] * $comision);
 
 											$precioConIva = $res['prod_precio'] + ($res['prod_precio'] * 0.19);
@@ -510,9 +524,25 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td>
-														COP: <input id="costo<?= $res['prod_id']; ?>" type="text" alt="<?= $res['prod_utilidad']; ?>" title="prod_costo" name="<?= $res[$pk]; ?>" value="<?= $res['prod_costo']; ?>" style="width: 80px; text-align: center" onChange="productos(this)"><br>
+														COP:	<input 
+																	id="costo<?= $res['prod_id']; ?>" 
+																	type="text" 
+																	alt="<?= $res['prod_utilidad']; ?>" 
+																	title="prod_costo" 
+																	name="<?= $res[$pk]; ?>" 
+																	value="<?= $res['prod_costo']; ?>" 
+																	style="width: 80px; text-align: center" 
+																	onChange="productos(this)"
+																><br>
 
-														USD: <input type="text" title="prod_costo_dolar" name="<?= $res[$pk]; ?>" value="<?= $res['prod_costo_dolar']; ?>" style="width: 80px; text-align: center" onChange="productos(this)">
+														USD:	<input 
+																	type="text" 
+																	title="prod_costo_dolar" 
+																	name="<?= $res[$pk]; ?>" 
+																	value="<?= $res['prod_costo_dolar']; ?>" 
+																	style="width: 80px; text-align: center" 
+																	onChange="productos(this)"
+																>
 													</td>
 													<?php } ?>	
 
@@ -522,8 +552,19 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 														<input id="utilidad<?= $res['prod_id']; ?>" type="text" alt="<?= $res['prod_costo']; ?>" title="prod_utilidad" name="<?= $res[$pk]; ?>" value="<?= $res['prod_utilidad']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
 														<span style="visibility: hidden;"><?= $res['prod_utilidad']; ?></span>
 													</td>
-												<?php } ?>
+												<?php }
 
+												$precioLista = 0;
+												if (!empty($res['prod_precio'])) {
+													$precioLista = $res['prod_precio'];
+												}
+												?>
+
+												<td id="precioLista<?= $res['prod_id']; ?>">$<?= number_format($precioLista, 0, ",", "."); ?></td>
+
+												<td id="precioListaDolarHoy<?= $res['prod_id']; ?>">$<?= number_format($precioListaDolarHoy, 0, ",", "."); ?></td>
+
+												<td id="precioListaUSD<?= $res['prod_id']; ?>">USD <?= number_format($precioListaUSD, 2, ",", "."); ?></td>
 
 												<td>
 													<input type="text" title="prod_descuento1" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento1']; ?>" style="width: 40px; text-align: center" onChange="productos(this)" <?php if ($_SESSION["id"] != 7 and $_SESSION["id"] != 15) {echo "disabled";} ?>>
@@ -531,43 +572,32 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 												</td>
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
-													<td>
-														<input type="text" title="prod_comision" name="<?= $res[$pk]; ?>" value="<?= $res['prod_comision']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
-														<span style="visibility: hidden;"><?= $res['prod_comision']; ?></span>
-													</td>
+														<td>
+															<input type="text" title="prod_comision" name="<?= $res[$pk]; ?>" value="<?= $res['prod_comision']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
+															<span style="visibility: hidden;"><?= $res['prod_comision']; ?></span>
+														</td>
 
-													<td>
-														<input type="text" title="prod_comision_externo" name="<?= $res[$pk]; ?>" value="<?= $res['prod_comision_externo']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
-														<span style="visibility: hidden;"><?= $res['prod_comision_externo']; ?></span>
-													</td>
+														<td>
+															<input type="text" title="prod_comision_externo" name="<?= $res[$pk]; ?>" value="<?= $res['prod_comision_externo']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
+															<span style="visibility: hidden;"><?= $res['prod_comision_externo']; ?></span>
+														</td>
 
-													<td>
-														<input type="text" title="prod_descuento_web" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento_web']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
-														<span style="visibility: hidden;"><?= $res['prod_descuento_web']; ?></span>
-													</td>
+														<td>
+															<input type="text" title="prod_descuento_web" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento_web']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
+															<span style="visibility: hidden;"><?= $res['prod_descuento_web']; ?></span>
+														</td>
 
-													<td>$<?= number_format($precioWeb, 0, ",", "."); ?></td>
+														<td>$<?= number_format($precioWeb, 0, ",", "."); ?></td>
 
-													<td>
-														<input type="text" title="prod_descuento2" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento2']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
-														<span style="visibility: hidden;"><?= $res['prod_descuento2']; ?></span>
-													</td>
+														<td>
+															<input type="text" title="prod_descuento2" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento2']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
+															<span style="visibility: hidden;"><?= $res['prod_descuento2']; ?></span>
+														</td>
 
-													
-
-													
 												<?php
 													} 
-													$num=0;
-													if(!empty($res['prod_precio'])){
-														$num=$res['prod_precio'];
-													}
 												?>
-												<td id="precioLista<?= $res['prod_id']; ?>">$<?= number_format($num, 0, ",", "."); ?></td>
-
-												<td id="precioListaDolarHoy<?= $res['prod_id']; ?>">$<?= number_format($precioListaDolarHoy, 0, ",", "."); ?></td>
-
-												<td id="precioListaUSD<?= $res['prod_id']; ?>">USD <?= number_format($precioListaUSD, 2, ",", "."); ?></td>
+												
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td id="precioListaIva<?= $res['prod_id']; ?>">$<?= number_format($precioConIva, 0, ",", "."); ?></td>
