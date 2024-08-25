@@ -1,5 +1,7 @@
 <?php
 include("sesion.php");
+include_once RUTA_PROYECTO."/usuarios/class/Producto.php";
+
 $idPagina = 207;
 include("includes/verificar-paginas.php");
 
@@ -123,7 +125,7 @@ if($extension == 'xlsx'){
 
 							if($origen > 0){
 								$utilidad = $datos['prod_utilidad']/100;
-								$precio1 = $arrayIndividual['prod_costo'] + ($arrayIndividual['prod_costo'] * $utilidad);
+								$precio1 = Producto::CalcularPrecioLista($arrayIndividual['prod_costo'], $utilidad);
 			
 								$conexionBdPrincipal->query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$arrayIndividual['prod_id']."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', '".$origen."')");
 							}

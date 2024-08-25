@@ -62,32 +62,58 @@ include("includes/head.php");
 		var proceso  = 1;
 		var valor    = enviada.value;
 
-		if (campo == 'prod_costo') {
+		var costo;
+		var utilidad;
+		var precioNuevo;
+		var precioNuevoIva;
 
-			/* 
-		document.getElementById("costo"+producto).value=valor;
-		
-		var utilidad = (parseFloat(enviada.alt)/100);
-		var precioNuevo = (parseFloat(valor) + (parseFloat(valor)*parseFloat(utilidad)));
-		var precioNuevoIva = (parseFloat(precioNuevo) + (parseFloat(precioNuevo)*0.19));
-		  alert(utilidad);
-		  
-		document.getElementById("precioLista"+producto).innerHTML="$"+precioNuevo.toLocaleString();
-		document.getElementById("precioListaIva"+producto).innerHTML="$"+precioNuevoIva.toLocaleString();
-		*/
-		}
+		const descuentoDealer          = document.getElementById("descuentoDealer" + producto).value;
+		const descuentoDealerSobreCien = (descuentoDealer / 100);
+		const descuentoWeb             = document.getElementById("dctoWeb" + producto).value;
+		const descuentoWebSobreCien    = (descuentoWeb / 100);       
+		const utilidadActual           = document.getElementById("utilidad" + producto).value;
+		const utilidadSobreCien        = (utilidadActual / 100);
+		const costoActual              = document.getElementById("costo" + producto).value;
 
+		precioNuevo        = Math.round(parseFloat(costoActual) / (1 - parseFloat(utilidadSobreCien)));
+		precioNuevoIva     = Math.round(parseFloat(precioNuevo) + (parseFloat(precioNuevo) * 0.19));
 
-		if (campo == 'prod_utilidad') {
-			document.getElementById("utilidad" + producto).value = valor;
+		const precioDealer = Math.round(precioNuevo - (precioNuevo * descuentoDealerSobreCien));
+		const precioWeb    = Math.round(precioNuevo - (precioNuevo * descuentoWebSobreCien));
 
-			var costo          = enviada.alt;
-			var utilidad       = (valor / 100);
-			var precioNuevo    = (parseFloat(costo) / (1 - parseFloat(utilidad)));
-			var precioNuevoIva = (parseFloat(precioNuevo) + (parseFloat(precioNuevo) * 0.19));
-
+		if (campo == 'prod_utilidad' || campo == 'prod_costo') {
+			document.getElementById("precioDealer" + producto).innerHTML = "$" + precioDealer.toLocaleString();
+			document.getElementById("precioWeb" + producto).innerHTML = "$" + precioWeb.toLocaleString();
 			document.getElementById("precioLista" + producto).innerHTML = "$" + precioNuevo.toLocaleString();
 			document.getElementById("precioListaIva" + producto).innerHTML = "$" + precioNuevoIva.toLocaleString();
+
+			const fields = ["precioDealer", "precioWeb", "precioLista", "precioListaIva"];
+			fields.forEach(field => {
+				const element = document.getElementById(field + producto);
+
+				element.style.backgroundColor = "yellow";
+				setTimeout(() => {
+					element.style.backgroundColor = "";
+				}, 3000);
+			});
+		}
+
+		if (campo == 'prod_descuento2') {
+			document.getElementById("precioDealer" + producto).innerHTML = "$" + precioDealer.toLocaleString();
+			document.getElementById("precioDealer" + producto).style.backgroundColor = "yellow"
+
+			setTimeout(() => {
+				document.getElementById("precioDealer" + producto).style.backgroundColor = "";
+			}, 3000);
+		}
+
+		if (campo == 'prod_descuento_web') {
+			document.getElementById("precioWeb" + producto).innerHTML = "$" + precioWeb.toLocaleString();
+			document.getElementById("precioWeb" + producto).style.backgroundColor = "yellow"
+
+			setTimeout(() => {
+				document.getElementById("precioWeb" + producto).style.backgroundColor = "";
+			}, 3000);
 		}
 
 		$('#resp').empty().hide().html("Esperando...").show(1);
@@ -312,7 +338,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 							<div id="scrolly" class="widget-container">
 
 								<table class="table table-striped table-bordered" id="data-table" style="font-size: 9px;">
-									<thead>
+									<thead style="position: sticky; top: 0; background-color: white; z-index: 100;">
 										<tr>
 											<th>No</th>
 
@@ -333,22 +359,27 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 											<?php } ?>
 
 											<th>Precio lista</th>
-											<th>Precio lista</br>Segun dolar hoy</th>
+
+											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+												<th>Precio lista + IVA</th>
+											<?php } ?>
+
 											<th>Precio lista (USD)</th>
+											<th>Precio lista</br>Segun dolar hoy</th>
+
+											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+												
+												<th title="Sobre el precio de lista.">Descuento Dealer. (%)</th>
+												<th>Precio dealer</th>
+												<th title="Sobre el precio de lista.">Descuento Web. (%)</th>
+												<th>Precio web</th>
+											<?php } ?>
 
 											<th title="Sobre el precio de lista.">Dcto. Max. (%)</th>
 
 											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>Comisión (%)</th>
-												<th>Comisión externo (%)</th>
-												<th title="Sobre el precio de lista.">Utilidad Web. (%)</th>
-												<th>Precio web</th>
-												<th title="Sobre el precio de lista.">Utilidad Dealer. (%)</th>	
-											<?php } ?>
-
-											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
-												<th>Precio lista + IVA</th>
-												<th>Precio dealer</th>	
+												<th>Comisión externo (%)</th>	
 											<?php } ?>
 
 											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
@@ -368,7 +399,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 									</thead>
 									<tbody>
 										<?php
-										$limite = 100;
+										$limite = 10;
 										if(isset($_GET["todo"])){
 											if ($_GET["todo"] == 1) {
 												$limite = 10000;
@@ -452,19 +483,19 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 											/*$dcto1 = $res['prod_descuento1']/100;
 											$precioMinimo = $res['prod_precio'] - ($res['prod_precio']*$dcto1);*/
 
-											$utilidadDealer = $res['prod_descuento2'] / 100;
+											$descuentoDealer = $res['prod_descuento2'] / 100;
 
-											if(!empty($res['prod_costo'])){
-												$precioDealer = $res['prod_costo'] + ($res['prod_costo'] * $utilidadDealer);
+											if(!empty($res['prod_precio'])){
+												$precioDealer = $res['prod_precio'] - ($res['prod_precio'] * $descuentoDealer);
 											}
 
-											$utilidadWeb = 0;
+											$descuentoWeb = 0;
 											if(!empty($res['prod_descuento_web'])){
-												$utilidadWeb = $res['prod_descuento_web'] / 100;
+												$descuentoWeb = $res['prod_descuento_web'] / 100;
 											}
 
-											if(!empty($res['prod_costo'])){
-											$precioWeb = $res['prod_costo'] + ($res['prod_costo'] * $utilidadWeb);
+											if(!empty($res['prod_precio'])){
+												$precioWeb = $res['prod_precio'] - ($res['prod_precio'] * $descuentoWeb);
 											}
 
 											if(!empty($res['prod_utilidad']) AND !empty($res['prod_costo_dolar'])){
@@ -485,9 +516,9 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 												<td><?= $no; ?></td>
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
-													<td><a href="#" onClick="pred(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_precio_predeterminado']; ?>" id="p<?= $res[$pk]; ?>"><?=$opcionSINO[$res['prod_precio_predeterminado']];?></a></td>
+													<td><a href="javascript:void(0);" onClick="pred(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_precio_predeterminado']; ?>" id="p<?= $res[$pk]; ?>"><?=$opcionSINO[$res['prod_precio_predeterminado']];?></a></td>
 
-													<td><a href="#" onClick="visweb(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_visible_web']; ?>" id="vw<?= $res[$pk];?>"><?= $opcionSINO[$res['prod_visible_web']]; ?></a></td>
+													<td><a href="javascript:void(0);" onClick="visweb(this)" name="<?= $res[$pk]; ?>" title="<?= $res['prod_visible_web']; ?>" id="vw<?= $res[$pk];?>"><?= $opcionSINO[$res['prod_visible_web']]; ?></a></td>
 												<?php } ?>
 
 												<td align="center" style="font-weight: bold;">
@@ -549,7 +580,16 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 													<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 
 													<td>
-														<input id="utilidad<?= $res['prod_id']; ?>" type="text" alt="<?= $res['prod_costo']; ?>" title="prod_utilidad" name="<?= $res[$pk]; ?>" value="<?= $res['prod_utilidad']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
+														<input 
+															id="utilidad<?= $res['prod_id']; ?>" 
+															type="text" 
+															alt="<?= $res['prod_costo']; ?>" 
+															title="prod_utilidad" 
+															name="<?= $res[$pk]; ?>" 
+															value="<?= $res['prod_utilidad']; ?>" 
+															style="width: 40px; text-align: center" 
+															onChange="productos(this)"
+														>
 														<span style="visibility: hidden;"><?= $res['prod_utilidad']; ?></span>
 													</td>
 												<?php }
@@ -562,9 +602,47 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 
 												<td id="precioLista<?= $res['prod_id']; ?>">$<?= number_format($precioLista, 0, ",", "."); ?></td>
 
-												<td id="precioListaDolarHoy<?= $res['prod_id']; ?>">$<?= number_format($precioListaDolarHoy, 0, ",", "."); ?></td>
+												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+													<td id="precioListaIva<?= $res['prod_id']; ?>">$<?= number_format($precioConIva, 0, ",", "."); ?></td>
+												<?php } ?>
 
 												<td id="precioListaUSD<?= $res['prod_id']; ?>">USD <?= number_format($precioListaUSD, 2, ",", "."); ?></td>
+
+												<td id="precioListaDolarHoy<?= $res['prod_id']; ?>">$<?= number_format($precioListaDolarHoy, 0, ",", "."); ?></td>
+
+												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+													<td>
+														<input
+															id="descuentoDealer<?= $res['prod_id']; ?>"
+															type="text" 
+															title="prod_descuento2" 
+															name="<?= $res[$pk]; ?>" 
+															value="<?= $res['prod_descuento2']; ?>" 
+															style="width: 40px; text-align: center" 
+															onChange="productos(this)"
+														>
+														<span style="visibility: hidden;"><?= $res['prod_descuento2']; ?></span>
+													</td>
+
+													<td id="precioDealer<?= $res['prod_id']; ?>">$<?= number_format($precioDealer, 0, ",", "."); ?></td>
+
+													<td>
+														<input
+															id="dctoWeb<?= $res['prod_id']; ?>"
+															type="text" 
+															title="prod_descuento_web" 
+															name="<?= $res[$pk]; ?>" 
+															value="<?= $res['prod_descuento_web']; ?>" 
+															style="width: 40px; text-align: center" 
+															onChange="productos(this)"
+														>
+														<span style="visibility: hidden;"><?= $res['prod_descuento_web']; ?></span>
+													</td>
+
+													<td id="precioWeb<?= $res['prod_id']; ?>">$<?= number_format($precioWeb, 0, ",", "."); ?></td>
+
+													
+												<?php } ?>
 
 												<td>
 													<input type="text" title="prod_descuento1" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento1']; ?>" style="width: 40px; text-align: center" onChange="productos(this)" <?php if ($_SESSION["id"] != 7 and $_SESSION["id"] != 15) {echo "disabled";} ?>>
@@ -582,30 +660,13 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 															<span style="visibility: hidden;"><?= $res['prod_comision_externo']; ?></span>
 														</td>
 
-														<td>
-															<input type="text" title="prod_descuento_web" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento_web']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
-															<span style="visibility: hidden;"><?= $res['prod_descuento_web']; ?></span>
-														</td>
-
-														<td>$<?= number_format($precioWeb, 0, ",", "."); ?></td>
-
-														<td>
-															<input type="text" title="prod_descuento2" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento2']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
-															<span style="visibility: hidden;"><?= $res['prod_descuento2']; ?></span>
-														</td>
 
 												<?php
 													} 
 												?>
 												
 
-												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
-													<td id="precioListaIva<?= $res['prod_id']; ?>">$<?= number_format($precioConIva, 0, ",", "."); ?></td>
-
-													<td>$<?= number_format($precioDealer, 0, ",", "."); ?></td>
-
-													
-												<?php } ?>
+												
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td><?= $grupo1['catp_nombre']; ?></td>

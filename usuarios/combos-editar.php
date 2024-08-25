@@ -195,7 +195,7 @@ include("includes/js-formularios.php");
 									<button type="button" class="btn btn-danger">Cancelar</button>
 								</div>
                               
-                                
+                                </form>
 
 						</div>
 					</div>
@@ -264,7 +264,7 @@ include("includes/js-formularios.php");
 									<span><?=$prod['prod_id']." - ".$prod['prod_nombre'];?></span>
 									<?php } ?>
 								</td>
-                                <td><input type="number" title="copp_cantidad" name="<?=$prod['copp_id'];?>" value="<?=$prod['copp_cantidad'];?>" oninput="productos(this)" style="width: 50px; text-align: center;" <?=$disabled;?>></td>
+                                <td><input type="number" title="copp_cantidad" name="<?=$prod['copp_id'];?>" value="<?=$prod['copp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;" <?=$disabled;?>></td>
                                 <td>$<?=number_format($prod['copp_precio'],0,",",".");?></td>
                                 <td>$<?=number_format($prod['prod_precio'],0,",",".");?></td>
 								<td>$<?=number_format($subtotal,0,",",".");?></td>
@@ -322,8 +322,6 @@ include("includes/js-formularios.php");
 							</tfoot>	
 								
 							</table>
-
-							</form>
 							
 						</div>
 					</div>

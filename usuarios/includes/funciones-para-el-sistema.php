@@ -1,4 +1,6 @@
 <?php
+include_once RUTA_PROYECTO."/usuarios/class/Producto.php";
+
 function subirArchivosAlServidor($archivoCargado, $prefijo, $destino){
 	$extensionParte1 = explode(".", $archivoCargado['name']);
 	$extension = end($extensionParte1);
@@ -50,7 +52,7 @@ function informarErrorAlUsuario($linea, $error){
 
 function productosPrecioListaUSD($porcentajeUtilidad, $costoEnDolares){
 	$utilidadPrincipal   = $porcentajeUtilidad / 100;
-	$precioListaUSD      = $costoEnDolares / (1 - $utilidadPrincipal);
+	$precioListaUSD      = Producto::CalcularPrecioLista($costoEnDolares, $utilidadPrincipal);
 
 	return $precioListaUSD;
 }
