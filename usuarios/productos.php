@@ -399,7 +399,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 									</thead>
 									<tbody>
 										<?php
-										$limite = 10;
+										$limite = 100;
 										if(isset($_GET["todo"])){
 											if ($_GET["todo"] == 1) {
 												$limite = 10000;
