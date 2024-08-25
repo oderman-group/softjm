@@ -39,7 +39,13 @@ class Modulos {
      * 
      * @return bool
     **/
-    public static function validarRol($paginas, $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion){
+    public static function validarRol(
+        $paginas, 
+        $conexionBdPrincipal, 
+        $conexionBdAdmin, 
+        $datosUsuarioActual, 
+        $configuracion
+    ) {
 
         if ($datosUsuarioActual['usr_tipo'] == 1) { 
             return true;

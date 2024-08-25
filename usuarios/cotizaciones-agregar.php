@@ -80,24 +80,35 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" onChange="clientes(this)" required>
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_ciudad!='1122' AND cli_id_empresa='".$idEmpresa."'");
-											if(Modulos::validarRol([389], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
-											}
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
+											WHERE cli_ciudad! = ".CIUDADES_INTERNACIONALES."
+											AND cli_id_empresa='".$idEmpresa."'");
 
-												if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
-													$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
+											$paginasParaValidar = [389];
+
+											if (Modulos::validarRol($paginasParaValidar, $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
+												WHERE cli_id_empresa='".$idEmpresa."'");
+											}
+
+											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
+
+												if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+													$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
+													WHERE zpu_usuario='".$_SESSION["id"]."' 
+													AND zpu_zona='".$resOp['cli_zona']."'");
 													$numZ = $consultaNumZ->num_rows;
-													if($numZ==0) continue;
+
+													if($numZ == 0) continue;
 												}
 
 												$disabled = '';
-												$dealer = '';
-												if($resOp['cli_categoria']== CLI_CATEGORIA_DEALER){
+												$dealer   = '';
+
+												if ($resOp['cli_categoria']== CLI_CATEGORIA_DEALER) {
 													$dealer = '(DEALER)';
 
-													if(!Modulos::validarRol([390], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+													if (!Modulos::validarRol([390], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 														$disabled = 'disabled';
 													}	
 												}

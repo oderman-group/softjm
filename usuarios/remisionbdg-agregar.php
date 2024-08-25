@@ -78,7 +78,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" onChange="clientes(this)" required>
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_ciudad!='1122' AND cli_id_empresa='".$idEmpresa."'");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_ciudad!=".CIUDADES_INTERNACIONALES." AND cli_id_empresa='".$idEmpresa."'");
 											if(Modulos::validarRol([389], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 												$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
 											}
