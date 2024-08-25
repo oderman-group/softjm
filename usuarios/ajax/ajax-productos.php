@@ -1,5 +1,7 @@
-<?php 
+<?php
 include("../sesion.php");
+include_once RUTA_PROYECTO."/usuarios/class/Producto.php";
+
 //EDITAR PRODUCTOS
 if ($_POST["proceso"] == 1) {
 
@@ -15,7 +17,7 @@ if ($_POST["proceso"] == 1) {
 			$datos    = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 			$utilidad = $_POST["valor"] / 100;
-			$precio1  = $datos['prod_costo'] / (1 - $utilidad);
+			$precio1  = Producto::CalcularPrecioLista($datos['prod_costo'], $utilidad);
 
 			mysqli_query($conexionBdPrincipal,"INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)
 			VALUES('".$_POST["producto"]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', 2)");
@@ -33,7 +35,7 @@ if ($_POST["proceso"] == 1) {
 			$datos    = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 			$utilidad = $datos['prod_utilidad']/100;
-			$precio1  = $_POST["valor"] / (1 - $utilidad);
+			$precio1  = Producto::CalcularPrecioLista($_POST["valor"], $utilidad);
 
 			mysqli_query($conexionBdPrincipal,"INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)
 			VALUES('".$_POST["producto"]."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', 1)");
@@ -71,7 +73,7 @@ if ($_POST["proceso"] == 2) {
 		}
 
 		if ($_POST["campo"]=='czpp_valor') {
-			if($_POST["valor"]<$datosProducto['prod_precio'] and $_POST['tipoCliente'] == 1){
+			if($_POST["valor"] < $datosProducto['prod_precio'] && $_POST['tipoCliente'] == 1) {
 
 				echo '<script type="text/javascript">alert("El precio que está otorgando es menor al máximo permitido para este producto, el cual es de $'.number_format($datosProducto['prod_precio'],0,".",".").'.");</script>';
 				exit();	
@@ -101,7 +103,7 @@ if ($_POST["proceso"] ==3) {
 		$utilidad = $_POST["valor"]/100;
 		$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_categoria='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
 		while($datos = mysqli_fetch_array($productos, MYSQLI_BOTH)){
-			$precio1 = $datos['prod_costo'] + ($datos['prod_costo']*$utilidad);
+			$precio1 = Producto::CalcularPrecioLista($datos['prod_costo'], $utilidad);
 			mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$datos['prod_id']."' AND prod_precio_predeterminado=0");
 			
 		}	
@@ -120,7 +122,7 @@ if ($_POST["proceso"] == 4) {
 		$utilidad = $_POST["valor"]/100;
 		$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_grupo1='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
 		while($datos = mysqli_fetch_array($productos, MYSQLI_BOTH)){
-			$precio1 = $datos['prod_costo'] + ($datos['prod_costo']*$utilidad);
+			$precio1 = Producto::CalcularPrecioLista($datos['prod_costo'], $utilidad);
 			mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$datos['prod_id']."' AND prod_precio_predeterminado=0");
 			
 		}
@@ -140,7 +142,7 @@ if ($_POST["proceso"] == 5) {
 		$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_marca='".$_POST["producto"]."' AND prod_precio_predeterminado=0");
 
 		while ($datos = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
-			$precio1 = $datos['prod_costo'] + ($datos['prod_costo']*$utilidad);
+			$precio1 = Producto::CalcularPrecioLista($datos['prod_costo'], $utilidad);
 			mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_precio='".$precio1."', prod_ultima_actualizacion=now(), prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' WHERE prod_id='".$datos['prod_id']."' AND prod_precio_predeterminado=0");
 		}
 		
@@ -153,20 +155,29 @@ if ($_POST["proceso"] == 5) {
 }
 //PRODUCTOS PREDETERMINADOS
 if ($_POST["proceso"] == 6) {
-	$datos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'"), MYSQLI_BOTH);
-	$estado = 0;
-	if($datos['prod_precio_predeterminado']=='0') $estado = 1;
-	
-	mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_precio_predeterminado='".$estado."' WHERE prod_id='".$_POST["producto"]."'");
-	
+	mysqli_query($conexionBdPrincipal, "
+		UPDATE productos 
+		SET prod_precio_predeterminado = IF(prod_precio_predeterminado = '0', '1', '0') 
+		WHERE prod_id = '" . $_POST["producto"] . "'
+	");
 }
 //PRODUCTOS DE LOS COMBOS
-if($_POST["proceso"]==7){
-	mysqli_query($conexionBdPrincipal,"UPDATE combos_productos SET ".$_POST["campo"]."='".$_POST["valor"]."' WHERE copp_id='".$_POST["producto"]."'");
-	
-	
-	//echo '<script type="text/javascript">location.reload();</script>';
+if ($_POST["proceso"]==7) {
+	try {
+		mysqli_query($conexionBdPrincipal,"UPDATE combos_productos 
+		SET ".$_POST["campo"]."='".$_POST["valor"]."' 
+		WHERE copp_id='".$_POST["producto"]."'");
+	} catch (Exception $e) {
+?>
+		<div class="alert alert-danger">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-exclamation-sign"></i><strong>Error!</strong> Ha ocurrido un error. <?php echo $e->getMessage(); ?>
+		</div>
+<?php
+		exit();
+	}
 }
+
 //PRODUCTOS DE LA REMISIÓN
 if($_POST["proceso"]==8){
 	if($_POST["campo"]=='czpp_descuento'){
