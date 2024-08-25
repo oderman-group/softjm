@@ -1,5 +1,6 @@
 <?php
 require_once ('sensitive.php');
+
 define('ID_DOC_COTIZACION', 1);
 define('ID_DOC_REMISION', 2);
 define('ID_DOC_PEDIDO', 3);
@@ -62,3 +63,5 @@ define('REM_TIPOS_EQUIPOS_USADO', 2);
 
 // TIPOS USUARIOS
 define('ADMIN', 1);
+
+define('CIUDADES_INTERNACIONALES', 1122);
