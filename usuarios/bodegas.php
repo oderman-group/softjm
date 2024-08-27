@@ -119,6 +119,7 @@ include("includes/head.php");
 									<thead>
 										<tr>
 											<th>No</th>
+											<th>COD.</th>
 											<th>Creación</th>
 											<th>Nombre</th>
 											<th>Ciudad</th>
@@ -134,15 +135,24 @@ include("includes/head.php");
 										WHERE bod_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
-											$consultaProductosBodegas=$conexionBdPrincipal->query("SELECT * FROM productos_bodegas WHERE prodb_bodega='".$res[0]."'");
+											$consultaProductosBodegas = $conexionBdPrincipal->query("SELECT * FROM productos_bodegas 
+											WHERE prodb_bodega='".$res[0]."'");
 											$cantProd = $consultaProductosBodegas->num_rows;
 										?>
 											<tr>
 												<td><?= $no; ?></td>
+												<td><?= $res['bod_id']; ?></td>
 												<td><?= $res['bod_fecha_creacion']; ?></td>
 												<td><?= $res['bod_nombre']; ?></td>
 												<td><?= $res['ciu_nombre'].", ".$res['dep_nombre']; ?></td>
-												<td><a href="bodegas-productos.php?bod=<?=$res[0];?>"><?= $cantProd; ?></a></td>
+												<td>
+													<a 
+														href="bodegas-productos.php?bod=<?=$res[0];?>"
+														style="text-decoration: underline;"
+													>
+														<?= $cantProd; ?>
+													</a>
+												</td>
 												<td>
 													<h4>
 													<?php if($res[0] != 1){

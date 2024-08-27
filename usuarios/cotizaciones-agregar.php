@@ -81,7 +81,7 @@ include("includes/js-formularios.php");
 											<option value=""></option>
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
-											WHERE cli_ciudad! = ".CIUDADES_INTERNACIONALES."
+											WHERE cli_ciudad != ".CIUDADES_INTERNACIONALES."
 											AND cli_id_empresa='".$idEmpresa."'");
 
 											$paginasParaValidar = [389];
