@@ -66,6 +66,7 @@ include("includes/head.php");
 		var utilidad;
 		var precioNuevo;
 		var precioNuevoIva;
+		var precioNuevoUSD;
 
 		const descuentoDealer          = document.getElementById("descuentoDealer" + producto).value;
 		const descuentoDealerSobreCien = (descuentoDealer / 100);
@@ -74,9 +75,12 @@ include("includes/head.php");
 		const utilidadActual           = document.getElementById("utilidad" + producto).value;
 		const utilidadSobreCien        = (utilidadActual / 100);
 		const costoActual              = document.getElementById("costo" + producto).value;
+		const costoActualUSD           = document.getElementById("costoUSD" + producto).value;
 
 		precioNuevo        = Math.round(parseFloat(costoActual) / (1 - parseFloat(utilidadSobreCien)));
 		precioNuevoIva     = Math.round(parseFloat(precioNuevo) + (parseFloat(precioNuevo) * 0.19));
+
+		precioNuevoUSD     = Math.round(parseFloat(costoActualUSD) / (1 - parseFloat(utilidadSobreCien)));
 
 		const precioDealer = Math.round(precioNuevo - (precioNuevo * descuentoDealerSobreCien));
 		const precioWeb    = Math.round(precioNuevo - (precioNuevo * descuentoWebSobreCien));
@@ -86,8 +90,10 @@ include("includes/head.php");
 			document.getElementById("precioWeb" + producto).innerHTML = "$" + precioWeb.toLocaleString();
 			document.getElementById("precioLista" + producto).innerHTML = "$" + precioNuevo.toLocaleString();
 			document.getElementById("precioListaIva" + producto).innerHTML = "$" + precioNuevoIva.toLocaleString();
+			document.getElementById("precioListaUSD" + producto).innerHTML = "$" + precioNuevoUSD.toLocaleString();
 
-			const fields = ["precioDealer", "precioWeb", "precioLista", "precioListaIva"];
+			const fields = ["precioDealer", "precioWeb", "precioLista", "precioListaIva", "precioListaUSD"];
+
 			fields.forEach(field => {
 				const element = document.getElementById(field + producto);
 
@@ -460,6 +466,10 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 
 										$consulta = $conexionBdPrincipal->query("SELECT * FROM productos 
 										LEFT JOIN productos_categorias ON catp_id=prod_categoria 
+										LEFT JOIN (
+											SELECT catp_id AS G2ID, catp_nombre AS G2NAME FROM productos_categorias
+										) grupo1 ON G2ID=prod_grupo1
+										LEFT JOIN marcas ON mar_id=prod_marca 
 										WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' 
 										$filtro 
 										LIMIT 0, $limite
@@ -473,12 +483,6 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 										$precioWeb=0;
 
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
-
-											$consultaGrupo1=$conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_id='" . $res['prod_grupo1'] . "' AND catp_id_empresa='".$idEmpresa."'");
-											$grupo1 = mysqli_fetch_array($consultaGrupo1, MYSQLI_BOTH);
-
-											$consultaMarca=$conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id='" . $res['prod_marca'] . "' AND mar_id_empresa='".$idEmpresa."' ");
-											$marca = mysqli_fetch_array($consultaMarca, MYSQLI_BOTH);
 
 											/*$dcto1 = $res['prod_descuento1']/100;
 											$precioMinimo = $res['prod_precio'] - ($res['prod_precio']*$dcto1);*/
@@ -599,6 +603,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 																><br>
 
 																<span translate="no">USD:</span>	<input 
+																	id="costoUSD<?= $res['prod_id']; ?>"
 																	type="text" 
 																	title="prod_costo_dolar" 
 																	name="<?= $res[$pk]; ?>" 
@@ -705,11 +710,11 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 												
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
-													<td><?= $grupo1['catp_nombre']; ?></td>
+													<td><?= $res['G2NAME']; ?></td>
 												<?php } ?>
 
 												<td><?= $res['catp_nombre']; ?></td>
-												<td><?= $marca['mar_nombre']; ?></td>
+												<td><?= $res['mar_nombre']; ?></td>
 
 
 
