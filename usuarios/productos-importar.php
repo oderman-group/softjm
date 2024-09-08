@@ -61,7 +61,7 @@ include("includes/texto-editor.php");
                                <div class="control-group">
 									<label class="control-label">Grupo 1</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="grupo1" required>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="grupo1">
 											<option value=""></option>
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_id_empresa='".$idEmpresa."'");
