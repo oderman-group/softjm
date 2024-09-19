@@ -5,8 +5,7 @@ $idPagina = 176;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-$consuluta=$conexionBdPrincipal->query("SELECT * FROM usuarios 
-INNER JOIN usuarios_tipos ON utipo_id=usr_tipo
+$consuluta=$conexionBdAdmin->query("SELECT * FROM ".MAINBD.".usuarios 
 WHERE usr_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consuluta, MYSQLI_BOTH);
 ?>
