@@ -342,7 +342,7 @@ include("includes/js-formularios.php");
 												
 												$gradosV1 = (359 - $sumaGradosV1);
 												$minutosV1 = (59 - $sumaMinutosV1);
-												$segundosV1 = (60 - $sumaSegundosV1);
+												$segundosV1 = $sumaSegundosV1 > 0 ? (60 - $sumaSegundosV1) : 0;
 
 												$sumaGradosH1 = ($resultadoD['rem_p1hd_grados'] + $resultadoD['rem_p1hi_grados']);
 												$sumaMinutosH1 = ($resultadoD['rem_p1hd_minutos'] + $resultadoD['rem_p1hi_minutos']);
@@ -350,7 +350,7 @@ include("includes/js-formularios.php");
 												
 												$gradosH1 = (179 - $sumaGradosH1);
 												$minutosH1 = (59 - $sumaMinutosH1);
-												$segundosH1 = (60 - $sumaSegundosH1);
+												$segundosH1 = $sumaSegundosH1 > 0 ? (60 - $sumaSegundosH1) : 0;
 												?>
 												
 												<tr align="center">
@@ -421,7 +421,7 @@ include("includes/js-formularios.php");
 												
 												$gradosV2 = (359 - $sumaGradosV2);
 												$minutosV2 = (59 - $sumaMinutosV2);
-												$segundosV2 = (60 - $sumaSegundosV2);
+												$segundosV2 = $sumaSegundosV2 > 0 ? (60 - $sumaSegundosV2) : 0;
 
 												$sumaGradosH2 = ($resultadoD['rem_p2hd_grados'] + $resultadoD['rem_p2hi_grados']);
 												$sumaMinutosH2 = ($resultadoD['rem_p2hd_minutos'] + $resultadoD['rem_p2hi_minutos']);
@@ -429,7 +429,7 @@ include("includes/js-formularios.php");
 												
 												$gradosH2 = (179 - $sumaGradosH2);
 												$minutosH2 = (59 - $sumaMinutosH2);
-												$segundosH2 = (60 - $sumaSegundosH2);
+												$segundosH2 = $sumaSegundosH2 > 0 ? (60 - $sumaSegundosH2) : 0;
 												?>
 												
 												<tr align="center">
