@@ -39,6 +39,11 @@ include("includes/js-formularios.php");
 <body>
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
+
+<?php
+include_once(RUTA_PROYECTO."/usuarios/class/Api/JmEquipos.php");
+$data = Api_JmEquipos::getData(Api_JmEquipos::JM_URL_PORTAFOLIOS);
+?>
     
     
     
@@ -78,21 +83,13 @@ include("includes/js-formularios.php");
                                         <div class="controls">
                                             <select data-placeholder="Escoja varias opciones..." class="chzn-select span8" multiple tabindex="2" name="portafolios[]">
                                                 <option value=""></option>
-                                                
-                                                <option value="1">Portafolio Topografía</option>
-                                                <option value="2">Portafolio Construcción y Arquitectura</option>
-												<option value="3">Portafolio Accesorios</option>
-												<option value="4">Portafolio Agricultura</option>
-												<option value="5">Portafolio Cartografía</option>
+                                                <?php foreach($data['data'] as $portafolio) {?>
+                                                    <option value="<?=$portafolio['cata_archivo'];?>"><?=$portafolio['cata_nombre'];?></option>
+                                                <?php }?>
                                                
                                                <?php if($_SESSION["bd"]=='odermancom_orioncrm_exacta'){?>
                                                     <option value="6">Portafolio Exacta Ing.</option>
                                                 <?php }?>
-
-                                                <option value="7">Brochure Laboratorio</option>
-
-                                                <option value="8">Portafolio Drones.</option>
-                                                <option value="9">Portafolio Estaciones totales</option>
                                                 
                                             </select>
                                         </div>
