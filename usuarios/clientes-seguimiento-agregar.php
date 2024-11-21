@@ -314,25 +314,23 @@ include("includes/js-formularios.php");
 										<input type="text" class="span4" name="cotizacion" style="font-weight:bold;">
 									</div>
 								</div>
+
+								<?php
+								include_once(RUTA_PROYECTO."/usuarios/class/Api/JmEquipos.php");
+								$data = Api_JmEquipos::getData(Api_JmEquipos::JM_URL_PORTAFOLIOS);
+								?>
 								
 								<div class="control-group">
                                         <label class="control-label">Enviar portafolios</label>
                                         <div class="controls">
                                             <select data-placeholder="Escoja varias opciones..." class="chzn-select span6" multiple tabindex="2" name="portafolios[]">
-                                                <option value="0"></option>
-                                                <option value="1">Topografía</option>
-                                                <option value="2">Construcción y Arquitectura</option>
-												<option value="3">Accesorios</option>
-												<option value="4">Agricultura</option>
-												<option value="5">Cartografía</option>
+												<?php foreach($data['data'] as $portafolio) {?>
+                                                    <option value="<?=$portafolio['cata_archivo'];?>"><?=$portafolio['cata_nombre'];?></option>
+                                                <?php }?>
 
 												<?php if($_SESSION["bd"]=='odermancom_orioncrm_exacta'){?>
                                                     <option value="6">Portafolio Exacta Ing.</option>
                                                 <?php }?>
-												
-                                                <option value="7">Brochure Laboratorio</option>
-                                                <option value="8">Portafolio Drones.</option>
-                                                <option value="9">Portafolio Estaciones totales</option>
                                             </select>
                                         </div>
                                    </div>

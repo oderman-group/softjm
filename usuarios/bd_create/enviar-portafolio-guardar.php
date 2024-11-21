@@ -1,6 +1,8 @@
 <?php
 require_once("../sesion.php");
 
+include_once(RUTA_PROYECTO."/usuarios/class/Api/JmEquipos.php");
+
 require '../../librerias/phpmailer/Exception.php';
 require '../../librerias/phpmailer/PHPMailer.php';
 require '../../librerias/phpmailer/SMTP.php';
@@ -10,20 +12,16 @@ use PHPMailer\PHPMailer\Exception;
 $idPagina = 365;
 $asesor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $_SESSION["id"] . "'"));
 
-
-
-$portafNombres = array("", "Topografía", "Construcción y Arquitectura", "Accesorios", "Agricultura", "Cartografía", "Completo Exacta Ing.", "Brochure Laboratorio", "Portafolio Drones", "Portafolio Estaciones totales");
-
 $numero = (count($_POST["portafolios"]));
+
 if ($numero > 0) {
-	
 	$contador = 0;
 	while ($contador < $numero) {
-		
-		$portafolios .= '<a href="'.REDIRECT_ROUTE.'/usuarios/files/portafolios/' . $_POST["portafolios"][$contador] . '.pdf">' . $portafNombres[$_POST["portafolios"][$contador]] . '</a><br>';
+		$portafolios .= '<a href="' . Api_JmEquipos::JM_URL_ARCHIVOS_PORTAFOLIOS . $_POST["portafolios"][$contador] . '">' . $_POST["portafolios"][$contador] . '</a><br>';
 		$contador++;
 	}
 }
+
 $numC = strlen($portafolios) - 1;
 $portafolios = substr($portafolios, 0, $numC);
 
@@ -38,10 +36,15 @@ if ($numero > 0) {
 		while ($ctes = mysqli_fetch_array($clientes)) {
 			
 			if ($ctes['cli_email'] != "" and !is_null($ctes['cli_email'])) {
-				$fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
+				$fin =  '<html><body style="background-color:#FFF;">';
+				$fin .=  '<div style="width: 100%; display: grid; place-content: center;">';
+				$fin .=  '
+				<div style="font-family:arial; background:#0033a0; width:600px; color:#FFF; text-align:center; padding:15px;">
+					<h3>PORTAFOLIOS</h3>
+				</div>
+				';
 				$fin .= '
-							<center>
-								<div style="font-family:arial; background:' . $configuracion["conf_fondo_mensaje"] . '; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
+							<div style="font-family:arial; background:#FAFAFA; width:600px; color:#000; text-align:justify; padding:15px;">
 
 									<p style="color:' . $configuracion["conf_color_letra"] . ';">
 									Cordial saludo estimado cliente.
@@ -59,17 +62,20 @@ if ($numero > 0) {
 									' . $asesor['usr_telefono'] . '
 									</p>
 
-									<p align="center" style="color:' . $configuracion["conf_color_letra"] . ';">
+									<p align="center" style="background:#0033a0; color:#FFF;">
 										' . $configuracion["conf_mensaje_pie"] . '<br>
-										<a href="' . $configuracion["conf_web"] . '" style="color:' . $configuracion["conf_color_link"] . ';">' . $configuracion["conf_web"] . '</a>
+										<a href="' . $configuracion["conf_web"] . '" style="color:#FFF;">' . $configuracion["conf_web"] . '</a>
 									</p>
 
 								</div>
+								</div>
+							</center>
+							</div>
 							</center>
 							<p>&nbsp;</p>
 						';
-				$fin .= '';
-				$fin .=  '<html><body>';
+				$fin .= '</div>';
+				$fin .=  '</body></html>';
 
 				// Instantiation and passing `true` enables exceptions
 				$mail = new PHPMailer(true);
@@ -90,8 +96,6 @@ if ($numero > 0) {
 
 					$mail->addAddress($ctes['cli_email'], $ctes['cli_nombre']);     // Add a recipient
 					$mail->addAddress($asesor['usr_email'], $asesor['usr_nombre']);     // Add a recipient
-
-
 
 					// Content
 					$mail->isHTML(true);                                  // Set email format to HTML
