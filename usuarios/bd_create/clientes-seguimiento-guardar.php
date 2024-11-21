@@ -1,19 +1,14 @@
 <?php
 require_once("../sesion.php");
 
+include_once(RUTA_PROYECTO."/usuarios/class/Api/JmEquipos.php");
+
 require '../../librerias/phpmailer/Exception.php';
 require '../../librerias/phpmailer/PHPMailer.php';
 require '../../librerias/phpmailer/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-	/*if($_POST["idTK"]==""){
-		mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_tikets(tik_asunto_principal, tik_tipo_tiket, tik_fecha_creacion, tik_usuario_responsable, tik_estado, tik_cliente, tik_prioridad, tik_observaciones, tik_canal)VALUES('TIKET AUTOMÁTICO','".$_POST["tipoS"]."','".$_POST["fechaContacto"]."','".$_SESSION["id"]."',2,'".$_POST["cliente"]."',1,'".$_POST["observaciones"]."','".$_POST["canal"]."')",$conexion);
-		if(mysql_errno()!=0){echo informarErrorAlUsuario(__LINE__, mysql_error()); exit();}
-		$tiketID = mysqli_insert_id($conexionBdPrincipal);
-	}else{
-		$tiketID = $_POST["idTK"];
-	}*/
 	if (empty($_POST["idTK"]) && empty($_POST["tiketCreado"])) {
 		mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_tikets(tik_asunto_principal, tik_tipo_tiket, tik_fecha_creacion, tik_usuario_responsable, tik_estado, tik_cliente, tik_prioridad, tik_observaciones, tik_canal)
 		VALUES('TIKCET AUTOMÁTICO',1,'" . $_POST["fechaContacto"] . "','" . $_SESSION["id"] . "',2,'" . $_POST["cliente"] . "',1,'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_POST["canal"] . "')");
@@ -71,59 +66,63 @@ use PHPMailer\PHPMailer\Exception;
 		mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_realizado=1 WHERE cseg_id='" . $idInsertU . "'");
 	}
 
-	$portafNombres = array("", "Topografía", "Construcción y Arquitectura", "Accesorios", "Agricultura", "Cartografía", "Completo Exacta Ing.", "Brochure Laboratorio", "Portafolio Drones", "Portafolio Estaciones totales");
-
     if(!empty($_POST["portafolios"])){
         $numero = (count($_POST["portafolios"]));
         if ($numero > 0) {
             $contador = 0;
             while ($contador < $numero) {
-                $portafolios .= '<a href="'.REDIRECT_ROUTE.'/usuarios/files/portafolios/' . $_POST["portafolios"][$contador] . '.pdf">' . $portafNombres[$_POST["portafolios"][$contador]] . '</a><br>';
+                $portafolios .= '<a href="' . Api_JmEquipos::JM_URL_ARCHIVOS_PORTAFOLIOS . $_POST["portafolios"][$contador] . '">' . $_POST["portafolios"][$contador] . '</a><br>';
                 $contador++;
             }
         }
         $numC = strlen($portafolios) - 1;
         $portafolios = substr($portafolios, 0, $numC);
 
-
-
         if ($numero > 0) {
             $contactoCLiente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='" . $_POST["contacto"] . "'"));
 
             $asesor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $_SESSION["id"] . "'"));
 
-            $fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
-            $fin .= '
-                        <center>
-                            <div style="font-family:arial; background:' . $configuracion["conf_fondo_mensaje"] . '; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
+            $fin =  '<html><body style="background-color:#FFF;">';
+			$fin .=  '<div style="width: 100%; display: grid; place-content: center;">';
+			$fin .=  '
+			<div style="font-family:arial; background:#0033a0; width:600px; color:#FFF; text-align:center; padding:15px;">
+				<h3>PORTAFOLIOS</h3>
+			</div>
+			';
+			$fin .= '
+							<div style="font-family:arial; background:#FAFAFA; width:600px; color:#000; text-align:justify; padding:15px;">
 
-                                <p style="color:' . $configuracion["conf_color_letra"] . ';">
-                                Cordial saludo estimado ' . strtoupper($contactoCLiente['cont_nombre']) . ',<br>
-                                </p>
+									<p style="color:' . $configuracion["conf_color_letra"] . ';">
+									Cordial saludo estimado cliente.
+									</p>
 
-                                <p>' . $configuracion["conf_emsj_portafolios"] . '</p>
+									<p>' . $configuracion["conf_emsj_portafolios"] . '</p>
 
-                                <p>' . $portafolios . '</p>
+									<p>' . $portafolios . '</p>
 
-                                <p>
-                                Cualquier duda o inquietud no dude en contactarnos.<br>
-                                Recuerde que el asesor que lo atendió en esta ocasión fue:<br>
-                                ' . strtoupper($asesor['usr_nombre']) . '<br>
-                                ' . strtolower($asesor['usr_email']) . '<br>
-                                ' . $asesor['usr_telefono'] . '
-                                </p>
+									<p>
+									Cualquier duda o inquietud no dude en contactarnos.<br>
+									Recuerde que el asesor que lo atendió en esta ocasión fue:<br>
+									' . strtoupper($asesor['usr_nombre']) . '<br>
+									' . strtolower($asesor['usr_email']) . '<br>
+									' . $asesor['usr_telefono'] . '
+									</p>
 
-                                <p align="center" style="color:' . $configuracion["conf_color_letra"] . ';">
-                                    ' . $configuracion["conf_mensaje_pie"] . '<br>
-                                    <a href="' . $configuracion["conf_web"] . '" style="color:' . $configuracion["conf_color_link"] . ';">' . $configuracion["conf_web"] . '</a>
-                                </p>
+									<p align="center" style="background:#0033a0; color:#FFF;">
+										' . $configuracion["conf_mensaje_pie"] . '<br>
+										<a href="' . $configuracion["conf_web"] . '" style="color:#FFF;">' . $configuracion["conf_web"] . '</a>
+									</p>
 
-                            </div>
-                        </center>
-                        <p>&nbsp;</p>
-                    ';
-            $fin .= '';
-            $fin .=  '<html><body>';
+								</div>
+								</div>
+							</center>
+							</div>
+							</center>
+							<p>&nbsp;</p>
+						';
+				$fin .= '</div>';
+				$fin .=  '</body></html>';
 
             // Instantiation and passing `true` enables exceptions
             $mail = new PHPMailer(true);
@@ -144,7 +143,6 @@ use PHPMailer\PHPMailer\Exception;
 
                 $mail->addAddress($contactoCLiente['cont_email'], $contactoCLiente['cont_nombre']);     // Add a recipient
                 $mail->addAddress($asesor['usr_email'], $asesor['usr_nombre']);     // Add a recipient
-
 
 
                 // Content
