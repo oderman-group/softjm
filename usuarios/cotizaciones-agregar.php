@@ -87,14 +87,7 @@ include("includes/js-formularios.php");
 
 											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 
-												if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
-													$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
-													WHERE zpu_usuario='".$_SESSION["id"]."' 
-													AND zpu_zona='".$resOp['cli_zona']."'");
-													$numZ = $consultaNumZ->num_rows;
-
-													if($numZ == 0) continue;
-												}
+												
 
 												$disabled = '';
 												$dealer   = '';
