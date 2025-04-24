@@ -95,9 +95,7 @@ include("includes/js-formularios.php");
 												if ($resOp['cli_categoria']== CLI_CATEGORIA_DEALER) {
 													$dealer = '(DEALER)';
 
-													if (!Modulos::validarRol([390], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
-														$disabled = 'disabled';
-													}	
+												
 												}
 
 
