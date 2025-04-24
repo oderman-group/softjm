@@ -84,6 +84,7 @@ include("includes/js-formularios.php");
 											WHERE cli_ciudad != ".CIUDADES_INTERNACIONALES."
 											AND cli_id_empresa='".$idEmpresa."'");
 
+											//Permiso para mostrar todos los clientes, incluyendo los internacionales.
 											$paginasParaValidar = [389];
 
 											if (Modulos::validarRol($paginasParaValidar, $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
@@ -108,7 +109,7 @@ include("includes/js-formularios.php");
 												if ($resOp['cli_categoria']== CLI_CATEGORIA_DEALER) {
 													$dealer = '(DEALER)';
 
-													if (!Modulos::validarRol([390], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+													if (!Modulos::validarRol([415], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 														$disabled = 'disabled';
 													}	
 												}
