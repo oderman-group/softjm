@@ -81,15 +81,9 @@ include("includes/js-formularios.php");
 											<option value=""></option>
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
-											WHERE cli_ciudad != ".CIUDADES_INTERNACIONALES."
-											AND cli_id_empresa='".$idEmpresa."'");
+											WHERE cli_id_empresa='".$idEmpresa."'");
 
-											$paginasParaValidar = [389];
-
-											if (Modulos::validarRol($paginasParaValidar, $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
-												WHERE cli_id_empresa='".$idEmpresa."'");
-											}
+											
 
 											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 
