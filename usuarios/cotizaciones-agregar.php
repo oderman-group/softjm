@@ -81,13 +81,27 @@ include("includes/js-formularios.php");
 											<option value=""></option>
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
-											WHERE cli_id_empresa='".$idEmpresa."'");
+											WHERE cli_ciudad != ".CIUDADES_INTERNACIONALES."
+											AND cli_id_empresa='".$idEmpresa."'");
 
-											
+											//Permiso para mostrar todos los clientes, incluyendo los internacionales.
+											$paginasParaValidar = [389];
+
+											if (Modulos::validarRol($paginasParaValidar, $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
+												WHERE cli_id_empresa='".$idEmpresa."'");
+											}
 
 											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 
-												
+												if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+													$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
+													WHERE zpu_usuario='".$_SESSION["id"]."' 
+													AND zpu_zona='".$resOp['cli_zona']."'");
+													$numZ = $consultaNumZ->num_rows;
+
+													if($numZ == 0) continue;
+												}
 
 												$disabled = '';
 												$dealer   = '';
@@ -95,7 +109,9 @@ include("includes/js-formularios.php");
 												if ($resOp['cli_categoria']== CLI_CATEGORIA_DEALER) {
 													$dealer = '(DEALER)';
 
-												
+													if (!Modulos::validarRol([415], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+														$disabled = 'disabled';
+													}	
 												}
 
 
