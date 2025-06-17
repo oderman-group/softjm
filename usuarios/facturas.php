@@ -187,9 +187,9 @@ $paginaActual['pag_nombre'] = "Facturas";
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 											
 											$czppFactura=$res['factura_id'];
-											if($res['factura_concepto']=="Traída de remisión"){
-												$czppFactura=$res['factura_remision'];
-											}
+											// if($res['factura_concepto']=="Traída de remisión"){
+											// 	$czppFactura=$res['factura_remision'];
+											// }
 
 											if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$consultaZona=mysqli_query($conexionBdPrincipal, "SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
@@ -208,6 +208,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 											
 											$consultaTotal = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
 													WHERE czpp_cotizacion='".$czppFactura."' AND czpp_valor>0 AND czpp_cantidad>0
+													AND czpp_tipo=".CZPP_TIPO_FACT."
 													GROUP BY czpp_id
 													");
 
@@ -303,10 +304,11 @@ $paginaActual['pag_nombre'] = "Facturas";
 													$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
 													INNER JOIN productos ON prod_id=czpp_producto
 													WHERE czpp_cotizacion='" . $czppFactura . "'
+													AND czpp_tipo=".CZPP_TIPO_FACT."
 													");
 													$i = 1;
 													while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
-														echo "<b>" . $i . ".</b> " . $prod['prod_nombre'] . "</br>";
+														echo "<b>" . $i . ".</b> " . $prod['prod_nombre'] . " <b>(".$prod['czpp_cantidad']." Unds.)</b></br>";
 														$i++;
 													}
 													?>
