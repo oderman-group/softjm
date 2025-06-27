@@ -1,349 +1,206 @@
-<?php
-include("../sesion.php");
-$idPagina = 373;
-if (!empty($_GET["cte"]) AND $_GET["cte"] == 1) {
-	$_GET["id"] = base64_decode($_GET["id"]);
-} else {
-	if ($_SESSION["id"] == "")
-		header("Location:../../salir.php");
-}
-
-//CONFIGURACIÓN DEL PROGRAMA
-$monedas = array("", "COP", "USD");
-$simbolosMonedas = array("", "$", "USD");
-
-
-$configuracion = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM configuracion WHERE conf_id=1"), MYSQLI_BOTH);
-
-$resultado = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos
-INNER JOIN clientes ON cli_id=pedid_cliente
-INNER JOIN sucursales ON sucu_id=pedid_sucursal
-INNER JOIN contactos ON cont_id=pedid_contacto
-INNER JOIN usuarios ON usr_id=pedid_vendedor
-WHERE pedid_id='" . $_GET["id"] . "'"), MYSQLI_BOTH);
-$consulta=$conexionBdAdmin->query("SELECT * FROM documentos_configuracion 
-WHERE dconf_id_empresa= '".$idEmpresa."' 
-AND dconf_id_documento= '".ID_DOC_PEDIDO."';");
-$configuracionDoc = mysqli_fetch_array($consulta, MYSQLI_BOTH);
-$fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', $configuracionDoc["dconf_estilo_letra"]) . "&display=swap";
-?>
-<!DOCTYPE HTML>
-<html lang="en">
-
+<!DOCTYPE html>
+<html lang="es">
 <head>
-	<meta charset="utf-8">
-	<title>Pedido <?= $resultado['pedid_id']; ?> (<?= $resultado['pedid_propuesta']; ?>) - <?= $resultado['pedid_nombre']; ?></title>
-	<link rel="stylesheet" href="<?php echo $fontLink;?>">
-	<style type="text/css">
-		#contenedor {
-			max-height: 1122px;
-			max-width: 793px;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impresión de Pedido - #12345</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        /* Estilos personalizados para impresión */
+        @media print {
+            body {
+                font-family: Arial, sans-serif;
+                font-size: 10pt;
+            }
+            .container-fluid {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            .table th, .table td {
+                padding: 0.5rem;
+                font-size: 9pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            /* Eliminar márgenes de página si es posible */
+            @page {
+                margin: 0.5cm;
+            }
+            /* Esto es CRUCIAL para que los encabezados y pies de tabla se repitan */
+            .table thead { display: table-header-group; }
+            .table tfoot { display: table-footer-group; }
+            /* Evitar que las filas de la tabla se rompan entre páginas */
+            .table tbody tr {
+                page-break-inside: avoid;
+            }
+            /* Forzar el salto de página después del encabezado principal si es muy largo,
+               o después de un bloque específico que quieras que comience en una nueva página.
+               NO USAR ESTO PARA EL ENCABEZADO PRINCIPAL QUE QUIERES REPETIR.
+               Esto es solo un ejemplo si tuvieras una sección grande entre el encabezado
+               y la tabla que no quieres que se rompa. */
+            /* .header-section { page-break-after: always; } */
+
+            /* Para el encabezado y pie de página de toda la "página de impresión"
+               (no de la tabla) que se repita en cada hoja.
+               Requiere un posicionamiento más avanzado y puede ser un poco más complicado
+               de alinear perfectamente con el contenido si el contenido varía mucho en altura.
+               Generalmente, es mejor dejar que el navegador repita los thead/tfoot de la tabla.
+               Si necesitas un encabezado/pie de página GLOBAL que se repita en CADA hoja,
+               tendrías que usar position: fixed y jugar con los márgenes del @page
+               para dejar espacio. Aquí un ejemplo si lo necesitaras para elementos fuera de la tabla:
+            */
+            /*
+            .global-print-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 100px; /* Ajusta esto a la altura de tu encabezado *
+                background-color: white;
+                padding: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+            .global-print-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 50px; /* Ajusta esto a la altura de tu pie de página *
+                background-color: white;
+                padding: 10px;
+                border-top: 1px solid #ccc;
+            }
+            body {
+                padding-top: 100px; /* Deja espacio para el encabezado fijo *
+                padding-bottom: 50px; /* Deja espacio para el pie de página fijo *
+            }
+            */
+        }
+        /* Estilos generales */
+        body {
+            background-color: #f8f9fa;
+        }
+        .invoice-box {
+            background-color: #fff;
+            padding: 30px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .header-section, .footer-section {
+            padding-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        .footer-section {
+            border-bottom: none; /* Quitamos el borde inferior si solo es un bloque de notas */
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .text-end {
+            text-align: right !important;
+        }
+        .table thead th {
+            background-color: #e9ecef;
+        }
+        .logo {
+            max-width: 150px;
+            height: auto;
+        }
+    </style>
 </head>
+<body>
 
-<body style="font-family:<?php echo $configuracionDoc['dconf_estilo_letra'] ?? 'Verdana, sans-serif'; ?>; font-size:<?php echo $configuracionDoc['dconf_tamano_letra'] ?? '11'; ?>px;">
-	<!--
-<div style="text-align:left;"><img src="https://softjm.com/usuarios/files/logojm.png" width="300"></div>
+    <div class="container invoice-box">
+        <div class="text-center mb-4 no-print">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir Pedido</button>
+        </div>
 
+        <div class="row header-section">
+            <div class="col-md-6">
+                <h4 class="mb-1">Nombre de Tu Empresa S.A.S.</h4>
+                <p class="mb-0">Dirección: Calle 123 #45-67, Tu Ciudad</p>
+                <p class="mb-0">Teléfono: +57 300 123 4567</p>
+                <p class="mb-0">Email: info@tuempresa.com</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <h2 class="mb-1">PEDIDO #12345</h2>
+                <p class="mb-0"><strong>Fecha del Pedido:</strong> 27 de Junio de 2025</p>
+                <p class="mb-0"><strong>Fecha de Entrega:</strong> 30 de Junio de 2025</p>
+                <p class="mb-0"><strong>Cliente:</strong> Juan Pérez S.A.</p>
+                <p class="mb-0"><strong>NIT/C.C.:</strong> 900.123.456-7</p>
+                <p class="mb-0"><strong>Dirección Cliente:</strong> Av. Principal #89-01, Otra Ciudad</p>
+            </div>
+        </div>
 
-<div style="width: 100%; height: 40px; background-color: #fbbd01; text-align: center; font-size: 20px; font-weight: bold;">
-	<p style="padding: 10px;">COTIZACIÓN</p>
-</div>
--->
-	<img src="../images/<?= $configuracion['conf_encabezado_pedido']; ?>" style="width: 793px;"><br>
-	<img src="../images/<?= $configuracion['conf_encabezado2_pedido']; ?>" style="width: 793px;">
+        <div class="row">
+            <div class="col-12">
+                <h5 class="mb-3">Detalles del Pedido:</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Descripción del Producto</th>
+                                <th scope="col" class="text-end">Cantidad</th>
+                                <th scope="col" class="text-end">Precio Unitario</th>
+                                <th scope="col" class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php for ($i = 1; $i <= 15; $i++): ?>
+                            <tr>
+                                <th scope="row"><?php echo $i; ?></th>
+                                <td>Producto <?php echo chr(64 + $i); ?> - Descripción detallada del item <?php echo $i; ?></td>
+                                <td class="text-end"><?php echo rand(1, 5); ?></td>
+                                <td class="text-end">$<?php echo number_format(rand(10000, 100000), 0, ',', '.'); ?></td>
+                                <td class="text-end">$<?php echo number_format(rand(10000, 500000), 0, ',', '.'); ?></td>
+                            </tr>
+                            <?php endfor; ?>
+                            </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="4" class="text-end">Subtotal:</th>
+                                <td class="text-end">$200.000</td>
+                            </tr>
+                            <tr>
+                                <th colspan="4" class="text-end">Descuento (5%):</th>
+                                <td class="text-end">-$10.000</td>
+                            </tr>
+                            <tr>
+                                <th colspan="4" class="text-end">IVA (19%):</th>
+                                <td class="text-end">$36.100</td>
+                            </tr>
+                            <tr class="fw-bold">
+                                <th colspan="4" class="text-end">Total a Pagar:</th>
+                                <td class="text-end">$226.100</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-	<div id="contenedor">
-		<?php
-		$formaPago = array("", "CONTADO", "CRÉDITO");
-		?>
-		<div style="margin: 10px;">
-			<table width="100%">
-				<tr>
-					<td width="60%">
-						<span style="font-size: 16px; font-weight: bold;">CLIENTE:</span><br>
-						<?= strtoupper($resultado['cli_nombre']); ?><br>
-						<strong>NIT:</strong> <?= $resultado['cli_usuario']; ?><br>
-						<strong>DIRECCIÓN:</strong> <?= $resultado['cli_direccion']; ?><br>
-						<strong>EMAIL:</strong> <?= $resultado['cli_email']; ?><br>
-						<strong>TELÉFONO:</strong> <?= $resultado['cli_telefono']; ?><br>
-						<strong>CELULAR:</strong> <?= $resultado['cli_celular']; ?><br>
-						<strong>CONTACTO:</strong> <?= $resultado['cont_nombre']; ?><br>
+        <div class="row mt-4">
+            <div class="col-12">
+                <p><strong>Notas del Pedido:</strong></p>
+                <p>Favor revisar los productos al momento de la entrega. Cualquier reclamo, por favor, comunicarse dentro de las 24 horas siguientes.</p>
+            </div>
+        </div>
 
-					</td>
-					<td width="40%">
-						<span style="font-size: 16px; font-weight: bold;">PEDIDO # <?= $_GET["id"]; ?></span><br>
-						<strong>FECHA PROPUESTA:</strong> <?= $resultado['pedid_fecha_propuesta']; ?><br>
-						<strong>FECHA VENCIMIENTO:</strong> <?= $resultado['pedid_fecha_vencimiento']; ?><br>
-						<strong>FORMA DE PAGO:</strong> <?= $formaPago[$resultado['pedid_forma_pago']]; ?><br>
-						<strong>VENDEDOR:</strong> <?= strtoupper($resultado['usr_nombre']); ?><br>
-						<strong>EMAIL:</strong> <?= strtoupper($resultado['usr_email']); ?>
-					</td>
-				</tr>
-			</table>
-		</div>
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <p>¡Gracias por tu pedido!</p>
+                <p>Visítanos en: www.tuempresa.com</p>
+            </div>
+        </div>
 
-		<div style="margin: 10px; font-size: 10px;" align="center">
-			<table width="100%" border="0" rules="groups">
-				<thead>
-					<tr style="background-color:<?php echo $configuracionDoc['dconf_estilo'] ?? '#00002b'; ?>; height: 50px; color: white;">
-						<th>No</th>
-						<th>&nbsp;</th>
-						<th>Producto/Servicio</th>
-						<th>Cant.</th>
-						<th>Valor</th>
-						<th>IVA</th>
-						<th>Dcto.</th>
-						<th>SUBTOTAL</th>
-					</tr>
-				</thead>
-				<tbody>
+    </div>
 
-					<!-- COMBOS -->
-					<?php
-						$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos
-		INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."'
-		ORDER BY czpp_orden");
-
-
-						while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
-							$dcto = 0;
-							$valorTotal = 0;
-
-							$valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
-
-							if ($prod['czpp_cantidad'] > 0 and $prod['czpp_descuento'] > 0) {
-								$dcto = ($valorTotal * ($prod['czpp_descuento'] / 100));
-								$totalDescuento += $dcto;
-							}
-
-							$valorConDcto = $valorTotal - $dcto;
-
-							$totalIva += ($valorConDcto * ($prod['czpp_impuesto'] / 100));
-
-							$subtotal += $valorTotal;
-
-
-							$totalCantidad += $prod['czpp_cantidad'];
-
-							$fondo = 'white';
-							if ($no % 2 == 0) {
-								$fondo = 'lightgray';
-							}
-
-							$precioNormalCombo = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT SUM(copp_cantidad*prod_precio) FROM combos_productos
-								INNER JOIN productos ON prod_id=copp_producto
-								WHERE copp_combo='".$prod['combo_id']."'"), MYSQLI_BOTH);
-						?>
-							<tr style="height: 30px; background-color: <?= $fondo; ?>;">
-								<td align="center"><?= $no; ?></td>
-								<td align="center">
-									<?php if ($prod['combo_imagen'] != "") { ?>
-										<img src="../files/combos/<?= $prod['combo_imagen']; ?>" width="40">
-									<?php } ?>
-								</td>
-								<td>
-									<?= $prod['combo_nombre']; ?><br>
-
-									<?php if($prod['combo_descuento']!="" and $resultado['cotiz_ocultar_descuento_combo']=='0'){?>
-										<span><b>Precio Normal:</b> $<?=number_format($precioNormalCombo[0],0,".",".");?></span><br>
-										<span><b>Descuento:</b> <?=$prod['combo_descuento'];?>%</span><br>
-									<?php }?>
-
-									<span style="font-size: 9px; color: darkblue;"><?= $prod['combo_descripcion']; ?></span><br>
-									<span style="font-size: 9px; color: teal;">
-										<?php
-										$productosCombo = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
-										INNER JOIN productos_categorias ON catp_id=prod_categoria
-										INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='" . $prod['combo_id'] . "'
-										ORDER BY copp_id");
-										$c = 1;
-										while ($prodCombo = mysqli_fetch_array($productosCombo, MYSQLI_BOTH)) {
-											if ($c == 1) {
-												echo "<br><b>INCLUYE:</b><br>";
-											}
-											echo $prodCombo['prod_nombre'] . " (" . $prodCombo['copp_cantidad'] . " Unds.).<br>";
-											$c++;
-										}
-										?>
-									</span>
-									<span style="font-size: 9px; color: darkblue;"><?= $prod['czpp_observacion']; ?></span>
-								</td>
-								<td align="center" class="alinear"><?= $prod['czpp_cantidad']; ?></td>
-								<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format($prod['czpp_valor'], 0, ",", "."); ?></td>
-								<td align="center" class="alinear"><?= $prod['czpp_impuesto']; ?>%</td>
-								<td align="center" class="alinear"><?= $prod['czpp_descuento']; ?>%</td>
-								<td align="right" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format($valorTotal, 0, ",", "."); ?></td>
-							</tr>
-						<?php
-							$no++;
-						}
-						?>
-
-
-				
-					<?php
-					//Productos
-					$no = 1;
-					$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
-		INNER JOIN productos_categorias ON catp_id=prod_categoria
-		INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."'
-		ORDER BY czpp_orden");
-					while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
-						$dcto = 0;
-							$valorTotal = 0;
-
-							$valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
-
-							if ($prod['czpp_cantidad'] > 0 and $prod['czpp_descuento'] > 0) {
-								$dcto = ($valorTotal * ($prod['czpp_descuento'] / 100));
-								$totalDescuento += $dcto;
-							}
-
-							$valorConDcto = $valorTotal - $dcto;
-
-							$totalIva += ($valorConDcto * ($prod['czpp_impuesto'] / 100));
-
-							$subtotal += $valorTotal;
-
-
-							$totalCantidad += $prod['czpp_cantidad'];
-						$total += $subtotal;
-
-						$fondo = 'white';
-						if ($no % 2 == 0) {
-							$fondo = 'lightgray';
-						}
-					?>
-						<tr style="height: 30px; background-color: <?= $fondo; ?>;">
-							<td align="center"><?= $no; ?></td>
-							<td align="center">
-								<?php if ($prod['prod_foto'] != "") { ?>
-									<img src="../files/productos/<?= $prod['prod_foto']; ?>" width="40">
-								<?php } ?>
-							</td>
-							<td>
-								<?= "<b>" . $prod['prod_referencia'] . "</b> " . $prod['prod_nombre']; ?><br>
-								<span style="font-size: 9px; color: darkblue;"><?= $prod['prod_descripcion_corta']; ?></span<br>
-									<span style="font-size: 9px; color: darkblue;"><?= $prod['czpp_observacion']; ?></span>
-							</td>
-							<td align="center"><?= $prod['czpp_cantidad']; ?></td>
-							<td align="right"><?= $simbolosMonedas[$resultado['pedid_moneda']]; ?><?= number_format($prod['czpp_valor'], 0, ",", "."); ?></td>
-							<td align="center"><?= $prod['czpp_impuesto']; ?>%</td>
-							<td align="center"><?= $prod['czpp_descuento']; ?>%</td>
-							<td align="right"><?= $simbolosMonedas[$resultado['pedid_moneda']]; ?><?= number_format($subtotal, 0, ",", "."); ?></td>
-						</tr>
-					<?php
-						$no++;
-					}
-					?>
-
-
-						
-					<?php
-					//Servicios
-					$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM servicios
-		INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."'
-		ORDER BY czpp_orden");
-					while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
-						$valorTotal += ($prod['czpp_valor'] * $prod['czpp_cantidad']);
-
-						$totalIva += ($prod['czpp_cantidad'] * ($prod['czpp_valor'] * ($prod['czpp_impuesto'] / 100)));
-
-						$valorTotal = $prod['czpp_valor'] + ($prod['czpp_valor'] * ($prod['czpp_impuesto'] / 100));
-
-						if ($prod['czpp_cantidad'] > 0 and $prod['czpp_descuento'] > 0) {
-							$totalDescuento += $prod['czpp_cantidad'] * ($valorTotal * ($prod['czpp_descuento'] / 100));
-						}
-
-						$valorTotal = $valorTotal - ($valorTotal * ($prod['czpp_descuento'] / 100));
-
-						$subtotal = ($prod['czpp_cantidad'] * $valorTotal);
-						$total += $subtotal;
-
-
-						$totalCantidad += $prod['czpp_cantidad'];
-
-						$fondo = 'white';
-						if ($no % 2 == 0) {
-							$fondo = 'lightgray';
-						}
-					?>
-						<tr style="height: 30px; background-color: <?= $fondo; ?>;">
-							<td align="center"><?= $no; ?></td>
-							<td align="center">&nbsp;</td>
-							<td>
-								<?= $prod['serv_nombre']; ?><br>
-								<span style="font-size: 9px; color: darkblue;"><?= $prod['czpp_observacion']; ?></span>
-							</td>
-							<td align="center"><?= $prod['czpp_cantidad']; ?></td>
-							<td align="right"><?= $simbolosMonedas[$resultado['pedid_moneda']]; ?><?= number_format($prod['czpp_valor'], 0, ",", "."); ?></td>
-							<td align="center"><?= $prod['czpp_impuesto']; ?>%</td>
-							<td align="center"><?= $prod['czpp_descuento']; ?>%</td>
-							<td align="right"><?= $simbolosMonedas[$resultado['pedid_moneda']]; ?><?= number_format($subtotal, 0, ",", "."); ?></td>
-						</tr>
-					<?php
-						$no++;
-					}
-					?>
-				</tbody>
-
-
-				<?php
-					$total = $subtotal - $totalDescuento;
-					$total += $totalIva;
-
-					?>
-
-				<tfoot>
-					<tr style="font-weight: bold; font-size: 13px; height: 30px;">
-						<td colspan="6" rowspan="4">
-							<!--
-						<div style="text-align: justify; font-size: 10px; font-weight: normal;">
-							<h3>Términos y condiciones</h3>
-							<strong>GARANTÍA:</strong> Un año por desperfectos de fabricación para los equipos 3 meses para los accesorios.<br><br>
-							<strong>TIEMPO DE ENTREGA:</strong> Si se encuentra en Stock sería inmediatamente, de lo contrario 20 días aproximadamente.
-						</div>
-						-->
-							<?= $resultado['pedid_observaciones']; ?>
-						</td>
-						<td style="text-align: right;">SUBTOTAL</td>
-						<td align="right""><?= $simbolosMonedas[$resultado['pedid_moneda']]; ?><?= number_format($subtotal, 0, ",", "."); ?></td>
-			</tr>
-			<tr style=" font-weight: bold; font-size: 13px; height: 30px;">
-
-						<td style="text-align: right;">DESCUENTO</td>
-						<td align="right"><?= $simbolosMonedas[$resultado['pedid_moneda']]; ?><?= number_format($totalDescuento, 0, ",", "."); ?></td>
-					</tr>
-					<tr style="font-weight: bold; font-size: 13px; height: 30px;">
-
-						<td style="text-align: right;">IVA</td>
-						<td align="right"><?= $simbolosMonedas[$resultado['pedid_moneda']]; ?><?= number_format($totalIva, 0, ",", "."); ?></td>
-					</tr>
-					<tr style="font-weight: bold; font-size: 13px; height: 30px;">
-
-						<td style="text-align: right; background-color: <?php echo $configuracionDoc['dconf_estilo'] ?? '#00002b'; ?>;">TOTAL NETO</td>
-						<td align="right" style="background-color: <?php echo $configuracionDoc['dconf_estilo'] ?? '#00002b'; ?>;"><?= $simbolosMonedas[$resultado['pedid_moneda']]; ?><?= number_format($total, 0, ",", "."); ?></td>
-					</tr>
-				</tfoot>
-
-			</table>
-
-
-
-		</div>
-
-
-	</div>
-
-	<p>&nbsp;</p>
-	<p><img src="../images/<?= $configuracion['conf_pie_pedido']; ?>" style="width: 793px;"></p>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9Gkcqila03B2R6Spm0n/o0" crossorigin="anonymous"></script>
 </body>
-
-<script type="application/javascript">
-	print();
-</script>
-
 </html>
