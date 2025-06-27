@@ -248,17 +248,17 @@ use PHPMailer\PHPMailer\Exception;
 					</center>
 					<p>&nbsp;</p>
 				';
-		$fin .= '';
-		$fin .=  '<html><body>';
-		$sfrom = $configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
-		$sdestinatario = $cliente['cli_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-		$ssubject = "CRM - Seguimiento a clientes"; //ASUNTO DEL MENSAJE 				
-		$shtml = $fin; //MENSAJE EN SI			
-		$sheader = "From:" . $sfrom . "\nReply-To:" . $sfrom . "\n";
-		$sheader = $sheader . "X-Mailer:PHP/" . phpversion() . "\n";
-		$sheader = $sheader . "Mime-Version: 1.0\n";
-		$sheader = $sheader . "Content-Type: text/html; charset=UTF-8\r\n";
-		@mail($sdestinatario, $ssubject, $shtml, $sheader);
+		// $fin .= '';
+		// $fin .=  '<html><body>';
+		// $sfrom = $configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
+		// $sdestinatario = $cliente['cli_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
+		// $ssubject = "CRM - Seguimiento a clientes"; //ASUNTO DEL MENSAJE 				
+		// $shtml = $fin; //MENSAJE EN SI			
+		// $sheader = "From:" . $sfrom . "\nReply-To:" . $sfrom . "\n";
+		// $sheader = $sheader . "X-Mailer:PHP/" . phpversion() . "\n";
+		// $sheader = $sheader . "Mime-Version: 1.0\n";
+		// $sheader = $sheader . "Content-Type: text/html; charset=UTF-8\r\n";
+		// @mail($sdestinatario, $ssubject, $shtml, $sheader);
 	}
 
 	if ($_POST["canalPC"] == 4) {
@@ -288,17 +288,17 @@ use PHPMailer\PHPMailer\Exception;
 					</center>
 					<p>&nbsp;</p>
 				';
-		$fin .= '';
-		$fin .=  '<html><body>';
-		$sfrom = $configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
-		$sdestinatario = $cliente['cli_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-		$ssubject = "Visita programada - JMEQUIPOS"; //ASUNTO DEL MENSAJE 				
-		$shtml = $fin; //MENSAJE EN SI			
-		$sheader = "From:" . $sfrom . "\nReply-To:" . $sfrom . "\n";
-		$sheader = $sheader . "X-Mailer:PHP/" . phpversion() . "\n";
-		$sheader = $sheader . "Mime-Version: 1.0\n";
-		$sheader = $sheader . "Content-Type: text/html; charset=UTF-8\r\n";
-		@mail($sdestinatario, $ssubject, $shtml, $sheader);
+		// $fin .= '';
+		// $fin .=  '<html><body>';
+		// $sfrom = $configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
+		// $sdestinatario = $cliente['cli_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
+		// $ssubject = "Visita programada - JMEQUIPOS"; //ASUNTO DEL MENSAJE 				
+		// $shtml = $fin; //MENSAJE EN SI			
+		// $sheader = "From:" . $sfrom . "\nReply-To:" . $sfrom . "\n";
+		// $sheader = $sheader . "X-Mailer:PHP/" . phpversion() . "\n";
+		// $sheader = $sheader . "Mime-Version: 1.0\n";
+		// $sheader = $sheader . "Content-Type: text/html; charset=UTF-8\r\n";
+		// @mail($sdestinatario, $ssubject, $shtml, $sheader);
 	}
 
 	echo '<script type="text/javascript">window.location.href="../clientes-seguimiento-editar.php?id=' . $idInsertU . '&msg=1&idTK=' . $tiketID . '&cte=' . $_POST["cliente"] . '";</script>';
