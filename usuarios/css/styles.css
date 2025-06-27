@@ -2789,3 +2789,8 @@ position:relative;
  margin-left: 0;
 }
 }
+
+.normalLink {
+	text-decoration: underline;
+	color: #0044cc;
+}
