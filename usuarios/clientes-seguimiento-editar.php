@@ -282,6 +282,13 @@ include("includes/js-formularios.php");
                                         <input type="checkbox" value="1" name="vendio" <?php if($resultadoD['cseg_vendio']==1) echo "checked";?>>
 									</div>
 								</div>
+
+								<div class="control-group">
+									<label class="control-label">¿Hubo demostración?</label>
+									<div class="controls">
+                                        <input type="checkbox" value="1" name="demostracion" <?php if($resultadoD['cseg_demostracion']==1) echo "checked";?>>
+									</div>
+								</div>
 								
                                 <div class="control-group">
 									<label class="control-label"># Cotización</label>
