@@ -44,14 +44,19 @@ use PHPMailer\PHPMailer\Exception;
 		$vendio = 1;
 	}
 
+	$demostracion = 0;
+	if ($_POST["demostracion"] == 1) {
+		$demostracion = 1;
+	}
+
 	if (!empty($_POST["encargado"])) {
 		$numero = (count($_POST["encargado"]));
 
 		if ($numero == 1) {
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_archivo, cseg_cotizo, cseg_vendio, cseg_consiguio_datos, cseg_forma_contacto)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["encargado"][0] . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $archivo . "','" . $cotizo . "','" . $vendio . "','" . $datos . "','" . $_POST["formaContacto"] . "')");
+			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_archivo, cseg_cotizo, cseg_vendio, cseg_consiguio_datos, cseg_forma_contacto, cseg_demostracion)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["encargado"][0] . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $archivo . "','" . $cotizo . "','" . $vendio . "','" . $datos . "','" . $_POST["formaContacto"] . "','" . $demostracion . "')");
 			$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 		} elseif ($numero > 1) {
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_varios, cseg_archivo, cseg_forma_contacto)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $numero . "','" . $archivo . "','" . $_POST["formaContacto"] . "')");
+			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_varios, cseg_archivo, cseg_forma_contacto, cseg_demostracion)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $numero . "','" . $archivo . "','" . $_POST["formaContacto"] . "','" . $demostracion . "')");
 			$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 		}
 	} else {
@@ -165,15 +170,16 @@ use PHPMailer\PHPMailer\Exception;
     }
 
 
-	/*
+	
 	if ($_POST["notf"] == 1) {
 
 		$contador = 0;
 		while ($contador < $numero) {
 			mysqli_query($conexionBdPrincipal,"INSERT INTO notificaciones(not_asunto, not_cliente, not_usuario, not_visto, not_estado, not_seguimiento, not_fecha)VALUES('" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "', '" . $_POST["cliente"] . "', '" . $_POST["encargado"][$contador] . "', 0, 1, '" . $idInsertU . "', now())");
-			
+			$contador++;
 		}
 
+		/*
 		$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='" . $_POST["cliente"] . "'"));
 
 		$fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
@@ -212,7 +218,8 @@ use PHPMailer\PHPMailer\Exception;
 		$sheader = $sheader . "Mime-Version: 1.0\n";
 		$sheader = $sheader . "Content-Type: text/html; charset=UTF-8\r\n";
 		@mail($sdestinatario, $ssubject, $shtml, $sheader);
-	}*/
+		*/
+	}
 
 	if ($_POST["notfCliente"] == 1 and $_POST["canalPC"] != 4) {
 		$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='" . $_POST["cliente"] . "'"));
