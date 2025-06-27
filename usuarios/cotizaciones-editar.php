@@ -18,6 +18,16 @@ if(isset($_GET["cte"])){
 }else{
 	$cliente = $resultadoD['cotiz_cliente'];
 }
+
+require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
+
+$predicado = [
+	'pedid_cotizacion' => $resultadoD['cotiz_id'],
+	'pedid_id_empresa' => $idEmpresa
+];
+
+$pedidoAsociado = Pedido::Select($predicado);
+$pedidoAsociadoDatos = mysqli_fetch_array($pedidoAsociado, MYSQLI_BOTH);
 ?>
 
 <link href="css/chosen.css" rel="stylesheet">
@@ -203,7 +213,8 @@ include("includes/js-formularios.php");
 			<?php
 			if($resultadoD['cotiz_vendida']==1){
 			?>
-				<p style="color: black; background-color: aquamarine; padding: 10px; font-weight: bold;">Esta cotización ya generó pedido en la siguiente fecha: <?=$resultadoD['cotiz_fecha_vendida'];?>.</p>
+				<p style="color: black; background-color: aquamarine; padding: 10px; font-weight: bold;">Esta cotización ya generó pedido en la siguiente fecha: <?=$resultadoD['cotiz_fecha_vendida'];?>. 
+				<a href="pedidos.php?busqueda=<?=$pedidoAsociadoDatos['pedid_id'];?>" class="btn btn-success"> Ver pedido número <?=$pedidoAsociadoDatos['pedid_id'];?></a></p>
 				<p style="color: black; background-color: gold; padding: 10px; font-weight: bold;"> No es posible hacer más cambios en esta cotización.</p>
 			<?php
 			}
