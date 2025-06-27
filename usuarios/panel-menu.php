@@ -422,13 +422,14 @@ FLOT PIE CHART
 					<div class="alert alert-info">
 						<i class="icon-exclamation-sign"></i>
 						<strong>Información!</strong>
-						Haga click sobre el botón <b>completar tarea</b> y ésta quedará completada y desaparecerá de esta lista.
+						Haga click sobre el botón <b>completar tarea</b> y ésta quedará completada.
 					</div>
 					
 					<div class="tab-widget">
 						<ul class="nav nav-tabs" id="myTab1">
 							<li class="active"><a href="#user"><i class="icon-tasks"></i> Tareas para hoy</a></li>
-							<li><a href="#task"><i class=" icon-tasks"></i> Tareas para mañana</a></li>
+							<li><a href="#task"><i class="icon-time"></i> Tareas para mañana</a></li>
+							<li><a href="#task-old"><i class="icon-warning-sign"></i> Tareas vencidas</a></li>
 						</ul>
 						<div class="tab-content">
 							<div class="tab-pane active" id="user">
@@ -443,7 +444,8 @@ FLOT PIE CHART
 										$consultaClienteSeguimiento=$conexionBdPrincipal->query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()), cseg_usuario_encargado FROM cliente_seguimiento 
 										WHERE cseg_id='".$tkRes['cseg_id']."'");
 										$segHoy = mysqli_fetch_array($consultaClienteSeguimiento, MYSQLI_BOTH);
-										if(($segHoy[0]<0 and $tkRes['cseg_realizado']==1) or $segHoy[0]>0) continue;
+										//Si la tarea está vencida o no es de noy la omitimos
+										if($segHoy[0] <> 0) continue;
 									?>
                                     <div class="user_block">
 										<div class="info_block">
@@ -451,7 +453,6 @@ FLOT PIE CHART
 												<img width="46" height="46" alt="User" src="images/user-thumb1.png">
 											</div>
 											<ul class="list_info clearfix">
-												<?php if($segHoy[0]<0){?><li><span style="color: red;">TAREA VENCIDA (Hace <?=($segHoy[0]*-1);?> días)</span></li><?php }?>
 												<li><span>Cliente: <i><a href="clientes-editar.php?id=<?=$tkRes['cli_id'];?>" target="_blank"><?=$tkRes['cli_nombre'];?></a></i></span></li>
                                                 <li><span>Asunto: <b><?=$tkRes['cseg_asunto'];?></b></span></li>
 												<li><span>Creador del seguimiento: <b><?=$tkRes['usr_nombre'];?></b></span></li>
@@ -465,9 +466,17 @@ FLOT PIE CHART
 												<a href="clientes-seguimiento-editar.php?id=<?=$tkRes['cseg_id'];?>&idTK=<?=$tkRes['cseg_tiket'];?>" class="btn btn-mini" target="new"><i class=" icon-list-alt"></i> Más detalles</a>
                                                 <!--<a href="#" onClick='window.open("clientes-tikets-editar.php?id=<?=$tkRes['tik_id'];?>","EditarTiket","width=1200,height=800,menubar=no")' class="btn "><i class=" icon-edit"></i> Editar</a>-->
 											</div>
-											<div class="btn-group pull-right">
-												<a href="bd_update/cliente-seguimiento-estado-update.php?id=<?=$tkRes['cseg_id'];?>&get=28" class="btn"><i class="icon-ok-circle"></i> Completar tarea</a>
-											</div>
+											<?php if ($tkRes['cseg_realizado'] != 1) {?>
+												<div class="btn-group pull-right">
+													<a href="bd_update/cliente-seguimiento-estado-update.php?id=<?=$tkRes['cseg_id'];?>&get=28" class="btn"><i class="icon-ok-circle"></i> Completar tarea</a>
+												</div>
+											<?php } else {?>
+												<div class="btn-group pull-right" style="margin-bottom: 20px;">
+													<button class="btn btn-round-min btn-success"><span><i class="icon-ok"></i></span></button>
+												</div>
+											<?php }?>
+
+											
 										</div>
 									</div>
 									<?php }?>
@@ -515,6 +524,54 @@ FLOT PIE CHART
 											</div>
 											<div class="btn-group pull-right">
 												<!--<a href="sql.php?id=<?=$tkRes['tik_id'];?>&get=24" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" class="btn"><i class=" icon-remove-sign"></i> Eliminar</a>-->
+											</div>
+										</div>
+									</div>
+									<?php }?>
+                                    
+								</div>
+							</div>
+
+							<div class="tab-pane" id="task-old">
+								<div class="user_list">
+									
+									<?php
+									$tikets3 = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
+									INNER JOIN clientes ON cli_id=cseg_cliente
+									INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
+									WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND cseg_fecha_proximo_contacto!='0000-00-00'
+									");
+									while($tkRes3 = mysqli_fetch_array($tikets3, MYSQLI_BOTH)){
+										switch($tkRes3['cseg_tipo']){
+											case 1: $tipoS = 'Comercial'; $etiquetaT='success'; break;
+											case 2: $tipoS = 'Soporte'; $etiquetaT='info'; break;
+										}
+										$consultaClienteSeguimiento=$conexionBdPrincipal->query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()), cseg_usuario_encargado FROM cliente_seguimiento 
+										WHERE cseg_id='".$tkRes3['cseg_id']."'");
+										$segHoy3 = mysqli_fetch_array($consultaClienteSeguimiento, MYSQLI_BOTH);
+										if($segHoy3[0] >= 0 && $tkRes['cseg_realizado'] != 1) continue;
+									?>
+                                    <div class="user_block">
+										<div class="info_block">
+											<div class="widget_thumb">
+												<img width="46" height="46" alt="User" src="images/user-thumb1.png">
+											</div>
+											<ul class="list_info clearfix">
+												<li><span style="color: red;">TAREA VENCIDA (Hace <?=($segHoy[0]*-1);?> días)</span></li>
+												<li><span>Cliente: <i><a href="#"><?=$tkRes3['cli_nombre'];?></a></i></span></li>
+                                                <li><span>Asunto: <b><?=$tkRes3['cseg_asunto'];?></b></span></li>
+												<li><span>Creador del seguimiento: <b><?=$tkRes3['usr_nombre'];?></b></span></li>
+                                                <li><span>Fecha de contacto anterior: <b><?=$tkRes3['cseg_fecha_contacto'];?></b></span></li>
+                                                <li><span>Fecha programada: <b><?=$tkRes3['cseg_fecha_proximo_contacto'];?></b></span></li>
+												<li><span>Tipo de seguimiento: <b><?=$tipoS;?></b></span></li>
+											</ul>
+										</div>
+										<div class="clearfix">
+											<div class="btn-group pull-left">
+												<a href="clientes-seguimiento-editar.php?id=<?=$tkRes3['cseg_id'];?>&idTK=<?=$tkRes3['cseg_tiket'];?>" class="btn btn-mini" target="new"><i class=" icon-list-alt"></i> Más detalles</a>
+											</div>
+											<div class="btn-group pull-right">
+												<a href="bd_update/cliente-seguimiento-estado-update.php?id=<?=$tkRes3['cseg_id'];?>&get=28" class="btn"><i class="icon-ok-circle"></i> Completar tarea</a>
 											</div>
 										</div>
 									</div>
