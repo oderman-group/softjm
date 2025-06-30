@@ -4,23 +4,28 @@ $idPagina = 416;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
-
-	<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
-  	<!-- DevExtreme theme -->
-	<link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/23.2.5/css/dx.light.css">
-
-	<!-- DevExtreme libraries (reference only one of them) 
-	<script type="text/javascript" src="../assets/devexpress/web/dx.all.js"></script> -->  
-	<script type="text/javascript" src="https://cdn3.devexpress.com/jslib/23.2.5/js/dx.all.js"></script>   
-
+	<script src="js/jquery.js"></script>
 
 	<!-- Exportar a excel -->
 	<script src="../librerias/devexpress/web/polyfill.min.js"></script>
 	<script src="../librerias/devexpress/web/exceljs.min.js"></script>
 	<script src="../librerias/devexpress/web/FileSaver.min.js"></script>
-	<script src="js/_datos_pruebas.js"></script>
 
+	<link href="css/tablecloth.css" rel="stylesheet">
+
+	<script src="js/jquery-ui-1.10.1.custom.min.js"></script>
+	<script src="js/bootstrap.js"></script>
+	<script src="js/accordion.nav.js"></script>
+	<script src="js/jquery.tablecloth.js"></script>
+	<script src="js/jquery.dataTables.js"></script>
+	<script src="js/ZeroClipboard.js"></script>
+	<script src="js/dataTables.bootstrap.js"></script>
+	<script src="js/TableTools.js"></script>
+	<script src="js/custom.js"></script>
+	<script src="js/respond.min.js"></script>
+	<script src="js/ios-orientationchange-fix.js"></script>
+	<script src="js/bootbox.js"></script>
+	<link rel="stylesheet" href="css/modal/jquery-ui.css">
 	
 	<style type="text/css">
 		#overlay {
@@ -61,6 +66,15 @@ include("includes/head.php");
 		<div id="loader"></div>
 		<div id="loading-text">Cargando...</div>
 	</div>
+
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+  	<!-- DevExtreme theme -->
+	<link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/23.2.5/css/dx.light.css">
+
+	<!-- DevExtreme libraries (reference only one of them) 
+	<script type="text/javascript" src="../assets/devexpress/web/dx.all.js"></script> -->  
+	<script type="text/javascript" src="https://cdn3.devexpress.com/jslib/23.2.5/js/dx.all.js"></script>  
 <?php include("includes/funciones-js.php");?>
 </head>
 <body>
