@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const grdDatos = $('#grdDatos').dxPivotGrid({}).dxPivotGrid('instance');
     const grdDatosChart = $('#grdDatosChart').dxChart({}).dxChart('instance');
-
     
 
     kpi1.addEventListener('click', btnKpiClic);
@@ -104,6 +103,20 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'desc'
                             }],
                             store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
                         }  
                     });           
                     
@@ -224,7 +237,21 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
                             }],
                             store: datosKpi
-                        },
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
                     });
 
                     grdDatos.bindChart(grdDatosChart, { dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false});     
@@ -288,7 +315,21 @@ document.addEventListener('DOMContentLoaded', () => {
                             area: 'data',
                             }],
                             store: datosKpi
-                        },
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
                     });
 
                 }
