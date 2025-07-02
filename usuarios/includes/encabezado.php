@@ -91,11 +91,11 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 				<div class="btn-toolbar pull-right notification-nav">
 
 				<?php
-$notificaciones = mysqli_query($conexionBdPrincipal, "SELECT * FROM notificaciones
-INNER JOIN clientes ON cli_id=not_cliente AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
-WHERE not_usuario='".$_SESSION["id"]."' AND not_visto=0 AND not_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' LIMIT 0,5");
-$numNotf = mysqli_num_rows($notificaciones);
-?>
+				$notificaciones = mysqli_query($conexionBdPrincipal, "SELECT * FROM notificaciones
+				INNER JOIN clientes ON cli_id=not_cliente AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+				WHERE not_usuario='".$_SESSION["id"]."' AND not_visto=0 AND not_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' LIMIT 0,5");
+				$numNotf = mysqli_num_rows($notificaciones);
+				?>
 					
 					<div class="btn-group">
 						<div class="dropdown">
@@ -107,7 +107,7 @@ $numNotf = mysqli_num_rows($notificaciones);
 									$color = 'black';
 									if($notf['not_varios']==1){$color = 'red';}
 								?>
-                                <a href="notificaciones-lista.php?idNot=<?=$notf['not_id']?>&idSeg=<?=$notf['not_seguimiento']?>" class="msg-container clearfix"><span class="notification-thumb"><img src="images/notify-thumb.png" width="50" height="50" alt="user-thumb"></span><span class="notification-intro" style="color: <?=$color;?>;"> <?=$notf['not_asunto']?> - <b><?=$notf['cli_nombre']?></b><span class="notify-time"> Hace un momento </span></span></a>
+                                <a href="clientes-seguimiento.php?seg=<?=$notf['not_seguimiento']?>" class="msg-container clearfix"><span class="notification-thumb"><img src="images/notify-thumb.png" width="50" height="50" alt="user-thumb"></span><span class="notification-intro" style="color: <?=$color;?>;"> <?=$notf['not_asunto']?> - <b><?=$notf['cli_nombre']?></b><span class="notify-time"> <?=$notf['not_fecha']?> </span></span></a>
                                 <?php }?>
                                 
 								<a href="notificaciones-lista.php" class="btn btn-primary btn-large btn-block"> Ver todo</a>
