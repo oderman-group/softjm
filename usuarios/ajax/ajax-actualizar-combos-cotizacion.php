@@ -1,6 +1,13 @@
 <?php
 include("../sesion.php");
 
+require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
+
+if (Cotizacion::esCotizacionVendida($_POST["id"], $idEmpresa)) {
+    echo 'No es posible eliminar combos de una cotización que ya generó pedido.';
+    exit();
+}
+
 //COMBOS
 if(!empty($_POST["combo"])){
     $numero = (count($_POST["combo"]));
