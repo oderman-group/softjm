@@ -67,7 +67,7 @@ include("includes/js-formularios.php");
 				<div class="span3">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> Ticket</h3>
+							<h3> Ticket #<?=$resultadoD["cseg_tiket"];?></h3>
 							<?php
 							$consultaInfoTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets
 							INNER JOIN clientes ON cli_id=tik_cliente
