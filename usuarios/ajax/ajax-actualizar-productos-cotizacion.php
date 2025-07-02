@@ -1,6 +1,13 @@
 <?php
 include("../sesion.php");
 
+require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
+
+if (Cotizacion::esCotizacionVendida($_POST["id"], $idEmpresa)) {
+    echo 'No es posible eliminar productos de una cotización que ya generó pedido.';
+    exit();
+}
+
 if (isset($_POST["producto"]) && count($_POST["producto"]) > 0) {
     $numero = count($_POST["producto"]);
 
@@ -29,7 +36,7 @@ if (isset($_POST["producto"]) && count($_POST["producto"]) > 0) {
                 $valorProducto = productosPrecioListaUSD($productoDatos['prod_utilidad'], $productoDatos['prod_costo_dolar']);
             }
 
-            $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo, czpp_costo, czpp_utilidad_porcentaje)VALUES('" . $_POST["id"] . "','" . $_POST["producto"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 1, '".$productoDatos['prod_costo']."', '".$productoDatos['prod_utilidad']."')");
+            $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo, czpp_costo, czpp_utilidad_porcentaje)VALUES('" . $_POST["id"] . "','" . $_POST["producto"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', ".CZPP_TIPO_COTZ.", '".$productoDatos['prod_costo']."', '".$productoDatos['prod_utilidad']."')");
 
             } else {
                 if ($_POST["monedaActual"] != $_POST["moneda"]) {
