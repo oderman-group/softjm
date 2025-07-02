@@ -1,6 +1,13 @@
 <?php
 require_once("../sesion.php");
 
+require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
+
+if (Cotizacion::esCotizacionVendida($_POST["id"], $idEmpresa)) {
+    echo '<script type="text/javascript">window.location.href="../cotizaciones-editar.php?id=' . $_POST["id"] . '&warning=4";</script>';
+    exit();
+}
+
 $idPagina = 25;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
