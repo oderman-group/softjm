@@ -7,14 +7,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const kpi1 = document.getElementById("kpi1");
     const kpi2 = document.getElementById("kpi2");
     const kpi3 = document.getElementById("kpi3");
+    const kpi4 = document.getElementById("kpi4");
+    const kpi5 = document.getElementById("kpi5");
+    const kpi6 = document.getElementById("kpi6");
+    const kpi7 = document.getElementById("kpi7");
+    const kpi8 = document.getElementById("kpi8");
+    const kpi9 = document.getElementById("kpi9");
+    const kpi10 = document.getElementById("kpi10");
+    const kpi11 = document.getElementById("kpi11");
+    const kpi12 = document.getElementById("kpi12");
+    const kpi13 = document.getElementById("kpi13");
+    const kpi14 = document.getElementById("kpi14");
 
     const grdDatos = $('#grdDatos').dxPivotGrid({}).dxPivotGrid('instance');
     const grdDatosChart = $('#grdDatosChart').dxChart({}).dxChart('instance');
     
+    grdDatos.bindChart(grdDatosChart, { dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false}); 
 
     kpi1.addEventListener('click', btnKpiClic);
     kpi2.addEventListener('click', btnKpiClic);
     kpi3.addEventListener('click', btnKpiClic);
+    kpi4.addEventListener('click', btnKpiClic);
+    kpi5.addEventListener('click', btnKpiClic);
+    kpi6.addEventListener('click', btnKpiClic);
+    kpi7.addEventListener('click', btnKpiClic);
+    kpi8.addEventListener('click', btnKpiClic);
+    kpi9.addEventListener('click', btnKpiClic);
+    kpi10.addEventListener('click', btnKpiClic);
+    kpi11.addEventListener('click', btnKpiClic);
+    kpi12.addEventListener('click', btnKpiClic);
+    kpi13.addEventListener('click', btnKpiClic);
+    kpi14.addEventListener('click', btnKpiClic);
+
 
     function btnKpiClic(e) {
         e.preventDefault();
@@ -119,16 +143,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }  
                     });           
-                    
-                    grdDatos.bindChart(grdDatosChart, { dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false});         
+                          
                 }
                 if (this.id == "kpi2") {     
 
                     grdDatosChart.option({                       
                         tooltip: {
                             enabled: true,
-                            customizeTooltip(args) {                               
-                                const valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue);                 
+                            customizeTooltip(args) { 
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                }                     
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
@@ -253,17 +279,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     });
-
-                    grdDatos.bindChart(grdDatosChart, { dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false});     
+   
                 }
-
                 if (this.id == "kpi3") {
 
                     grdDatosChart.option({
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) {                               
-                                const valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue);                 
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
@@ -275,44 +302,49 @@ document.addEventListener('DOMContentLoaded', () => {
                             dataField: 'id',
                             visible: false
                             },{
-                            width: 150,
-                            caption: 'Sucursal',
-                            dataField: 'proyecto',
-                            area: 'row',
-                            sortOrder: 'asc'
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
                             },{
-                            width: 150,
-                            caption: 'Asesor',
-                            dataField: 'asesor',
-                            area: 'row',
-                            sortOrder: 'asc'
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
                             },{
-                            width: 150,
-                            caption: 'Cliente',
-                            dataField: 'tercero',
-                            area: 'row',
-                            sortOrder: 'asc'
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
                             },{
-                            caption: 'Venta',
-                            dataField: 'inmueble',
-                            area: 'row'
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
                             },{
-                            caption: 'Fecha',
-                            dataField: 'fechaContrato',
-                            dataType: 'date',
-                            area: 'column',
-                            sortOrder: 'desc'
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
                             },{
-                            groupName: 'date',
-                            groupInterval: 'month',
-                            sortOrder: 'desc'
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
                             },{
-                            caption: 'Valor',
-                            dataField: 'valor_capital',
-                            dataType: 'number',
-                            summaryType: 'sum',
-                            format: 'currency',
-                            area: 'data',
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
                             }],
                             store: datosKpi
                         },onCellPrepared: function(e) {
@@ -333,6 +365,931 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                 }
+                if (this.id == "kpi4") {
+
+                    grdDatosChart.option({
+                        tooltip: {
+                            enabled: true,
+                            customizeTooltip(args) {                               
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
+                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
+                            },
+                        }
+                    });
+
+                    grdDatos.option({
+                        dataSource: {
+                            fields: [{
+                            dataField: 'id',
+                            visible: false
+                            },{
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
+                            },{
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
+                            },{
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
+                            },{
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
+                            }],
+                            store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
+                    });
+
+                }
+                if (this.id == "kpi5") {
+
+                    grdDatosChart.option({
+                        tooltip: {
+                            enabled: true,
+                            customizeTooltip(args) {                               
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
+                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
+                            },
+                        }
+                    });
+
+                    grdDatos.option({
+                        dataSource: {
+                            fields: [{
+                            dataField: 'id',
+                            visible: false
+                            },{
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
+                            },{
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
+                            },{
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
+                            },{
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
+                            }],
+                            store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
+                    });
+
+                }
+                if (this.id == "kpi6") {
+
+                    grdDatosChart.option({
+                        tooltip: {
+                            enabled: true,
+                            customizeTooltip(args) {                               
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
+                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
+                            },
+                        }
+                    });
+
+                    grdDatos.option({
+                        dataSource: {
+                            fields: [{
+                            dataField: 'id',
+                            visible: false
+                            },{
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
+                            },{
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
+                            },{
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
+                            },{
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
+                            }],
+                            store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
+                    });
+
+                }
+                if (this.id == "kpi7") {
+
+                    grdDatosChart.option({
+                        tooltip: {
+                            enabled: true,
+                            customizeTooltip(args) {                               
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
+                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
+                            },
+                        }
+                    });
+
+                    grdDatos.option({
+                        dataSource: {
+                            fields: [{
+                            dataField: 'id',
+                            visible: false
+                            },{
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
+                            },{
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
+                            },{
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
+                            },{
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
+                            }],
+                            store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
+                    });
+
+                }
+                if (this.id == "kpi8") {
+
+                    grdDatosChart.option({
+                        tooltip: {
+                            enabled: true,
+                            customizeTooltip(args) {                               
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
+                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
+                            },
+                        }
+                    });
+
+                    grdDatos.option({
+                        dataSource: {
+                            fields: [{
+                            dataField: 'id',
+                            visible: false
+                            },{
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
+                            },{
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
+                            },{
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
+                            },{
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
+                            }],
+                            store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
+                    });
+
+                }
+                if (this.id == "kpi9") {
+
+                    grdDatosChart.option({
+                        tooltip: {
+                            enabled: true,
+                            customizeTooltip(args) {                               
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
+                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
+                            },
+                        }
+                    });
+
+                    grdDatos.option({
+                        dataSource: {
+                            fields: [{
+                            dataField: 'id',
+                            visible: false
+                            },{
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
+                            },{
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
+                            },{
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
+                            },{
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
+                            }],
+                            store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
+                    });
+
+                }
+                if (this.id == "kpi10") {
+
+                    grdDatosChart.option({
+                        tooltip: {
+                            enabled: true,
+                            customizeTooltip(args) {                               
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
+                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
+                            },
+                        }
+                    });
+
+                    grdDatos.option({
+                        dataSource: {
+                            fields: [{
+                            dataField: 'id',
+                            visible: false
+                            },{
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
+                            },{
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
+                            },{
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
+                            },{
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
+                            }],
+                            store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
+                    });
+
+                }
+                if (this.id == "kpi11") {
+
+                    grdDatosChart.option({
+                        tooltip: {
+                            enabled: true,
+                            customizeTooltip(args) {                               
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
+                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
+                            },
+                        }
+                    });
+
+                    grdDatos.option({
+                        dataSource: {
+                            fields: [{
+                            dataField: 'id',
+                            visible: false
+                            },{
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
+                            },{
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
+                            },{
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
+                            },{
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
+                            }],
+                            store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
+                    });
+
+                }
+                if (this.id == "kpi12") {
+
+                    grdDatosChart.option({
+                        tooltip: {
+                            enabled: true,
+                            customizeTooltip(args) {                               
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
+                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
+                            },
+                        }
+                    });
+
+                    grdDatos.option({
+                        dataSource: {
+                            fields: [{
+                            dataField: 'id',
+                            visible: false
+                            },{
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
+                            },{
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
+                            },{
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
+                            },{
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
+                            }],
+                            store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
+                    });
+
+                }
+                if (this.id == "kpi13") {
+
+                    grdDatosChart.option({
+                        tooltip: {
+                            enabled: true,
+                            customizeTooltip(args) {                               
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
+                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
+                            },
+                        }
+                    });
+
+                    grdDatos.option({
+                        dataSource: {
+                            fields: [{
+                            dataField: 'id',
+                            visible: false
+                            },{
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
+                            },{
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
+                            },{
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
+                            },{
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
+                            }],
+                            store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
+                    });
+
+                }
+                if (this.id == "kpi14") {
+
+                    grdDatosChart.option({
+                        tooltip: {
+                            enabled: true,
+                            customizeTooltip(args) {                               
+                                let valueText = args.originalValue;  
+                                if (!args.seriesName.includes("Cantidad")) {
+                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
+                                } 
+                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
+                            },
+                        }
+                    });
+
+                    grdDatos.option({
+                        dataSource: {
+                            fields: [{
+                            dataField: 'id',
+                            visible: false
+                            },{
+                                width: 150,
+                                caption: 'Sucursal',
+                                dataField: 'sucursal',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Vendedor',
+                                dataField: 'vendedor',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                width: 150,
+                                caption: 'Cliente',
+                                dataField: 'cliente',
+                                area: 'row',
+                                sortOrder: 'asc'
+                            },{
+                                caption: 'Factura',
+                                dataField: 'factura',
+                                area: 'row'
+                            },{
+                                caption: 'Fecha',
+                                dataField: 'fecha',
+                                dataType: 'date',
+                                area: 'column',
+                                sortOrder: 'desc'
+                            },{
+                                groupName: 'date',
+                                groupInterval: 'month',
+                                sortOrder: 'desc'
+                            },{
+                                summaryType: 'count',
+                                caption: 'Cantidad',
+                                area: 'data',
+                                sortOrder: 'desc'
+                            },{
+                                caption: 'Total',
+                                dataField: 'total',
+                                dataType: 'number',
+                                summaryType: 'sum',
+                                format: 'currency',
+                                area: 'data'
+                            }],
+                            store: datosKpi
+                        },onCellPrepared: function(e) {
+                            if (e.area === "row" && e.cellElement && e.cell.text) {
+                                const valor = e.cell.text;
+                                if (e.cell.path?.length == 4) {
+                                    e.cellElement.empty();
+                                    $("<a>")
+                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("target", "_blank")
+                                        .text(valor)
+                                        .appendTo(e.cellElement);
+                                }else {
+                                    e.cellElement;
+                                }
+                            }
+                        }
+                    });
+
+                }
+                
 
             }
             if (respuesta["estado"] === 'ko') {
