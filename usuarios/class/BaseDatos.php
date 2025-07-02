@@ -54,7 +54,12 @@ class BaseDatos {
         return mysqli_affected_rows($conexionBdPrincipal);
     }
 
-    public static function Select(array $predicado = [], string $campos = '*', string $sqlfooter ="") {
+    public static function Select(
+        array $predicado = [], 
+        string $campos = '*', 
+        string $sqlfooter ="", 
+        string $join = ""
+    ) {
         global $conexionBdPrincipal;
         $where = '';
 
@@ -62,25 +67,25 @@ class BaseDatos {
 
         if( !empty($predicado) ) {
             $where = "WHERE ";
-            foreach( $predicado as $clave => $valor ) {
+            foreach ( $predicado as $clave => $valor ) {
                 if ($clave === self::OTHER_PREDICATE) {
                     $where.= " {$valor} AND ";
                 } else {
                     $asociacion = explode(" ",$clave);
-                    if(empty($asociacion[1])){
+                    if (empty($asociacion[1])) {
                         $where .= $clave ." = ".self::formatValor($valor)." AND ";
-                    }else{
+                    } else {
                         $where .= $clave ."  ".$valor." AND ";
                     }
-                    
                 }
                 
             }
+
             $where = substr($where, 0, -5);
         }
-        
+
         try {
-            $consulta = "SELECT $campos FROM ".static::$schema.".".static::$tableName." {$where} ".$sqlfooter;
+            $consulta = "SELECT $campos FROM ".static::$schema.".".static::$tableName." ".$join." {$where} ".$sqlfooter;
 
             $execute = $conexionBdPrincipal->query($consulta);
 
