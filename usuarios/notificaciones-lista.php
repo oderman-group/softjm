@@ -147,21 +147,24 @@ $paginaActual['pag_nombre'] = "Notificaciones";
                                 <th>Asunto</th>
 								<th>Cliente</th>
                                 <th>Teléfono</th>
+                                <th>Leída</th>
                                 <th>Estado</th>
                                 <th></th>
 							</tr>
 							</thead>
 							<tbody>
                             <?php
-							if(!isset($_GET["estNot"]) or !is_numeric($_GET["estNot"])){$estadoNot = 'AND not_estado=' . NOT_ESTADO_PENDIENTE;}
-							else{
+							if (!isset($_GET["estNot"]) or !is_numeric($_GET["estNot"])) {
+								$estadoNot = 'AND not_estado=' . NOT_ESTADO_PENDIENTE;
+							} else {
 								switch($_GET["estNot"]){
 									case 1: $estadoNot = 'AND not_estado=' . NOT_ESTADO_PENDIENTE; break;
 									case 2: $estadoNot = 'AND not_estado=' . NOT_ESTADO_COMPLETA; break;
-									case 3: $estadoNot = $estadoNot = 'AND (not_estado=' . NOT_ESTADO_PENDIENTE . ' OR not_estado=' . NOT_ESTADO_COMPLETA . ')';
-									break;
+									case 3: $estadoNot = 'AND (not_estado IN (' . NOT_ESTADO_PENDIENTE . ', ' . NOT_ESTADO_COMPLETA . ')'; break;
+									default: $estadoNot = 'AND not_estado=' . NOT_ESTADO_PENDIENTE; break;
 								}
 							}
+
 							mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_usuario='".$_SESSION["id"]."' AND not_varios IS NULL");
 								
 							if(is_numeric($_GET["idNot"])){
@@ -175,7 +178,8 @@ $paginaActual['pag_nombre'] = "Notificaciones";
 								
 							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM notificaciones 
 							INNER JOIN clientes ON cli_id=not_cliente 
-							WHERE not_usuario='".$_SESSION["id"]."' $estadoNot
+							WHERE not_usuario='".$_SESSION["id"]."' 
+							$estadoNot
 							ORDER BY not_id DESC");
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
@@ -200,6 +204,7 @@ $paginaActual['pag_nombre'] = "Notificaciones";
                                 <td><?=$res['not_asunto'];?></td>
                                 <td><?=$res['cli_nombre'];?></td>
                                 <td><?=$res['cli_telefono'];?></td>
+                                <td><?=$res['not_visto'];?></td>
                                 <td><a href="bd_update/notificaciones-estado-actualizar.php?get=20&id=<?=$res['not_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Cambiar de estado"><span class="label label-<?=$etiquetaE;?>"><?=$estado;?></span></a></td>
                                 <td>	
 								<h4>
