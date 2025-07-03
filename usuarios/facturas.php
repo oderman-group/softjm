@@ -368,8 +368,8 @@ $paginaActual['pag_nombre'] = "Facturas";
 									<tfoot>
 										<tr style="height: 30px; font-weight: bold; font-size: 16px;">
 											<td colspan="12" style="text-align: right;">Total</td>
-											<td>$<?= number_format($sumaFacturasSinIva, 0, ".", ".");?></td>
-											<td>$<?= number_format($sumaFacturasConIva, 0, ".", ".");?></td>
+											<td>$<?= number_format($sumaFacturasSinIva, 2, ".", ".");?></td>
+											<td>$<?= number_format($sumaFacturasConIva, 2, ".", ".");?></td>
 											<td colspan="3">&nbsp;</td>
 										</tr>
 									</tfoot>
