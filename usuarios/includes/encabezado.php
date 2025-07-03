@@ -107,7 +107,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 									$color = 'black';
 									if($notf['not_varios']==1){$color = 'red';}
 								?>
-                                <a href="clientes-seguimiento.php?seg=<?=$notf['not_seguimiento']?>" class="msg-container clearfix"><span class="notification-thumb"><img src="images/notify-thumb.png" width="50" height="50" alt="user-thumb"></span><span class="notification-intro" style="color: <?=$color;?>;"> <?=$notf['not_asunto']?> - <b><?=$notf['cli_nombre']?></b><span class="notify-time"> <?=$notf['not_fecha']?> </span></span></a>
+                                <a href="notificaciones-lista.php?idNot=<?=$notf['not_id']?>&idSeg=<?=$notf['not_seguimiento']?>" class="msg-container clearfix"><span class="notification-thumb"><img src="images/notify-thumb.png" width="50" height="50" alt="user-thumb"></span><span class="notification-intro" style="color: <?=$color;?>;"> <?=$notf['not_asunto']?> - <b><?=$notf['cli_nombre']?></b><span class="notify-time"> <?=$notf['not_fecha']?> </span></span></a>
                                 <?php }?>
                                 
 								<a href="notificaciones-lista.php" class="btn btn-primary btn-large btn-block"> Ver todo</a>
