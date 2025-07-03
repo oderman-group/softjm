@@ -34,7 +34,6 @@ WHERE cotiz_id='" . $_POST["id"] . "' AND  cotiz_id_empresa='".$_SESSION["dataAd
 if($_POST["monedaActual"] != $_POST["moneda"]){
     require('actualizar-productos-cotizacion-2.php');
     require('actualizar-combos-cotizacion-2.php');
-    require('actualizar-servicios-cotizacion-2.php');
 }
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
