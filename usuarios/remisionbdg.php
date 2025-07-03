@@ -146,7 +146,6 @@ include("includes/head.php");
                                 <th>Cliente</th>
 								<th>Responsable</th>
 								<th>Vendedor</th>
-								<th>Estado</th>
 								<th>#Pedido</th>
                                 <th></th>
 							</tr>
@@ -198,8 +197,7 @@ include("includes/head.php");
                                 <td><?=strtoupper($res['cli_nombre']);?></td>
 								<td><?=strtoupper($res['usr_nombre']);?></td>
 								<td><?=strtoupper($vendedor['usr_nombre']);?></td>
-								<td><?=$res['remi_estado'];?></td>
-								<td><?=$res['remi_pedido'];?></td>
+								<td><a href="pedidos.php?busqueda=<?=$res['remi_pedido'];?>" class="normalLink"><?=$res['remi_pedido'];?></a></td>
                                 <td>
 									<div class="btn-group">
 										<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span>

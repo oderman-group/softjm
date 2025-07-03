@@ -185,6 +185,7 @@ include("includes/js-formularios.php");
 				</div>
 				
 				<div class="span9">
+					<p>Los campos marcados con (*) son obligatorios.</p>
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
@@ -198,7 +199,7 @@ include("includes/js-formularios.php");
                             
                                
                                <div class="control-group">
-									<label class="control-label">Contacto</label>
+									<label class="control-label">Contacto (*)</label>
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required>
 											<option value=""></option>
@@ -238,7 +239,7 @@ include("includes/js-formularios.php");
 								  <?php }?>
                             	
                                 <div class="control-group">
-									<label class="control-label">Fecha del contacto</label>
+									<label class="control-label">Fecha del contacto (*)</label>
 									<div class="controls">
 										<input type="date" class="span4" name="fechaContacto" value="<?=date("Y-m-d");?>" readonly>
                                         <span style="color:#009;">Esta fecha es la de HOY y se guardará automáticamente.</span>
@@ -246,9 +247,9 @@ include("includes/js-formularios.php");
 								</div>
                                 
 								<div class="control-group">
-									<label class="control-label">¿Cómo fue el contacto?</label>
+									<label class="control-label">¿Cómo fue el contacto? (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="formaContacto">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="formaContacto" required>
 											<option value="1"></option>
                                             <?php
 											$opciones = array("","La empresa contactó al cliente","El cliente contactó  a la empresa");
@@ -262,9 +263,9 @@ include("includes/js-formularios.php");
                                </div>
 								
                                 <div class="control-group">
-									<label class="control-label">Canal de contacto</label>
+									<label class="control-label">Canal de contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal" required>
 											<option value="4"></option>
                                             <?php
 											$opciones = array("","Facebook","WhatsApp","Fijo","Celular","Personal","Skype","Otro","Correo", "Sitio Web");
@@ -279,9 +280,9 @@ include("includes/js-formularios.php");
                                 
                                
                                 <div class="control-group">
-									<label class="control-label">Observaciones</label>
+									<label class="control-label">Observaciones/Descripción (*)</label>
 									<div class="controls">
-										<textarea name="observaciones" style="width: 80%"></textarea>
+										<textarea name="observaciones" style="width: 80%" required></textarea>
 									</div>
 								</div>
                                 
@@ -307,11 +308,35 @@ include("includes/js-formularios.php");
                                         <input type="checkbox" value="1" name="vendio">
 									</div>
 								</div>
+
+								<div class="control-group">
+									<label class="control-label">¿Hubo demostración?</label>
+									<div class="controls">
+                                        <input type="checkbox" value="1" name="demostracion">
+									</div>
+								</div>
 								
 								<div class="control-group">
 									<label class="control-label"># Cotización</label>
 									<div class="controls">
-										<input type="text" class="span4" name="cotizacion" style="font-weight:bold;">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cotizacion">
+											<option value=""></option>
+                                            <?php
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 
+												cli_id, cli_nombre, cli_zona,
+												usr_id, usr_nombre 
+												FROM cotizacion
+												INNER JOIN clientes ON cli_id=cotiz_cliente
+												INNER JOIN usuarios ON usr_id=cotiz_creador
+												WHERE cotiz_id=cotiz_id AND cotiz_id_empresa='".$idEmpresa."'
+												ORDER BY cotiz_id DESC");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+											?>
+                                            	<option value="<?=$resOp['cotiz_id'];?>"><?=$resOp['cotiz_id']." - ".$resOp['cotiz_fecha_propuesta']." (".$resOp['cli_nombre'].")";?></option>
+                                            <?php
+											}
+											?>
+                                    	</select>
 									</div>
 								</div>
 
@@ -351,6 +376,20 @@ include("includes/js-formularios.php");
 									<div class="controls">
 										<input type="date" class="span4" name="fechaPC">
 										<a href="calendario.php?id=<?=$_SESSION["id"];?>" target="_blank" style="color:#009; text-decoration: underline;"><i class="icon icon-calendar"></i> Ver mi calendario</a>
+									</div>
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Hora próximo contacto</label>
+									<div class="controls">
+										<input type="time" class="span2" name="horaPC">
+									</div>
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Recordatorio (Minutos antes)</label>
+									<div class="controls">
+										<input type="number" class="span2" name="minutosRecordarAntes">
 									</div>
 								</div>
 								
@@ -409,7 +448,7 @@ include("includes/js-formularios.php");
 									<label class="control-label">Notificar de inmediato al encargado</label>
 									<div class="controls">
                                         <input type="checkbox" value="1" name="notf">
-                                        <span style="color:#F03;">Llegará una notificación inmediata al encargado</span>
+                                        <span style="color:#00078A;">Llegará una notificación inmediata al encargado</span>
 									</div>
 								</div>
 								

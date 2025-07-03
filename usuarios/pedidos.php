@@ -4,6 +4,8 @@ include("sesion.php");
 $idPagina = 151;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+
+require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
 ?>
 <!-- styles -->
 
@@ -194,12 +196,12 @@ include("includes/head.php");
 								<td><?=$nombreVendedor;?></td>
 								<td>
 									<?php if (Modulos::validarRol([237], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-										<a href="pedidos-timeline.php?id=<?=$res['pedid_id'];?>" target="_blank">En camino</a>
+										<a href="pedidos-timeline.php?id=<?=$res['pedid_id'];?>" target="_blank" class="normalLink"><?=Pedido::ESTADO_PEDIDO[$res['pedid_estado']];?></a>
 										<?php } else {?>
-										<span>En camino</span>
+										<span><?=Pedido::ESTADO_PEDIDO[$res['pedid_estado']];?></span>
 									<?php } ?>
 								</td>
-								<td><?=$res['pedid_cotizacion'];?></td>
+								<td><a href="cotizaciones-editar.php?id=<?=$res['pedid_cotizacion'];?>" class="normalLink"><?=$res['pedid_cotizacion'];?></a></td>
                                 <td>
 									<div class="btn-group">
 										<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span>

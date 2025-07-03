@@ -67,7 +67,7 @@ include("includes/js-formularios.php");
 				<div class="span3">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> Ticket</h3>
+							<h3> Ticket #<?=$resultadoD["cseg_tiket"];?></h3>
 							<?php
 							$consultaInfoTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets
 							INNER JOIN clientes ON cli_id=tik_cliente
@@ -177,6 +177,8 @@ include("includes/js-formularios.php");
 				<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 					<p><a href="clientes-seguimiento-agregar.php?idTK=<?=$_GET["idTK"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
 				<?php } ?>
+
+					<p>Los campos marcados con (*) son obligatorios.</p>
 					
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
@@ -192,7 +194,7 @@ include("includes/js-formularios.php");
                             
                             	
                                 <div class="control-group">
-									<label class="control-label">Fecha del contacto</label>
+									<label class="control-label">Fecha del contacto (*)</label>
 									<div class="controls">
 										<input type="date" class="span4" name="fechaContacto" value="<?=$resultadoD[9];?>" readonly>
 									</div>
@@ -200,7 +202,7 @@ include("includes/js-formularios.php");
                                 
                                
                                <div class="control-group">
-									<label class="control-label">Contacto</label>
+									<label class="control-label">Contacto (*)</label>
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="contacto" required>
 											<option value="0"></option>
@@ -222,9 +224,9 @@ include("includes/js-formularios.php");
                                </div>
                                
 								<div class="control-group">
-									<label class="control-label">¿Cómo fue el contacto?</label>
+									<label class="control-label">¿Cómo fue el contacto? (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="formaContacto">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="formaContacto" required>
 											<option value="1"></option>
                                             <?php
 											$opciones = array("","La empresa contactó al cliente","El cliente contactó  a la empresa");
@@ -238,9 +240,9 @@ include("includes/js-formularios.php");
                                </div>
 								
                                <div class="control-group">
-									<label class="control-label">Canal de contacto</label>
+									<label class="control-label">Canal de contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal" required>
 											<option value="4"></option>
                                             <?php
 											$opciones = array("","Facebook","WhatsApp","Fijo","Celular","Personal","Skype","Otro","Correo", "Sitio Web");
@@ -254,9 +256,9 @@ include("includes/js-formularios.php");
                                </div>
                                
                                 <div class="control-group">
-									<label class="control-label">Observaciones</label>
+									<label class="control-label">Observaciones (*)</label>
 									<div class="controls">
-										<textarea rows="5" cols="80" style="width: 80%" name="observaciones"><?=$resultadoD['cseg_observacion'];?></textarea>
+										<textarea rows="5" cols="80" style="width: 80%" name="observaciones" required><?=$resultadoD['cseg_observacion'];?></textarea>
 									</div>
 								</div>
 								
@@ -280,6 +282,13 @@ include("includes/js-formularios.php");
 									<label class="control-label">¿Hubo venta?</label>
 									<div class="controls">
                                         <input type="checkbox" value="1" name="vendio" <?php if($resultadoD['cseg_vendio']==1) echo "checked";?>>
+									</div>
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">¿Hubo demostración?</label>
+									<div class="controls">
+                                        <input type="checkbox" value="1" name="demostracion" <?php if($resultadoD['cseg_demostracion']==1) echo "checked";?>>
 									</div>
 								</div>
 								
@@ -310,6 +319,20 @@ include("includes/js-formularios.php");
 									<label class="control-label">Fecha próximo contacto</label>
 									<div class="controls">
 										<input type="date" class="span4" name="fechaPC" value="<?=$resultadoD[5];?>">
+									</div>
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Hora próximo contacto</label>
+									<div class="controls">
+										<input type="time" class="span2" name="horaPC" value="<?=$resultadoD['cseg_hora_proximo_contacto'];?>">
+									</div>
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Recordatorio (Minutos antes)</label>
+									<div class="controls">
+										<input type="number" class="span2" name="minutosRecordarAntes" value="<?=$resultadoD['cseg_minutos_recordar_anticipadamente'];?>">
 									</div>
 								</div>
                                 
@@ -343,7 +366,7 @@ include("includes/js-formularios.php");
 										<label class="control-label">Notificar de inmediato al encargado</label>
 										<div class="controls">
 											<input type="checkbox" value="1" name="notf">
-											<span style="color:#F03;">Llegará una notificación inmediata al encargado</span>
+											<span style="color:#00078A;">Llegará una notificación inmediata al encargado</span>
 										</div>
 									</div>
 

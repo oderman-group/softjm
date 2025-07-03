@@ -134,6 +134,22 @@ include("includes/head.php");
 						</div>
 					<?php } ?>
 
+					<?php if (Modulos::validarRol([78], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+						<div class="span3">
+							<div class="board-widgets small-widget" style="background-color:slateblue;">
+								<a href="cotizaciones-agregar.php"><span class="widget-icon icon-file"></span><span class="widget-label">Crear cotización</span></a>
+							</div>
+						</div>
+					<?php } ?>
+
+					<?php if (Modulos::validarRol([36], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+						<div class="span3">
+							<div class="board-widgets small-widget" style="background-color:turquoise;">
+								<a href="productos.php"><span class="widget-icon icon-th"></span><span class="widget-label">Ver productos</span></a>
+							</div>
+						</div>
+					<?php } ?>
+
 
 				</div>
 
@@ -147,7 +163,39 @@ include("includes/head.php");
 						</div>
 					<?php } ?>
 
+					<?php if (Modulos::validarRol([88], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+						<div class="span3">
+							<div class="board-widgets small-widget" style="background-color:burlywood;">
+								<a href="clientes-tikets.php"><span class="widget-icon icon-folder-open"></span><span class="widget-label">Tickets</span></a>
+							</div>
+						</div>
+					<?php } ?>
 
+					<?php if (Modulos::validarRol([12], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+						<div class="span3">
+							<div class="board-widgets small-widget" style="background-color:cadetblue;">
+								<a href="clientes-seguimiento.php"><span class="widget-icon icon-list"></span><span class="widget-label">Seguimientos</span></a>
+							</div>
+						</div>
+					<?php } ?>
+
+					<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+						<div class="span3">
+							<div class="board-widgets small-widget" style="background-color:thistle;">
+								<a href="clientes-agregar.php"><span class="widget-icon icon-user"></span><span class="widget-label">Crear cliente</span></a>
+							</div>
+						</div>
+					<?php } ?>
+				</div>
+
+				<div class="row-fluid">
+					<?php if (Modulos::validarRol([416], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+						<div class="span3">
+							<div class="board-widgets small-widget" style="background-color:darkolivegreen">
+								<a href="kpi.php"><span class="widget-icon icon-bar-chart"></span><span class="widget-label">KPI</span></a>
+							</div>
+						</div>
+					<?php } ?>
 				</div>
 
 

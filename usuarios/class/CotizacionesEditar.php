@@ -1,10 +1,18 @@
 <?php
+require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
+
 class CotizacionesEditar {
 
-    public static function generarTablaProductos($conexionBdPrincipal, $resultadoD, $simbolosMonedas) {
+    public static function generarTablaProductos($conexionBdPrincipal, array $resultadoD, $simbolosMonedas, int $idEmpresa): string {
         $htmlTabla = ''; 
         global $datosUsuarioActual;
-                            
+
+        $camposCotizacionDisabled = '';
+
+        if (Cotizacion::esCotizacionVendida($_GET["id"], $idEmpresa)) {
+            $camposCotizacionDisabled = 'disabled';
+        }
+
         $productos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,
             prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad
             FROM productos
@@ -43,30 +51,34 @@ class CotizacionesEditar {
 
             $htmlTabla .= '<tr class="producto">';
             $htmlTabla .= '<td>' . $no . '</td>';
-            $htmlTabla .= '<td><input type="number" title="czpp_orden" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_orden'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
+            $htmlTabla .= '<td><input type="number" title="czpp_orden" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_orden'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             $htmlTabla .= '<td>';
-            $htmlTabla .= '<a href="#" class="delete-product" data-id="'. $prod['prod_id'].'"><i class="icon-trash"></i></a>';
+
+            if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA) {
+                $htmlTabla .= '<a href="#" class="delete-product" data-id="'. $prod['prod_id'].'"><i class="icon-trash"></i></a>';
+            }
+
             $htmlTabla .= '<a href="productos-editar.php?id=' . $prod['prod_id'] . '" target="_blank">' . $prod['prod_nombre'] . '</a><br>';
             $htmlTabla .= '<span style="font-size: 9px; color: darkblue;">' . $prod['prod_descripcion_corta'] . '</span><br>';
-            $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4">' . $prod['czpp_observacion'] . '</textarea></p>';
+            $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.'>' . $prod['czpp_observacion'] . '</textarea></p>';
             $htmlTabla .= '</td>';
-            $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
+            $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             $htmlTabla .= '<td>';
             if ($resultadoD['cli_categoria'] == CLI_CATEGORIA_DEALER && $datosUsuarioActual['usr_tipo'] == 1) {
                 $htmlTabla .= '<b>Precio Dealer: $' . number_format($precioDealer, 0, ",", ".") . '</b><br>';
             }
-            $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no"><br>';
+            $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no" '.$camposCotizacionDisabled.'><br>';
             if ($datosUsuarioActual['usr_tipo'] == 1) {
                 $htmlTabla .= '<b>Costo: $' . number_format($prod['prod_costo'], 0, ",", ".") . '</b><br>';
                 $htmlTabla .= '<b>Utilidad: ' . $prod['prod_utilidad'] . '%</b><br>';
                 $htmlTabla .= '<b>Valor Utilidad: $' . number_format(($prod['czpp_valor'] - $prod['prod_costo']), 0, ",", ".") . '</b><br>';
             }
             $htmlTabla .= '</td>';
-            $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
-            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
+            $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
+            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             if ($resultadoD['cotiz_descuentos_especiales'] == 1) {
                 $htmlTabla .= '<td>';
-                $htmlTabla .= '<input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no">';
+                $htmlTabla .= '<input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'>';
                 if ($datosUsuarioActual['usr_tipo'] == 1 && $prod['czpp_aprobado_usuario'] == "" && $prod['czpp_descuento_especial'] > 0) {
                     $htmlTabla .= '<br><a href="bd_update/descuentos-cotizaciones-actualizar.php?idItem=' . $prod['czpp_id'] . '" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>';
                 }
@@ -84,10 +96,14 @@ class CotizacionesEditar {
         return "<body>$htmlTabla</body>"; // Devuelve el HTML de la tabla
     }
 
-    public static function generarTablacombos($conexionBdPrincipal, $resultadoD, $simbolosMonedas) {
+    public static function generarTablacombos($conexionBdPrincipal, array $resultadoD, $simbolosMonedas, int $idEmpresa): string {
         $htmlTabla = ''; 
         global $datosUsuarioActual;
-                            
+
+        if (Cotizacion::esCotizacionVendida($_GET["id"], $idEmpresa)) {
+            $camposCotizacionDisabled = 'disabled';
+        }
+
         $productos = $conexionBdPrincipal->query("SELECT * FROM combos
         INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='".$_GET["id"]."'
         WHERE combo_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
@@ -148,9 +164,13 @@ class CotizacionesEditar {
 
             $htmlTabla .= '<tr class="combo">';
             $htmlTabla .= '<td>' . $no . '</td>';
-            $htmlTabla .= '<td><input type="number" title="czpp_orden" name="'.$prod['czpp_id'].'" value="'.$prod['czpp_orden'].'" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
+            $htmlTabla .= '<td><input type="number" title="czpp_orden" name="'.$prod['czpp_id'].'" value="'.$prod['czpp_orden'].'" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             $htmlTabla .= '<td>';
-            $htmlTabla .= '<a href="#" class="delete-combo" data-id="'. $prod['combo_id'].'"><i class="icon-trash"></i></a>';
+
+            if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA) {
+                $htmlTabla .= '<a href="#" class="delete-combo" data-id="'. $prod['combo_id'].'"><i class="icon-trash"></i></a>';
+            }
+
             $htmlTabla .= '<a href="combos-editar.php?id=' . $prod['combo_id'] . '" target="_blank">' . $prod['combo_nombre'] . '</a><br>';
             if($prod['combo_descuento']!="" and $resultadoD['cotiz_ocultar_descuento_combo']=='0'){
                 $htmlTabla .= '<span><b>Precio Normal:</b> $'.number_format($precioNormalCombo[0],0,".",".").'</span><br>';
@@ -162,28 +182,30 @@ class CotizacionesEditar {
             INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='".$prod['combo_id']."'
             WHERE prod_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
             ORDER BY copp_id");
+
             while($prodCombo = mysqli_fetch_array($productosCombo, MYSQLI_BOTH)){
                 $htmlTabla .= $prodCombo['prod_nombre']." (".$prodCombo['copp_cantidad']." Unds.).<br>";
             }
+
             $htmlTabla .= '</span><br>';
-            $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4">' . $prod['czpp_observacion'] . '</textarea></p>';
+            $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.'>' . $prod['czpp_observacion'] . '</textarea></p>';
             $htmlTabla .= '</td>';
-            $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
+            $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             $htmlTabla .= '<td>';
             if ($resultadoD['cli_categoria'] == CLI_CATEGORIA_DEALER && $datosUsuarioActual['usr_tipo'] == 1) {
                 $htmlTabla .= '<b>Precio Dealer: $' . number_format($totalDealer, 0, ",", ".") . '</b><br>';
             }
-            $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no"><br>';
+            $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no" '.$camposCotizacionDisabled.'><br>';
             if ($datosUsuarioActual['usr_tipo'] == 1) {
                 $htmlTabla .= '<b>Costo: $' . number_format($sumaCostosProductosCombos, 0, ",", ".") . '</b><br>';
                 $htmlTabla .= '<b>Valor Utilidad: $' . number_format(($prod['czpp_valor'] - $sumaCostosProductosCombos), 0, ",", ".") . '</b><br>';
             }
             $htmlTabla .= '</td>';
-            $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
-            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
+            $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
+            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             if ($resultadoD['cotiz_descuentos_especiales'] == 1) {
                 $htmlTabla .= '<td>';
-                $htmlTabla .= '<input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no">';
+                $htmlTabla .= '<input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'>';
                 if ($datosUsuarioActual['usr_tipo'] == 1 && $prod['czpp_aprobado_usuario'] == "" && $prod['czpp_descuento_especial'] > 0) {
                     $htmlTabla .= '<br><a href="bd_update/descuentos-cotizaciones-actualizar.php?idItem=' . $prod['czpp_id'] . '" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>';
                 }
@@ -201,10 +223,14 @@ class CotizacionesEditar {
         return "<body>$htmlTabla</body>"; // Devuelve el HTML de la tabla
     }
 
-    public static function generarTablaServicios($conexionBdPrincipal, $resultadoD, $simbolosMonedas) {
+    public static function generarTablaServicios($conexionBdPrincipal, array $resultadoD, $simbolosMonedas, int $idEmpresa) {
         $htmlTabla = ''; 
         global $datosUsuarioActual;
-                            
+
+        if (Cotizacion::esCotizacionVendida($_GET["id"], $idEmpresa)) {
+            $camposCotizacionDisabled = 'disabled';
+        }
+
         $productos = $conexionBdPrincipal->query("SELECT * FROM servicios
         INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='".$_GET["id"]."'
         WHERE serv_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
@@ -233,24 +259,27 @@ class CotizacionesEditar {
             $totalIva += ($valorConDcto * ($prod['czpp_impuesto']/100));
 
             $subtotal +=$valorTotal;	
-            
-            
+
             $totalCantidad += $prod['czpp_cantidad'];
 
             $htmlTabla .= '<tr class="servicio">';
             $htmlTabla .= '<td>' . $no . '</td>';
-            $htmlTabla .= '<td><input type="number" title="czpp_orden" name="'.$prod['czpp_id'].'" value="'.$prod['czpp_orden'].'" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
+            $htmlTabla .= '<td><input type="number" title="czpp_orden" name="'.$prod['czpp_id'].'" value="'.$prod['czpp_orden'].'" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             $htmlTabla .= '<td>';
-            $htmlTabla .= '<a href="#" class="delete-servicios" data-id="'. $prod['serv_id'].'"><i class="icon-trash"></i></a>';
+
+            if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA) {
+                $htmlTabla .= '<a href="#" class="delete-servicios" data-id="'. $prod['serv_id'].'"><i class="icon-trash"></i></a>';
+            }
+
             $htmlTabla .= '<a href="servicios-editar.php?id=' . $prod['serv_id'] . '" target="_blank">' . $prod['serv_nombre'] . '</a><br>';
-            $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4">' . $prod['czpp_observacion'] . '</textarea></p>';
+            $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.'>' . $prod['czpp_observacion'] . '</textarea></p>';
             $htmlTabla .= '</td>';
-            $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
-            $htmlTabla .= '<td><input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no"></td>';
-            $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
-            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="servicios(this)" style="width: 50px; text-align: center;" translate="no"></td>';
+            $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
+            $htmlTabla .= '<td><input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no" '.$camposCotizacionDisabled.'></td>';
+            $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
+            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="servicios(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             if ($resultadoD['cotiz_descuentos_especiales'] == 1) {
-                $htmlTabla .= '<td><input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no"></td>';
+                $htmlTabla .= '<td><input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             }
             $htmlTabla .= '<td>'. '<span class="moneda-simbolo">' . $simbolosMonedas[$resultadoD['cotiz_moneda']].'</span>'. '	<span class="valor-numerico">'. number_format($valorTotal, 0, ",", ".") . '</span>'.'</td>';
             $htmlTabla .= '</tr>';

@@ -8,6 +8,7 @@ $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 ?>
 <link href="css/chosen.css" rel="stylesheet">
+<link href="css/jquery.gritter.css" rel="stylesheet">
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -23,6 +24,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+<script src="js/jquery.gritter.js"></script>
 <script>
 	function mostrar(data) {
 		if(data.value == "Colombia"){
@@ -673,17 +675,8 @@ include("includes/js-formularios.php");
 															<a href="clientes-seguimiento-agregar.php?cte=<?=$_GET["id"];?>" class="btn btn-danger" target="_blank"><i class="icon-plus"></i> Agregar seguimiento</a>
 															<?php } ?>	
 															</p>
-															<table class="table table-striped table-bordered" id="data-table">
-															<thead>
-															<tr>
-																<th>No</th>
-																<th>Contacto</th>
-																<th>Seguimiento</th>
-																<th>#Cotización</th>
-																<th>Estado</th>
-															</tr>
-															</thead>
-															<tbody>
+															<div class="accordion" id="accordion2">
+															
 															<?php
 															$consulta = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
 															INNER JOIN clientes ON cli_id=cseg_cliente
@@ -710,25 +703,46 @@ include("includes/js-formularios.php");
 																
 
 																switch($res['cseg_realizado']){
-																	case 1: $html = '<span class="label label-success">Completado</span>'; break;
-																	default: $html = '<a href="bd_update/cliente-seguimiento-estado-update.php?id='.$res['cseg_id'].'&get=28" class="label label-important">Pendiente</a>'; break;
+																	case 1: 
+																		$html = '<span class="label label-success">Completado</span>';
+																		$colorFondoSeguimiento = 'cornflowerblue'; 
+																	break;
+
+																	default: 
+																		$html = '<a href="bd_update/cliente-seguimiento-estado-update.php?id='.$res['cseg_id'].'&get=28" class="label label-important">Pendiente</a>';
+																		$colorFondoSeguimiento = 'crimson';
+																	break;
 																}
 															?>
-															<tr>
-																<td <?=$fondoColor;?>><?=$no;?></td>
-																<td <?=$fondoColor;?>>
-																	<?php
-																	if(isset($contacto['cont_nombre'])){
-																		echo "<b>Nombre</b>:". $contacto['cont_nombre'];
-																	}
-																		
-																	?>
-																	<?php 
+
+															
+						<div class="accordion-group">
+							<div class="accordion-heading">
+								<a href="#collapse<?=$res[0];?>" data-parent="#accordion2" data-toggle="collapse" class="accordion-toggle" style="
+    background: <?=$colorFondoSeguimiento;?>;"><?=$res['cseg_fecha_reporte'];?> - <?=$res['usr_nombre'];?></a>
+							</div>
+							<div class="accordion-body collapse" id="collapse<?=$res[0];?>">
+								<div class="accordion-inner">
+									<?php
+									if(isset($contacto['cont_nombre'])){
+										echo "<b>Nombre</b>:". $contacto['cont_nombre'];
+									}
+
+									
 																	if(isset($res['cont_telefono'])) echo "<br><b>Tel:</b> ". $res['cont_telefono'];
-																	?>
-																	<?php if(isset($res['cont_email'])) echo "<br><b>Email:</b> ". $res['cont_email'];?>
 																	
-																	<h4 style="margin-top:10px;">
+																	 if(isset($res['cont_email'])) echo "<br><b>Email:</b> ". $res['cont_email'];
+									
+									echo $res['cseg_observacion'];
+									?>
+
+									<p>
+										<h5 style="font-weight:bold;">Próximo contacto</h5>
+										<b>Fecha:</b> <?=$res['cseg_fecha_proximo_contacto'];?><br>
+										<b>Encargado:</b> <?=$encargado['usr_nombre'];?>
+									</p>
+
+									<h4 style="margin-top:10px;">
 																			<?php if (Modulos::validarRol([14], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<a href="clientes-seguimiento-editar.php?id=<?=$res[0];?>&cte=<?=$_GET["id"];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
 																			<?php } ?>
@@ -737,24 +751,19 @@ include("includes/js-formularios.php");
 																			<?php // codigo 4 no se encontro en el archivo sql.php ?>
 																			<?php } ?>
 																	</h4>
-																</td>
-																<td <?=$fondoColor;?>>
-																	<b>Fecha:</b> <?=$res['cseg_fecha_reporte'];?><br>
-																	<b>Responsable:</b> <?=$res['usr_nombre'];?><br>
-																	<b>Observación:</b><br>
-																	<span style="color:#009;"><?=$res['cseg_observacion'];?></span>
-																	<p>
-																		<h5 style="font-weight:bold;">Próximo contacto</h5>
-																		<b>Fecha:</b> <?=$res['cseg_fecha_proximo_contacto'];?><br>
-																		<b>Encargado:</b> <?=$encargado['usr_nombre'];?>
-																	</p>
-																</td>
-																<td <?=$fondoColor;?>><?=$res['cseg_cotizacion'];?></td>
-																<td <?=$fondoColor;?>><?=$html;?></td>
-															</tr>
+
+																	<?=$html;?>
+								</div>
+							</div>
+						</div>
+
+					
+
+																
+															
 															<?php $no++;}?>
-															</tbody>
-															</table>
+															</div>
+														
 														</div>
 													</div>
 												</div>

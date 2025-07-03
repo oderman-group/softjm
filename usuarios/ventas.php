@@ -340,10 +340,19 @@
 
 
 												$consultaTotal = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
-													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_tipo=".FACTURA_TIPO_VENTA." {$filtroFactura} AND factura_id_empresa=".$_SESSION["dataAdicional"]["id_empresa"]."
-													INNER JOIN clientes ON cli_id=factura_cliente {$filtroCliente} AND cli_id_empresa=".$_SESSION["dataAdicional"]["id_empresa"]."
-													WHERE czpp_tipo IN (".CZPP_TIPO_FACT.") AND czpp_valor>0 AND czpp_cantidad>0
-													GROUP BY czpp_id");
+												INNER JOIN facturas 
+													ON factura_id=czpp_cotizacion 
+													AND factura_vendedor IS NOT NULL 
+													AND factura_tipo=".FACTURA_TIPO_VENTA." 
+													{$filtroFactura} 
+													AND factura_id_empresa=".$_SESSION["dataAdicional"]["id_empresa"]."
+												INNER JOIN clientes 
+													ON cli_id=factura_cliente 
+													{$filtroCliente} 
+													AND cli_id_empresa=".$_SESSION["dataAdicional"]["id_empresa"]."
+												WHERE czpp_tipo IN (".CZPP_TIPO_FACT.") 
+												AND czpp_valor>0 AND czpp_cantidad>0
+												GROUP BY czpp_id");
 
 												$total = 0;
 												$sumaTotal = 0;

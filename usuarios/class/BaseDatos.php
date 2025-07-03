@@ -2,6 +2,11 @@
 
 class BaseDatos {
 
+    public const OTHER_PREDICATE = 'OTHER_PREDICATE';
+
+    public static $schema;
+    public static $tableName;
+
     public static function eliminarRegistro(array $infoEliminar): string
     {
         global $conexionBdPrincipal;
@@ -47,6 +52,65 @@ class BaseDatos {
         $conexionBdPrincipal->query($sql);
 
         return mysqli_affected_rows($conexionBdPrincipal);
+    }
+
+    public static function Select(
+        array $predicado = [], 
+        string $campos = '*', 
+        string $sqlfooter ="", 
+        string $join = ""
+    ) {
+        global $conexionBdPrincipal;
+        $where = '';
+
+        $campos ??= '*';
+
+        if( !empty($predicado) ) {
+            $where = "WHERE ";
+            foreach ( $predicado as $clave => $valor ) {
+                if ($clave === self::OTHER_PREDICATE) {
+                    $where.= " {$valor} AND ";
+                } else {
+                    $asociacion = explode(" ",$clave);
+                    if (empty($asociacion[1])) {
+                        $where .= $clave ." = ".self::formatValor($valor)." AND ";
+                    } else {
+                        $where .= $clave ."  ".$valor." AND ";
+                    }
+                }
+                
+            }
+
+            $where = substr($where, 0, -5);
+        }
+
+        try {
+            $consulta = "SELECT $campos FROM ".static::$schema.".".static::$tableName." ".$join." {$where} ".$sqlfooter;
+
+            $execute = $conexionBdPrincipal->query($consulta);
+
+            if ($execute) {
+
+                return $execute;
+
+            } else {
+                throw new Exception("Error al preparar la consulta.");
+            }
+        } catch (PDOException  $e) {
+            echo "Excepción capturada: " . $e->getMessage();
+            return null;
+        }
+
+    }
+
+    public static function formatValor($valor): string {
+        if ( is_numeric($valor) || is_bool($valor)) {
+            $result = $valor+0;
+        } else{
+            $result = "'".$valor."'";
+        }
+
+        return $result;
     }
 
 }

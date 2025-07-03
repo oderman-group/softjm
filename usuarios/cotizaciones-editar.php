@@ -18,6 +18,11 @@ if(isset($_GET["cte"])){
 }else{
 	$cliente = $resultadoD['cotiz_cliente'];
 }
+
+require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Remision.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Factura.php';
 ?>
 
 <link href="css/chosen.css" rel="stylesheet">
@@ -106,19 +111,19 @@ include("includes/js-formularios.php");
 <?php
 		require '../usuarios/class/CotizacionesEditar.php';
 		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaProductos') {
-			$htmlTablaProductos = CotizacionesEditar::generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas);
+			$htmlTablaProductos = CotizacionesEditar::generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
 			echo $htmlTablaProductos;
 			exit; 
 		}
 
 		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablacombos') {
-			$htmlTablaCombos = CotizacionesEditar::generarTablacombos($conexionBdPrincipal, $resultadoD,$simbolosMonedas);
+			$htmlTablaCombos = CotizacionesEditar::generarTablacombos($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
 			echo $htmlTablaCombos;
 			exit; 
 		}
 
 		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaServicios') {
-			$htmlTablaServicios = CotizacionesEditar::generarTablaServicios($conexionBdPrincipal, $resultadoD,$simbolosMonedas);
+			$htmlTablaServicios = CotizacionesEditar::generarTablaServicios($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
 			echo $htmlTablaServicios;
 			exit; 
 		}
@@ -146,6 +151,7 @@ include("includes/js-formularios.php");
 			</div>
             
             <?php include("includes/notificaciones.php");?>
+
 			<div class="row-fluid">
 				<div class="span12">
 					<div class="content-widgets gray">
@@ -201,14 +207,68 @@ include("includes/js-formularios.php");
 			</p>
 			
 			<?php
-			if($resultadoD['cotiz_vendida']==1){
+			$camposCotizacionDisabled = '';
+			if ($resultadoD['cotiz_vendida'] == Cotizacion::COTIZACION_VENDIDA) {
+				$camposCotizacionDisabled = 'disabled';
+
+				//Pedido
+				$predicado = [
+					'pedid_cotizacion' => $resultadoD['cotiz_id'],
+					'pedid_id_empresa' => $idEmpresa
+				];
+
+				$pedidoAsociado = Pedido::Select($predicado);
+				$pedidoAsociadoDatos = mysqli_fetch_array($pedidoAsociado, MYSQLI_BOTH);
+
+				//Remisión
+				$predicado = [
+					'remi_pedido' => $pedidoAsociadoDatos[Pedido::$primaryKey],
+					'remi_id_empresa' => $idEmpresa
+				];
+
+				$remisionAsociada = Remision::Select($predicado);
+				$remisionAsociadaDatos = mysqli_fetch_array($remisionAsociada, MYSQLI_BOTH);
+
+				$linkRemision = '#';
+				$breadCrumbRemision = 'Remisión Pendiente';
+
+				if (!empty($remisionAsociadaDatos[Remision::$primaryKey])) {
+					$linkRemision = 'remisionbdg.php?busqueda='.$remisionAsociadaDatos[Remision::$primaryKey];
+					$breadCrumbRemision = 'Remisión Nro. '.$remisionAsociadaDatos[Remision::$primaryKey];
+				}
+
+				//Factura
+				$predicado = [
+					'factura_remision' => $remisionAsociadaDatos[Remision::$primaryKey],
+					'factura_id_empresa' => $idEmpresa
+				];
+
+				$facturaAsociada = Factura::Select($predicado);
+				$facturaAsociadaDatos = mysqli_fetch_array($facturaAsociada, MYSQLI_BOTH);
+
+				$linkFactura = '#';
+				$breadCrumbFactura = 'Factura Pendiente';
+
+				if (!empty($facturaAsociadaDatos[Factura::$primaryKey])) {
+					$linkFactura = 'remisionbdg.php?busqueda='.$facturaAsociadaDatos[Factura::$primaryKey];
+					$breadCrumbFactura = 'Factura Nro. '.$facturaAsociadaDatos[Factura::$primaryKey];
+				}
 			?>
-				<p style="color: black; background-color: aquamarine; padding: 10px; font-weight: bold;">Esta cotización ya generó pedido en la siguiente fecha: <?=$resultadoD['cotiz_fecha_vendida'];?>.</p>
+				<p style="color: black; background-color: aquamarine; padding: 10px; font-weight: bold;">
+					Esta cotización ya generó pedido en la siguiente fecha: <?=$resultadoD['cotiz_fecha_vendida'];?>. 
+				</p>
+
+				<ul class="breadcrumb" style="background: antiquewhite;">
+					<li><a href="#">Cotización Nro. <?=$resultadoD['cotiz_id'];?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
+					<li><a href="pedidos.php?busqueda=<?=$pedidoAsociadoDatos[Pedido::$primaryKey];?>" target="_blank">Pedido Nro.<?=$pedidoAsociadoDatos[Pedido::$primaryKey];?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
+					<li><a href="<?=$linkRemision;?>" target="_blank"><?=$breadCrumbRemision;?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
+					<li><a href="<?=$linkFactura;?>" target="_blank"><?=$breadCrumbFactura;?></a><span class="divider"></li>
+				</ul>
+
 				<p style="color: black; background-color: gold; padding: 10px; font-weight: bold;"> No es posible hacer más cambios en esta cotización.</p>
 			<?php
 			}
-			?>	
-								
+			?>
 			
 			<div class="row-fluid">
 				<div class="span12">
@@ -231,7 +291,7 @@ include("includes/js-formularios.php");
 								<div class="form-actions">
                                 	<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
 									<?php
-									if($resultadoD['cotiz_vendida']!=1){
+									if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
 									?>
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									<?php }?>
@@ -273,7 +333,7 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Cliente</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" required onChange="clientes(this)">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" required onChange="clientes(this)" <?=$camposCotizacionDisabled;?>>
 											<option value=""></option>
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT cli_id, cli_nombre, cli_categoria, 
@@ -298,7 +358,7 @@ include("includes/js-formularios.php");
 											?>
                                     	</select>
                                     </div>
-									<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA) {?>
 								   <a href="clientes-editar.php?id=<?=$cliente;?>" class="btn btn-info" target="_blank">Editar cliente</a>
 									<?php } ?>
                                </div>
@@ -306,7 +366,7 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Sucursal</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="sucursal" required>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="sucursal" required <?=$camposCotizacionDisabled;?>>
 											<option value=""></option>
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT sucu_id, sucu_nombre FROM sucursales WHERE sucu_cliente_principal='".$cliente."'");
@@ -335,7 +395,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Contacto</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required <?=$camposCotizacionDisabled;?>>
 											<option value=""></option>
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT cont_id, cont_nombre, cont_email FROM contactos 
@@ -366,7 +426,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Usuario Influyente</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente" <?=$camposCotizacionDisabled;?>>
 											<option value=""></option>
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
@@ -383,14 +443,14 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Fecha de la propuesta</label>
 									<div class="controls">
-										<input type="date" class="span4" name="fechaPropuesta" required value="<?=$resultadoD['cotiz_fecha_propuesta'];?>">
+										<input type="date" class="span4" name="fechaPropuesta" required value="<?=$resultadoD['cotiz_fecha_propuesta'];?>" <?=$camposCotizacionDisabled;?>>
 									</div>
 								</div>
 								
 								<div class="control-group">
 									<label class="control-label">Fecha de vencimiento</label>
 									<div class="controls">
-										<input type="date" class="span4" name="fechaVencimiento" required value="<?=$resultadoD['cotiz_fecha_vencimiento'];?>">
+										<input type="date" class="span4" name="fechaVencimiento" required value="<?=$resultadoD['cotiz_fecha_vencimiento'];?>" <?=$camposCotizacionDisabled;?>>
 									</div>
 								</div>
 								
@@ -410,7 +470,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Forma de pago</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="formaPago">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="formaPago" <?=$camposCotizacionDisabled;?>>
 											<option value=""></option>
                                             <option value="1" <?php if($resultadoD['cotiz_forma_pago']==1)echo "selected";?>>Contado</option>
                                             <option value="2" <?php if($resultadoD['cotiz_forma_pago']==2)echo "selected";?>>Crédito</option>
@@ -435,7 +495,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Moneda</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="moneda" onChange="getPay(this)">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="moneda" onChange="getPay(this)" <?=$camposCotizacionDisabled;?>>
 
 											<option value=""></option>
                                             <option value="1" <?php if($resultadoD['cotiz_moneda']==1)echo "selected";?>>COP</option>
@@ -447,7 +507,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 										<label class="control-label">Combos</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="combo[]" multiple id="combos-select">
+											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="combo[]" multiple id="combos-select" <?=$camposCotizacionDisabled;?>>
 												<option value=""></option>
 												<?php
 												$conOp = $conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo, combo_id, combo_nombre FROM cotizacion_productos
@@ -467,7 +527,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 										<label class="control-label">Productos</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="producto[]" multiple id="product-select">
+											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="producto[]" multiple id="product-select" <?=$camposCotizacionDisabled;?>>
 											<?php
             									$consultaProductos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad FROM cotizacion_productos
 												INNER JOIN productos ON prod_id=czpp_producto AND prod_id_empresa='".$idEmpresa."'
@@ -482,32 +542,12 @@ include("includes/js-formularios.php");
 											</select>
 										</div>
 									</div>
-								
-									<div class="control-group">
-										<label class="control-label">Servicios</label>
-										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="servicio[]" multiple id="servicios-select">
-												<option value=""></option>
-												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT czpp_servicio, czpp_cotizacion, serv_id, serv_nombre FROM cotizacion_productos
-												INNER JOIN servicios ON serv_id=czpp_servicio AND serv_id_empresa='".$idEmpresa."' 
-												WHERE czpp_cotizacion='".$resultadoD['cotiz_id']."'
-												ORDER BY serv_nombre");
-												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-												?>
-													<option selected value="<?=$resOp['serv_id'];?>"><?=$resOp['serv_id'].". ".$resOp['serv_nombre'];?></option>
-												<?php
-												}
-												?>
-											</select>
-										</div>
-								   </div>
 
 
 								   <div class="control-group">
 									<label class="control-label">Ocultar descuento de combos</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span2" tabindex="2" name="dctoCombos">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span2" tabindex="2" name="dctoCombos" <?=$camposCotizacionDisabled;?>>
 											<option value=""></option>
                                             <option value="1" <?php if($resultadoD['cotiz_ocultar_descuento_combo']==1)echo "selected";?>>SI</option>
                                             <option value="0" <?php if($resultadoD['cotiz_ocultar_descuento_combo']=='0')echo "selected";?>>NO</option>
@@ -521,7 +561,7 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Requiere un descuento especial?</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span2" tabindex="2" name="dctoEspecial">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span2" tabindex="2" name="dctoEspecial" <?=$camposCotizacionDisabled;?>>
 											<option value=""></option>
                                             <option value="1" <?php if($resultadoD['cotiz_descuentos_especiales']==1)echo "selected";?>>SI</option>
                                             <option value="0" <?php if($resultadoD['cotiz_descuentos_especiales']=='0')echo "selected";?>>NO</option>
@@ -534,21 +574,21 @@ include("includes/js-formularios.php");
 									<div class="control-group">
 										<label class="control-label">Observaciones</label>
 										<div class="controls">
-											<textarea rows="5" cols="80" style="width: 80%" class="tinymce-simple" name="notas"><?=$resultadoD['cotiz_observaciones'];?></textarea>
+											<textarea rows="5" cols="80" style="width: 80%" class="tinymce-simple" name="notas" <?=$camposCotizacionDisabled;?>><?=$resultadoD['cotiz_observaciones'];?></textarea>
 										</div>
 									</div>
 								
 								<div class="control-group">
 									<label class="control-label">Costo Envío</label>
 									<div class="controls">
-										<input type="text" class="span4" name="envio" value="<?=$resultadoD['cotiz_envio'];?>">
+										<input type="text" class="span4" name="envio" value="<?=$resultadoD['cotiz_envio'];?>" <?=$camposCotizacionDisabled;?>>
 									</div>
 								</div>
 								
                                <div class="form-actions">
                                 	<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
 									<?php
-									if($resultadoD['cotiz_vendida']!=1){
+									if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
 									?>
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									<?php }?>
@@ -644,7 +684,7 @@ include("includes/js-formularios.php");
 									
                                 	<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
 									<?php
-									if($resultadoD['cotiz_vendida']!=1){
+									if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
 									?>
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 									<?php }?>

@@ -166,14 +166,14 @@ $paginaActual['pag_nombre'] = "Facturas";
 										<?php
 										if (isset($_GET["cte"]) and $_GET["cte"] != "") {
 											$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
-											LEFT JOIN clientes ON cli_id=factura_cliente AND cli_id='" . $_GET["cte"] . "'
+											INNER JOIN clientes ON cli_id=factura_cliente AND cli_id='" . $_GET["cte"] . "'
 											WHERE factura_id_empresa='".$idEmpresa."'
 											ORDER BY factura_id DESC
 											LIMIT $inicio, $limite
 											");
 										} else {
 											$consulta = mysqli_query($conexionBdPrincipal, "SELECT * FROM facturas
-											LEFT JOIN clientes ON cli_id=factura_cliente
+											INNER JOIN clientes ON cli_id=factura_cliente
 											LEFT JOIN proveedores ON prov_id=factura_proveedor
 											INNER JOIN usuarios ON usr_id=factura_creador
 											WHERE factura_id=factura_id AND factura_id_empresa='".$idEmpresa."' $filtro
@@ -187,9 +187,9 @@ $paginaActual['pag_nombre'] = "Facturas";
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 											
 											$czppFactura=$res['factura_id'];
-											if($res['factura_concepto']=="Traída de remisión"){
-												$czppFactura=$res['factura_remision'];
-											}
+											// if($res['factura_concepto']=="Traída de remisión"){
+											// 	$czppFactura=$res['factura_remision'];
+											// }
 
 											if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$consultaZona=mysqli_query($conexionBdPrincipal, "SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
@@ -208,6 +208,7 @@ $paginaActual['pag_nombre'] = "Facturas";
 											
 											$consultaTotal = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
 													WHERE czpp_cotizacion='".$czppFactura."' AND czpp_valor>0 AND czpp_cantidad>0
+													AND czpp_tipo=".CZPP_TIPO_FACT."
 													GROUP BY czpp_id
 													");
 
@@ -303,10 +304,11 @@ $paginaActual['pag_nombre'] = "Facturas";
 													$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
 													INNER JOIN productos ON prod_id=czpp_producto
 													WHERE czpp_cotizacion='" . $czppFactura . "'
+													AND czpp_tipo=".CZPP_TIPO_FACT."
 													");
 													$i = 1;
 													while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
-														echo "<b>" . $i . ".</b> " . $prod['prod_nombre'] . "</br>";
+														echo "<b>" . $i . ".</b> " . $prod['prod_nombre'] . " <b>(".$prod['czpp_cantidad']." Unds.)</b></br>";
 														$i++;
 													}
 													?>
@@ -366,8 +368,8 @@ $paginaActual['pag_nombre'] = "Facturas";
 									<tfoot>
 										<tr style="height: 30px; font-weight: bold; font-size: 16px;">
 											<td colspan="12" style="text-align: right;">Total</td>
-											<td>$<?= number_format($sumaFacturasSinIva, 0, ".", ".");?></td>
-											<td>$<?= number_format($sumaFacturasConIva, 0, ".", ".");?></td>
+											<td>$<?= number_format($sumaFacturasSinIva, 2, ".", ".");?></td>
+											<td>$<?= number_format($sumaFacturasConIva, 2, ".", ".");?></td>
 											<td colspan="3">&nbsp;</td>
 										</tr>
 									</tfoot>

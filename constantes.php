@@ -17,6 +17,10 @@ define('CLI_CATEGORIA_DEALER', 3);
 define('TIK_ESTADO_ABIERTO', 1);
 define('TIK_ESTADO_CERRADO', 2);
 
+define('TICKET_PRIORIDAD_NORMAL', 1);
+define('TICKET_PRIORIDAD_URGENTE', 2);
+define('TICKET_PRIORIDAD_MUY_URGENTE', 3);
+
 // Constantes para 'cotizacion_productos'
 define('CZPP_TIPO_COTZ', 1);
 define('CZPP_TIPO_PED', 2);
@@ -65,3 +69,7 @@ define('REM_TIPOS_EQUIPOS_USADO', 2);
 define('ADMIN', 1);
 
 define('CIUDADES_INTERNACIONALES', 1122);
+
+//MONEDAS
+define('MONEDA_COP', 1);
+define('MONEDA_USD', 2);
