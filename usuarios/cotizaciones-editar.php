@@ -542,26 +542,6 @@ include("includes/js-formularios.php");
 											</select>
 										</div>
 									</div>
-								
-									<div class="control-group">
-										<label class="control-label">Servicios</label>
-										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="servicio[]" multiple id="servicios-select" <?=$camposCotizacionDisabled;?>>
-												<option value=""></option>
-												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT czpp_servicio, czpp_cotizacion, serv_id, serv_nombre FROM cotizacion_productos
-												INNER JOIN servicios ON serv_id=czpp_servicio AND serv_id_empresa='".$idEmpresa."' 
-												WHERE czpp_cotizacion='".$resultadoD['cotiz_id']."'
-												ORDER BY serv_nombre");
-												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-												?>
-													<option selected value="<?=$resOp['serv_id'];?>"><?=$resOp['serv_id'].". ".$resOp['serv_nombre'];?></option>
-												<?php
-												}
-												?>
-											</select>
-										</div>
-								   </div>
 
 
 								   <div class="control-group">
