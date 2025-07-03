@@ -3,7 +3,10 @@
 $idPagina = 43;
 $paginaActual['pag_nombre'] = "Notificaciones";
 ?>
-<?php include("includes/verificar-paginas.php");?>
+<?php 
+include("includes/verificar-paginas.php");
+mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_usuario='".$_SESSION["id"]."' AND not_varios IS NULL");
+?>
 <?php include("includes/head.php");?>
 
 <!-- styles -->
@@ -165,7 +168,6 @@ $paginaActual['pag_nombre'] = "Notificaciones";
 								}
 							}
 
-							mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_usuario='".$_SESSION["id"]."' AND not_varios IS NULL");
 								
 							if(is_numeric($_GET["idNot"])){
 								mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_id='".$_GET["idNot"]."'");
