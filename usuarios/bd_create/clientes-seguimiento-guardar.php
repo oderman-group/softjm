@@ -49,10 +49,10 @@ require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
 		$numero = (count($_POST["encargado"]));
 
 		if ($numero == 1) {
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_archivo, cseg_cotizo, cseg_vendio, cseg_consiguio_datos, cseg_forma_contacto, cseg_demostracion)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["encargado"][0] . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $archivo . "','" . $cotizo . "','" . $vendio . "','" . $datos . "','" . $_POST["formaContacto"] . "','" . $demostracion . "')");
+			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_archivo, cseg_cotizo, cseg_vendio, cseg_consiguio_datos, cseg_forma_contacto, cseg_demostracion, cseg_hora_proximo_contacto, cseg_minutos_recordar_anticipadamente)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["encargado"][0] . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $archivo . "','" . $cotizo . "','" . $vendio . "','" . $datos . "','" . $_POST["formaContacto"] . "','" . $demostracion . "','" . $_POST["horaPC"] . "','" . $_POST["minutosRecordarAntes"] . "')");
 			$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 		} elseif ($numero > 1) {
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_varios, cseg_archivo, cseg_forma_contacto, cseg_demostracion)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $numero . "','" . $archivo . "','" . $_POST["formaContacto"] . "','" . $demostracion . "')");
+			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_varios, cseg_archivo, cseg_forma_contacto, cseg_demostracion, cseg_hora_proximo_contacto, cseg_minutos_recordar_anticipadamente)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $numero . "','" . $archivo . "','" . $_POST["formaContacto"] . "','" . $demostracion . "','" . $_POST["horaPC"] . "','" . $_POST["minutosRecordarAntes"] . "')");
 			$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 		}
 	} else {
@@ -184,7 +184,10 @@ require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
 			];
 
 			$_SESSION["dataAdicional"]["nombre_empresa"] = "JM EQUIPOS S.A.S."; // Simular sesión
-			$fin = "<p>".$_POST["asunto"]."</p>"; // Simular el cuerpo HTML
+			$fin = "
+			<p>Te han asignado un nuevo seguimiento con el siguiente asunto: <br><i>".$_POST["asunto"]."</i></p>
+			<p>Recuerda que para entrar al link del seguimiento debes estar logueado en el sistema.</p>
+			"; // Simular el cuerpo HTML
 
 			// 1. Instanciar el servicio
 			$mailer = new MailerService();
@@ -196,8 +199,8 @@ require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
 				'subject'       => $subject,
 				'app_name'      => $_SESSION["dataAdicional"]["nombre_empresa"], // Reutiliza el nombre de la empresa
 				'content'       => $fin, // Tu contenido HTML aquí
-				'button_link'   => '', // Si no necesitas botón, dejar vacío
-				'button_text'   => '', // Si no necesitas botón, dejar vacío
+				'button_link'   => 'https://developer.orioncrm.com.co/softjm/usuarios/clientes-seguimiento.php?idTK='.$tiketID.'&seg='.$idInsertU, // Si no necesitas botón, dejar vacío
+				'button_text'   => 'Ver el seguimiento', // Si no necesitas botón, dejar vacío
 				'support_email' => 'soporte@jmequipos.com',
 			];
 
