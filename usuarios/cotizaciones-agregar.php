@@ -312,14 +312,6 @@ include("includes/js-formularios.php");
 									</div>
 								
 									<div class="control-group">
-										<label class="control-label">Servicios</label>
-										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="servicio[]" multiple id="servicios-select">
-											</select>
-										</div>
-								   </div>
-								
-									<div class="control-group">
 										<label class="control-label">Observaciones</label>
 										<div class="controls">
 											<textarea rows="5" cols="80" style="width: 80%" class="tinymce-simple" name="notas"></textarea>
