@@ -199,7 +199,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
 				'subject'       => $subject,
 				'app_name'      => $_SESSION["dataAdicional"]["nombre_empresa"], // Reutiliza el nombre de la empresa
 				'content'       => $fin, // Tu contenido HTML aquí
-				'button_link'   => 'https://developer.orioncrm.com.co/softjm/usuarios/clientes-seguimiento.php?idTK='.$tiketID.'&seg='.$idInsertU, // Si no necesitas botón, dejar vacío
+				'button_link'   => REDIRECT_ROUTE.'/usuarios/clientes-seguimiento.php?idTK='.$tiketID.'&seg='.$idInsertU, // Si no necesitas botón, dejar vacío
 				'button_text'   => 'Ver el seguimiento', // Si no necesitas botón, dejar vacío
 				'support_email' => 'soporte@jmequipos.com',
 			];
