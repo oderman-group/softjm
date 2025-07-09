@@ -510,9 +510,15 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 												$comision = $res['prod_comision'] / 100;
 											}
 
-											$valorComision = ($res['prod_precio'] * $comision);
+											$valorComision = 0;
+											$precioConIva = 0;
 
-											$precioConIva = $res['prod_precio'] + ($res['prod_precio'] * 0.19);
+											if (!empty($res['prod_precio'])) {
+
+												$valorComision = ($res['prod_precio'] * $comision);
+
+												$precioConIva = $res['prod_precio'] + ($res['prod_precio'] * 0.19);
+											}
 
 											$precioListaDolarHoy = ($precioListaUSD * $configuracion['conf_trm_venta']);
 										?>
