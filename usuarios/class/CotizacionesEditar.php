@@ -71,7 +71,7 @@ class CotizacionesEditar {
             if ($datosUsuarioActual['usr_tipo'] == 1) {
                 $htmlTabla .= '<b>Costo: $' . number_format($prod['prod_costo'], 0, ",", ".") . '</b><br>';
                 $htmlTabla .= '<b>Utilidad: ' . $prod['prod_utilidad'] . '%</b><br>';
-                $htmlTabla .= '<b>Valor Utilidad: $' . number_format(($prod['czpp_valor'] - $prod['prod_costo']), 0, ",", ".") . '</b><br>';
+                $htmlTabla .= '<b class="valor-utilidad" data-utilidad="' . ($prod['czpp_valor'] - $prod['prod_costo']) . '">Valor Utilidad: $' . number_format(($prod['czpp_valor'] - $prod['prod_costo']), 0, ",", ".") . '</b><br>';
             }
             $htmlTabla .= '</td>';
             $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
@@ -198,7 +198,7 @@ class CotizacionesEditar {
             $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no" '.$camposCotizacionDisabled.'><br>';
             if ($datosUsuarioActual['usr_tipo'] == 1) {
                 $htmlTabla .= '<b>Costo: $' . number_format($sumaCostosProductosCombos, 0, ",", ".") . '</b><br>';
-                $htmlTabla .= '<b>Valor Utilidad: $' . number_format(($prod['czpp_valor'] - $sumaCostosProductosCombos), 0, ",", ".") . '</b><br>';
+                $htmlTabla .= '<b class="valor-utilidad" data-utilidad="' . ($prod['czpp_valor'] - $sumaCostosProductosCombos) . '">Valor Utilidad: $' . number_format(($prod['czpp_valor'] - $sumaCostosProductosCombos), 0, ",", ".") . '</b><br>';
             }
             $htmlTabla .= '</td>';
             $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
