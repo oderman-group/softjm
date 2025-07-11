@@ -33,47 +33,48 @@ if($extension == 'xlsx'){
 
 			$hojaActual = $documento->getSheet(0);
 			$numFilas = $hojaActual->getHighestDataRow();
-			if($_POST["filaFinal"] > 0){
+
+			if ($_POST["filaFinal"] > 0) {
 				$numFilas = $_POST["filaFinal"];
 			}
+
 			$letraColumnas= $hojaActual->getHighestDataColumn();
 			$f=2;
 			$arrayTodos = [];
 			$claves_validar = array('prod_id', 'prod_referencia', 'prod_nombre');
 
-			// Check_id 7 y
-				$sql = "INSERT INTO productos(prod_id, prod_referencia, prod_nombre, prod_grupo1, prod_categoria, prod_marca, prod_costo, prod_descuento1, prod_descuento2, prod_utilidad, prod_precio_fabrica, prod_flete, prod_aduana, prod_costo_dolar, prod_visible, prod_ultima_actualizacion, prod_ultima_actualizacion_usuario) VALUES ";
-			// endif-check_id 	
-			
+			// Campos a llenar cuando el producto es nuevo
+			$sql = "INSERT INTO productos(prod_id, prod_referencia, prod_nombre, prod_grupo1, prod_categoria, prod_marca, prod_costo, prod_descuento1, prod_descuento2, prod_utilidad, prod_precio_fabrica, prod_flete, prod_aduana, prod_costo_dolar, prod_visible, prod_ultima_actualizacion, prod_ultima_actualizacion_usuario, prod_precio) VALUES ";
+
 			$productosCreados      = array();
 			$productosActualizados = array();
 			$productosNoCreados    = array();
 
-			while($f<=$numFilas){
+			while ($f <= $numFilas) {
+				$precioLista     = 0;
+				$utilidadActual  = 0;
+				$todoBien        = true;
+				$costoActual     = 0;
 
 				/*
 				***************PRODUCTOS********************
 				*/
-				$todoBien = true;
-
-				// Check_id 7 
-					$arrayIndividual = [
-						'prod_id'		   	  => $hojaActual->getCell('B'.$f)->getValue(),
-						'prod_referencia'     => $hojaActual->getCell('C'.$f)->getValue(),
-						'prod_nombre'         => $hojaActual->getCell('D'.$f)->getValue(),
-						'prod_grupo1'         => $hojaActual->getCell('E'.$f)->getValue(),
-						'prod_categoria'      => $hojaActual->getCell('G'.$f)->getValue(),
-						'prod_marca'  		  => $hojaActual->getCell('I'.$f)->getValue(),
-						'prod_costo_dolar'    => $hojaActual->getCell('L'.$f)->getValue(),
-						'prod_costo' 		  => $hojaActual->getCell('N'.$f)->getValue(),
-						'prod_utilidad'       => $hojaActual->getCell('O'.$f)->getValue(),
-						'prod_descuento1'     => $hojaActual->getCell('P'.$f)->getValue(), // Descuento normal
-						'prod_precio'         => $hojaActual->getCell('Q'.$f)->getValue(), // Precio lista COP
-						'prod_descuento2'     => $hojaActual->getCell('R'.$f)->getValue(), // Descuento Dealear
-						'prod_descuento_web'  => $hojaActual->getCell('T'.$f)->getValue(),
-						'prod_precio_fabrica' => $hojaActual->getCell('X'.$f)->getValue(),
-					];
-				// endif-check_id 
+				$arrayIndividual = [
+					'prod_id'		   	  => $hojaActual->getCell('B'.$f)->getValue(),
+					'prod_referencia'     => $hojaActual->getCell('C'.$f)->getValue(),
+					'prod_nombre'         => $hojaActual->getCell('D'.$f)->getValue(),
+					'prod_grupo1'         => $hojaActual->getCell('E'.$f)->getValue(),
+					'prod_categoria'      => $hojaActual->getCell('G'.$f)->getValue(),
+					'prod_marca'  		  => $hojaActual->getCell('I'.$f)->getValue(),
+					'prod_costo_dolar'    => $hojaActual->getCell('L'.$f)->getValue(),
+					'prod_costo' 		  => $hojaActual->getCell('N'.$f)->getValue(),
+					'prod_utilidad'       => $hojaActual->getCell('O'.$f)->getValue(),
+					'prod_descuento1'     => $hojaActual->getCell('P'.$f)->getValue(), // Descuento normal
+					'prod_precio'         => $hojaActual->getCell('Q'.$f)->getValue(), // Precio lista COP
+					'prod_descuento2'     => $hojaActual->getCell('R'.$f)->getValue(), // Descuento Dealear
+					'prod_descuento_web'  => $hojaActual->getCell('T'.$f)->getValue(),
+					'prod_precio_fabrica' => $hojaActual->getCell('X'.$f)->getValue(),
+				];
 
 				//Validamos que los campos más importantes no vengan vacios
 				foreach ($claves_validar as $clave) {
@@ -83,53 +84,51 @@ if($extension == 'xlsx'){
 				}
 
 				//Si los campos están completos entonces ordenamos los datos del producto
-				if($todoBien) {
+				if ($todoBien) {
+
+					//La utilidad y el costo se le asigna el dato que viene en el excel
+					$utilidadActual = $arrayIndividual['prod_utilidad']/100;
+					$costoActual    = $arrayIndividual['prod_costo'];
 
 					$consultaProducto = $conexionBdPrincipal->query("SELECT * FROM productos 
 					WHERE prod_id='".$arrayIndividual['prod_id']."'");
 					$numProducto = mysqli_num_rows($consultaProducto);
 
-					$origen = 0;
-					if(!empty($_POST["id"])){
-						$datos = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM productos 
-						WHERE prod_id='".$_POST["id"]."'"), MYSQLI_BOTH);
-				
-						if($datos['prod_costo'] != $arrayIndividual['prod_costo']){
-							$origen = 1;
-						}
-					}
+					//Si el producto ya existe, procedemos a actualizar sus datos
+					if ($numProducto > 0) {
+						$precioLista = $arrayIndividual['prod_precio'];
 
-					if($numProducto > 0) {
+						$datos = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
 
-						$costoDolar=0;
-						if(!empty($arrayIndividual['prod_costo_dolar'])){
-							$costoDolar=$arrayIndividual['prod_costo_dolar'];
+						//Si el costo o la utilidad cambian recalculamos el precio lista
+						if ($datos['prod_costo'] != $arrayIndividual['prod_costo'] || $datos['prod_utilidad'] != $arrayIndividual['prod_utilidad']) {
+							$precioLista = Producto::CalcularPrecioLista($costoActual, $utilidadActual);
+
+							$conexionBdPrincipal->query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$arrayIndividual['prod_id']."', '".$datos['prod_precio']."', '".$precioLista."', '".$_SESSION["id"]."', 1)");
 						}
+
+						$costoDolar = 0;
+
+						if (!empty($arrayIndividual['prod_costo_dolar'])) {
+							$costoDolar = $arrayIndividual['prod_costo_dolar'];
+						}
+
 						$camposActualizar=", prod_costo_dolar='".round($costoDolar,2)."'";
 
-						if(true){
-							$camposActualizar=",
-							prod_referencia='".$arrayIndividual['prod_referencia']."', 
-							prod_nombre='".$arrayIndividual['prod_nombre']."', 
-							prod_grupo1='".$arrayIndividual['prod_grupo1']."', 
-							prod_categoria='".$arrayIndividual['prod_categoria']."', 
-							prod_marca='".$arrayIndividual['prod_marca']."', 
-							prod_costo_dolar='".$arrayIndividual['prod_costo_dolar']."', 
-							prod_costo='".$arrayIndividual['prod_costo']."',
-							prod_utilidad='".$arrayIndividual['prod_utilidad']."', 
-							prod_descuento1='".$arrayIndividual['prod_descuento1']."', 
-							prod_precio='".$arrayIndividual['prod_precio']."', 
-							prod_descuento2='".$arrayIndividual['prod_descuento2']."', 
-							prod_descuento_web='".$arrayIndividual['prod_descuento_web']."'
-							";
-
-							if($origen > 0){
-								$utilidad = $datos['prod_utilidad']/100;
-								$precio1 = Producto::CalcularPrecioLista($arrayIndividual['prod_costo'], $utilidad);
-			
-								$conexionBdPrincipal->query("INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)VALUES('".$arrayIndividual['prod_id']."', '".$datos['prod_precio']."', '".$precio1."', '".$_SESSION["id"]."', '".$origen."')");
-							}
-						}
+						$camposActualizar=",
+						prod_referencia='".$arrayIndividual['prod_referencia']."', 
+						prod_nombre='".$arrayIndividual['prod_nombre']."', 
+						prod_grupo1='".$arrayIndividual['prod_grupo1']."', 
+						prod_categoria='".$arrayIndividual['prod_categoria']."', 
+						prod_marca='".$arrayIndividual['prod_marca']."', 
+						prod_costo_dolar='".$arrayIndividual['prod_costo_dolar']."', 
+						prod_costo='".$arrayIndividual['prod_costo']."',
+						prod_utilidad='".$arrayIndividual['prod_utilidad']."', 
+						prod_descuento1='".$arrayIndividual['prod_descuento1']."', 
+						prod_precio='".$precioLista."', 
+						prod_descuento2='".$arrayIndividual['prod_descuento2']."', 
+						prod_descuento_web='".$arrayIndividual['prod_descuento_web']."'
+						";
 
 						try {
 							$conexionBdPrincipal->query("UPDATE productos SET
@@ -144,38 +143,32 @@ if($extension == 'xlsx'){
 							echo "Excepción catpurada: ".$e->getMessage();
 							exit();
 						}
-
+					// Insertamos el producto nuevo cuando no existe previamente
 					} else {
+						$precioLista = Producto::CalcularPrecioLista($costoActual, $utilidadActual);
 
 						$arrayTodos[$f] = $arrayIndividual;
 
-						if(true){
-
-							$sql .= "(
-							'".$arrayIndividual['prod_id']."', 
-							'".$arrayIndividual['prod_referencia']."', 
-							'".$arrayIndividual['prod_nombre']."', 
-							'".$arrayIndividual['prod_grupo1']."', 
-							'".$arrayIndividual['prod_categoria']."', 
-							'".$arrayIndividual['prod_marca']."', 
-							'".$arrayIndividual['prod_costo']."', 
-							'".$arrayIndividual['prod_descuento1']."', 
-							'".$arrayIndividual['prod_descuento2']."', 
-							'".$arrayIndividual['prod_utilidad']."', 
-							'".$arrayIndividual['prod_precio_fabrica']."', 
-							'".$arrayIndividual['prod_flete']."', 
-							'".$arrayIndividual['prod_aduana']."', 
-							'".$arrayIndividual['prod_costo_dolar']."', 
-							1, 
-							now(), 
-							'".$_SESSION["id"]."'
-							),";
-
-						}else{
-
-							$sql .= "('".$arrayIndividual['prod_id']."', '".$arrayIndividual['prod_referencia']."', '".$arrayIndividual['prod_nombre']."', '".$arrayIndividual['prod_grupo1']."', '".$arrayIndividual['prod_categoria']."', '".$arrayIndividual['prod_marca']."', '".$arrayIndividual['prod_costo']."', 1, now(), '".$_SESSION["id"]."'),";
-
-						}
+						$sql .= "(
+						'".$arrayIndividual['prod_id']."', 
+						'".$arrayIndividual['prod_referencia']."', 
+						'".$arrayIndividual['prod_nombre']."', 
+						'".$arrayIndividual['prod_grupo1']."', 
+						'".$arrayIndividual['prod_categoria']."', 
+						'".$arrayIndividual['prod_marca']."', 
+						'".$arrayIndividual['prod_costo']."', 
+						'".$arrayIndividual['prod_descuento1']."', 
+						'".$arrayIndividual['prod_descuento2']."', 
+						'".$arrayIndividual['prod_utilidad']."', 
+						'".$arrayIndividual['prod_precio_fabrica']."', 
+						'".$arrayIndividual['prod_flete']."', 
+						'".$arrayIndividual['prod_aduana']."', 
+						'".$arrayIndividual['prod_costo_dolar']."', 
+						1, 
+						now(), 
+						'".$_SESSION["id"]."',
+						'".$precioLista."'
+						),";
 
 						$productosCreados["FILA_".$f] = $arrayIndividual['prod_id'];
 
@@ -185,6 +178,9 @@ if($extension == 'xlsx'){
 				}
 
 				$f++;
+
+				//Libreramos el espacio en memoria del resultado de la consulta mysqli
+				mysqli_free_result($consultaProducto);
 			}
 			
 			$numeroProductosCreados = 0;
@@ -232,7 +228,7 @@ if($extension == 'xlsx'){
 			echo '<script type="text/javascript">window.location.href="productos.php?msg=15&'.$summary.'";</script>';
 			exit();
 
-		}else{
+		} else {
 			switch ($_FILES['planilla']['error']) {
 				case UPLOAD_ERR_INI_SIZE:
 					$message = "El fichero subido excede la directiva upload_max_filesize de php.ini.";
@@ -263,12 +259,12 @@ if($extension == 'xlsx'){
 			echo '<script type="text/javascript">window.location.href="productos-importar.php?error=3&message='.$message.'";</script>';
 			exit();
 		}
-	}else{
+	} else {
 		$message = 'El archivo enviado es invalido. Por favor vuelva a intentarlo: '.$_FILES['planilla']['error'];
 		echo '<script type="text/javascript">window.location.href="productos-importar.php?error=3&message='.$message.'";</script>';
 		exit();
 	}	
-}else{
+} else {
 	$message = "Este archivo no es admitido, por favor verifique que el archivo a importar sea un excel (.xlsx)";
 	echo '<script type="text/javascript">window.location.href="productos-importar.php?error=3&message='.$message.'";</script>';
 	exit();
