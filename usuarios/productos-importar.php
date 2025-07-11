@@ -155,7 +155,7 @@ include("includes/texto-editor.php");
 					<div style="background-color: antiquewhite; padding: 5px; margin: 10px;">
 					<h2>Información importante</h2>
 						<p><b>1.</b> Descargue la plantilla de excel. <a href="productos-exportar.php" target="_blank">[Descargar plantilla]</a></p>
-						<p><b>2.</b> Llene la información de sus productos en la planilla descargada y guardela con ese mismo formato que ya trae la plantilla (Excel 97-2003).</p>
+						<p><b>2.</b> Llene la información de sus productos en la planilla descargada y guardela con ese mismo formato que ya trae la plantilla (Excel xlsx).</p>
 						<p><b>3.</b> Suba la planilla de excel.</p>
 					</div>
 					
