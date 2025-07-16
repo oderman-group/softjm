@@ -73,7 +73,10 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     conf_comision_vendedores='" . $_POST["comisionVendedores"] . "', 
     conf_coreo_puntos='" . $_POST["correoPuntos"] . "', 
     conf_vencimiento_puntos='" . $_POST["fechaVencimientoSaldo"] . "', 
-    conf_cliente_imprimir_certificado='" . $_POST["clientesImprimir"] . "', conf_terminos_condiciones='".$_POST["terminos"]."'
+    conf_cliente_imprimir_certificado='" . $_POST["clientesImprimir"] . "', 
+	conf_terminos_condiciones='".$_POST["terminos"]."',
+    conf_tiempo_ticket_sin_respuesta='".$_POST["conf_tiempo_ticket_sin_respuesta"]."',
+    conf_tiempo_tareas_vencidas='".$_POST["conf_tiempo_tareas_vencidas"]."'
     WHERE conf_id_empresa= '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 	
 	include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
