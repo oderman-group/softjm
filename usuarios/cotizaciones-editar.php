@@ -676,7 +676,7 @@ include("includes/js-formularios.php");
 							<?php
 							if(Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 
-								<p style="color: black; background-color: <?=$colorCredito;?>; padding: 15px; font-weight: bold; font-size: 16px;">Esta cotización deja una utilidad aproximada de $<?=!empty($sumaUtilidad) ? number_format( ($sumaUtilidad) ,0,",",".") : 0;?></p>
+								<p style="color: black; background-color: <?=$colorCredito;?>; padding: 15px; font-weight: bold; font-size: 16px;">Esta cotización deja una utilidad aproximada de $<span id="utilidadTotal">0</span>
 							<?php }?>
 							
 							
