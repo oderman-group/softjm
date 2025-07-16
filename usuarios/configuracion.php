@@ -456,6 +456,28 @@ include("includes/js-formularios.php");
                                             </div>
                                         </div>
 
+                                        <hr>
+
+                                        <div class="control-group">
+                                            <label class="control-label">Tiempo para alerta de ticket sin respuesta (Horas)
+                                              <button class="tooltipp">Establezca el tiempo en horas para que el sistema dispare una notificación al encargado cuando un ticket no tenga respuesta.</button>
+										      <i class="fa-solid fa-circle-question"></i>
+                                            </label>
+                                            <div class="controls">
+                                                <input type="number" class="span1" name="conf_tiempo_ticket_sin_respuesta" value="<?= $resultadoD['conf_tiempo_ticket_sin_respuesta']; ?>">
+                                            </div>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label class="control-label">Tiempo para alerta de tareas vencidas (Horas)
+                                              <button class="tooltipp">Establezca la frecuencia en horas para que el sistema dispare una notificación al encargado por tareas vencidas.</button>
+										      <i class="fa-solid fa-circle-question"></i>
+                                            </label>
+                                            <div class="controls">
+                                                <input type="number" class="span1" name="conf_tiempo_tareas_vencidas" value="<?= $resultadoD['conf_tiempo_tareas_vencidas']; ?>">
+                                            </div>
+                                        </div>
+
 
                                     </fieldset>
 
