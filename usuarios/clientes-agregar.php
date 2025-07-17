@@ -372,6 +372,13 @@ include("includes/js-formularios.php");
                                         <span style="color:#F03;">En caso de que este cliente sea el mismo contacto</span>
 									</div>
 								</div>
+
+								<div class="control-group">
+									<label class="control-label">Este es un cliente Institucional?</label>
+									<div class="controls">
+                                        <input type="checkbox" value="1" name="clienteInstitucional">
+									</div>
+								</div>
                                 
 
                               
