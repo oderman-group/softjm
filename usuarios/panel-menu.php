@@ -371,7 +371,7 @@ FLOT PIE CHART
 						</div>
 					</div>
 					
-					<div class="content-widgets gray">
+					<!-- <div class="content-widgets gray">
 						<div class="widget-head blue">
 							<h3><i class="icon-trophy"></i> Oportunidades</h3>
 						</div>
@@ -380,26 +380,32 @@ FLOT PIE CHART
 								<li>Hay una oportunidad con <a href="#" id="add-regular">Nombre del cliente</a> para el asunto...</li>
 							</ul>
 						</div>
-					</div>
+					</div> -->
 					
 					<?php
 					$ConsultaNumTikets=$conexionBdPrincipal->query("SELECT * FROM clientes_tikets
 					INNER JOIN clientes ON cli_id=tik_cliente
-					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado='".TIK_ESTADO_ABIERTO."'
+					WHERE 
+						tik_usuario_responsable='".$_SESSION["id"]."' 
+					AND tik_estado='".TIK_ESTADO_ABIERTO."'
+					AND tik_prioridad = ".TICKET_PRIORIDAD_MUY_URGENTE."
 					ORDER BY tik_tipo_tiket DESC
 					");
 					$NumtiketsI = $ConsultaNumTikets->num_rows;
 
 					$tiketsI = $conexionBdPrincipal->query("SELECT * FROM clientes_tikets
 					INNER JOIN clientes ON cli_id=tik_cliente
-					WHERE tik_usuario_responsable='".$_SESSION["id"]."' AND tik_estado='".TIK_ESTADO_ABIERTO."' 
+					WHERE 
+						tik_usuario_responsable='".$_SESSION["id"]."' 
+					AND tik_estado='".TIK_ESTADO_ABIERTO."' 
+					AND tik_prioridad = ".TICKET_PRIORIDAD_MUY_URGENTE."
 					ORDER BY tik_tipo_tiket DESC
 					LIMIT 0,5
 					");
 					?>
 					<div class="content-widgets gray">
 						<div class="widget-head" style="background-color: #eb4132;">
-							<h3><i class="icon-list"></i> Tickets Abiertos (<?=$NumtiketsI;?>)</h3>
+							<h3><i class="icon-list"></i> Tickets Muy Urgentes Abiertos (<?=$NumtiketsI;?>)</h3>
 						</div>
 							<?php $i=1; while($tkResI = mysqli_fetch_array($tiketsI, MYSQLI_BOTH)){?>
                             <ul class="sample-noty">

@@ -2,12 +2,8 @@
 require_once("../sesion.php");
 
 include_once(RUTA_PROYECTO."/usuarios/class/Api/JmEquipos.php");
+require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
 
-require '../../librerias/phpmailer/Exception.php';
-require '../../librerias/phpmailer/PHPMailer.php';
-require '../../librerias/phpmailer/SMTP.php';
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
 	if (empty($_POST["idTK"]) && empty($_POST["tiketCreado"])) {
 		mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_tikets(tik_asunto_principal, tik_tipo_tiket, tik_fecha_creacion, tik_usuario_responsable, tik_estado, tik_cliente, tik_prioridad, tik_observaciones, tik_canal)
@@ -53,10 +49,10 @@ use PHPMailer\PHPMailer\Exception;
 		$numero = (count($_POST["encargado"]));
 
 		if ($numero == 1) {
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_archivo, cseg_cotizo, cseg_vendio, cseg_consiguio_datos, cseg_forma_contacto, cseg_demostracion)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["encargado"][0] . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $archivo . "','" . $cotizo . "','" . $vendio . "','" . $datos . "','" . $_POST["formaContacto"] . "','" . $demostracion . "')");
+			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_archivo, cseg_cotizo, cseg_vendio, cseg_consiguio_datos, cseg_forma_contacto, cseg_demostracion, cseg_hora_proximo_contacto, cseg_minutos_recordar_anticipadamente)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["encargado"][0] . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $archivo . "','" . $cotizo . "','" . $vendio . "','" . $datos . "','" . $_POST["formaContacto"] . "','" . $demostracion . "','" . $_POST["horaPC"] . "','" . $_POST["minutosRecordarAntes"] . "')");
 			$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 		} elseif ($numero > 1) {
-			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_varios, cseg_archivo, cseg_forma_contacto, cseg_demostracion)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $numero . "','" . $archivo . "','" . $_POST["formaContacto"] . "','" . $demostracion . "')");
+			mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_varios, cseg_archivo, cseg_forma_contacto, cseg_demostracion, cseg_hora_proximo_contacto, cseg_minutos_recordar_anticipadamente)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $numero . "','" . $archivo . "','" . $_POST["formaContacto"] . "','" . $demostracion . "','" . $_POST["horaPC"] . "','" . $_POST["minutosRecordarAntes"] . "')");
 			$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 		}
 	} else {
@@ -71,11 +67,17 @@ use PHPMailer\PHPMailer\Exception;
 		mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_realizado=1 WHERE cseg_id='" . $idInsertU . "'");
 	}
 
+	$contactoCLiente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos 
+	INNER JOIN clientes ON cli_id=cont_cliente_principal
+	WHERE cont_id='" . $_POST["contacto"] . "'
+	"));
+    $asesor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $_SESSION["id"] . "'"));
+
     if(!empty($_POST["portafolios"])){
-        $numero = (count($_POST["portafolios"]));
-        if ($numero > 0) {
+        $numeroPortafolios = (count($_POST["portafolios"]));
+        if ($numeroPortafolios > 0) {
             $contador = 0;
-            while ($contador < $numero) {
+            while ($contador < $numeroPortafolios) {
                 $portafolios .= '<a href="' . Api_JmEquipos::JM_URL_ARCHIVOS_PORTAFOLIOS . $_POST["portafolios"][$contador] . '">' . $_POST["portafolios"][$contador] . '</a><br>';
                 $contador++;
             }
@@ -83,10 +85,7 @@ use PHPMailer\PHPMailer\Exception;
         $numC = strlen($portafolios) - 1;
         $portafolios = substr($portafolios, 0, $numC);
 
-        if ($numero > 0) {
-            $contactoCLiente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='" . $_POST["contacto"] . "'"));
-
-            $asesor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $_SESSION["id"] . "'"));
+        if ($numeroPortafolios > 0) {
 
             $fin =  '<html><body style="background-color:#FFF;">';
 			$fin .=  '<div style="width: 100%; display: grid; place-content: center;">';
@@ -130,34 +129,34 @@ use PHPMailer\PHPMailer\Exception;
 				$fin .=  '</body></html>';
 
             // Instantiation and passing `true` enables exceptions
-            $mail = new PHPMailer(true);
+           // $mail = new PHPMailer(true);
             echo '<div style="display:none;">';
             try {
-                //Server settings
-                $mail->SMTPDebug = 2;                                       // Enable verbose debug output
-                $mail->isSMTP();                                            // Set mailer to use SMTP
-                $mail->Host       = 'mail.orioncrm.com.co';  // Specify main and backup SMTP servers
-                $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-                $mail->Username   = $configuracion['conf_email'];                     // SMTP username
-                $mail->Password   = $configuracion['conf_clave_correo'];                              // SMTP password
-                $mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
-                $mail->Port       = 465;                                    // TCP port to connect to
+                // //Server settings
+                // $mail->SMTPDebug = 2;                                       // Enable verbose debug output
+                // $mail->isSMTP();                                            // Set mailer to use SMTP
+                // $mail->Host       = 'mail.orioncrm.com.co';  // Specify main and backup SMTP servers
+                // $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+                // $mail->Username   = $configuracion['conf_email'];                     // SMTP username
+                // $mail->Password   = $configuracion['conf_clave_correo'];                              // SMTP password
+                // $mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
+                // $mail->Port       = 465;                                    // TCP port to connect to
 
-                //Recipients
-                $mail->setFrom($configuracion['conf_email'], '');
+                // //Recipients
+                // $mail->setFrom($configuracion['conf_email'], '');
 
-                $mail->addAddress($contactoCLiente['cont_email'], $contactoCLiente['cont_nombre']);     // Add a recipient
-                $mail->addAddress($asesor['usr_email'], $asesor['usr_nombre']);     // Add a recipient
+                // $mail->addAddress($contactoCLiente['cont_email'], $contactoCLiente['cont_nombre']);     // Add a recipient
+                // $mail->addAddress($asesor['usr_email'], $asesor['usr_nombre']);     // Add a recipient
 
 
-                // Content
-                $mail->isHTML(true);                                  // Set email format to HTML
-                $mail->Subject = "PORTAFOLIO ".$_SESSION["dataAdicional"]['nombre_empresa'];
-                $mail->Body = $fin;
-                $mail->CharSet = 'UTF-8';
+                // // Content
+                // $mail->isHTML(true);                                  // Set email format to HTML
+                // $mail->Subject = "PORTAFOLIO ".$_SESSION["dataAdicional"]['nombre_empresa'];
+                // $mail->Body = $fin;
+                // $mail->CharSet = 'UTF-8';
 
-                $mail->send();
-                echo 'Enviado portafolio al cliente.';
+                // $mail->send();
+                // echo 'Enviado portafolio al cliente.';
 
                 mysqli_query($conexionBdPrincipal,"INSERT INTO buzon_salida(buz_remite, buz_destino, buz_tipo, buz_estado, buz_observacion, buz_referencia, buz_cliente, buz_usuario, buz_contacto)VALUES('" . $asesor['usr_email'] . "', '" . $contactoCLiente['cont_email'] . "', 1, 1, 'Enviados correctamente.<br> Portafolios:<br> " . $portafolios . "', '" . $idInsertU . "', '" . $contactoCLiente['cont_cliente_principal'] . "', '" . $_SESSION["id"] . "', '" . $contactoCLiente['cont_id'] . "')");
             } catch (Exception $e) {
@@ -176,49 +175,69 @@ use PHPMailer\PHPMailer\Exception;
 		$contador = 0;
 		while ($contador < $numero) {
 			mysqli_query($conexionBdPrincipal,"INSERT INTO notificaciones(not_asunto, not_cliente, not_usuario, not_visto, not_estado, not_seguimiento, not_fecha)VALUES('" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "', '" . $_POST["cliente"] . "', '" . $_POST["encargado"][$contador] . "', 0, 1, '" . $idInsertU . "', now())");
+
+			$contactoCliente = [
+				'cont_email' => 'jhonoderman@gmail.com',
+				'cont_nombre' => 'Jhon Mejia'
+			];
+
+			$asesorDatos = [
+				'usr_email' => $asesor['usr_email'],
+				'usr_nombre' => $asesor['usr_nombre']
+			];
+
+			$_SESSION["dataAdicional"]["nombre_empresa"] = "JM EQUIPOS S.A.S."; // Simular sesión
+			$fin = "
+			<p>
+			Hola, te informamos que <b>".$datosUsuarioActual['usr_nombre']."</b> te ha asignado un nuevo seguimiento, relacionado al cliente <b>".$contactoCLiente['cli_nombre']."</b>, con el siguiente asunto: <br>
+			<i>".$_POST["asunto"]."</i>
+			</p>
+			<p>Recuerda que para entrar al link del seguimiento debes estar logueado en el sistema.</p>
+			"; // Simular el cuerpo HTML
+
+			// 1. Instanciar el servicio
+			$mailer = new MailerService();
+
+			// 2. Preparar el contenido del correo usando la plantilla
+			$subject =  " Nuevo seguimiento asignado relacionado al ticket ".$tiketID;
+
+			$emailData = [
+				'subject'       => $subject,
+				'app_name'      => $_SESSION["dataAdicional"]["nombre_empresa"], // Reutiliza el nombre de la empresa
+				'content'       => $fin, // Tu contenido HTML aquí
+				'button_link'   => REDIRECT_ROUTE.'/usuarios/clientes-seguimiento.php?idTK='.$tiketID.'&seg='.$idInsertU, // Si no necesitas botón, dejar vacío
+				'button_text'   => 'Ver el seguimiento', // Si no necesitas botón, dejar vacío
+				'support_email' => 'soporte@jmequipos.com',
+			];
+
+			$htmlBody = renderEmailTemplate(RUTA_PROYECTO.'/usuarios/plantillas_email/notificaciones.html', $emailData);
+			$textBody = strip_tags($htmlBody); // Siempre genera una versión de texto plano
+
+			// 3. Definir destinatarios adicionales (asesor en CC)
+			$ccRecipients = [];
+			if (!empty($asesorDatos['usr_email'])) {
+				$ccRecipients[] = $asesorDatos['usr_email'];
+			}
+
+			// 4. Enviar el correo usando el método sendEmail
+			if ($mailer->sendEmail(
+				$contactoCliente['cont_email'],
+				$contactoCliente['cont_nombre'],
+				$subject,
+				$htmlBody,
+				$textBody,
+				[], // No hay adjuntos en este ejemplo
+				$ccRecipients // El asesor en CC
+			)) {
+				echo "Correo de seguimiento enviado con éxito.<br>";
+			} else {
+				echo "Fallo el envío del correo de seguimiento.<br>";
+			}
+
 			$contador++;
 		}
 
-		/*
-		$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='" . $_POST["cliente"] . "'"));
 
-		$fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
-		$fin .= '
-					<center>
-						<p align="center"><img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="350"></p>
-						<div style="font-family:arial; background:' . $configuracion["conf_fondo_mensaje"] . '; width:800px; color:#000; text-align:justify; padding:15px; border-radius:5px;">
-							
-							<p style="color:' . $configuracion["conf_color_letra"] . ';">' . strtoupper($contacto['usr_nombre']) . ',<br>
-							Te han encargado un nuevo seguimiento para uno de los clientes.<br>
-							<b>ALGUNOS DETALLES</b><br>
-							Asunto: ' . $_POST["asunto"] . '<br>
-							Cliente: ' . $cliente['cli_nombre'] . '<br>
-							Para revisar este pendiente ingresa al CRM con tus datos de acceso, mediante el siguiente link.</p>
-							
-							<p align="center"><a href="http://softjm.com/index.php?idseg=' . $idInsertU . '" target="_blank" style="color:' . $configuracion["conf_color_link"] . ';">IR AL SEGUIMIENTO</a></p>
-							
-							<p align="center" style="color:' . $configuracion["conf_color_letra"] . ';">
-								<img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="80"><br>
-								' . $configuracion["conf_mensaje_pie"] . '<br>
-								<a href="' . $configuracion["conf_web"] . '" style="color:' . $configuracion["conf_color_link"] . ';">' . $configuracion["conf_web"] . '</a>
-							</p>
-							
-						</div>
-					</center>
-					<p>&nbsp;</p>
-				';
-		$fin .= '';
-		$fin .=  '<html><body>';
-		$sfrom = $configuracion['conf_email']; //LA CUETA DEL QUE ENVIA EL MENSAJE			
-		$sdestinatario = $contacto['usr_email']; //CUENTA DEL QUE RECIBE EL MENSAJE			
-		$ssubject = "ORIÓN - Seguimiento a clientes"; //ASUNTO DEL MENSAJE 				
-		$shtml = $fin; //MENSAJE EN SI			
-		$sheader = "From:" . $sfrom . "\nReply-To:" . $sfrom . "\n";
-		$sheader = $sheader . "X-Mailer:PHP/" . phpversion() . "\n";
-		$sheader = $sheader . "Mime-Version: 1.0\n";
-		$sheader = $sheader . "Content-Type: text/html; charset=UTF-8\r\n";
-		@mail($sdestinatario, $ssubject, $shtml, $sheader);
-		*/
 	}
 
 	if ($_POST["notfCliente"] == 1 and $_POST["canalPC"] != 4) {

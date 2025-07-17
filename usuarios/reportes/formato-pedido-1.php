@@ -1,9 +1,37 @@
+<?php
+require_once '../sesion.php';
+
+$idPagina = 373;
+
+require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Cliente.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Contacto.php';
+require_once RUTA_PROYECTO.'/usuarios/class/ItemAsociado.php';
+
+$predicado = [
+    'pedid_id' => $_GET["id"],
+    'pedid_id_empresa' => $idEmpresa
+];
+
+$consultaPedido = Pedido::Select($predicado);
+$datosPedido = mysqli_fetch_array($consultaPedido, MYSQLI_BOTH);
+
+//Cliente
+$predicado = [
+    Cliente::$primaryKey => $datosPedido['pedid_cliente'],
+    'cli_id_empresa' => $idEmpresa
+];
+
+$consultaCliente = Cliente::Select($predicado);
+$datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impresión de Pedido - #12345</title>
+    <title>Impresión de Pedido - #<?=$datosPedido[Pedido::$primaryKey];?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         /* Estilos personalizados para impresión */
@@ -35,48 +63,7 @@
             .table tbody tr {
                 page-break-inside: avoid;
             }
-            /* Forzar el salto de página después del encabezado principal si es muy largo,
-               o después de un bloque específico que quieras que comience en una nueva página.
-               NO USAR ESTO PARA EL ENCABEZADO PRINCIPAL QUE QUIERES REPETIR.
-               Esto es solo un ejemplo si tuvieras una sección grande entre el encabezado
-               y la tabla que no quieres que se rompa. */
-            /* .header-section { page-break-after: always; } */
 
-            /* Para el encabezado y pie de página de toda la "página de impresión"
-               (no de la tabla) que se repita en cada hoja.
-               Requiere un posicionamiento más avanzado y puede ser un poco más complicado
-               de alinear perfectamente con el contenido si el contenido varía mucho en altura.
-               Generalmente, es mejor dejar que el navegador repita los thead/tfoot de la tabla.
-               Si necesitas un encabezado/pie de página GLOBAL que se repita en CADA hoja,
-               tendrías que usar position: fixed y jugar con los márgenes del @page
-               para dejar espacio. Aquí un ejemplo si lo necesitaras para elementos fuera de la tabla:
-            */
-            /*
-            .global-print-header {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 100px; /* Ajusta esto a la altura de tu encabezado *
-                background-color: white;
-                padding: 10px;
-                border-bottom: 1px solid #ccc;
-            }
-            .global-print-footer {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 50px; /* Ajusta esto a la altura de tu pie de página *
-                background-color: white;
-                padding: 10px;
-                border-top: 1px solid #ccc;
-            }
-            body {
-                padding-top: 100px; /* Deja espacio para el encabezado fijo *
-                padding-bottom: 50px; /* Deja espacio para el pie de página fijo *
-            }
-            */
         }
         /* Estilos generales */
         body {
@@ -122,18 +109,17 @@
 
         <div class="row header-section">
             <div class="col-md-6">
-                <h4 class="mb-1">Nombre de Tu Empresa S.A.S.</h4>
-                <p class="mb-0">Dirección: Calle 123 #45-67, Tu Ciudad</p>
-                <p class="mb-0">Teléfono: +57 300 123 4567</p>
-                <p class="mb-0">Email: info@tuempresa.com</p>
+                <h4 class="mb-1"><?=$configuracion['conf_empresa'];?></h4>
+                <p class="mb-0">Nit: <?=$configuracion['conf_nit'];?></p>
+                <p class="mb-0">Teléfono: <?=$configuracion['conf_telefono'];?></p>
+                <p class="mb-0">Email: <?=$configuracion['conf_email'];?></p>
             </div>
             <div class="col-md-6 text-md-end">
-                <h2 class="mb-1">PEDIDO #12345</h2>
-                <p class="mb-0"><strong>Fecha del Pedido:</strong> 27 de Junio de 2025</p>
-                <p class="mb-0"><strong>Fecha de Entrega:</strong> 30 de Junio de 2025</p>
-                <p class="mb-0"><strong>Cliente:</strong> Juan Pérez S.A.</p>
-                <p class="mb-0"><strong>NIT/C.C.:</strong> 900.123.456-7</p>
-                <p class="mb-0"><strong>Dirección Cliente:</strong> Av. Principal #89-01, Otra Ciudad</p>
+                <h2 class="mb-1">PEDIDO #<?=$datosPedido[Pedido::$primaryKey];?></h2>
+                <p class="mb-0"><strong>Fecha del Pedido:</strong> <?=$datosPedido['pedid_fecha_propuesta'];?></p>
+                <p class="mb-0"><strong>Cliente:</strong> <?=$datosCliente['cli_nombre'];?></p>
+                <p class="mb-0"><strong>NIT/C.C.:</strong> <?=$datosCliente['cli_usuario'];?></p>
+                <p class="mb-0"><strong>Dirección Cliente:</strong> <?=$datosCliente['cli_direccion'];?></p>
             </div>
         </div>
 
@@ -152,32 +138,114 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php for ($i = 1; $i <= 15; $i++): ?>
-                            <tr>
-                                <th scope="row"><?php echo $i; ?></th>
-                                <td>Producto <?php echo chr(64 + $i); ?> - Descripción detallada del item <?php echo $i; ?></td>
-                                <td class="text-end"><?php echo rand(1, 5); ?></td>
-                                <td class="text-end">$<?php echo number_format(rand(10000, 100000), 0, ',', '.'); ?></td>
-                                <td class="text-end">$<?php echo number_format(rand(10000, 500000), 0, ',', '.'); ?></td>
-                            </tr>
-                            <?php endfor; ?>
+                            <?php
+                            $itemAsociado = new ItemAsociado($conexionBdPrincipal);
+                            $listadoCombos = $itemAsociado->listadoAsociadoCombos($datosPedido[Pedido::$primaryKey], ItemAsociado::PROCESO_PEDIDO);
+                            $listadoProductos = $itemAsociado->listadoAsociadoProductos($datosPedido[Pedido::$primaryKey], ItemAsociado::PROCESO_PEDIDO);
+                            //$listadoServicios = $itemAsociado->listadoAsociadoServicios($datosPedido[Pedido::$primaryKey], ItemAsociado::PROCESO_PEDIDO);
+
+                            $todosLosItemsParaTabla = [];
+
+                            while ($combos = mysqli_fetch_array($listadoCombos, MYSQLI_BOTH)) {
+
+                                $itemActual  = [
+                                    'nombre' => $combos['combo_nombre'],
+                                    'cantidad' => $combos['czpp_cantidad'],
+                                    'valor' => $combos['czpp_valor'],
+                                    'descuento' => $combos['czpp_descuento'],
+                                    'impuesto' => $combos['czpp_impuesto'],
+                                    'observacion' => $combos['czpp_observacion']
+                                ];
+
+                                $todosLosItemsParaTabla[] = $itemActual;
+                            }
+
+                            $listadoCombos->free();
+
+                            while ($producto = mysqli_fetch_array($listadoProductos, MYSQLI_BOTH)) {
+
+                                $itemActual  = [
+                                    'nombre' => $producto['prod_nombre'],
+                                    'cantidad' => $producto['czpp_cantidad'],
+                                    'valor' => $producto['czpp_valor'],
+                                    'descuento' => $producto['czpp_descuento'],
+                                    'impuesto' => $producto['czpp_impuesto'],
+                                    'observacion' => $producto['czpp_observacion']
+                                ];
+
+                                $todosLosItemsParaTabla[] = $itemActual;
+                            }
+
+                            $listadoProductos->free();
+
+                            // while ($servicio = mysqli_fetch_array($listadoServicios, MYSQLI_BOTH)) {
+
+                            //     $itemActual  = [
+                            //         'nombre' => $servicio['serv_nombre'],
+                            //         'cantidad' => $servicio['czpp_cantidad'],
+                            //         'valor' => $servicio['czpp_valor'],
+                            //         'descuento' => $servicio['czpp_descuento'],
+                            //         'impuesto' => $servicio['czpp_impuesto'],
+                            //         'observacion' => $servicio['czpp_observacion']
+                            //     ];
+
+                            //     $todosLosItemsParaTabla[] = $itemActual;
+                            // }
+
+                            // $listadoServicios->free();
+
+                            $subTotal = 0;
+                            $totalDescuento = 0;
+                            $totalDescuentoPorcentaje = 0;
+                            $totalIva = 0;
+                            $i = 1;
+
+                            foreach ($todosLosItemsParaTabla as $item) {
+
+                                $totalPorItem = $item['valor'] * $item['cantidad'];
+                                $subTotal += $totalPorItem;
+
+                                $descuento = is_int($item['descuento']) ? $item['descuento'] : 0;
+
+                                $descuentoPorItem = ($descuento / 100) * $totalPorItem;
+                                $totalDescuento += $descuentoPorItem;
+                                $totalDescuentoPorcentaje += $descuento;
+
+                                $valorConDescuentoPorItem = $totalPorItem - $descuentoPorItem;
+
+
+                                $ivaPorItem = ($item['impuesto'] / 100) * $valorConDescuentoPorItem;
+                                $totalIva += $ivaPorItem;
+                            ?>
+                                <tr>
+                                    <th scope="row"><?php echo $i; ?></th>
+                                    <td><?php echo $item['nombre']; ?></td>
+                                    <td class="text-end"><?php echo $item['cantidad']; ?></td>
+                                    <td class="text-end">$<?php echo number_format($item['valor'], 0, ',', '.'); ?></td>
+                                    <td class="text-end">$<?php echo number_format($totalPorItem, 0, ',', '.'); ?></td>
+                                </tr>
+                            <?php 
+                                $i++; 
+                            } 
+                            $totalPagar = $subTotal - $totalDescuento + $totalIva;
+                            ?>
                             </tbody>
                         <tfoot>
                             <tr>
                                 <th colspan="4" class="text-end">Subtotal:</th>
-                                <td class="text-end">$200.000</td>
+                                <td class="text-end">$<?php echo number_format($subTotal, 0, ',', '.'); ?></td>
                             </tr>
                             <tr>
-                                <th colspan="4" class="text-end">Descuento (5%):</th>
-                                <td class="text-end">-$10.000</td>
+                                <th colspan="4" class="text-end">Descuento (<?=$totalDescuentoPorcentaje;?>%):</th>
+                                <td class="text-end">-$<?php echo number_format($totalDescuento, 0, ',', '.'); ?></td>
                             </tr>
                             <tr>
                                 <th colspan="4" class="text-end">IVA (19%):</th>
-                                <td class="text-end">$36.100</td>
+                                <td class="text-end">$<?php echo number_format($totalIva, 0, ',', '.'); ?></td>
                             </tr>
                             <tr class="fw-bold">
                                 <th colspan="4" class="text-end">Total a Pagar:</th>
-                                <td class="text-end">$226.100</td>
+                                <td class="text-end">$<?php echo number_format($totalPagar, 0, ',', '.'); ?></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -195,7 +263,7 @@
         <div class="row mt-4">
             <div class="col-12 text-center">
                 <p>¡Gracias por tu pedido!</p>
-                <p>Visítanos en: www.tuempresa.com</p>
+                <p>Visítanos en: <?=$configuracion['conf_web'];?></p>
             </div>
         </div>
 

@@ -30,5 +30,5 @@ WHERE cotiz_id='" . $_GET["id"] . "'");
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
-echo '<script type="text/javascript">window.location.href="../pedidos.php?q=' . $idInsert . '";</script>';
+echo '<script type="text/javascript">window.location.href="../pedidos.php?busqueda=' . $idInsert . '";</script>';
 exit();
