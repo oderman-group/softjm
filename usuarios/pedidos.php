@@ -218,12 +218,18 @@ require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
 											<?php }?>
 											
 											<?php if (Modulos::validarRol([373], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-											<li><a href="reportes/formato-pedido-1.php?id=<?=$res[0];?>" target="_blank">Imprimir</a></li>
+											<li><a href="reportes/formato-pedido-1_pdf.php?id=<?=$res[0];?>" target="_blank">Imprimir</a></li>
 											<?php } ?>
 
 											<?php if($generoRemision[0]=="" && Modulos::validarRol([374], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 											
 												<li><a href="bd_create/pedidos-generar-remision.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea generar remisión de este pedido?')){return false;}">Generar remisión</a></li>
+
+											<?php }?>
+
+											<?php if($generoRemision[0]==""){?>
+											
+												<li><a href="#" onClick="if(!confirm('Desea hacer la reversión de este pedido?')){return false;}">Revertir pedido</a></li>
 
 											<?php }?>
 											
