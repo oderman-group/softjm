@@ -237,7 +237,7 @@ $pdf->writeHTML($html, true, false, true, false, '');
 
 
 // Salida del PDF
-$pdf->Output('reporte_clientes.pdf', 'I');
+$pdf->Output('pedido_'.$_GET["id"].'.pdf', 'I');
 
 
 //echo $html;
