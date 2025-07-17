@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const kpi11 = document.getElementById("kpi11");
     const kpi12 = document.getElementById("kpi12");
     const kpi13 = document.getElementById("kpi13");
-    const kpi14 = document.getElementById("kpi14");
 
     const grdDatos = $('#grdDatos').dxPivotGrid({}).dxPivotGrid('instance');
     const grdDatosChart = $('#grdDatosChart').dxChart({}).dxChart('instance');
@@ -37,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
     kpi11.addEventListener('click', btnKpiClic);
     kpi12.addEventListener('click', btnKpiClic);
     kpi13.addEventListener('click', btnKpiClic);
-    kpi14.addEventListener('click', btnKpiClic);
 
 
     function btnKpiClic(e) {
@@ -73,9 +71,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 let datosKpi = [];
                 grdDatos.option({dataSource: {store: datosKpi}});
                 datosKpi = respuesta["datos"]; // respuesta["datos"]; dataRespuestaKPI[0]["datos"];
+                
                 if (this.id == "kpi1") {
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                            format: {
+                                type: 'fixedPoint',
+                                precision: 0,
+                            },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) {                               
@@ -86,6 +95,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     });  
                     
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                                 dataField: 'id',
@@ -149,7 +189,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi2") {     
 
-                    grdDatosChart.option({                       
+                    grdDatosChart.option({   
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                            format: {
+                                type: 'fixedPoint',
+                                precision: 0,
+                            },
+                            },
+                        },                    
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) { 
@@ -286,6 +336,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.id == "kpi3") {
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                            format: {
+                                type: 'fixedPoint',
+                                precision: 0,
+                            },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) {                               
@@ -296,6 +356,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                             dataField: 'id',
@@ -638,6 +729,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.id == "kpi7") {
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'spline',
+                            label: {
+                            visible: true,
+                            format: {
+                                type: 'fixedPoint',
+                                precision: 0,
+                            },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) {                               
@@ -648,6 +749,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                             dataField: 'id',
@@ -1230,38 +1362,7 @@ document.addEventListener('DOMContentLoaded', () => {
         exportFilterFieldHeaders: true,
     };
 
-    grdDatos.option({
-        allowSortingBySummary: true,
-        allowFiltering: true,
-        allowSorting: true,
-        showBorders: true,
-        showColumnGrandTotals: true,
-        showRowGrandTotals: true,
-        showRowTotals: true,
-        showColumnTotals: false,
-        fieldPanel: {
-            showColumnFields: true,
-            showDataFields: true,
-            showFilterFields: true,
-            showRowFields: true,
-            allowFieldDragging: true,
-            visible: true,
-        },                        
-        fieldChooser: {
-            enabled: true,
-            allowSearch: true
-        },
-        headerFilter: {
-            search: {
-                enabled: true,
-            },
-            showRelevantValues: true,
-            width: 300,
-            height: 400,
-        },
-        export: {
-            enabled: true,
-        },        
+    grdDatos.option({                
         onExporting(e) {
             
             if (divEncabezadoPki.innerText == "SELECCIONA UN KPI") {
@@ -1307,17 +1408,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
 
-    grdDatosChart.option({
-        commonSeriesSettings: {
-            type: 'bar',
-            label: {
-            visible: true,
-            format: {
-                type: 'fixedPoint',
-                precision: 0,
-            },
-            },
-        },
+    grdDatosChart.option({        
         export: {
             enabled: true
         },
