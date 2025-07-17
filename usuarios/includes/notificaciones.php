@@ -136,3 +136,16 @@ if(isset($_GET["error"])){
 	<?php }?>
 
 <?php }?>
+
+
+<?php
+if(isset($_GET["warning"])){
+?>
+	<?php if($_GET["warning"]==1){?>
+		<div class="alert alert-warning">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-exclamation-sign"></i><strong>Advertencia!</strong> No es posible hacer cambios en una cotización que ya generó pedido.
+		</div>
+	<?php }?>
+
+<?php }?>

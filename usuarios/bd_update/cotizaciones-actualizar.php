@@ -1,6 +1,13 @@
 <?php
 require_once("../sesion.php");
 
+require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
+
+if (Cotizacion::esCotizacionVendida($_POST["id"], $idEmpresa)) {
+    echo '<script type="text/javascript">window.location.href="../cotizaciones-editar.php?id=' . $_POST["id"] . '&warning=4";</script>';
+    exit();
+}
+
 $idPagina = 25;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
@@ -27,7 +34,6 @@ WHERE cotiz_id='" . $_POST["id"] . "' AND  cotiz_id_empresa='".$_SESSION["dataAd
 if($_POST["monedaActual"] != $_POST["moneda"]){
     require('actualizar-productos-cotizacion-2.php');
     require('actualizar-combos-cotizacion-2.php');
-    require('actualizar-servicios-cotizacion-2.php');
 }
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");

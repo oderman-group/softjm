@@ -5,6 +5,8 @@ $idPagina = 2;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+
+require_once RUTA_PROYECTO.'/usuarios/class/UsuarioMeta.php';
 ?>
 <!-- styles -->
 <link href="css/tablecloth.css" rel="stylesheet">
@@ -66,7 +68,7 @@ include("includes/head.php");
 	function usuarios(enviada) {
 		var valorActual = enviada.value;
 		var idUsuario = enviada.id;
-		var proceso = 1;
+		var proceso = enviada.getAttribute('data-proceso');
 		$('#resp').empty().hide().html("Esperando...").show(1);
 		datos = "idUsuario=" + (idUsuario) + "&proceso=" + (proceso) + "&valorActual=" + (valorActual);
 		$.ajax({
@@ -120,7 +122,9 @@ include("includes/head.php");
 												<th>Bloq.</th>
 												<th>Sesión</th>
 												<th>Último ingreso</th>
-												<th>Meta</th>
+												<th>Meta <br>(Valor ventas)</th>
+												<th>Meta <br>(Número de ventas)</th>
+												<th>Meta <br>(Número de demostraciones)</th>
 												<th></th>
 											</tr>
 										</thead>
@@ -142,6 +146,27 @@ include("includes/head.php");
 												while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 													$estadoSesion = 'gris.jpg';
 													if(empty($res['usr_sesion']) && $res['usr_sesion']==1){$estadoSesion = 'verde.jpg';}
+
+													$predicadoNumeroVenta = [
+														'um_usuario' => $res['usr_id'], 
+														'um_id_empresa' => $idEmpresa,
+														'um_tipo_meta' => 'NUMERO_VENTA',
+														'um_year' => date('Y'),
+														'um_mes' => date('m')
+													];
+
+													$usuarioMetaVenta = mysqli_fetch_array(UsuarioMeta::Select($predicadoNumeroVenta), MYSQLI_BOTH);
+
+													$predicadoDemo = [
+														'um_usuario' => $res['usr_id'], 
+														'um_id_empresa' => $idEmpresa,
+														'um_tipo_meta' => 'DEMO',
+														'um_year' => date('Y'),
+														'um_mes' => date('m')
+													];
+
+													$usuarioMetaDemo = mysqli_fetch_array(UsuarioMeta::Select($predicadoDemo), MYSQLI_BOTH);
+
 											?>
 											<tr>
 												<td><?=$no;?></td>
@@ -174,8 +199,20 @@ include("includes/head.php");
 												<td><?=$res['usr_ultimo_ingreso'];?></td>
 
 												<td>
-													<input id="<?= $res['usr_id']; ?>" type="text"  value="<?= $res['usr_meta_ventas']; ?>" style="width: 80px; text-align: center" onChange="usuarios(this)">
+													<input id="<?= $res['usr_id']; ?>" type="text"  value="<?= $res['usr_meta_ventas']; ?>" style="width: 80px; text-align: center" onChange="usuarios(this)" data-proceso="1">
 													<span style="display: none;"><?php if(!empty($res['usr_meta_ventas']) && is_numeric($res['usr_meta_ventas'])) echo number_format($res['usr_meta_ventas'],0,".",".");?></span>
+													
+												</td>
+
+												<td>
+													<input id="<?= $res['usr_id']; ?>" type="text"  value="<?= $usuarioMetaVenta['um_meta']; ?>" style="width: 80px; text-align: center" onChange="usuarios(this)" data-proceso="2">
+													<span style="display: none;"><?php if(!empty($usuarioMetaVenta['um_meta']) && is_numeric($usuarioMetaVenta['um_meta'])) echo $usuarioMetaVenta['um_meta'];?></span>
+													
+												</td>
+
+												<td>
+													<input id="<?= $res['usr_id']; ?>" type="text"  value="<?= $usuarioMetaDemo['um_meta']; ?>" style="width: 80px; text-align: center" onChange="usuarios(this)" data-proceso="3">
+													<span style="display: none;"><?php if(!empty($usuarioMetaDemo['um_meta']) && is_numeric($usuarioMetaDemo['um_meta'])) echo $usuarioMetaDemo['um_meta'];?></span>
 													
 												</td>
 

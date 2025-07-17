@@ -43,6 +43,8 @@ cseg_cotizo='" . $cotizo . "',
 cseg_vendio='" . $vendio . "', 
 cseg_consiguio_datos='" . $datos . "', 
 cseg_demostracion='" . $demostracion . "', 
+cseg_hora_proximo_contacto='" . $_POST["horaPC"] . "', 
+cseg_minutos_recordar_anticipadamente='" . $_POST["minutosRecordarAntes"]. "', 
 cseg_forma_contacto='" . $_POST["formaContacto"] . "' 
 WHERE cseg_id='" . $_POST["id"] . "'");
 

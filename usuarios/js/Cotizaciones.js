@@ -189,6 +189,7 @@ if (idEditar) {
         let subtotal = 0;
         let totalDiscount = 0;
         let totalIva = 0;
+        let utilidadTotal = 0;
 
         $("#data-table tbody tr").each(function () {
             let quantity = parseInt($(this).find("input[title='czpp_cantidad']").val()) || 0;
@@ -202,6 +203,10 @@ if (idEditar) {
             subtotal += subtotalRow;
             totalDiscount += discountAmount;
             totalIva += rowIva;
+            
+            //Aquí extraemos la utilidad individual
+            const utilidad = parseFloat($(this).find("b.valor-utilidad").data("utilidad")) || 0;
+            utilidadTotal += utilidad;
         });
 
         $("#subtotal .valor-numerico").text(subtotal.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
@@ -211,6 +216,9 @@ if (idEditar) {
         let envio = parseFloat($("input[name='envio']").val()) || 0;
         let total = subtotal - totalDiscount + totalIva + envio;
         $("#total .valor-numerico").text(total.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+        
+        //Mostramos la utilidad total
+        $("#utilidadTotal").text(utilidadTotal.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
     }
 
     $("#data-table tbody").on("input", "input[title='czpp_cantidad'], input[title='czpp_valor'], input[title='czpp_descuento'], input[title='czpp_impuesto']", recalculate);

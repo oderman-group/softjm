@@ -325,7 +325,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 					<form method="get" action="productos.php" style="text-align: center; margin-top: 10px;">
 						<div class="control-group">
 							<div class="controls">
-								<input type="text" class="span8" name="busqueda" placeholder="Búsqueda en todos los registros..." value="<?php if(isset($_GET['busqueda'])){$_GET['busqueda'];}?>" required><br>
+								<input type="text" class="span8" name="busqueda" placeholder="Búsqueda en todos los registros..." value="<?php if(isset($_GET['busqueda'])){echo $_GET['busqueda'];}?>" required><br>
 								<button type="submit" class="btn btn-info"> Buscar</button>
 								<a href="productos.php" type="submit" class="btn btn-danger"> Quitar filtro</a>
 							</div>
@@ -487,7 +487,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 											/*$dcto1 = $res['prod_descuento1']/100;
 											$precioMinimo = $res['prod_precio'] - ($res['prod_precio']*$dcto1);*/
 
-											$descuentoDealer = $res['prod_descuento2'] / 100;
+											$descuentoDealer = !empty($res['prod_descuento2']) ? $res['prod_descuento2'] / 100 : 0;
 
 											if(!empty($res['prod_precio'])){
 												$precioDealer = $res['prod_precio'] - ($res['prod_precio'] * $descuentoDealer);
@@ -510,9 +510,15 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 												$comision = $res['prod_comision'] / 100;
 											}
 
-											$valorComision = ($res['prod_precio'] * $comision);
+											$valorComision = 0;
+											$precioConIva = 0;
 
-											$precioConIva = $res['prod_precio'] + ($res['prod_precio'] * 0.19);
+											if (!empty($res['prod_precio'])) {
+
+												$valorComision = ($res['prod_precio'] * $comision);
+
+												$precioConIva = $res['prod_precio'] + ($res['prod_precio'] * 0.19);
+											}
 
 											$precioListaDolarHoy = ($precioListaUSD * $configuracion['conf_trm_venta']);
 										?>

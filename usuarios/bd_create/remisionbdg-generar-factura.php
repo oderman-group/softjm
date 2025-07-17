@@ -32,5 +32,5 @@ while ($prod = mysqli_fetch_array($productos)) {
     $contador++;
 }
 
-echo '<script type="text/javascript">window.location.href="../facturas.php?q=' . $idInsert . '";</script>';
+echo '<script type="text/javascript">window.location.href="../facturas.php?busqueda=' . $idInsert . '";</script>';
 exit();

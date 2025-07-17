@@ -1,6 +1,13 @@
 <?php
 include("../sesion.php");
 
+require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
+
+if (Cotizacion::esCotizacionVendida($_POST["id"], $idEmpresa)) {
+    echo 'No es posible eliminar servicios de una cotización que ya generó pedido.';
+    exit();
+}
+
 //SERVICIOS
 if(!empty($_POST["servicio"])){
     $numero = (count($_POST["servicio"]));

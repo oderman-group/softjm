@@ -448,7 +448,7 @@ include("includes/js-formularios.php");
 									<label class="control-label">Notificar de inmediato al encargado</label>
 									<div class="controls">
                                         <input type="checkbox" value="1" name="notf">
-                                        <span style="color:#F03;">Llegará una notificación inmediata al encargado</span>
+                                        <span style="color:#00078A;">Llegará una notificación inmediata al encargado</span>
 									</div>
 								</div>
 								
