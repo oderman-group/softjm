@@ -46,8 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
         clsGenerales_.mtdActivarLoadPagina();
         let txtOpcion = "consultar_kpi_ventas";
 
-        if (this.id == "kpi1") { txtOpcion = "consultar_kpi_ventas"; };
-        if (this.id == "kpi2") { txtOpcion = "consultar_kpi_ventas"; };
+        if (this.id == "kpi1") { txtOpcion = "consultar_kpi_1_2_ventas"; };
+        if (this.id == "kpi2") { txtOpcion = "consultar_kpi_1_2_ventas"; };
+        if (this.id == "kpi3") { txtOpcion = "consultar_kpi_3_tiempo_promedio_cierre_ventas"; };
+        if (this.id == "kpi7") { txtOpcion = "consultar_kpi_7_numero_llamadas_enviadas_ejecutivo_prospeccion"; };
 
         $.ajax({
             url: "ajax/ajax-kpis.php",
@@ -287,10 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) {                               
-                                let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
+                                let valueText = args.originalValue;
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
@@ -339,12 +338,34 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'data',
                                 sortOrder: 'desc'
                             },{
-                                caption: 'Total',
-                                dataField: 'total',
+                                caption: 'Duracion',
+                                dataField: 'duracion_cierre_dias',
                                 dataType: 'number',
                                 summaryType: 'sum',
-                                format: 'currency',
                                 area: 'data'
+                            },{
+                                caption: 'Prom',
+                                dataField: 'duracion_cierre_dias',
+                                dataType: 'number',
+                                area: 'data',
+                                summaryType: "custom",
+                                calculateCustomSummary: function(options) {
+                                    switch(options.summaryProcess) {
+                                        case "start":
+                                            options.totalValue = 0;
+                                            options.nValues = 0;
+                                        break;
+                                        case "calculate":
+                                            if (!isNaN(options.value)) {
+                                                options.nValues++;
+                                                options.totalValue += options.value;
+                                            }
+                                        break;
+                                        case "finalize":
+                                            options.totalValue = options.nValues ? Number(options.totalValue / options.nValues).toFixed(2) : 0;
+                                        break;
+                                    }
+                                }
                             }],
                             store: datosKpi
                         },onCellPrepared: function(e) {
@@ -371,10 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) {                               
-                                let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
+                                let valueText = args.originalValue;
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
@@ -624,9 +642,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             enabled: true,
                             customizeTooltip(args) {                               
                                 let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
@@ -645,8 +660,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'asc'
                             },{
                                 width: 150,
-                                caption: 'Vendedor',
-                                dataField: 'vendedor',
+                                caption: 'Ejecutivo',
+                                dataField: 'ejecutivo',
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
@@ -656,8 +671,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
-                                caption: 'Factura',
-                                dataField: 'factura',
+                                caption: 'Seguimiento',
+                                dataField: 'seguimiento',
                                 area: 'row'
                             },{
                                 caption: 'Fecha',
@@ -674,13 +689,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 caption: 'Cantidad',
                                 area: 'data',
                                 sortOrder: 'desc'
-                            },{
-                                caption: 'Total',
-                                dataField: 'total',
-                                dataType: 'number',
-                                summaryType: 'sum',
-                                format: 'currency',
-                                area: 'data'
                             }],
                             store: datosKpi
                         },onCellPrepared: function(e) {
