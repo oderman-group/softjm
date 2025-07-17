@@ -97,7 +97,7 @@ include("includes/head.php");
 							<div class="widget-container">
 								<a href="#" style="margin-bottom:10px;" id="kpi1">1. Número de ventas</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi2">2. Promedio de valor venta por factura</a><br>
-								<a href="#" style="margin-bottom:10px;" id="kpi3">3. Tiempo Promedio de Cierre de Ventas</a><br>
+								<a href="#" style="margin-bottom:10px;" id="kpi3">3. Tiempo (días) Promedio de Cierre de Ventas</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi4">4. Cumplimiento de la cuota comercial</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi5">5. Tasa de conversión de prospecto a cliente</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi6">6. Ejecución de Demostraciones</a><br>
