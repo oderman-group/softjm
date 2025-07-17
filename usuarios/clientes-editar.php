@@ -382,6 +382,13 @@ include("includes/js-formularios.php");
 															</select>
 														</div>
 												   </div>
+
+												   <div class="control-group">
+														<label class="control-label">Este es un cliente Institucional?</label>
+														<div class="controls">
+															<input type="checkbox" value="1" name="clienteInstitucional" <?php if($resultadoD['cli_institucional']==1) echo "checked";?>>
+														</div>
+													</div>
 													   
 													   <div class="control-group">
 														<label class="control-label">Saldo disponible
