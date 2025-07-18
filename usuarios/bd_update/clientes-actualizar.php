@@ -31,6 +31,8 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 		$city=$_POST["ciuExtra"];
 	}
 
+    $clienteInsitucional = $_POST["clienteInstitucional"] == 1 ? 1 : 0;
+
 	$conexionBdPrincipal->query("UPDATE clientes SET 
     cli_nombre='" . $_POST["nombre"] . "', 
     cli_referencia='" . $_POST["referencia"] . "', 
@@ -59,7 +61,8 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     cli_credito='" . $_POST["credito"] . "', 
     cli_tipo_documento='" . $_POST["tipoDocumento"] . "', 
     cli_pais='" . $pais . "', 
-    cli_ciudad_extranjera='" . $city . "'
+    cli_ciudad_extranjera='" . $city . "',
+    cli_institucional='" . $clienteInsitucional . "'
     WHERE cli_id='" . $_POST["id"] . "'");
 
 if(isset($_POST["grupos"])){

@@ -97,7 +97,7 @@ include("includes/head.php");
 							<div class="widget-container">
 								<a href="#" style="margin-bottom:10px;" id="kpi1">1. Número de ventas</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi2">2. Promedio de valor venta por factura</a><br>
-								<a href="#" style="margin-bottom:10px;" id="kpi3">3. Tiempo Promedio de Cierre de Ventas</a><br>
+								<a href="#" style="margin-bottom:10px;" id="kpi3">3. Tiempo (días) Promedio de Cierre de Ventas</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi4">4. Cumplimiento de la cuota comercial</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi5">5. Tasa de conversión de prospecto a cliente</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi6">6. Ejecución de Demostraciones</a><br>
@@ -106,10 +106,9 @@ include("includes/head.php");
 								<a href="#" style="margin-bottom:10px;" id="kpi9">9. Nuevos subdistribuidores</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi10">10. Captación de clientes instituciones</a><br>
 
-								<a href="#" style="margin-bottom:10px;" id="kpi11">11. Oportunidades Implementadas</a><br>
-								<a href="#" style="margin-bottom:10px;" id="kpi12">12. Número de visitas realizas</a><br>
-								<a href="#" style="margin-bottom:10px;" id="kpi13">13. Tasa de éxito de las licitaciones</a><br>
-								<a href="#" style="margin-bottom:10px;" id="kpi14">14. Participación en Eventos</a><br>
+								<a href="#" style="margin-bottom:10px;" id="kpi11">11. Número de visitas realizadas</a><br>
+								<a href="#" style="margin-bottom:10px;" id="kpi12">12. Tasa de éxito de las licitaciones</a><br>
+								<a href="#" style="margin-bottom:10px;" id="kpi13">13. Participación en Eventos</a><br>
 
 							</div>
 						</div>
