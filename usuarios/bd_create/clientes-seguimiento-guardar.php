@@ -67,11 +67,17 @@ require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
 		mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_realizado=1 WHERE cseg_id='" . $idInsertU . "'");
 	}
 
+	$contactoCLiente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos 
+	INNER JOIN clientes ON cli_id=cont_cliente_principal
+	WHERE cont_id='" . $_POST["contacto"] . "'
+	"));
+    $asesor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $_SESSION["id"] . "'"));
+
     if(!empty($_POST["portafolios"])){
-        $numero = (count($_POST["portafolios"]));
-        if ($numero > 0) {
+        $numeroPortafolios = (count($_POST["portafolios"]));
+        if ($numeroPortafolios > 0) {
             $contador = 0;
-            while ($contador < $numero) {
+            while ($contador < $numeroPortafolios) {
                 $portafolios .= '<a href="' . Api_JmEquipos::JM_URL_ARCHIVOS_PORTAFOLIOS . $_POST["portafolios"][$contador] . '">' . $_POST["portafolios"][$contador] . '</a><br>';
                 $contador++;
             }
@@ -79,10 +85,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
         $numC = strlen($portafolios) - 1;
         $portafolios = substr($portafolios, 0, $numC);
 
-        if ($numero > 0) {
-            $contactoCLiente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_id='" . $_POST["contacto"] . "'"));
-
-            $asesor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $_SESSION["id"] . "'"));
+        if ($numeroPortafolios > 0) {
 
             $fin =  '<html><body style="background-color:#FFF;">';
 			$fin .=  '<div style="width: 100%; display: grid; place-content: center;">';
@@ -185,7 +188,10 @@ require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
 
 			$_SESSION["dataAdicional"]["nombre_empresa"] = "JM EQUIPOS S.A.S."; // Simular sesión
 			$fin = "
-			<p>Te han asignado un nuevo seguimiento con el siguiente asunto: <br><i>".$_POST["asunto"]."</i></p>
+			<p>
+			Hola, te informamos que <b>".$datosUsuarioActual['usr_nombre']."</b> te ha asignado un nuevo seguimiento, relacionado al cliente <b>".$contactoCLiente['cli_nombre']."</b>, con el siguiente asunto: <br>
+			<i>".$_POST["asunto"]."</i>
+			</p>
 			<p>Recuerda que para entrar al link del seguimiento debes estar logueado en el sistema.</p>
 			"; // Simular el cuerpo HTML
 

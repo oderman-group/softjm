@@ -1,4 +1,3 @@
-
 <?php
 $datosUsuarioActual = $_SESSION["dataAdicional"]["datos_usuario_actual"];
 

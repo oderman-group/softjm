@@ -31,7 +31,13 @@ $clave1 = generarClaves();
 $clave2 = generarClaves();
 
 $direccion = $_POST["op1"] . " " . $_POST["op2"] . " " . $_POST["op3"] . " # " . $_POST["op4"] . " " . $_POST["op5"] . " - " . $_POST["op6"] . " - " . $_POST["op7"];
-mysqli_query($conexionBdPrincipal,"INSERT INTO clientes(cli_nombre, cli_referencia, cli_categoria, cli_email, cli_telefono, cli_ciudad, cli_usuario, cli_clave, cli_direccion, cli_zona, cli_fecha_registro, cli_fecha_ingreso, cli_nivel, cli_celular, cli_telefonos, cli_sigla, cli_responsable, cli_clave_documentos, cli_tipo_documento, cli_pais, cli_ciudad_extranjera, cli_id_empresa, cli_usuario_acceso)VALUES('" . $_POST["nombre"] . "','" . $_POST["referencia"] . "','" . $_POST["categoria"] . "','" . $_POST["email"] . "','" . $_POST["telefono"] . "','" . $_POST["ciudad"] . "','" . trim($_POST["usuario"]) . "','" . $clave1 . "','" . strtoupper($direccion) . "','" . $zona[2] . "',now(),'" . $_POST["fechaIngreso"] . "','" . $_POST["nivel"] . "','" . $_POST["celular"] . "','" . $_POST["telefonos"] . "','" . $_POST["sigla"] . "','" . $_SESSION["id"] . "','" . $clave2 . "','" . $_POST["tipoDocumento"] . "','" . $pais . "','" . $city . "','" . $idEmpresa . "','" . trim($_POST["usuarioAcceso"]) . "".$_POST["dominio"]."')");
+
+$clienteInsitucional = 0;
+if ($_POST["clienteInstitucional"] == 1) {
+    $clienteInsitucional = 1;
+}
+
+mysqli_query($conexionBdPrincipal,"INSERT INTO clientes(cli_nombre, cli_referencia, cli_categoria, cli_email, cli_telefono, cli_ciudad, cli_usuario, cli_clave, cli_direccion, cli_zona, cli_fecha_registro, cli_fecha_ingreso, cli_nivel, cli_celular, cli_telefonos, cli_sigla, cli_responsable, cli_clave_documentos, cli_tipo_documento, cli_pais, cli_ciudad_extranjera, cli_id_empresa, cli_usuario_acceso, cli_institucional)VALUES('" . $_POST["nombre"] . "','" . $_POST["referencia"] . "','" . $_POST["categoria"] . "','" . $_POST["email"] . "','" . $_POST["telefono"] . "','" . $_POST["ciudad"] . "','" . trim($_POST["usuario"]) . "','" . $clave1 . "','" . strtoupper($direccion) . "','" . $zona[2] . "',now(),'" . $_POST["fechaIngreso"] . "','" . $_POST["nivel"] . "','" . $_POST["celular"] . "','" . $_POST["telefonos"] . "','" . $_POST["sigla"] . "','" . $_SESSION["id"] . "','" . $clave2 . "','" . $_POST["tipoDocumento"] . "','" . $pais . "','" . $city . "','" . $idEmpresa . "','" . trim($_POST["usuarioAcceso"]) . "".$_POST["dominio"]."', '".$clienteInsitucional."')");
 $idInsertU = mysqli_insert_id($conexionBdPrincipal);
 
 if( !empty($_POST["grupos"]) ){

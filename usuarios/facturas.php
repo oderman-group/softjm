@@ -4,7 +4,11 @@ $idPagina = 126;
 $paginaActual['pag_nombre'] = "Facturas";
 ?>
 <?php include("includes/verificar-paginas.php"); ?>
-<?php include("includes/head.php"); ?>
+<?php 
+include("includes/head.php");
+
+require_once RUTA_PROYECTO.'/usuarios/class/Usuario.php';
+?>
 <!-- styles -->
 
 
@@ -123,7 +127,39 @@ $paginaActual['pag_nombre'] = "Facturas";
 										ORDER BY factura_id DESC";
 									}
 								?>
+								<form action="facturas.php" method="GET">
+									<input type="hidden" name="usuario" value="<?=$_GET['usuario'];?>">
+
+										Fecha desde:
+										<input type="date" class="form-control" name="desde" required value="<?=$_GET['desde'];?>">
+
+										Fecha hasta:
+										<input type="date" class="form-control" name="hasta" required value="<?=$_GET['hasta'];?>">
+
+										<button type="submit" class="btn btn-primary">Filtrar</button>
+								</form>
+								
+								<div class="btn-group">
+									<button class="btn btn-primary">Vendedores</button>
+									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu">
+										<li><a href="facturas.php">Todos</a></li>
+										<?php
+										$grupos = Usuario::Select(['usr_bloqueado' => 0, 'usr_id_empresa' => $idEmpresa]);
+										while($grupo = mysqli_fetch_array($grupos, MYSQLI_BOTH)){
+											$color = 'white';
+											if(isset($_GET["usuario"])){
+												if($grupo[0]==$_GET["usuario"]) $color = 'black' ;
+											}
+										?>
+										<li><a href="facturas.php?usuario=<?=$grupo['usr_id'];?>&desde=<?=$_GET['desde'];?>&hasta=<?=$_GET['hasta'];?>" style="color:<?=$color;?>"><?=$grupo['usr_nombre'];?></a></li>
+										<?php }?>
+									</ul>
+								</div>
+
 								<div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
+
 									<h4 align="center">-Busqueda general y paginación-</h4>
 									<p> 
 										<form class="form-horizontal" style="text-align: right;" action="<?=$_SERVER['PHP_SELF'];?>" method="get">

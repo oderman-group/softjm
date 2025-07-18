@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const kpi11 = document.getElementById("kpi11");
     const kpi12 = document.getElementById("kpi12");
     const kpi13 = document.getElementById("kpi13");
-    const kpi14 = document.getElementById("kpi14");
 
     const grdDatos = $('#grdDatos').dxPivotGrid({}).dxPivotGrid('instance');
     const grdDatosChart = $('#grdDatosChart').dxChart({}).dxChart('instance');
@@ -37,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
     kpi11.addEventListener('click', btnKpiClic);
     kpi12.addEventListener('click', btnKpiClic);
     kpi13.addEventListener('click', btnKpiClic);
-    kpi14.addEventListener('click', btnKpiClic);
 
 
     function btnKpiClic(e) {
@@ -46,8 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
         clsGenerales_.mtdActivarLoadPagina();
         let txtOpcion = "consultar_kpi_ventas";
 
-        if (this.id == "kpi1") { txtOpcion = "consultar_kpi_ventas"; };
-        if (this.id == "kpi2") { txtOpcion = "consultar_kpi_ventas"; };
+        if (this.id == "kpi1") { txtOpcion = "consultar_kpi_1_2_ventas"; };
+        if (this.id == "kpi2") { txtOpcion = "consultar_kpi_1_2_ventas"; };
+        if (this.id == "kpi3") { txtOpcion = "consultar_kpi_3_tiempo_promedio_cierre_ventas"; };
+        if (this.id == "kpi7") { txtOpcion = "consultar_kpi_7_numero_llamadas_enviadas_ejecutivo_prospeccion"; };
 
         $.ajax({
             url: "ajax/ajax-kpis.php",
@@ -71,9 +71,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 let datosKpi = [];
                 grdDatos.option({dataSource: {store: datosKpi}});
                 datosKpi = respuesta["datos"]; // respuesta["datos"]; dataRespuestaKPI[0]["datos"];
+                
                 if (this.id == "kpi1") {
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                            format: {
+                                type: 'fixedPoint',
+                                precision: 0,
+                            },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) {                               
@@ -84,6 +95,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     });  
                     
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                                 dataField: 'id',
@@ -147,7 +189,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi2") {     
 
-                    grdDatosChart.option({                       
+                    grdDatosChart.option({   
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                            format: {
+                                type: 'fixedPoint',
+                                precision: 0,
+                            },
+                            },
+                        },                    
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) { 
@@ -284,19 +336,57 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.id == "kpi3") {
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                            format: {
+                                type: 'fixedPoint',
+                                precision: 0,
+                            },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) {                               
-                                let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
+                                let valueText = args.originalValue;
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
                     });
 
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                             dataField: 'id',
@@ -339,12 +429,34 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'data',
                                 sortOrder: 'desc'
                             },{
-                                caption: 'Total',
-                                dataField: 'total',
+                                caption: 'Duracion',
+                                dataField: 'duracion_cierre_dias',
                                 dataType: 'number',
                                 summaryType: 'sum',
-                                format: 'currency',
                                 area: 'data'
+                            },{
+                                caption: 'Prom',
+                                dataField: 'duracion_cierre_dias',
+                                dataType: 'number',
+                                area: 'data',
+                                summaryType: "custom",
+                                calculateCustomSummary: function(options) {
+                                    switch(options.summaryProcess) {
+                                        case "start":
+                                            options.totalValue = 0;
+                                            options.nValues = 0;
+                                        break;
+                                        case "calculate":
+                                            if (!isNaN(options.value)) {
+                                                options.nValues++;
+                                                options.totalValue += options.value;
+                                            }
+                                        break;
+                                        case "finalize":
+                                            options.totalValue = options.nValues ? Number(options.totalValue / options.nValues).toFixed(2) : 0;
+                                        break;
+                                    }
+                                }
                             }],
                             store: datosKpi
                         },onCellPrepared: function(e) {
@@ -371,10 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) {                               
-                                let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
+                                let valueText = args.originalValue;
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
@@ -620,19 +729,57 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.id == "kpi7") {
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'spline',
+                            label: {
+                            visible: true,
+                            format: {
+                                type: 'fixedPoint',
+                                precision: 0,
+                            },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
                             customizeTooltip(args) {                               
                                 let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
                     });
 
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                             dataField: 'id',
@@ -645,8 +792,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'asc'
                             },{
                                 width: 150,
-                                caption: 'Vendedor',
-                                dataField: 'vendedor',
+                                caption: 'Ejecutivo',
+                                dataField: 'ejecutivo',
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
@@ -656,8 +803,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
-                                caption: 'Factura',
-                                dataField: 'factura',
+                                caption: 'Seguimiento',
+                                dataField: 'seguimiento',
                                 area: 'row'
                             },{
                                 caption: 'Fecha',
@@ -674,13 +821,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 caption: 'Cantidad',
                                 area: 'data',
                                 sortOrder: 'desc'
-                            },{
-                                caption: 'Total',
-                                dataField: 'total',
-                                dataType: 'number',
-                                summaryType: 'sum',
-                                format: 'currency',
-                                area: 'data'
                             }],
                             store: datosKpi
                         },onCellPrepared: function(e) {
@@ -689,7 +829,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if (e.cell.path?.length == 4) {
                                     e.cellElement.empty();
                                     $("<a>")
-                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("href", `clientes-seguimiento-editar.php?id=${valor}`)
                                         .attr("target", "_blank")
                                         .text(valor)
                                         .appendTo(e.cellElement);
@@ -1205,90 +1345,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                 }
-                if (this.id == "kpi14") {
-
-                    grdDatosChart.option({
-                        tooltip: {
-                            enabled: true,
-                            customizeTooltip(args) {                               
-                                let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
-                                return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
-                            },
-                        }
-                    });
-
-                    grdDatos.option({
-                        dataSource: {
-                            fields: [{
-                            dataField: 'id',
-                            visible: false
-                            },{
-                                width: 150,
-                                caption: 'Sucursal',
-                                dataField: 'sucursal',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                width: 150,
-                                caption: 'Vendedor',
-                                dataField: 'vendedor',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                width: 150,
-                                caption: 'Cliente',
-                                dataField: 'cliente',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                caption: 'Factura',
-                                dataField: 'factura',
-                                area: 'row'
-                            },{
-                                caption: 'Fecha',
-                                dataField: 'fecha',
-                                dataType: 'date',
-                                area: 'column',
-                                sortOrder: 'desc'
-                            },{
-                                groupName: 'date',
-                                groupInterval: 'month',
-                                sortOrder: 'desc'
-                            },{
-                                summaryType: 'count',
-                                caption: 'Cantidad',
-                                area: 'data',
-                                sortOrder: 'desc'
-                            },{
-                                caption: 'Total',
-                                dataField: 'total',
-                                dataType: 'number',
-                                summaryType: 'sum',
-                                format: 'currency',
-                                area: 'data'
-                            }],
-                            store: datosKpi
-                        },onCellPrepared: function(e) {
-                            if (e.area === "row" && e.cellElement && e.cell.text) {
-                                const valor = e.cell.text;
-                                if (e.cell.path?.length == 4) {
-                                    e.cellElement.empty();
-                                    $("<a>")
-                                        .attr("href", `facturas.php?busqueda=${valor}`)
-                                        .attr("target", "_blank")
-                                        .text(valor)
-                                        .appendTo(e.cellElement);
-                                }else {
-                                    e.cellElement;
-                                }
-                            }
-                        }
-                    });
-
-                }
                 
 
             }
@@ -1306,38 +1362,7 @@ document.addEventListener('DOMContentLoaded', () => {
         exportFilterFieldHeaders: true,
     };
 
-    grdDatos.option({
-        allowSortingBySummary: true,
-        allowFiltering: true,
-        allowSorting: true,
-        showBorders: true,
-        showColumnGrandTotals: true,
-        showRowGrandTotals: true,
-        showRowTotals: true,
-        showColumnTotals: false,
-        fieldPanel: {
-            showColumnFields: true,
-            showDataFields: true,
-            showFilterFields: true,
-            showRowFields: true,
-            allowFieldDragging: true,
-            visible: true,
-        },                        
-        fieldChooser: {
-            enabled: true,
-            allowSearch: true
-        },
-        headerFilter: {
-            search: {
-                enabled: true,
-            },
-            showRelevantValues: true,
-            width: 300,
-            height: 400,
-        },
-        export: {
-            enabled: true,
-        },        
+    grdDatos.option({                
         onExporting(e) {
             
             if (divEncabezadoPki.innerText == "SELECCIONA UN KPI") {
@@ -1383,17 +1408,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
 
-    grdDatosChart.option({
-        commonSeriesSettings: {
-            type: 'bar',
-            label: {
-            visible: true,
-            format: {
-                type: 'fixedPoint',
-                precision: 0,
-            },
-            },
-        },
+    grdDatosChart.option({        
         export: {
             enabled: true
         },
