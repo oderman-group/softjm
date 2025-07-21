@@ -180,7 +180,7 @@ include("includes/head.php");
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
-											if ($datosUsuarioActual['uss_tipo'] != ADMIN) {
+											if ($datosUsuarioActual['usr_tipo'] != ADMIN) {
 												$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
 												WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
 												$numZ = $consultaNumZ->num_rows;
