@@ -829,7 +829,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if (e.cell.path?.length == 4) {
                                     e.cellElement.empty();
                                     $("<a>")
-                                        .attr("href", `facturas.php?busqueda=${valor}`)
+                                        .attr("href", `clientes-seguimiento-editar.php?id=${valor}`)
                                         .attr("target", "_blank")
                                         .text(valor)
                                         .appendTo(e.cellElement);
