@@ -2,15 +2,20 @@
 <?php
 $idPagina = 116;
 $paginaActual['pag_nombre'] = "Agregar evento";
+$paginaActual['pag_nombre'] = "Agregar evento";
 ?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <!-- styles -->
+
 
 <!--[if IE 7]>
 <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
 <![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
+
 
 
 <!--[if IE 7]>
@@ -22,6 +27,7 @@ $paginaActual['pag_nombre'] = "Agregar evento";
 <!--[if IE 9]>
 <link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
 <![endif]-->
+
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -49,6 +55,8 @@ include("includes/js-formularios.php");
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
     
+	<?php include("includes/encabezado.php");?>
+    
     
     
 	<div class="main-wrapper">
@@ -58,11 +66,14 @@ include("includes/js-formularios.php");
 					<div class="primary-head">
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
 						
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
+						
                         
 					</div>
 					<ul class="breadcrumb">
 						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
 						<li><a href="calendario.php">Mi calendario</a><span class="divider"><i class="icon-angle-right"></i></span></li>
+						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
 					</ul>
 				</div>
@@ -71,6 +82,7 @@ include("includes/js-formularios.php");
 				<div class="span12">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
+							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
@@ -129,10 +141,16 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa={$_SESSION['dataAdicional']['id_empresa']}");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa={$_SESSION['dataAdicional']['id_empresa']}");
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												if($datosUsuarioActual[3]!=1){
 													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
 													$numZ = mysqli_num_rows($consultaZonas);
+													$consultaZonas=mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$resOp['cli_zona']."'");
+													$numZ = mysqli_num_rows($consultaZonas);
 													
+													$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_usuarios WHERE cliu_usuario='".$_SESSION["id"]."' AND cliu_cliente='".$resOp['cli_id']."'");
+													$numCliente = mysqli_num_rows($consultaClientes);
 													$consultaClientes=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_usuarios WHERE cliu_usuario='".$_SESSION["id"]."' AND cliu_cliente='".$resOp['cli_id']."'");
 													$numCliente = mysqli_num_rows($consultaClientes);
 									
@@ -199,6 +217,7 @@ include("includes/js-formularios.php");
 
 		</div>
 	</div>
+	<?php include("includes/pie.php");?>
 	<?php include("includes/pie.php");?>
 </div>
 </body>

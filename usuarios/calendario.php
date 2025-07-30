@@ -2,7 +2,10 @@
 <?php
 $idPagina = 104;
 $paginaActual['pag_nombre'] = "Calendario";
+$paginaActual['pag_nombre'] = "Calendario";
 ?>
+<?php include("includes/verificar-paginas.php");?>
+<?php include("includes/head.php");?>
 <?php include("includes/verificar-paginas.php");?>
 <?php include("includes/head.php");?>
 
@@ -14,10 +17,16 @@ if(is_numeric($_GET["id"])){
 }
 $consultaCalendario=mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='".$usuarioID."'");
 $usuarioCalendario = mysqli_fetch_array($consultaCalendario, MYSQLI_BOTH);
+$consultaCalendario=mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='".$usuarioID."'");
+$usuarioCalendario = mysqli_fetch_array($consultaCalendario, MYSQLI_BOTH);
 
 $consulta = mysqli_query($conexionBdPrincipal, "SELECT cseg_id, cseg_asunto,cseg_observacion, cseg_fecha_proximo_contacto, cseg_usuario_encargado, cseg_realizado, cseg_tiket, cseg_cliente, DAY(cseg_fecha_proximo_contacto) as dia, MONTH(cseg_fecha_proximo_contacto) as mes, YEAR(cseg_fecha_proximo_contacto) as agno FROM cliente_seguimiento 
 WHERE cseg_usuario_encargado='".$usuarioID."' AND YEAR(cseg_fecha_proximo_contacto)>='".date("Y")."' AND MONTH(cseg_fecha_proximo_contacto)>='".date("m")."'
 LIMIT 0,8
+");
+$contReg=1;
+$eventos="";
+while($resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 ");
 $contReg=1;
 $eventos="";
@@ -42,10 +51,14 @@ $eventos = substr($eventos,0,-1);
 
 $proyectos = mysqli_query($conexionBdPrincipal, "SELECT proy_id, proy_titulo, proy_descripcion, proy_inicio, proy_fin, proy_responsable_principal, proy_estado, DAY(proy_fin) as dia, MONTH(proy_fin) as mes, YEAR(proy_fin) as agno FROM proyectos 
 WHERE proy_responsable_principal='".$usuarioID."' AND YEAR(proy_fin)>='".date("Y")."' AND MONTH(proy_fin)>='".date("m")."' AND proy_id_empresa={$_SESSION['dataAdicional']['id_empresa']}
+$proyectos = mysqli_query($conexionBdPrincipal, "SELECT proy_id, proy_titulo, proy_descripcion, proy_inicio, proy_fin, proy_responsable_principal, proy_estado, DAY(proy_fin) as dia, MONTH(proy_fin) as mes, YEAR(proy_fin) as agno FROM proyectos 
+WHERE proy_responsable_principal='".$usuarioID."' AND YEAR(proy_fin)>='".date("Y")."' AND MONTH(proy_fin)>='".date("m")."' AND proy_id_empresa={$_SESSION['dataAdicional']['id_empresa']}
 LIMIT 0,8
+");
 ");
 
 $i=1;
+while($proy = mysqli_fetch_array($proyectos, MYSQLI_BOTH)){
 while($proy = mysqli_fetch_array($proyectos, MYSQLI_BOTH)){
 	
 	$proy["mes"]--;
@@ -72,8 +85,15 @@ WHERE age_usuario='".$usuarioID."' AND YEAR(age_fecha)>='".date("Y")."' AND MONT
 
 $i=1;
 while($age = mysqli_fetch_array($agenda, MYSQLI_BOTH)){
+while($age = mysqli_fetch_array($agenda, MYSQLI_BOTH)){
 	
 	$age["mes"]--;
+
+	$url = '';
+	if( Modulos::validarRol(['117'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) { 
+		$url = "url: 'calendario-editar.php?id=".$age["age_id"]."'";
+	}
+
 
 	$url = '';
 	if( Modulos::validarRol(['117'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) { 
@@ -130,6 +150,7 @@ $eventos .= '
 
 <!-- styles -->
 
+
 <!--[if IE 7]>
             <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
         <![endif]-->
@@ -144,6 +165,7 @@ $eventos .= '
             <link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
         <![endif]-->
 <link href="css/fullcalendar.css" rel="stylesheet">
+
 
 <!--============j avascript===========-->
 <script src="js/jquery.js"></script>
@@ -195,6 +217,8 @@ $eventos .= '
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
     
+	<?php include("includes/encabezado.php");?>
+    
     
 	
 	<div class="main-wrapper">
@@ -202,6 +226,7 @@ $eventos .= '
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?>: <?=$usuarioCalendario["usr_nombre"];?></h3>
 						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?>: <?=$usuarioCalendario["usr_nombre"];?></h3>
 					</div>
 				</div>
@@ -212,9 +237,13 @@ $eventos .= '
 					<?php if( Modulos::validarRol(['116'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
 						<p><a href="calendario-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar evento</a></p>
 					<?php }?>
+					<?php if( Modulos::validarRol(['116'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+						<p><a href="calendario-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar evento</a></p>
+					<?php }?>
 					
 					<div class="content-widgets gray">
 						<div class="widget-head orange">
+							<h3><i class=" icon-calendar"></i><?=$paginaActual['pag_nombre'];?></h3>
 							<h3><i class=" icon-calendar"></i><?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="ribbon-wrapper-green">
@@ -231,6 +260,7 @@ $eventos .= '
 			</div>
 		</div>
 	</div>
+	<?php include("includes/pie.php");?>
 	<?php include("includes/pie.php");?>
 </div>
 </body>
