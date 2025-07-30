@@ -179,7 +179,7 @@ foreach ($todosLosItemsParaTabla as $item) {
     $totalPorItem = $item['valor'] * $item['cantidad'];
     $subTotal += $totalPorItem;
 
-    $descuento = !empty($item['descuento']) ? $item['descuento'] : 0;
+    $descuento = is_int($item['descuento']) ? $item['descuento'] : 0;
 
     $descuentoPorItem = ($descuento / 100) * $totalPorItem;
     $totalDescuento += $descuentoPorItem;
