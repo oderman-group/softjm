@@ -273,9 +273,12 @@ $html = '
 
 			require("logica-cotizacion-items.php");
 
-			$descripcionCombo = $prod['serv_nombre'].'<br>
-				<span style="font-size: 9px; color: darkblue;">'.$prod['czpp_observacion'].'</span><br>
-			';
+			$descripcionComboObservacion = '';
+			if(isset($prod['czpp_observacion']) && $prod['czpp_observacion'] !=''){
+				$descripcionComboObservacion = '<br><span style="font-size: 9px; color: #0033a0;">'.$prod['czpp_observacion'].'</span><br>';
+			}
+
+			$descripcionCombo = $prod['serv_nombre'].$descripcionComboObservacion;
 
 			$html .= '
 			<tr>
@@ -321,7 +324,7 @@ $html .= '
             </tr>
 			 <tr style="line-height:8px;">
                 <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">ENVÍO:</th>
-                <td align="right" style="border: 1px solid #dee2e6;">$'.number_format($totalEnvioP, 0, ',', '.').'</td>
+                <td align="right" style="border: 1px solid #dee2e6;">$'.number_format(floatval($totalEnvioP), 0, ',', '.').'</td>
             </tr>
             <tr style="line-height:8px;"> 
                 <th style="font-weight: bold;border: 1px solid #dee2e6;background-color:#0033a0;color:white;" align="right">Total a Pagar:</th>
