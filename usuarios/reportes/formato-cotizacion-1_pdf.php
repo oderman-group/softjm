@@ -36,17 +36,12 @@ class MIPDF extends TCPDF {
         $this->writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, 'L', true);
 
 		// numero de cotización
-		$this->SetY(39); 
+		$this->SetY(40); 
         $this->SetFont('helvetica', '', 17);
 
-		$pageWidth = $this->getPageWidth();
-		$leftMargin = $this->getMargins()['left'];
-		$rightMargin = $this->getMargins()['right'];
-		$extraOffset = 9; // espacio deseado desde el borde
-		$cellWidth = $pageWidth - $leftMargin - $rightMargin - $extraOffset;
-
-        // Número de página alineado a la derecha
-        $this->Cell($cellWidth, 10, '# ' . $this->cotiz_id, 0, 0, 'R');
+		$html = '<span style="color: white;"># '.$this->cotiz_id.'</span>';
+        
+        $this->writeHTMLCell(0, 0, 170, '', $html, 0, 1, 0, true, 'C', true);
 
 		//  raya horizontal
 		$this->SetY(48); 
@@ -54,20 +49,15 @@ class MIPDF extends TCPDF {
 
         $html = ' <hr style="color:#dee2e6;">';
 
-        $this->writeHTMLCell(0, 0, 170, '', $html, 0, 1, 0, true, '', true);
+        $this->writeHTMLCell(0, 0, 170, '', $html, 0, 1, 0, true, 'R', true);
 
 		// pie de página
-		$this->SetY(45);
+		$this->SetY(49);
         $this->SetFont('helvetica', '', 7);
 
-		$pageWidth = $this->getPageWidth();
-		$leftMargin = $this->getMargins()['left'];
-		$rightMargin = $this->getMargins()['right'];
-		$extraOffset = -1; // espacio deseado desde el borde
-		$cellWidth = $pageWidth - $leftMargin - $rightMargin - $extraOffset;
-
-        // Número de página alineado a la derecha
-        $this->Cell($cellWidth, 10, 'Página ' . $this->getAliasNumPage() . ' de ' . $this->getAliasNbPages(), 0, 0, 'R');
+		$html = '<span style="color: white;">Página '.$this->getAliasNumPage() . ' de ' . $this->getAliasNbPages().'</span>';
+        
+        $this->writeHTMLCell(0, 0, 170, '', $html, 0, 1, 0, true, 'R', true);
     }
 
     public function Footer() {
@@ -308,10 +298,10 @@ $html .= '
         <hr style="color:#dee2e6;line-height:5px;">
         <tfoot>
             <tr style="line-height:8px">
-                <th colspan="5" rowspan="5" align="left" width="355px" style="font-weight: bold;border: 1px solid #dee2e6;">
+                <th colspan="5" rowspan="5" align="left" width="395px" style="font-weight: bold;border: 1px solid #dee2e6;">
                    <strong>Observaciones:</strong>
                 </th>
-                <th style="font-weight: bold;border: 1px solid #dee2e6;" width="120px" align="right">Subtotal:</th>
+                <th style="font-weight: bold;border: 1px solid #dee2e6;" width="80px" align="right">Subtotal:</th>
                 <td align="right" style="border: 1px solid #dee2e6;" width="80px">$'.number_format($subTotal, 0, ',', '.').'</td>
             </tr>
             <tr style="line-height:8px;">
