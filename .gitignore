@@ -20,3 +20,4 @@ clientes/registrados/php
 clientes/registrados/tags
 .vscode
 sensitive.php
+librerias/correo_gmail/credentials.json
