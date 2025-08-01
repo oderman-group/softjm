@@ -10,7 +10,8 @@ if($prod['czpp_valor']!=''){
 
 
 if($prod['czpp_cantidad']>0 and $prod['czpp_descuento']>0){
-	$dcto = ($valorTotal * ($prod['czpp_descuento']/100));
+	$valor_numerico_dcto = (float) str_replace(',', '.', $prod['czpp_descuento']);
+	$dcto = ($valorTotal * ($valor_numerico_dcto/100));
 	$totalDescuento = $totalDescuento+$dcto;	
 }
 

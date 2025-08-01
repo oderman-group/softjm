@@ -196,7 +196,7 @@ if (idEditar) {
             let value = parseFloat($(this).find("input[title='czpp_valor']").val()) || 0;
             let discount = parseFloat($(this).find("input[title='czpp_descuento']").val()) || 0;
             let subtotalRow = quantity * value;
-            let discountAmount = (subtotalRow * discount) / 100;
+            let discountAmount = subtotalRow * (discount / 100);
             let rowTotal = subtotalRow - discountAmount;
             let rowIva = (rowTotal * parseFloat($(this).find("input[title='czpp_impuesto']").val())) / 100;
 
