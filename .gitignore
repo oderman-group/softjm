@@ -20,4 +20,14 @@ clientes/registrados/php
 clientes/registrados/tags
 .vscode
 sensitive.php
+librerias/correo_gmail/composer
+librerias/correo_gmail/firebase
+librerias/correo_gmail/google
+librerias/correo_gmail/guzzlehttp
+librerias/correo_gmail/monolog
+librerias/correo_gmail/paragonie
+librerias/correo_gmail/phpseclib
+librerias/correo_gmail/psr
+librerias/correo_gmail/ralouphie
+librerias/correo_gmail/symfony
 librerias/correo_gmail/credentials.json
