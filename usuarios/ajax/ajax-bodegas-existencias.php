@@ -21,6 +21,9 @@ try {
 	prodb_usuario_actualizacion = '".$_SESSION["id"]."' 
 	WHERE prodb_id='".$_GET["idRegistro"]."'
 	");
+
+	Producto::sincronizarExistenciasConBodegas($_GET["idProducto"], $conexionBdPrincipal);
+
 } catch (Exception $e) {
 ?>
 	<div class="alert alert-danger">
