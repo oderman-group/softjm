@@ -161,7 +161,7 @@ while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 				<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 					<a href="clientes-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
 				<?php } ?>
-				<?php if (Modulos::validarRol([55], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+				<?php if (Modulos::validarRol([55], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) { ?>
 					<a href="bd_delete/clientes-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;
 				<?php } ?>
 				<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>

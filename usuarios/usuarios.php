@@ -225,7 +225,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/UsuarioMeta.php';
 															if (Modulos::validarRol([4], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 																echo '<a href="usuarios-editar.php?id='.$res['usr_id'].'" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a> ';
 															}
-															if (Modulos::validarRol([53], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+															if (Modulos::validarRol([53], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) {
 															?>
 																<a href="bd_delete/usuarios-eliminar.php?id=<?=$res['usr_id'];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 															<?php
