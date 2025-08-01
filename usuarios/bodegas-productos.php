@@ -207,6 +207,7 @@ include("includes/head.php");
 															text-align: center;
 														"
 														tabindex="1"
+														data-id-producto="<?=$res['prodb_producto'];?>"
 														onChange="actualizarExistencias(this)"
 													>
 												</td>
@@ -218,7 +219,7 @@ include("includes/head.php");
 													<?php if (Modulos::validarRol([146], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="bodegas-productos-agregar.php?id=<?= $res[0]; ?>&prod=<?= $res['prod_id']; ?>&bod=<?= $res['bod_id']; ?>&ex=<?= $res['prodb_existencias']; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
 													<?php } ?>
-													<?php if (Modulos::validarRol([213], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<?php if (Modulos::validarRol([213], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) {?>
 														<a href="bd_delete/productos-bodegas-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 													<?php } ?>
 
@@ -247,6 +248,7 @@ include("includes/head.php");
 			const existencias          = input.value;
 			const table                = document.getElementById('data-table');
 			const respuestasAsincronas = document.getElementById('respuestasAsincronas');
+			const idProducto           = input.getAttribute('data-id-producto');
 
 			table.querySelectorAll('input').forEach(input => {
 				input.disabled = true;
@@ -254,7 +256,7 @@ include("includes/head.php");
 
 			respuestasAsincronas.innerHTML = "Esperando respuesta...";
 
-			fetch(`ajax/ajax-bodegas-existencias.php?idRegistro=${idRegistro}&existencias=${existencias}`, {
+			fetch(`ajax/ajax-bodegas-existencias.php?idRegistro=${idRegistro}&existencias=${existencias}&idProducto=${idProducto}`, {
 				method: 'GET'
 			})
 			.then(response => response.text())
