@@ -31,6 +31,11 @@ if($num>0)
 	//INICIO SESION
 	//session_start();
 	$_SESSION["id"] = $fila['usr_id'];
+	$_SESSION["agendaCalendario"] = [
+		'code'     => null,
+		'token'     => null,
+		'evento'    => null
+	];
 	//$_SESSION["idUsuario"] = $fila[0];
 	if(!isset($_POST["idseg"]) or !is_numeric($_POST["idseg"])){$url = 'usuarios/';}
 	else{$url = 'usuarios/clientes-seguimiento-editar.php?id='.$_POST["idseg"];}

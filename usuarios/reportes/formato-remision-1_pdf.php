@@ -1,29 +1,30 @@
 <?php
 require_once '../sesion.php';
-$idPagina = 373;
+$idPagina = 417;
 
-require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Remision.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Cliente.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Contacto.php';
 require_once RUTA_PROYECTO.'/usuarios/class/ItemAsociado.php';
 require_once RUTA_PROYECTO.'/librerias/tcpdf/tcpdf.php';
 
 $predicado = [
-    'pedid_id' => $_GET["id"],
-    'pedid_id_empresa' => $idEmpresa
+    Remision::$primaryKey => $_GET["id"],
+    'remi_id_empresa' => $idEmpresa
 ];
 
-$consultaPedido = Pedido::Select($predicado);
+$consultaPedido = Remision::Select($predicado);
 $datosPedido = mysqli_fetch_array($consultaPedido, MYSQLI_BOTH);
 
 //Cliente
 $predicado = [
-    Cliente::$primaryKey => $datosPedido['pedid_cliente'],
+    Cliente::$primaryKey => $datosPedido['remi_cliente'],
     'cli_id_empresa' => $idEmpresa
 ];
 
 $consultaCliente = Cliente::Select($predicado);
 $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
+
 
 class MIPDF extends TCPDF {
 
@@ -52,8 +53,8 @@ class MIPDF extends TCPDF {
                     </td>
                     <td width="50%" align="right">
                         <br><br>
-                        <span style="font-weight: bold;font-size: 20;"> PEDIDO #' . $this->pedid_numero . '</span><br><br>
-                        <p class="mb-0" style="line-height:3px;margin:1px"><strong>Fecha del Pedido:</strong> ' . $this->pedid_fecha_propuesta . '</p>
+                        <span style="font-weight: bold;font-size: 20;"> REMISIÓN #' . $this->pedid_numero . '</span><br><br>
+                        <p class="mb-0" style="line-height:3px;margin:1px"><strong>Fecha de la remisión:</strong> ' . $this->pedid_fecha_propuesta . '</p>
                         <p class="mb-0" style="line-height:3px;"><strong>Nit/C.C.:</strong> ' . $this->cli_usuario . '</p>
                         <p class="mb-0" style="line-height:3px;"><strong>Cliente:</strong> ' . $this->cli_nombre . '</p>
                         <p class="mb-0" style="line-height:3px;"><strong>Dirección Cliente:</strong> ' . $this->cli_direccion . '</p>
@@ -78,13 +79,13 @@ class MIPDF extends TCPDF {
         <hr style="color:#dee2e6;">
         <table width="100%" cellpadding="0">            
             <tr>
-                <td width="33%" align="left">
+                <td width="15%" align="left">
                 </td>
-                <td width="34%" align="center">
-                   <p>¡Gracias por tu pedido!</p>
-                    <p>Visítanos en: ' . $this->conf_web . '</p>
+                <td width="70%" align="center">
+                   <p>Documento no válido como factura de venta. Para cualquier consulta, contáctenos</p>
+                    <p>¡Gracias por su confianza!</p>
                 </td>
-                <td width="33%" align="right">
+                <td width="15%" align="right">
                     <p></p>
                     <p></p>
                     Pág. ' . $this->getAliasNumPage() . ' de ' . $this->getAliasNbPages() . '
@@ -101,8 +102,8 @@ $pdf->conf_empresa = $configuracion['conf_empresa'];
 $pdf->conf_nit = $configuracion['conf_nit'];
 $pdf->conf_telefono = $configuracion['conf_telefono'];
 $pdf->conf_email = $configuracion['conf_email'];
-$pdf->pedid_numero = $datosPedido[Pedido::$primaryKey];
-$pdf->pedid_fecha_propuesta = $datosPedido['pedid_fecha_propuesta'];
+$pdf->pedid_numero = $datosPedido[Remision::$primaryKey];
+$pdf->pedid_fecha_propuesta = $datosPedido['remi_fecha_propuesta'];
 $pdf->cli_nombre = $datosCliente['cli_nombre'];
 $pdf->cli_usuario = $datosCliente['cli_usuario'];
 $pdf->cli_direccion = $datosCliente['cli_direccion'];
@@ -110,7 +111,7 @@ $pdf->conf_web = $configuracion['conf_web'];
 $pdf->ruta_imagen = RUTA_PROYECTO.'/usuarios/files/'.$configuracion['conf_logo'];
 
 $pdf->SetCreator('Mi Aplicación');
-$pdf->SetTitle('Impresión de Pedido - #'.$datosPedido[Pedido::$primaryKey]);
+$pdf->SetTitle('Impresión de Remision - #'.$datosPedido[Remision::$primaryKey]);
 
 $pdf->SetMargins(15, 50, 15); // Espacio para encabezado
 $pdf->SetAutoPageBreak(TRUE, 30);
@@ -118,7 +119,7 @@ $pdf->AddPage();
 
 // Estilos y encabezado de la tabla
 $html = '
-<h3 >Detalles del Pedido:</h3>
+<h3 >Detalles de la remisión:</h3>
 <table  cellpadding="5" style="width:100%; border-collapse: collapse;" >
     <thead>
         <tr style="line-height:10px;background-color: #e9ecef; font-weight: bold;">
@@ -133,27 +134,10 @@ $html = '
 
 
 $itemAsociado = new ItemAsociado($conexionBdPrincipal);
-$listadoCombos = $itemAsociado->listadoAsociadoCombos($datosPedido[Pedido::$primaryKey], ItemAsociado::PROCESO_PEDIDO);
-$listadoProductos = $itemAsociado->listadoAsociadoProductos($datosPedido[Pedido::$primaryKey], ItemAsociado::PROCESO_PEDIDO);
-//$listadoServicios = $itemAsociado->listadoAsociadoServicios($datosPedido[Pedido::$primaryKey], ItemAsociado::PROCESO_PEDIDO);
+$listadoProductos = $itemAsociado->listadoAsociadoProductos($datosPedido[Remision::$primaryKey], ItemAsociado::PROCESO_REMSION);
 
 $todosLosItemsParaTabla = [];
 
-while ($combos = mysqli_fetch_array($listadoCombos, MYSQLI_BOTH)) {
-
-    $itemActual  = [
-        'nombre' => $combos['combo_nombre'],
-        'cantidad' => $combos['czpp_cantidad'],
-        'valor' => $combos['czpp_valor'],
-        'descuento' => $combos['czpp_descuento'],
-        'impuesto' => $combos['czpp_impuesto'],
-        'observacion' => $combos['czpp_observacion']
-    ];
-
-    $todosLosItemsParaTabla[] = $itemActual;
-}
-
-$listadoCombos->free();
 
 while ($producto = mysqli_fetch_array($listadoProductos, MYSQLI_BOTH)) {
 
@@ -212,8 +196,8 @@ $html .= '
         <tfoot>
             <tr style="line-height:8px">
                 <th colspan="3" rowspan="4" align="left" width="330px">
-                    <p><strong>Notas del Pedido:</strong></p>
-                    <p style="line-height:8px;">Favor revisar los productos al momento de la entrega. Cualquier reclamo, por favor, comunicarse dentro de las 24 horas siguientes.</p>
+                    <p><strong>Observaciones:</strong></p>
+                    <p style="line-height:8px;">Esta remisión sirve como constancia de la entrega de los productos descritos. Los productos han sido revisados y recibidos a satisfacción.</p>
                 </th>
                 <th style="font-weight: bold;border: 1px solid #dee2e6;" width="100px" align="right">Subtotal:</th>
                 <td align="right" style="border: 1px solid #dee2e6;" width="100px">$'.number_format($subTotal, 0, ',', '.').'</td>
@@ -234,15 +218,30 @@ $html .= '
     </tbody>
 </table>';
 
-// Escribir HTML al PDF
+
+
 $pdf->SetFont('helvetica', '', 8);
 $pdf->writeHTML($html, true, false, true, false, '');
 
 
+$pdf->Ln(20);
+
+$htmlFirma = '
+<table width="100%" border="0" cellspacing="0" cellpadding="5">
+    <tr>
+        <td width="50%" align="center">
+            _________________________________________________<br>
+            Firma y Sello: Recibido por
+        </td>
+        <td width="50%" align="center">
+            _________________________________________________<br>
+            Firma: Entregado por
+        </td>
+    </tr>
+</table>';
+
+$pdf->writeHTML($htmlFirma, true, false, true, false, '');
+
+
 // Salida del PDF
-$pdf->Output('pedido_'.$_GET["id"].'.pdf', 'I');
-
-
-//echo $html;
-
-
+$pdf->Output('remision_'.$_GET["id"].'.pdf', 'I');

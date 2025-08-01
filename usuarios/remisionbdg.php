@@ -211,7 +211,7 @@ include("includes/head.php");
 											<li><a href="bd_delete/remisionbdg-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 											<?php }?>
 											<?php if (Modulos::validarRol([376], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-											<li><a href="reportes/formato-remision-1.php?id=<?=$res[0];?>" target="_blank">Imprimir</a></li>
+											<li><a href="reportes/formato-remision-1_pdf.php?id=<?=$res[0];?>" target="_blank">Generar pdf</a></li>
 											<?php }?>
 
 											<?php if($generoFactura[0]=="" && Modulos::validarRol([377], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
