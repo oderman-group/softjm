@@ -67,28 +67,47 @@ if ($_POST["proceso"] == 2) {
 
 		if ($_POST["campo"] == 'czpp_descuento') {
 			if ($_POST["valor"] > $datosProducto['prod_descuento1']) {
-				echo '<script type="text/javascript">alert("El descuento que está otorgando es mayor al máximo permitido para este producto, el cual es de '.$datosProducto['prod_descuento1'].'%.");</script>';
-				exit();	
+				$response = [
+					'success' => false,
+					'message' => "El descuento que está otorgando es mayor al máximo permitido para este producto, el cual es de ".$datosProducto['prod_descuento1']."%."
+				];
+				echo json_encode($response);
+				exit();
 			}
 		}
 
 		if ($_POST["campo"]=='czpp_valor') {
 			if($_POST["valor"] < $datosProducto['prod_precio'] && $_POST['tipoCliente'] == 1) {
 
-				echo '<script type="text/javascript">alert("El precio que está otorgando es menor al máximo permitido para este producto, el cual es de $'.number_format($datosProducto['prod_precio'],0,".",".").'.");</script>';
-				exit();	
+				$response = [
+					'success' => false,
+					'message' => "El precio que está otorgando es menor al máximo permitido para este producto, el cual es de $" . number_format($datosProducto['prod_precio'],0,".",".")
+				];
+				echo json_encode($response);
+				exit();
 			}
 		}
 
-		mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
+		mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."', czpp_ultima_actualizacion=now(), czpp_cantidad_actualizaciones=czpp_cantidad_actualizaciones+1, czpp_usuario_ultima_actualizacion='".$_SESSION["id"]."' 
+		WHERE czpp_id='".$_POST["producto"]."'");
+
+		$response = [
+			'success' => true,
+			'message' => '<div class="alert alert-success">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							<i class="icon-exclamation-sign"></i><strong>Exito!</strong> Los cambios ya se guardaron y todo está bien.
+						</div>'
+		];
+		echo json_encode($response);
+		exit();
 
 	} catch (Exception $e) {
-?>
-		<div class="alert alert-danger">
-			<button type="button" class="close" data-dismiss="alert">&times;</button>
-			<i class="icon-exclamation-sign"></i><strong>Error!</strong> Ha ocurrido un error al intentar hacer el cambio. <?php echo $e->getMessage(); ?>
-		</div>
-<?php
+
+		$response = [
+			'success' => false,
+			'message' => 'Ha ocurrido un error al intentar hacer el cambio. ' . $e->getMessage()
+		];
+		echo json_encode($response);
 		exit();
 	}
 	//echo '<script type="text/javascript">location.reload();</script>';
@@ -377,7 +396,8 @@ if($_POST["proceso"]==11){
 	}
 
 
-	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."', czpp_ultima_actualizacion=now(), czpp_cantidad_actualizaciones=czpp_cantidad_actualizaciones+1, czpp_usuario_ultima_actualizacion='".$_SESSION["id"]."' 
+	WHERE czpp_id='".$_POST["producto"]."'");
 	
 	
 	//echo '<script type="text/javascript">location.reload();</script>';
@@ -388,9 +408,10 @@ if($_POST["proceso"]==12){
 
 	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
 }
-?>
 
-<div class="alert alert-success">
-	<button type="button" class="close" data-dismiss="alert">&times;</button>
-	<i class="icon-exclamation-sign"></i><strong>Exito!</strong> Los cambios ya se guardaron y todo está bien.
-</div>
+if ($_POST["proceso"] != 2) {
+	echo '<div class="alert alert-success">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-exclamation-sign"></i><strong>Exito!</strong> Los cambios ya se guardaron y todo está bien.
+		</div>';
+}
