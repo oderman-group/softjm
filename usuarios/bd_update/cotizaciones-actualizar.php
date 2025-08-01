@@ -28,7 +28,8 @@ cotiz_usuario_modificacion='" . $_SESSION["id"] . "',
 cotiz_observaciones='" . $conexionBdPrincipal->real_escape_string($_POST["notas"]) . "', 
 cotiz_envio='" . $_POST["envio"] . "', 
 cotiz_ocultar_descuento_combo='" . $_POST["dctoCombos"] . "', 
-cotiz_descuentos_especiales='" . $_POST["dctoEspecial"] . "' 
+cotiz_descuentos_especiales='" . $_POST["dctoEspecial"] . "', 
+cotiz_version=cotiz_version+1
 WHERE cotiz_id='" . $_POST["id"] . "' AND  cotiz_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'");
 
 if($_POST["monedaActual"] != $_POST["moneda"]){
