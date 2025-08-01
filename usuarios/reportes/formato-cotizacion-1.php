@@ -9,6 +9,10 @@ $consulta=$conexionBdAdmin->query("SELECT * FROM documentos_configuracion
 																		AND dconf_id_documento='".ID_DOC_COTIZACION."';");
 $configuracionDoc = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 $fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', $configuracionDoc["dconf_estilo_letra"]) . "&display=swap";
+
+require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
+
+$versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultado['cotiz_version']);
 ?>
 
 <!DOCTYPE HTML>
@@ -70,7 +74,7 @@ $fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', 
 					<div class="col-3 text-right">
 						<div class="card border border-dark" style="width: 18rem;">
 							<div class="card-body">
-								<h5 class="card-title">COTIZACIÓN # <?= $_GET["id"]; ?></h5>
+								<h5 class="card-title">COTIZACIÓN # <?= $_GET["id"]; ?> <?=$versionActualCotizacion;?></h5>
 								<p class="card-text">
 
 									<strong>FECHA PROPUESTA:</strong> <?= $resultado['cotiz_fecha_propuesta']; ?><br>
@@ -126,7 +130,7 @@ $fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', 
 						$no = 1;
 
 						$productos = $conexionBdPrincipal->query("SELECT * FROM combos
-							INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "'
+							INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo = ".CZPP_TIPO_COTZ."
 							WHERE combo_id_empresa='".$idEmpresa."'
 							ORDER BY czpp_orden");
 							$totalIva = 0;
@@ -200,7 +204,7 @@ $fontLink = "https://fonts.googleapis.com/css2?family=" . str_replace(' ', '+', 
 							<?php
 							$productos = $conexionBdPrincipal->query("SELECT * FROM productos 
 								INNER JOIN productos_categorias ON catp_id=prod_categoria
-								INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "'
+								INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo = ".CZPP_TIPO_COTZ."
 								WHERE prod_id_empresa='".$idEmpresa."'
 								ORDER BY czpp_orden");
 							while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
