@@ -1,8 +1,12 @@
 <?php
 require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Combo.php';
 
 class CotizacionesEditar {
 
+    /**
+     * 
+     */
     public static function generarTablaProductos($conexionBdPrincipal, array $resultadoD, $simbolosMonedas, int $idEmpresa): string {
         $htmlTabla = ''; 
         global $datosUsuarioActual;
@@ -14,9 +18,9 @@ class CotizacionesEditar {
         }
 
         $productos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,
-            prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad
+            prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad, czpp_tipo, prod_existencias
             FROM productos
-            INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "'
+            INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo = ".CZPP_TIPO_COTZ."
             ORDER BY czpp_orden");
 
         $no = 1;
@@ -33,7 +37,8 @@ class CotizacionesEditar {
             $valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
 
             if ($prod['czpp_cantidad'] > 0 && $prod['czpp_descuento'] > 0) {
-                $dcto = ($valorTotal * ($prod['czpp_descuento'] / 100));
+                $valor_numerico_dcto = (float) str_replace(',', '.', $prod['czpp_descuento']);
+                $dcto = ($valorTotal * ($valor_numerico_dcto / 100));
                 $totalDescuento += $dcto;
             }
 
@@ -58,24 +63,29 @@ class CotizacionesEditar {
                 $htmlTabla .= '<a href="#" class="delete-product" data-id="'. $prod['prod_id'].'"><i class="icon-trash"></i></a>';
             }
 
-            $htmlTabla .= '<a href="productos-editar.php?id=' . $prod['prod_id'] . '" target="_blank">' . $prod['prod_nombre'] . '</a><br>';
+            $htmlTabla .= '<a href="productos-editar.php?id=' . $prod['prod_id'] . '" target="_blank">' . $prod['prod_nombre'] . ' <b>(Quedan '.$prod['prod_existencias'].' unds.)</b></a><br>';
             $htmlTabla .= '<span style="font-size: 9px; color: darkblue;">' . $prod['prod_descripcion_corta'] . '</span><br>';
-            $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.'>' . $prod['czpp_observacion'] . '</textarea></p>';
+            $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_observacion'].'">' . $prod['czpp_observacion'] . '</textarea></p>';
             $htmlTabla .= '</td>';
-            $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
+            $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_cantidad'].'"></td>';
             $htmlTabla .= '<td>';
+
             if ($resultadoD['cli_categoria'] == CLI_CATEGORIA_DEALER && $datosUsuarioActual['usr_tipo'] == 1) {
                 $htmlTabla .= '<b>Precio Dealer: $' . number_format($precioDealer, 0, ",", ".") . '</b><br>';
             }
-            $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no" '.$camposCotizacionDisabled.'><br>';
+
+            $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_valor'].'"><br>';
+
             if ($datosUsuarioActual['usr_tipo'] == 1) {
                 $htmlTabla .= '<b>Costo: $' . number_format($prod['prod_costo'], 0, ",", ".") . '</b><br>';
                 $htmlTabla .= '<b>Utilidad: ' . $prod['prod_utilidad'] . '%</b><br>';
                 $htmlTabla .= '<b class="valor-utilidad" data-utilidad="' . ($prod['czpp_valor'] - $prod['prod_costo']) . '">Valor Utilidad: $' . number_format(($prod['czpp_valor'] - $prod['prod_costo']), 0, ",", ".") . '</b><br>';
             }
+
             $htmlTabla .= '</td>';
-            $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
-            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
+            $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_impuesto'].'"></td>';
+            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_descuento'].'"></td>';
+
             if ($resultadoD['cotiz_descuentos_especiales'] == 1) {
                 $htmlTabla .= '<td>';
                 $htmlTabla .= '<input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'>';
@@ -87,6 +97,7 @@ class CotizacionesEditar {
                 $htmlTabla .= '<br><span style="font-size:10px; color:gray;">' . $prod['czpp_aprobado_fecha'] . '<br>' . $usuarioDctoEspecialAprobar['usr_nombre'] . '</span>';
                 $htmlTabla .= '</td>';
             }
+
             $htmlTabla .= '<td>'. '<span class="moneda-simbolo">' . $simbolosMonedas[$resultadoD['cotiz_moneda']].'</span>'. '	<span class="valor-numerico">'. number_format($valorTotal, 0, ",", ".") . '</span>'.'</td>';
             $htmlTabla .= '</tr>';
 
@@ -96,6 +107,9 @@ class CotizacionesEditar {
         return "<body>$htmlTabla</body>"; // Devuelve el HTML de la tabla
     }
 
+    /**
+     * 
+     */
     public static function generarTablacombos($conexionBdPrincipal, array $resultadoD, $simbolosMonedas, int $idEmpresa): string {
         $htmlTabla = ''; 
         global $datosUsuarioActual;
@@ -105,7 +119,7 @@ class CotizacionesEditar {
         }
 
         $productos = $conexionBdPrincipal->query("SELECT * FROM combos
-        INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='".$_GET["id"]."'
+        INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='".$_GET["id"]."' AND czpp_tipo = ".CZPP_TIPO_COTZ."
         WHERE combo_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
         ORDER BY czpp_orden");
 
@@ -123,7 +137,8 @@ class CotizacionesEditar {
             $valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
 
             if($prod['czpp_cantidad']>0 and $prod['czpp_descuento']>0){
-                $dcto = ($valorTotal * ($prod['czpp_descuento']/100));
+                $valor_numerico_dcto = (float) str_replace(',', '.', $prod['czpp_descuento']);
+                $dcto = ($valorTotal * ($valor_numerico_dcto /100));
                 $totalDescuento += $dcto;	
             }
 
@@ -140,6 +155,8 @@ class CotizacionesEditar {
             INNER JOIN productos ON prod_id=copp_producto
             WHERE copp_combo='".$prod['combo_id']."'");
             $precioNormalCombo = mysqli_fetch_array($consultaPreciosCombos, MYSQLI_BOTH);
+            
+            $valorActualCombo = round(Combo::obtenerValorActualCombo($prod['combo_id'], $conexionBdPrincipal),0);
 
             $productosDelCombo = $conexionBdPrincipal->query("SELECT * FROM combos_productos
             INNER JOIN productos ON prod_id=copp_producto
@@ -162,40 +179,50 @@ class CotizacionesEditar {
 
             $sumaUtilidad += ($prod['czpp_valor'] - $sumaCostosProductosCombos);
 
+            $alarmaValorComboDiferente = '';
+
+            if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA && $valorActualCombo <> $prod['czpp_valor']) {
+                $alarmaValorComboDiferente = 'style="background-color:#f5ee8c;" title="Este valor es diferente al actual del combo ($'.number_format($valorActualCombo, 0, ",", ".").'). Verificalo dando click sobre el nombre del combo. Si deseas actualizarlo puedes eliminar este item y volverlo a agregar."';
+            }
+
             $htmlTabla .= '<tr class="combo">';
             $htmlTabla .= '<td>' . $no . '</td>';
             $htmlTabla .= '<td><input type="number" title="czpp_orden" name="'.$prod['czpp_id'].'" value="'.$prod['czpp_orden'].'" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             $htmlTabla .= '<td>';
 
             if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA) {
-                $htmlTabla .= '<a href="#" class="delete-combo" data-id="'. $prod['combo_id'].'"><i class="icon-trash"></i></a>';
+                $htmlTabla .= '<a href="#" class="delete-combo" data-id="'. $prod['combo_id'].'"><i class="icon-trash"></i></a>&nbsp;';
             }
 
             $htmlTabla .= '<a href="combos-editar.php?id=' . $prod['combo_id'] . '" target="_blank">' . $prod['combo_nombre'] . '</a><br>';
-            if($prod['combo_descuento']!="" and $resultadoD['cotiz_ocultar_descuento_combo']=='0'){
+
+            if($prod['combo_descuento'] > 0 and $resultadoD['cotiz_ocultar_descuento_combo']=='0'){
                 $htmlTabla .= '<span><b>Precio Normal:</b> $'.number_format($precioNormalCombo[0],0,".",".").'</span><br>';
                 $htmlTabla .= '<span><b>Descuento:</b>'.$prod['combo_descuento'].'%</span><br>';
             }
+
             $htmlTabla .= '<span style="font-size: 9px; color: darkblue;">' . $prod['combo_descripcion'] . '</span><br>';
             $htmlTabla .= '<span style="font-size: 9px; color: teal;">';
-            $productosCombo = $conexionBdPrincipal->query("SELECT copp_id, copp_combo, copp_producto, copp_cantidad, prod_id, prod_nombre FROM productos
+            $productosCombo = $conexionBdPrincipal->query("SELECT copp_id, copp_combo, copp_producto, copp_cantidad, prod_id, prod_nombre, prod_existencias FROM productos
             INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='".$prod['combo_id']."'
             WHERE prod_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
             ORDER BY copp_id");
 
             while($prodCombo = mysqli_fetch_array($productosCombo, MYSQLI_BOTH)){
-                $htmlTabla .= $prodCombo['prod_nombre']." (".$prodCombo['copp_cantidad']." Unds.).<br>";
+                $htmlTabla .= $prodCombo['prod_nombre']." <b>(Incluye ".$prodCombo['copp_cantidad']." Unds. de ".$prodCombo['prod_existencias']." restantes)</b>.<br>";
             }
 
             $htmlTabla .= '</span><br>';
             $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.'>' . $prod['czpp_observacion'] . '</textarea></p>';
             $htmlTabla .= '</td>';
             $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
-            $htmlTabla .= '<td>';
+            $htmlTabla .= '<td '.$alarmaValorComboDiferente.'>';
+
             if ($resultadoD['cli_categoria'] == CLI_CATEGORIA_DEALER && $datosUsuarioActual['usr_tipo'] == 1) {
                 $htmlTabla .= '<b>Precio Dealer: $' . number_format($totalDealer, 0, ",", ".") . '</b><br>';
             }
-            $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no" '.$camposCotizacionDisabled.'><br>';
+
+            $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no" disabled><br>';
             if ($datosUsuarioActual['usr_tipo'] == 1) {
                 $htmlTabla .= '<b>Costo: $' . number_format($sumaCostosProductosCombos, 0, ",", ".") . '</b><br>';
                 $htmlTabla .= '<b class="valor-utilidad" data-utilidad="' . ($prod['czpp_valor'] - $sumaCostosProductosCombos) . '">Valor Utilidad: $' . number_format(($prod['czpp_valor'] - $sumaCostosProductosCombos), 0, ",", ".") . '</b><br>';
@@ -232,7 +259,7 @@ class CotizacionesEditar {
         }
 
         $productos = $conexionBdPrincipal->query("SELECT * FROM servicios
-        INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='".$_GET["id"]."'
+        INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='".$_GET["id"]."' AND czpp_tipo = ".CZPP_TIPO_COTZ."
         WHERE serv_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
         ORDER BY czpp_orden");
 
@@ -250,7 +277,8 @@ class CotizacionesEditar {
             $valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
 
             if($prod['czpp_cantidad']>0 and $prod['czpp_descuento']>0){
-                $dcto = ($valorTotal * ($prod['czpp_descuento']/100));
+                $valor_numerico_dcto = (float) str_replace(',', '.', $prod['czpp_descuento']);
+                $dcto = ($valorTotal * ($valor_numerico_dcto/100));
                 $totalDescuento += $dcto;	
             }
 
