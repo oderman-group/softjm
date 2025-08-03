@@ -96,7 +96,7 @@ include("includes/js-formularios.php");
 										<li><a href="#tickets"><i class=" icon-list"></i> Tickets</a></li>
 										<li><a href="#seguimientos"><i class=" icon-list-alt"></i> Seguimientos</a></li>
 										<li><a href="#cotizacion"><i class=" icon-list"></i> Cotizaciones</a></li>
-										<li><a href="#facturas"><i class=" icon-list-alt"></i> Facturas</a></li>
+										<!--<li><a href="#facturas"><i class=" icon-list-alt"></i> Facturas</a></li>-->
 									</ul>
 									<div class="tab-content">
 										<div class="tab-pane active" id="user">
