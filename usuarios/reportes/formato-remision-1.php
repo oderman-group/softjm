@@ -199,7 +199,7 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 
                                 $valorTotalPorItemMostrar = $item['es_valor_ok'] ? number_format($totalPorItemParaMostrar, 0, ',', '.') : "<strike>".number_format($totalPorItemParaMostrar, 0, ',', '.')."</strike>";
 
-                                $descuento = is_int($item['descuento']) ? $item['descuento'] : 0;
+                                $descuento = !empty($item['descuento']) ? $item['descuento'] : 0;
 
                                 $descuentoPorItem = ($descuento / 100) * $totalPorItem;
                                 $totalDescuento += $descuentoPorItem;
