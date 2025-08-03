@@ -3,6 +3,7 @@ require_once("../sesion.php");
 $idPagina = 377;
 
 require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Factura.php';
 
 //Verificamos que la remisión actual no haya generado ya otra factura
 $generoFactura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas WHERE factura_remision='" . $_GET["id"] . "'"));
@@ -29,14 +30,7 @@ while ($prod = mysqli_fetch_array($productos)) {
     if ($prod['czpp_orden'] == "") $prod['czpp_orden'] = 1;
     if ($prod['czpp_cantidad'] == "") $prod['czpp_cantidad'] = 1;
 
-    $predicado = [
-        'prod_id'         => $prod['czpp_producto'],
-        'prod_id_empresa' => $idEmpresa
-    ];
-
-    $datosDelProductoActual = mysqli_fetch_assoc(Producto::Select($predicado, 'prod_existencias'));
-
-    mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_descuento, czpp_observacion, czpp_servicio, czpp_combo, czpp_bodega, czpp_productos_existencias, czpp_precio_original)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '" . $prod['czpp_cantidad'] . "', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_FACT.", '" . $prod['czpp_descuento'] . "', '" . $prod['czpp_observacion'] . "', '" . $prod['czpp_servicio'] . "', '" . $prod['czpp_combo'] . "', '" . $prod['czpp_bodega'] . "', '".$datosDelProductoActual['prod_existencias']."', '" . $prod['czpp_precio_original'] . "')");
+    mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_descuento, czpp_observacion, czpp_servicio, czpp_combo, czpp_bodega, czpp_productos_en_combo)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '" . $prod['czpp_cantidad'] . "', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_FACT.", '" . $prod['czpp_descuento'] . "', '" . $prod['czpp_observacion'] . "', '" . $prod['czpp_servicio'] . "', '" . $prod['czpp_combo'] . "', '" . $prod['czpp_bodega'] . "', '" . $prod['czpp_productos_en_combo'] . "')");
 
     $contador++;
 }
