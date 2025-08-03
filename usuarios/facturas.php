@@ -10,6 +10,7 @@ include("includes/head.php");
 require_once RUTA_PROYECTO.'/usuarios/class/Usuario.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Factura.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
+require_once RUTA_PROYECTO.'/usuarios/class/ItemAsociado.php';
 ?>
 <!-- styles -->
 
@@ -253,16 +254,8 @@ require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 											$sumaTotalIva = 0;
 											$combosAsociados = [];
 
-											while($datos = mysqli_fetch_array($consultaTotal, MYSQLI_ASSOC)){
+											while ($datos = mysqli_fetch_array($consultaTotal, MYSQLI_ASSOC)) {
 
-												$nombreProducto = "";
-												$esValorOk = true;
-
-												if (!empty($datos['czpp_combo'])) {
-													Producto::procesarProductosEnCombos($datos, $nombreProducto, $esValorOk, $combosAsociados);
-													continue;
-												}
-												
 												$total = ($datos['czpp_valor'] * $datos['czpp_cantidad']);
 												$descuento = is_numeric($datos['czpp_descuento']) ? $datos['czpp_descuento'] : 0;
 												$VlrDcto = ($total * ($descuento/100));
@@ -275,24 +268,6 @@ require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 
 											}
 
-											$totalValorTodosLosCombos        = 0;
-											$totalValorFinalTodosLosCombos   = 0;
-											$totalDescuentosCombos           = 0;
-											$totalDescuentosCombosPorcentaje = 0;
-											$totalIvaCombos                  = 0;
-
-											if (!empty($combosAsociados)) {
-												foreach ($combosAsociados as $idCombo => $datosCombo) {
-													$totalValorTodosLosCombos        += $datosCombo['valor_combo_total'];
-													$totalValorFinalTodosLosCombos   += $datosCombo['valor_final_combo'];
-													$totalDescuentosCombos           += $datosCombo['valor_descuento_combo'];
-													$totalDescuentosCombosPorcentaje += $datosCombo['descuento_combo'];
-													$totalIvaCombos                  += $datosCombo['valor_iva_combo'];
-												}
-											}
-
-											$sumaTotalConDcto += $totalValorFinalTodosLosCombos;
-											$sumaTotalIva +=  $totalIvaCombos;
 											$sumaTotalFinal = $sumaTotalConDcto + $sumaTotalIva;
 
 											//Para el total al pie de pagina
@@ -353,14 +328,12 @@ require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 												<td><?= $nombreProveedor; ?></td>
 												<td>
 													<?php
-													$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
-													INNER JOIN productos ON prod_id=czpp_producto
-													WHERE czpp_cotizacion='" . $czppFactura . "'
-													AND czpp_tipo=".CZPP_TIPO_FACT."
-													");
-													$i = 1;
-													while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
-														echo "<b>" . $i . ".</b> " . $prod['prod_nombre'] . " <b>(".$prod['czpp_cantidad']." Unds.)</b></br>";
+													$itemAsociado = new ItemAsociado($conexionBdPrincipal);
+													$todosLosItemsParaTabla = $itemAsociado->listadoAsociadoTodosItems($czppFactura, ItemAsociado::PROCESO_FACTURA);
+													$i=1;
+
+													foreach ($todosLosItemsParaTabla as $item) {
+														echo "<b>" . $i . ".</b> " . $item['nombre'] . " <b>(Incluye ".$item['cantidad']." Unds.)</b></br>";
 														$i++;
 													}
 													?>

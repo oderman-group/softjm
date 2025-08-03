@@ -11,6 +11,8 @@
 		$suc = $_GET['suc'];
 	}
 	$metricas = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT * FROM metricas WHERE met_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'"));
+
+	require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 	?>
 	<!-- styles -->
 	<link href="css/jquery.gritter.css" rel="stylesheet">
@@ -138,13 +140,6 @@
 			<ul class="clearfix switch-item">
 				<li><a href="#" class="brown" data-toggle="modal" data-target="#exampleModal"><i class="icon-user"></i><span>Vendedor #1</span></a></li>
 				<li><a href="facturas.php" class="green"><i class="icon-shopping-cart"></i><span>Facturación</span></a></li>
-				<!--
-				<li><a href="#" class=" bondi-blue"><i class="icon-time"></i><span>Events</span></a></li>
-				<li><a href="#" class=" dark-yellow"><i class="icon-file-alt"></i><span>Post</span></a></li>
-				<li><a href="#" class=" blue"><i class="icon-copy"></i><span>Documents</span></a></li>
-				<li><a href="#" class="orange"><i class="icon-cogs"></i><span>Facturación</span></a></li>
-				<li><a href="#" class=" blue-violate"><i class="icon-lightbulb"></i><span>Support</span></a></li>
-				<li><a href="#" class=" magenta"><i class="icon-bar-chart"></i><span>Statistics</span></a></li>-->
 			</ul>
 		</div>
 	</div>
@@ -382,14 +377,16 @@
 													$totalFinal = $totalConDcto + $VlrIva;
 													$sumaTotalFinal += $totalFinal;
 
-													$porcentajeGral = !empty($metricas['met_meta_venta_mes']) ? ($sumaTotal / $metricas['met_meta_venta_mes']) * 100 : 0;
-
 												}
+
+												$porcentajeGral   = !empty($metricas['met_meta_venta_mes']) ? 
+																	($sumaTotal / $metricas['met_meta_venta_mes']) * 100 : 
+																	0;
 												?>
-												
+
 												<tr>
 													<td>1</td>
-													<td>Ventas Totales</td>
+													<td>Ventas Totales (Sin descuento y sin iva)</td>
 													<td>$<?= number_format($sumaTotal, 2, ",", "."); ?></td>
 													<td>
 														<?=number_format($porcentajeGral, 2, ",", ".");?>%<br>
@@ -410,21 +407,21 @@
 
 												<tr>
 													<td>3</td>
-													<td>Ventas totales con descuento</td>
+													<td>Ventas totales (Con descuento y sin iva)</td>
 													<td>$<?= number_format($sumaTotalConDcto, 2, ",", "."); ?></td>
 													<td>&nbsp;</td>
 												</tr>
 
 												<tr>
 													<td>4</td>
-													<td>Impuestos totales</td>
+													<td>Iva total</td>
 													<td>$<?= number_format($sumaTotalIva, 2, ",", "."); ?></td>
 													<td>&nbsp;</td>
 												</tr>
 
 												<tr>
 													<td>5</td>
-													<td>Ventas totales con impuesto</td>
+													<td>Ventas totales netas (Con descuento y con iva)</td>
 													<td>$<?= number_format($sumaTotalFinal, 2, ",", "."); ?></td>
 													<td>&nbsp;</td>
 												</tr>

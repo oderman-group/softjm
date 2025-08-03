@@ -141,26 +141,36 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
                         <tbody>
                             <?php
                             $itemAsociado = new ItemAsociado($conexionBdPrincipal);
+                            $listadoCombos = $itemAsociado->listadoAsociadoCombos($datosPedido[Remision::$primaryKey], ItemAsociado::PROCESO_REMSION);
                             $listadoProductos = $itemAsociado->listadoAsociadoProductos($datosPedido[Remision::$primaryKey], ItemAsociado::PROCESO_REMSION);
 
                             $todosLosItemsParaTabla = [];
-                            $combosAsociados = [];
+
+                            while ($combos = mysqli_fetch_array($listadoCombos, MYSQLI_BOTH)) {
+
+                                $itemActual  = [
+                                    'nombre' => $combos['combo_nombre'],
+                                    'cantidad' => $combos['czpp_cantidad'],
+                                    'valor' => $combos['czpp_valor'],
+                                    'descuento' => $combos['czpp_descuento'],
+                                    'impuesto' => $combos['czpp_impuesto'],
+                                    'observacion' => $combos['czpp_observacion']
+                                ];
+
+                                $todosLosItemsParaTabla[] = $itemActual;
+                            }
+
+                            $listadoCombos->free();
 
                             while ($producto = mysqli_fetch_array($listadoProductos, MYSQLI_BOTH)) {
 
-                                $nombreProducto = $producto['prod_nombre'];
-                                $esValorOk = true;
-
-                                Producto::procesarProductosEnCombos($producto, $nombreProducto, $esValorOk, $combosAsociados);
-
                                 $itemActual  = [
-                                    'nombre'      => $nombreProducto,
+                                    'nombre'      => $producto['prod_nombre'],
                                     'cantidad'    => $producto['czpp_cantidad'],
                                     'valor'       => $producto['czpp_valor'],
                                     'descuento'   => $producto['czpp_descuento'],
                                     'impuesto'    => $producto['czpp_impuesto'],
-                                    'observacion' => $producto['czpp_observacion'],
-                                    'es_valor_ok' => $esValorOk
+                                    'observacion' => $producto['czpp_observacion']
                                 ];
 
                                 $todosLosItemsParaTabla[] = $itemActual;
@@ -176,15 +186,15 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 
                             foreach ($todosLosItemsParaTabla as $item) {
 
-                                $valorUnitarioMostrar = $item['es_valor_ok'] ? number_format($item['valor'], 0, ',', '.') : "<strike>".number_format($item['valor'], 0, ',', '.')."</strike>";
+                                $valorUnitarioMostrar = number_format($item['valor'], 0, ',', '.');
 
-                                $totalPorItem = $item['es_valor_ok'] ? $item['valor'] * $item['cantidad'] : 0;
+                                $totalPorItem = $item['valor'] * $item['cantidad'];
                                 $totalPorItemParaMostrar = $item['valor'] * $item['cantidad'];
                                 $subTotal += $totalPorItem;
 
-                                $valorTotalPorItemMostrar = $item['es_valor_ok'] ? number_format($totalPorItemParaMostrar, 0, ',', '.') : "<strike>".number_format($totalPorItemParaMostrar, 0, ',', '.')."</strike>";
+                                $valorTotalPorItemMostrar = number_format($totalPorItemParaMostrar, 0, ',', '.');
 
-                                $descuento = !empty($item['descuento']) && $item['es_valor_ok'] ? $item['descuento'] : 0;
+                                $descuento = !empty($item['descuento']) ? $item['descuento'] : 0;
 
                                 $descuentoPorItem = ($descuento / 100) * $totalPorItem;
                                 $totalDescuento += $descuentoPorItem;
@@ -206,27 +216,6 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
                             <?php 
                                 $i++; 
                             }
-                            
-                            $totalValorTodosLosCombos        = 0;
-                            $totalValorFinalTodosLosCombos   = 0;
-                            $totalDescuentosCombos           = 0;
-                            $totalDescuentosCombosPorcentaje = 0;
-                            $totalIvaCombos                  = 0;
-
-                            if (!empty($combosAsociados)) {
-                                foreach ($combosAsociados as $idCombo => $datosCombo) {
-                                    $totalValorTodosLosCombos        += $datosCombo['valor_combo_total'];
-                                    $totalValorFinalTodosLosCombos   += $datosCombo['valor_final_combo'];
-                                    $totalDescuentosCombos           += $datosCombo['valor_descuento_combo'];
-                                    $totalDescuentosCombosPorcentaje += $datosCombo['descuento_combo'];
-                                    $totalIvaCombos                  += $datosCombo['valor_iva_combo'];
-                                }
-                            }
-
-                            $subTotal                 += $totalValorTodosLosCombos;
-                            $totalIva                 += $totalIvaCombos;
-                            $totalDescuento           += $totalDescuentosCombos;
-                            $totalDescuentoPorcentaje += $totalDescuentosCombosPorcentaje;
 
                             $totalPagar = $subTotal - $totalDescuento + $totalIva;
                             ?>
