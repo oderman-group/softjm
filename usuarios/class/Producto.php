@@ -203,7 +203,7 @@ class Producto extends BaseDatos {
     ) {
         if (!empty($itemActual['czpp_combo'])) {
             $esValorOk = false;
-            $nombreProducto = $itemActual['prod_nombre'] ." <br><b>(En combo #".$itemActual['czpp_combo']." con valor de $".number_format($itemActual['czpp_precio_original'],0,",",".").")</b>";
+            $nombreProducto = !empty($itemActual['prod_nombre']) ? $itemActual['prod_nombre'] ." <br><b>(En combo #".$itemActual['czpp_combo']." con valor de $".number_format($itemActual['czpp_precio_original'],0,",",".").")</b>" : "";
 
             if (!isset($combosAsociados[$itemActual['czpp_combo']])) {
                 $valorTotalDelCombo = !empty($itemActual['czpp_precio_original']) ? (float)$itemActual['czpp_precio_original'] : 0;
