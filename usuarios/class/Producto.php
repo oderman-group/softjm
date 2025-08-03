@@ -203,18 +203,25 @@ class Producto extends BaseDatos {
     ) {
         if (!empty($itemActual['czpp_combo'])) {
             $esValorOk = false;
-            $nombreProducto = !empty($itemActual['prod_nombre']) ? $itemActual['prod_nombre'] ." <br><b>(En combo #".$itemActual['czpp_combo']." con valor de $".number_format($itemActual['czpp_precio_original'],0,",",".").")</b>" : "";
+            $nombreProducto = !empty($itemActual['prod_nombre']) ? 
+                                $itemActual['prod_nombre'] ." <br><b>(En combo #".$itemActual['czpp_combo']." con valor de $".number_format($itemActual['czpp_precio_original'],0,",",".").")</b>" :
+                                "";
 
             if (!isset($combosAsociados[$itemActual['czpp_combo']])) {
-                $valorTotalDelCombo = !empty($itemActual['czpp_precio_original']) ? (float)$itemActual['czpp_precio_original'] : 0;
-                $valorDescuentoDelCombo = $valorTotalDelCombo * ($itemActual['czpp_descuento'] / 100);
-                $valorFinalDelCombo = $valorTotalDelCombo - $valorDescuentoDelCombo;
+                $valorTotalDelCombo       = !empty($itemActual['czpp_precio_original']) ? (float)$itemActual['czpp_precio_original'] : 0;
+                $valorDescuentoDelCombo   = $valorTotalDelCombo * ($itemActual['czpp_descuento'] / 100);
+                $valorFinalDelCombo       = $valorTotalDelCombo - $valorDescuentoDelCombo;
+                $valorIvaDelCombo         = $valorFinalDelCombo * ($itemActual['czpp_impuesto'] / 100);
+                $valorFinalDelComboConIva = $valorFinalDelCombo + $valorIvaDelCombo;
 
                 $combosAsociados[$itemActual['czpp_combo']] = [
-                    'valor_combo_total'     => $valorTotalDelCombo,
-                    'descuento_combo'       => $itemActual['czpp_descuento'],
-                    'valor_descuento_combo' => $valorDescuentoDelCombo,
-                    'valor_final_combo'     => $valorFinalDelCombo 
+                    'valor_combo_total'         => $valorTotalDelCombo,
+                    'descuento_combo'           => $itemActual['czpp_descuento'],
+                    'valor_descuento_combo'     => $valorDescuentoDelCombo,
+                    'valor_final_combo'         => $valorFinalDelCombo,
+                    'iva_porcentaje_combo'      => $itemActual['czpp_impuesto'],
+                    'valor_iva_combo'           => $valorIvaDelCombo,
+                    'valor_final_combo_con_iva' => $valorFinalDelComboConIva
                 ];
             }
         }
