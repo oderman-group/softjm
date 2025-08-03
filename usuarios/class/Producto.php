@@ -1,6 +1,12 @@
 <?php
+require_once RUTA_PROYECTO.'/usuarios/class/BaseDatos.php';
 
-class Producto {
+class Producto extends BaseDatos {
+
+    public static $schema     = MAINBD;
+    public static $tableName  = 'productos';
+    public static $primaryKey = 'prod_id';
+    public static $tableAs    = 'prod';
 
     public const PROD_UTILIDAD = 'prod_utilidad';
     public const PROD_COSTO    = 'prod_costo';
@@ -183,6 +189,34 @@ class Producto {
             $conexionBdPrincipal->rollback();
             self::logError("Excepción en sacarExistenciasProductoMultiBodega: " . $e->getMessage());
             return ['status' => 'error', 'message' => 'Fallo al procesar la operación: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * 
+     */
+    public static function procesarProductosEnCombos(
+        array  $itemActual,
+        string &$nombreProducto,
+        bool   &$esValorOk,
+        array  &$combosAsociados
+    ) {
+        if (!empty($itemActual['czpp_combo'])) {
+            $esValorOk = false;
+            $nombreProducto = $itemActual['prod_nombre'] ." <br><b>(En combo #".$itemActual['czpp_combo']." con valor de $".number_format($itemActual['czpp_precio_original'],0,",",".").")</b>";
+
+            if (!isset($combosAsociados[$itemActual['czpp_combo']])) {
+                $valorTotalDelCombo = !empty($itemActual['czpp_precio_original']) ? (float)$itemActual['czpp_precio_original'] : 0;
+                $valorDescuentoDelCombo = $valorTotalDelCombo * ($itemActual['czpp_descuento'] / 100);
+                $valorFinalDelCombo = $valorTotalDelCombo - $valorDescuentoDelCombo;
+
+                $combosAsociados[$itemActual['czpp_combo']] = [
+                    'valor_combo_total'     => $valorTotalDelCombo,
+                    'descuento_combo'       => $itemActual['czpp_descuento'],
+                    'valor_descuento_combo' => $valorDescuentoDelCombo,
+                    'valor_final_combo'     => $valorFinalDelCombo 
+                ];
+            }
         }
     }
 

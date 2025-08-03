@@ -7,6 +7,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/Remision.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Cliente.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Contacto.php';
 require_once RUTA_PROYECTO.'/usuarios/class/ItemAsociado.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 
 $predicado = [
     Remision::$primaryKey => $_GET["id"],
@@ -150,23 +151,7 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
                                 $nombreProducto = $producto['prod_nombre'];
                                 $esValorOk = true;
 
-                                if (!empty($producto['czpp_combo'])) {
-                                    $esValorOk = false;
-                                    $nombreProducto = $producto['prod_nombre'] ." <br><b>(En combo #".$producto['czpp_combo']." con valor de $".number_format($producto['czpp_precio_original'],0,",",".").")</b>";
-
-                                    if (!isset($combosAsociados[$producto['czpp_combo']])) {
-                                        $valorTotalDelCombo = !empty($producto['czpp_precio_original']) ? (float)$producto['czpp_precio_original'] : 0;
-                                        $valorDescuentoDelCombo = $valorTotalDelCombo * ($producto['czpp_descuento'] / 100);
-                                        $valorFinalDelCombo = $valorTotalDelCombo - $valorDescuentoDelCombo;
-
-                                        $combosAsociados[$producto['czpp_combo']] = [
-                                            'valor_combo_total'     => $valorTotalDelCombo,
-                                            'descuento_combo'       => $producto['czpp_descuento'],
-                                            'valor_descuento_combo' => $valorDescuentoDelCombo,
-                                            'valor_final_combo'     => $valorFinalDelCombo 
-                                        ];
-                                    }
-                                }
+                                Producto::procesarProductosEnCombos($producto, $nombreProducto, $esValorOk, $combosAsociados);
 
                                 $itemActual  = [
                                     'nombre'      => $nombreProducto,
@@ -199,7 +184,7 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 
                                 $valorTotalPorItemMostrar = $item['es_valor_ok'] ? number_format($totalPorItemParaMostrar, 0, ',', '.') : "<strike>".number_format($totalPorItemParaMostrar, 0, ',', '.')."</strike>";
 
-                                $descuento = !empty($item['descuento']) ? $item['descuento'] : 0;
+                                $descuento = !empty($item['descuento']) && $item['es_valor_ok'] ? $item['descuento'] : 0;
 
                                 $descuentoPorItem = ($descuento / 100) * $totalPorItem;
                                 $totalDescuento += $descuentoPorItem;

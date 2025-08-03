@@ -72,11 +72,12 @@ while ($combo = mysqli_fetch_array($productosCombos, MYSQLI_ASSOC)) { // Usar MY
                     $conexionBdPrincipal->rollback();
                 }
 
-                $datosDelProductoActual = mysqli_fetch_assoc(
-                    mysqli_query($conexionBdPrincipal,"SELECT prod_existencias 
-                    FROM productos 
-                    WHERE prod_id='".$comProd['id_producto']."'")
-                );
+                $predicado = [
+                    'prod_id'         => $comProd['id_producto'],
+                    'prod_id_empresa' => $idEmpresa
+                ];
+
+                $datosDelProductoActual = mysqli_fetch_assoc(Producto::Select($predicado, 'prod_existencias'));
 
                 // Cantidad total del producto en la remisión: (cantidad del producto en 1 combo) * (cantidad de combos pedidos)
                 $cantidadTotalProductoRemision = $comProd['cantidad_en_combo'] * $cantidadCombosPedidos;
