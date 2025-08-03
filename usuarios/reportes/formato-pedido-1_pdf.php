@@ -219,11 +219,11 @@ $html .= '
                 <td align="right" style="border: 1px solid #dee2e6;" width="100px">$'.number_format($subTotal, 0, ',', '.').'</td>
             </tr>
             <tr style="line-height:8px;">
-                <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">Descuento (<?=$totalDescuentoPorcentaje;?>%):</th>
+                <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">Descuento:</th>
                 <td align="right" style="border: 1px solid #dee2e6;">-$'.number_format($totalDescuento, 0, ',', '.').'</td>
             </tr>
             <tr style="line-height:8px;">
-                <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">IVA (19%):</th>
+                <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">IVA:</th>
                 <td align="right" style="border: 1px solid #dee2e6;">$'.number_format($totalIva, 0, ',', '.').'</td>
             </tr>
             <tr style="line-height:8px;"> 

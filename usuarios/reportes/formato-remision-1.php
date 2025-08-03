@@ -211,6 +211,7 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
                             $totalValorFinalTodosLosCombos   = 0;
                             $totalDescuentosCombos           = 0;
                             $totalDescuentosCombosPorcentaje = 0;
+                            $totalIvaCombos                  = 0;
 
                             if (!empty($combosAsociados)) {
                                 foreach ($combosAsociados as $idCombo => $datosCombo) {
@@ -218,11 +219,12 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
                                     $totalValorFinalTodosLosCombos   += $datosCombo['valor_final_combo'];
                                     $totalDescuentosCombos           += $datosCombo['valor_descuento_combo'];
                                     $totalDescuentosCombosPorcentaje += $datosCombo['descuento_combo'];
+                                    $totalIvaCombos                  += $datosCombo['valor_iva_combo'];
                                 }
                             }
 
                             $subTotal                 += $totalValorTodosLosCombos;
-                            $totalIva                 += $totalValorFinalTodosLosCombos * (19/100);
+                            $totalIva                 += $totalIvaCombos;
                             $totalDescuento           += $totalDescuentosCombos;
                             $totalDescuentoPorcentaje += $totalDescuentosCombosPorcentaje;
 
@@ -235,11 +237,11 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
                                 <td class="text-end">$<?php echo number_format($subTotal, 0, ',', '.'); ?></td>
                             </tr>
                             <tr>
-                                <th colspan="4" class="text-end">Descuento (<?=$totalDescuentoPorcentaje;?>%):</th>
+                                <th colspan="4" class="text-end">Descuento:</th>
                                 <td class="text-end">-$<?php echo number_format($totalDescuento, 0, ',', '.'); ?></td>
                             </tr>
                             <tr>
-                                <th colspan="4" class="text-end">IVA (19%):</th>
+                                <th colspan="4" class="text-end">IVA:</th>
                                 <td class="text-end">$<?php echo number_format($totalIva, 0, ',', '.'); ?></td>
                             </tr>
                             <tr class="fw-bold">

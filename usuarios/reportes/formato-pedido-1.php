@@ -356,11 +356,11 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
                                 <td class="text-end">$<?php echo number_format($subTotal, 0, ',', '.'); ?></td>
                             </tr>
                             <tr>
-                                <th colspan="4" class="text-end">Descuento (<?=$totalDescuentoPorcentaje;?>%):</th>
+                                <th colspan="4" class="text-end">Descuento:</th>
                                 <td class="text-end">-$<?php echo number_format($totalDescuento, 0, ',', '.'); ?></td>
                             </tr>
                             <tr>
-                                <th colspan="4" class="text-end">IVA (19%):</th>
+                                <th colspan="4" class="text-end">IVA:</th>
                                 <td class="text-end">$<?php echo number_format($totalIva, 0, ',', '.'); ?></td>
                             </tr>
                             <tr class="fw-bold">

@@ -251,8 +251,6 @@ require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 											$sumaTotalConDcto = 0;
 											$VlrIva = 0;
 											$sumaTotalIva = 0;
-											$totalFinal = 0;
-											$sumaTotalFinal = 0;
 											$combosAsociados = [];
 
 											while($datos = mysqli_fetch_array($consultaTotal, MYSQLI_ASSOC)){
@@ -275,15 +273,13 @@ require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 												$VlrIva = ($totalConDcto * ($datos['czpp_impuesto']/100));
 												$sumaTotalIva += $VlrIva;
 
-												$totalFinal = $totalConDcto + $VlrIva;
-												$sumaTotalFinal += $totalFinal;
-
 											}
 
 											$totalValorTodosLosCombos        = 0;
 											$totalValorFinalTodosLosCombos   = 0;
 											$totalDescuentosCombos           = 0;
 											$totalDescuentosCombosPorcentaje = 0;
+											$totalIvaCombos                  = 0;
 
 											if (!empty($combosAsociados)) {
 												foreach ($combosAsociados as $idCombo => $datosCombo) {
@@ -291,11 +287,12 @@ require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 													$totalValorFinalTodosLosCombos   += $datosCombo['valor_final_combo'];
 													$totalDescuentosCombos           += $datosCombo['valor_descuento_combo'];
 													$totalDescuentosCombosPorcentaje += $datosCombo['descuento_combo'];
+													$totalIvaCombos                  += $datosCombo['valor_iva_combo'];
 												}
 											}
 
 											$sumaTotalConDcto += $totalValorFinalTodosLosCombos;
-											$sumaTotalIva +=  $totalValorFinalTodosLosCombos * (19/100);
+											$sumaTotalIva +=  $totalIvaCombos;
 											$sumaTotalFinal = $sumaTotalConDcto + $sumaTotalIva;
 
 											//Para el total al pie de pagina
@@ -371,7 +368,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 												<td><?= $nombreResponsable; ?></td>
 												<td><?= $nombreVendedor; ?></td>
 												<td><?= $tipoFactura[$res['factura_tipo']]; ?></td>
-												<td><?= $res['factura_remision']; ?></td>
+												<td><?php if(!empty($res['factura_remision'])) echo '<a href="remisionbdg.php?busqueda=' . $res["factura_remision"] . '" target="_blank" style="text-decoration:underline; color:blue;">' . $res['factura_remision'] . '</a>'; ?></td>
 												<td align="center">$<?= number_format($sumaTotalConDcto, 0, ".", "."); ?></td>
 												<td align="center">$<?= number_format($sumaTotalFinal, 0, ".", "."); ?></td>
 												<td align="center" style="background-color: <?=$colorRedimidoV;?>;">$<?= number_format($comision, 0, ".", "."); ?></td>
