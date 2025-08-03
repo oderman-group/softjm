@@ -223,7 +223,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
 
 											<?php if($generoRemision[0]=="" && Modulos::validarRol([374], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 											
-												<li><a href="bd_create/pedidos-generar-remision.php?id=<?=$res[0];?>" onClick="if(!confirm('Esta acción descontará existencias de los productos asociados. Desea generar remisión de este pedido?')){return false;}">Generar remisión</a></li>
+												<li><a href="bd_create/pedidos-generar-remision-v2.php?id=<?=$res[0];?>" onClick="if(!confirm('Esta acción descontará existencias de los productos asociados. Desea generar remisión de este pedido?')){return false;}">Generar remisión</a></li>
 
 											<?php }?>
 											
