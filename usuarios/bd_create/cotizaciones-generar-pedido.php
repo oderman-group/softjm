@@ -55,7 +55,7 @@ while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
         }
     }
 
-    $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_servicio, czpp_combo, czpp_descuento, czpp_productos_en_combo_generar_pedido, czpp_productos_en_combo)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '" . $prod['czpp_cantidad'] . "', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_PED.", '" . $prod['czpp_servicio'] . "', '" . $prod['czpp_combo'] . "', '" . $prod['czpp_descuento'] . "', '".$jsonProductosCombo."', '" . $prod['czpp_productos_en_combo'] . "')");
+    $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_servicio, czpp_combo, czpp_descuento, czpp_productos_en_combo_generar_pedido, czpp_productos_en_combo, czpp_nombre_original)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '" . $prod['czpp_cantidad'] . "', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_PED.", '" . $prod['czpp_servicio'] . "', '" . $prod['czpp_combo'] . "', '" . $prod['czpp_descuento'] . "', '".$jsonProductosCombo."', '" . $prod['czpp_productos_en_combo'] . "', '" . $prod['czpp_nombre_original'] . "')");
 
     $contador++;
 }

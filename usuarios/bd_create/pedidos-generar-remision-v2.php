@@ -29,7 +29,7 @@ while ($prod = mysqli_fetch_array($productos)) {
     if ($prod['czpp_orden'] == "") $prod['czpp_orden'] = 1;
     if ($prod['czpp_cantidad'] == "") $prod['czpp_cantidad'] = 1;
 
-    mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento, czpp_productos_existencias)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '".$prod['czpp_cantidad']."', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_REM.", 1, '" . $prod['czpp_descuento'] . "', '" . $prod['prod_existencias'] . "')");
+    mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento, czpp_productos_existencias, czpp_nombre_original)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '".$prod['czpp_cantidad']."', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_REM.", 1, '" . $prod['czpp_descuento'] . "', '" . $prod['prod_existencias'] . "', '" . $prod['czpp_nombre_original'] . "')");
 
     $resultado = Producto::sacarExistenciasProductoMultiBodega($prod['czpp_producto'], $prod['czpp_cantidad'], $conexionBdPrincipal);
 
@@ -88,7 +88,7 @@ while ($combo = mysqli_fetch_array($productosCombos, MYSQLI_ASSOC)) { // Usar MY
         }
     }
 
-    mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento, czpp_productos_en_combo)VALUES('" . $idInsert . "','" . $combo['czpp_combo'] . "', '" . $combo['czpp_valor'] . "', '" . $combo['czpp_orden'] . "', '".$combo['czpp_cantidad']."', '" . $combo['czpp_impuesto'] . "', ".CZPP_TIPO_REM.", 1, '" . $combo['czpp_descuento'] . "', '" . $combo['czpp_productos_en_combo'] . "')");
+    mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento, czpp_productos_en_combo, czpp_nombre_original)VALUES('" . $idInsert . "','" . $combo['czpp_combo'] . "', '" . $combo['czpp_valor'] . "', '" . $combo['czpp_orden'] . "', '".$combo['czpp_cantidad']."', '" . $combo['czpp_impuesto'] . "', ".CZPP_TIPO_REM.", 1, '" . $combo['czpp_descuento'] . "', '" . $combo['czpp_productos_en_combo'] . "', '" . $prod['czpp_nombre_original'] . "')");
 }
 
 echo '<script type="text/javascript">window.location.href="../remisionbdg.php?busqueda=' . $idInsert . '";</script>';
