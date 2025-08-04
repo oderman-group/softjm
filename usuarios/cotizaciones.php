@@ -149,7 +149,7 @@ include("includes/head.php");
 											<th>ID</th>
 											<th>Fecha Propuesta</th>
 											<th>Cliente</th>
-											<th>Descripción</th>
+											<th>Items inluídos</th>
 											<th>Responsable</th>
 											<th>Vendedor</th>
 											<th></th>
