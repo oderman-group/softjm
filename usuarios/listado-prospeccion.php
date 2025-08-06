@@ -185,9 +185,9 @@ $clientesData = generarClientesSimulados(50);
 
         $(function() {
             const agentesComerciales = [
-                { id: 1, nombre: 'Agente A' },
-                { id: 2, nombre: 'Agente B' },
-                { id: 3, nombre: 'Agente C' },
+                { id: 1, nombre: 'Jaime Mendoza' },
+                { id: 2, nombre: 'Joan Mendoza' },
+                { id: 3, nombre: 'Maria Fernanda' },
             ];
 
             let currentClienteData = null; // Para almacenar los datos del cliente actual gestionado
