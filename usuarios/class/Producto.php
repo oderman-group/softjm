@@ -12,6 +12,10 @@ class Producto extends BaseDatos {
     public const PROD_COSTO    = 'prod_costo';
 
     public static function CalcularPrecioLista(string $costo, string $utilidadSobreCien) {
+        if (empty($costo) || empty($utilidadSobreCien)) {
+            return 0;
+        }
+
         return $costo / (1 - $utilidadSobreCien);
     }
 
