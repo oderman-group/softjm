@@ -6,6 +6,8 @@ $idPagina = 173;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
+require_once RUTA_PROYECTO.'/usuarios/class/Combo.php';
+
 $consultaCombo=$conexionBdPrincipal->query("SELECT * FROM combos WHERE combo_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consultaCombo, MYSQLI_BOTH);
 ?>
@@ -72,11 +74,10 @@ include("includes/js-formularios.php");
 			</div>
 			
 			<?php
-			$consultaNumCombosCotiz=$conexionBdPrincipal->query("SELECT * FROM cotizacion_productos WHERE czpp_combo='".$_GET["id"]."'");
-			$combosCotizacion = $consultaNumCombosCotiz->num_rows;
+			$combosCotizacion = Combo::numeroCotizacionesCombo($_GET["id"], $conexionBdPrincipal);
 			if($combosCotizacion>0){
 				$msjCombo = "";
-				$msjCombo = "Este combo se encuentra incluído en <b>".$combosCotizacion."</b> cotizaciones.";
+				$msjCombo = "Este combo se encuentra incluído en <b>".$combosCotizacion."</b> documentos.";
 				$colorCombo = 'gold';
 			?>	
 				<p style="color: black; background-color: <?=$colorCombo;?>; padding: 10px; font-weight: bold;"><?=$msjCombo;?></p>

@@ -368,35 +368,35 @@ include("includes/js-formularios.php");
 									</div>
 								</div>
                                 
-								<fieldset class="default">
+								<fieldset class="default" id="campos_controlados">
 								<legend>Próximo contacto</legend>
 
                                 <div class="control-group">
-									<label class="control-label">Fecha próximo contacto</label>
+									<label class="control-label">Fecha próximo contacto (*)</label>
 									<div class="controls">
-										<input type="date" class="span4" name="fechaPC">
+										<input type="date" class="span4" name="fechaPC" required id="fechaPC">
 										<a href="calendario.php?id=<?=$_SESSION["id"];?>" target="_blank" style="color:#009; text-decoration: underline;"><i class="icon icon-calendar"></i> Ver mi calendario</a>
 									</div>
 								</div>
 
 								<div class="control-group">
-									<label class="control-label">Hora próximo contacto</label>
+									<label class="control-label">Hora próximo contacto (*)</label>
 									<div class="controls">
-										<input type="time" class="span2" name="horaPC">
+										<input type="time" class="span2" name="horaPC" required id="horaPC">
 									</div>
 								</div>
 
 								<div class="control-group">
-									<label class="control-label">Recordatorio (Minutos antes)</label>
+									<label class="control-label">Recordatorio (Minutos antes) (*)</label>
 									<div class="controls">
-										<input type="number" class="span2" name="minutosRecordarAntes">
+										<input type="number" class="span2" name="minutosRecordarAntes" required id="minutosRecordarAntes">
 									</div>
 								</div>
 								
 								<div class="control-group">
-									<label class="control-label">Medio de contacto</label>
+									<label class="control-label">Medio de contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="canalPC" required>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="canalPC" required id="canalPC">
 											<option value="3"></option>
                                             <?php
 											$opciones = array("","WhatsApp","Fijo","Celular","Visitar al cliente","El cliente me visita","Skype", "Otro","Correo","Sitio Web");
@@ -410,16 +410,16 @@ include("includes/js-formularios.php");
                                </div>
                                 
                                 <div class="control-group">
-									<label class="control-label">Asunto a tratar</label>
+									<label class="control-label">Asunto a tratar (*)</label>
 									<div class="controls">
-                                        <textarea name="asunto" style="width: 80%"></textarea>
+                                        <textarea name="asunto" style="width: 80%" required id="asunto"></textarea>
 									</div>
 								</div>
                                 
                                 <div class="control-group">
-									<label class="control-label">Encargado del próximo contacto</label>
+									<label class="control-label">Encargado del próximo contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="encargado[]" multiple>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="encargado[]" multiple required id="encargado">
 											<option value="0"></option>
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."'");
@@ -439,7 +439,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Cerrar ticket</label>
 									<div class="controls">
-                                        <input type="checkbox" value="1" name="cerrarTK">
+                                        <input type="checkbox" value="1" name="cerrarTK" id="miCheckboxControl">
                                         <span style="color:navy;">Este se toma como el último seguimiento y el ticket quedará cerrado.</span>
 									</div>
 								</div>
@@ -475,5 +475,6 @@ include("includes/js-formularios.php");
 	</div>
 	<?php include("includes/pie.php");?>
 </div>
+<script src="js/seguimientos.js"></script>
 </body>
 </html>

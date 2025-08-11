@@ -5,6 +5,11 @@ $validarGet = validarVariableGet($_GET['user']);
 
 $_SESSION['admin'] = $_SESSION['id'];
 $_SESSION['id'] = $_GET['user'];
+$_SESSION["agendaCalendario"] = [
+    'code'     => null,
+    'token'     => null,
+    'evento'    => null
+];
 
 $rst_usr = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$_SESSION['id']."'");
 $num = $rst_usr->num_rows;

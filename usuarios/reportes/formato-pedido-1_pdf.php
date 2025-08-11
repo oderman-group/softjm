@@ -37,6 +37,7 @@ class MIPDF extends TCPDF {
     public $cli_usuario;
     public $cli_direccion;
     public $conf_web;
+    public $ruta_imagen;
 
     public function Header() {
 
@@ -44,16 +45,17 @@ class MIPDF extends TCPDF {
             <table width="100%" cellpadding="2">
                 <tr>
                     <td width="50%" align="left">
-                        <h2 class="mb-1">' . $this->conf_empresa . '</h2>
-                        <p class="mb-0" style="line-height:3px;">Nit: ' . $this->conf_nit . '</p>
-                        <p class="mb-0" style="line-height:3px;">Teléfono: ' . $this->conf_telefono . '</p>
-                        <p class="mb-0" style="line-height:3px;">Email: ' . $this->conf_email . '</p>
+                        <span ><img src="'. $this->ruta_imagen.'" width="109"></span><br>
+                        <p class="mb-0" style="line-height:1px;"><strong>Nit:</strong> ' . $this->conf_nit . '</p>
+                        <p class="mb-0" style="line-height:1px;"><strong>Teléfono:</strong> ' . $this->conf_telefono . '</p>
+                        <p class="mb-0" style="line-height:1px;"><strong>Email:</strong> ' . $this->conf_email . '</p>
                     </td>
                     <td width="50%" align="right">
-                        <h2 class="mb-1">PEDIDO #' . $this->pedid_numero . '</h2>
-                        <p class="mb-0" style="line-height:3px;"><strong>Fecha del Pedido:</strong> ' . $this->pedid_fecha_propuesta . '</p>
+                        <br><br>
+                        <span style="font-weight: bold;font-size: 20;"> PEDIDO #' . $this->pedid_numero . '</span><br><br>
+                        <p class="mb-0" style="line-height:3px;margin:1px"><strong>Fecha del Pedido:</strong> ' . $this->pedid_fecha_propuesta . '</p>
+                        <p class="mb-0" style="line-height:3px;"><strong>Nit/C.C.:</strong> ' . $this->cli_usuario . '</p>
                         <p class="mb-0" style="line-height:3px;"><strong>Cliente:</strong> ' . $this->cli_nombre . '</p>
-                        <p class="mb-0" style="line-height:3px;"><strong>NIT/C.C.:</strong> ' . $this->cli_usuario . '</p>
                         <p class="mb-0" style="line-height:3px;"><strong>Dirección Cliente:</strong> ' . $this->cli_direccion . '</p>
                     </td>
                 </tr>
@@ -105,6 +107,7 @@ $pdf->cli_nombre = $datosCliente['cli_nombre'];
 $pdf->cli_usuario = $datosCliente['cli_usuario'];
 $pdf->cli_direccion = $datosCliente['cli_direccion'];
 $pdf->conf_web = $configuracion['conf_web'];
+$pdf->ruta_imagen = RUTA_PROYECTO.'/usuarios/files/'.$configuracion['conf_logo'];
 
 $pdf->SetCreator('Mi Aplicación');
 $pdf->SetTitle('Impresión de Pedido - #'.$datosPedido[Pedido::$primaryKey]);
@@ -216,11 +219,11 @@ $html .= '
                 <td align="right" style="border: 1px solid #dee2e6;" width="100px">$'.number_format($subTotal, 0, ',', '.').'</td>
             </tr>
             <tr style="line-height:8px;">
-                <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">Descuento (<?=$totalDescuentoPorcentaje;?>%):</th>
+                <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">Descuento:</th>
                 <td align="right" style="border: 1px solid #dee2e6;">-$'.number_format($totalDescuento, 0, ',', '.').'</td>
             </tr>
             <tr style="line-height:8px;">
-                <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">IVA (19%):</th>
+                <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">IVA:</th>
                 <td align="right" style="border: 1px solid #dee2e6;">$'.number_format($totalIva, 0, ',', '.').'</td>
             </tr>
             <tr style="line-height:8px;"> 

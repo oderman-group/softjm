@@ -44,11 +44,13 @@ if ($extension == 'xlsx') {
 			while ($f <= $numFilas) {
 
 				mysqli_query($conexionBdPrincipal,"UPDATE productos_bodegas 
-				SET prodb_existencias = '".$hojaActual->getCell('E'.$f)->getValue()."', 
+				SET prodb_existencias = '".$hojaActual->getCell('G'.$f)->getValue()."', 
 				prodb_fecha_actualizacion = now(), 
 				prodb_usuario_actualizacion = '".$_SESSION["id"]."' 
 				WHERE prodb_id='".$hojaActual->getCell('A'.$f)->getValue()."'
 				");
+
+				Producto::sincronizarExistenciasConBodegas($hojaActual->getCell('E'.$f)->getValue(), $conexionBdPrincipal);
 
 				$f++;
 			}

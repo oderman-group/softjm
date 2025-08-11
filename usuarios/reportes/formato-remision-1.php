@@ -7,6 +7,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/Remision.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Cliente.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Contacto.php';
 require_once RUTA_PROYECTO.'/usuarios/class/ItemAsociado.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 
 $predicado = [
     Remision::$primaryKey => $_GET["id"],
@@ -140,18 +141,35 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
                         <tbody>
                             <?php
                             $itemAsociado = new ItemAsociado($conexionBdPrincipal);
+                            $listadoCombos = $itemAsociado->listadoAsociadoCombos($datosPedido[Remision::$primaryKey], ItemAsociado::PROCESO_REMSION);
                             $listadoProductos = $itemAsociado->listadoAsociadoProductos($datosPedido[Remision::$primaryKey], ItemAsociado::PROCESO_REMSION);
 
                             $todosLosItemsParaTabla = [];
 
+                            while ($combos = mysqli_fetch_array($listadoCombos, MYSQLI_BOTH)) {
+
+                                $itemActual  = [
+                                    'nombre' => $combos['combo_nombre'],
+                                    'cantidad' => $combos['czpp_cantidad'],
+                                    'valor' => $combos['czpp_valor'],
+                                    'descuento' => $combos['czpp_descuento'],
+                                    'impuesto' => $combos['czpp_impuesto'],
+                                    'observacion' => $combos['czpp_observacion']
+                                ];
+
+                                $todosLosItemsParaTabla[] = $itemActual;
+                            }
+
+                            $listadoCombos->free();
+
                             while ($producto = mysqli_fetch_array($listadoProductos, MYSQLI_BOTH)) {
 
                                 $itemActual  = [
-                                    'nombre' => $producto['prod_nombre'],
-                                    'cantidad' => $producto['czpp_cantidad'],
-                                    'valor' => $producto['czpp_valor'],
-                                    'descuento' => $producto['czpp_descuento'],
-                                    'impuesto' => $producto['czpp_impuesto'],
+                                    'nombre'      => $producto['prod_nombre'],
+                                    'cantidad'    => $producto['czpp_cantidad'],
+                                    'valor'       => $producto['czpp_valor'],
+                                    'descuento'   => $producto['czpp_descuento'],
+                                    'impuesto'    => $producto['czpp_impuesto'],
                                     'observacion' => $producto['czpp_observacion']
                                 ];
 
@@ -168,10 +186,15 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 
                             foreach ($todosLosItemsParaTabla as $item) {
 
+                                $valorUnitarioMostrar = number_format($item['valor'], 0, ',', '.');
+
                                 $totalPorItem = $item['valor'] * $item['cantidad'];
+                                $totalPorItemParaMostrar = $item['valor'] * $item['cantidad'];
                                 $subTotal += $totalPorItem;
 
-                                $descuento = is_int($item['descuento']) ? $item['descuento'] : 0;
+                                $valorTotalPorItemMostrar = number_format($totalPorItemParaMostrar, 0, ',', '.');
+
+                                $descuento = !empty($item['descuento']) ? $item['descuento'] : 0;
 
                                 $descuentoPorItem = ($descuento / 100) * $totalPorItem;
                                 $totalDescuento += $descuentoPorItem;
@@ -187,12 +210,13 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
                                     <th scope="row"><?php echo $i; ?></th>
                                     <td><?php echo $item['nombre']; ?></td>
                                     <td class="text-end"><?php echo $item['cantidad']; ?></td>
-                                    <td class="text-end">$<?php echo number_format($item['valor'], 0, ',', '.'); ?></td>
-                                    <td class="text-end">$<?php echo number_format($totalPorItem, 0, ',', '.'); ?></td>
+                                    <td class="text-end">$<?php echo $valorUnitarioMostrar; ?></td>
+                                    <td class="text-end">$<?php echo $valorTotalPorItemMostrar; ?></td>
                                 </tr>
                             <?php 
                                 $i++; 
-                            } 
+                            }
+
                             $totalPagar = $subTotal - $totalDescuento + $totalIva;
                             ?>
                             </tbody>
@@ -202,11 +226,11 @@ $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
                                 <td class="text-end">$<?php echo number_format($subTotal, 0, ',', '.'); ?></td>
                             </tr>
                             <tr>
-                                <th colspan="4" class="text-end">Descuento (<?=$totalDescuentoPorcentaje;?>%):</th>
+                                <th colspan="4" class="text-end">Descuento:</th>
                                 <td class="text-end">-$<?php echo number_format($totalDescuento, 0, ',', '.'); ?></td>
                             </tr>
                             <tr>
-                                <th colspan="4" class="text-end">IVA (19%):</th>
+                                <th colspan="4" class="text-end">IVA:</th>
                                 <td class="text-end">$<?php echo number_format($totalIva, 0, ',', '.'); ?></td>
                             </tr>
                             <tr class="fw-bold">

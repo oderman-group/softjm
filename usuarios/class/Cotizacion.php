@@ -35,4 +35,15 @@ class Cotizacion extends BaseDatos {
         return $datos['cotiz_vendida'] == self::COTIZACION_VENDIDA;
     }
 
+    /**
+     * Obtener la versión actual de la cotización
+     */
+    public static function obtenerVersionCotizacion(int $version) {
+        if ($version > 0) {
+            return "<span style='font-size:9px;'>(V ".$version.")</span>";
+        }
+
+        return "";
+    }
+
 }

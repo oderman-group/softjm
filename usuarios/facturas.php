@@ -8,6 +8,9 @@ $paginaActual['pag_nombre'] = "Facturas";
 include("includes/head.php");
 
 require_once RUTA_PROYECTO.'/usuarios/class/Usuario.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Factura.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
+require_once RUTA_PROYECTO.'/usuarios/class/ItemAsociado.php';
 ?>
 <!-- styles -->
 
@@ -116,11 +119,11 @@ require_once RUTA_PROYECTO.'/usuarios/class/Usuario.php';
 
 									if (isset($_GET["cte"]) and $_GET["cte"] != "") {
 										$SQL = "SELECT * FROM facturas
-										LEFT JOIN clientes ON cli_id=factura_cliente AND cli_id='" . $_GET["cte"] . "'
+										INNER JOIN clientes ON cli_id=factura_cliente AND cli_id='" . $_GET["cte"] . "'
 										ORDER BY factura_id DESC";
 									} else {
 										$SQL = "SELECT * FROM facturas
-										LEFT JOIN clientes ON cli_id=factura_cliente
+										INNER JOIN clientes ON cli_id=factura_cliente
 										LEFT JOIN proveedores ON prov_id=factura_proveedor
 										INNER JOIN usuarios ON usr_id=factura_creador
 										WHERE factura_id=factura_id $filtro
@@ -223,9 +226,6 @@ require_once RUTA_PROYECTO.'/usuarios/class/Usuario.php';
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 											
 											$czppFactura=$res['factura_id'];
-											// if($res['factura_concepto']=="Traída de remisión"){
-											// 	$czppFactura=$res['factura_remision'];
-											// }
 
 											if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$consultaZona=mysqli_query($conexionBdPrincipal, "SELECT * FROM zonas_usuarios WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
@@ -240,54 +240,43 @@ require_once RUTA_PROYECTO.'/usuarios/class/Usuario.php';
 											$consultaVendedor=mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='" . $res['factura_vendedor'] . "' AND usr_id_empresa='".$idEmpresa."'");
 											$vendedor = mysqli_fetch_array($consultaVendedor, MYSQLI_BOTH);
 
-
-											
 											$consultaTotal = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
-													WHERE czpp_cotizacion='".$czppFactura."' AND czpp_valor>0 AND czpp_cantidad>0
-													AND czpp_tipo=".CZPP_TIPO_FACT."
-													GROUP BY czpp_id
-													");
+											WHERE czpp_cotizacion='".$czppFactura."' AND czpp_valor>0 AND czpp_cantidad>0
+											AND czpp_tipo=".CZPP_TIPO_FACT."
+											GROUP BY czpp_id
+											");
 
-												$total = 0;
-												$sumaTotal = 0;
-												$VlrDcto = 0;
-												$totalConDcto = 0;
-												$SumaDcto = 0;
-												$sumaTotalConDcto = 0;
-												$VlrIva = 0;
-												$sumaTotalIva = 0;
-												$totalFinal = 0;
-												$sumaTotalFinal = 0;
+											$total = 0;
+											$VlrDcto = 0;
+											$totalConDcto = 0;
+											$sumaTotalConDcto = 0;
+											$VlrIva = 0;
+											$sumaTotalIva = 0;
+											$combosAsociados = [];
 
-												while($datos = mysqli_fetch_array($consultaTotal, MYSQLI_BOTH)){
+											while ($datos = mysqli_fetch_array($consultaTotal, MYSQLI_ASSOC)) {
 
-													$total = ($datos['czpp_valor'] * $datos['czpp_cantidad']);
-													$sumaTotal += $total;
-													$descuento = is_numeric($datos['czpp_descuento']) ? $datos['czpp_descuento'] : 0;
-													$VlrDcto = ($total * ($descuento/100));
-													$SumaDcto += $VlrDcto;
-													
-													$totalConDcto = ($total - $VlrDcto);
-													$sumaTotalConDcto += $totalConDcto;
+												$total = ($datos['czpp_valor'] * $datos['czpp_cantidad']);
+												$descuento = is_numeric($datos['czpp_descuento']) ? $datos['czpp_descuento'] : 0;
+												$VlrDcto = ($total * ($descuento/100));
 
-													$VlrIva = ($totalConDcto * ($datos['czpp_impuesto']/100));
-													$sumaTotalIva += $VlrIva;
+												$totalConDcto = ($total - $VlrDcto);
+												$sumaTotalConDcto += $totalConDcto;
 
-													$totalFinal = $totalConDcto + $VlrIva;
-													$sumaTotalFinal += $totalFinal;
+												$VlrIva = ($totalConDcto * ($datos['czpp_impuesto']/100));
+												$sumaTotalIva += $VlrIva;
 
+											}
 
-												}
+											$sumaTotalFinal = $sumaTotalConDcto + $sumaTotalIva;
 
-												//Para el total al pie de pagina
-												if($res['factura_tipo'] == FACTURA_TIPO_VENTA){
+											//Para el total al pie de pagina
+											if($res['factura_tipo'] == FACTURA_TIPO_VENTA){
 
-													$sumaFacturasSinIva += $sumaTotalConDcto;
-													$sumaFacturasConIva += $sumaTotalFinal;
+												$sumaFacturasSinIva += $sumaTotalConDcto;
+												$sumaFacturasConIva += $sumaTotalFinal;
 
-												}
-												
-
+											}
 
 											$pCom = $configuracion['conf_comision_vendedores'] / 100;
 
@@ -300,32 +289,34 @@ require_once RUTA_PROYECTO.'/usuarios/class/Usuario.php';
 											//Color redimido clientes
 											$colorRedimido = 'tomato';
 											if($res['factura_redimido_cliente']==1){
-													$colorRedimido = 'aquamarine';
+												$colorRedimido = 'aquamarine';
 											}
 
 											//Color redimido vendedores
 											$colorRedimidoV = 'tomato';
 											if($res['factura_redimido_vendedor']==1){
-													$colorRedimidoV = 'aquamarine';
+												$colorRedimidoV = 'aquamarine';
 											}
 
 											$nombreCliente="";
 											if(!empty($res['cli_nombre'])){
 												$nombreCliente=strtoupper($res['cli_nombre']);
 											}
+
 											$nombreProveedor="";
 											if(!empty($res['prov_nombre'])){
 												$nombreProveedor=strtoupper($res['prov_nombre']);
 											}
+
 											$nombreResponsable="";
 											if(!empty($res['usr_nombre'])){
 												$nombreResponsable=strtoupper($res['usr_nombre']);
 											}
+
 											$nombreVendedor="";
 											if(!empty($vendedor['usr_nombre'])){
 												$nombreVendedor=strtoupper($vendedor['usr_nombre']);
 											}
-
 										?>
 											<tr>
 											<td><?= $no; ?></td>	
@@ -337,14 +328,12 @@ require_once RUTA_PROYECTO.'/usuarios/class/Usuario.php';
 												<td><?= $nombreProveedor; ?></td>
 												<td>
 													<?php
-													$productos = mysqli_query($conexionBdPrincipal, "SELECT * FROM cotizacion_productos
-													INNER JOIN productos ON prod_id=czpp_producto
-													WHERE czpp_cotizacion='" . $czppFactura . "'
-													AND czpp_tipo=".CZPP_TIPO_FACT."
-													");
-													$i = 1;
-													while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
-														echo "<b>" . $i . ".</b> " . $prod['prod_nombre'] . " <b>(".$prod['czpp_cantidad']." Unds.)</b></br>";
+													$itemAsociado = new ItemAsociado($conexionBdPrincipal);
+													$todosLosItemsParaTabla = $itemAsociado->listadoAsociadoTodosItems($czppFactura, ItemAsociado::PROCESO_FACTURA);
+													$i=1;
+
+													foreach ($todosLosItemsParaTabla as $item) {
+														echo "<b>" . $i . ".</b> " . $item['nombre'] . " <b>(Incluye ".$item['cantidad']." Unds.)</b></br>";
 														$i++;
 													}
 													?>
@@ -352,7 +341,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/Usuario.php';
 												<td><?= $nombreResponsable; ?></td>
 												<td><?= $nombreVendedor; ?></td>
 												<td><?= $tipoFactura[$res['factura_tipo']]; ?></td>
-												<td><?= $res['factura_remision']; ?></td>
+												<td><?php if(!empty($res['factura_remision'])) echo '<a href="remisionbdg.php?busqueda=' . $res["factura_remision"] . '" target="_blank" style="text-decoration:underline; color:blue;">' . $res['factura_remision'] . '</a>'; ?></td>
 												<td align="center">$<?= number_format($sumaTotalConDcto, 0, ".", "."); ?></td>
 												<td align="center">$<?= number_format($sumaTotalFinal, 0, ".", "."); ?></td>
 												<td align="center" style="background-color: <?=$colorRedimidoV;?>;">$<?= number_format($comision, 0, ".", "."); ?></td>

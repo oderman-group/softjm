@@ -203,15 +203,15 @@ include("includes/head.php");
 										<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span>
 										</button>
 										<ul class="dropdown-menu">
-											<?php if (Modulos::validarRol([150], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+											<?php if (Modulos::validarRol([150], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && empty($res['remi_pedido'])) {?>
 											<li><a href="remisionbdg-editar.php?id=<?=$res[0];?>#productos"> Editar</a></li>
 											<?php }?>
 											
-											<?php if (Modulos::validarRol([375], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+											<?php if (Modulos::validarRol([375], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) {?>
 											<li><a href="bd_delete/remisionbdg-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 											<?php }?>
 											<?php if (Modulos::validarRol([376], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-											<li><a href="reportes/formato-remision-1.php?id=<?=$res[0];?>" target="_blank">Imprimir</a></li>
+											<li><a href="reportes/formato-remision-1_pdf.php?id=<?=$res[0];?>" target="_blank">Generar pdf</a></li>
 											<?php }?>
 
 											<?php if($generoFactura[0]=="" && Modulos::validarRol([377], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>

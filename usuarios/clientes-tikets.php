@@ -261,7 +261,7 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 															<a href="clientes-tikets-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
 														<?php }?>
 
-														<?php if( Modulos::validarRol(['91'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
+														<?php if( Modulos::validarRol(['91'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) {?>
 															<a href="bd_delete/clientes-tikets-eliminar.php?id=<?=$res[0];?>&cte=<?=$_GET["cte"];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 														<?php }?>
 													</h4>

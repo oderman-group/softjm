@@ -46,7 +46,7 @@ function axiosAjax(datos){
 <?php
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
-echo "se cargo el sitio web en ".$tiempoMostrar;
+echo "<div style='padding:10px; color:darkblue;'>Se cargó esta pagina en ".$tiempoMostrar." seg.</div>";
 ?>
 
 <div style="height: 100px;"></div>

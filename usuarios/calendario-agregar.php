@@ -7,10 +7,12 @@ $paginaActual['pag_nombre'] = "Agregar evento";
 <?php include("includes/head.php");?>
 <!-- styles -->
 
+
 <!--[if IE 7]>
 <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
 <![endif]-->
 <link href="css/chosen.css" rel="stylesheet">
+
 
 
 <!--[if IE 7]>
@@ -22,6 +24,7 @@ $paginaActual['pag_nombre'] = "Agregar evento";
 <!--[if IE 9]>
 <link rel="stylesheet" type="text/css" href="css/ie/ie9.css" />
 <![endif]-->
+
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -43,11 +46,11 @@ $paginaActual['pag_nombre'] = "Agregar evento";
 include("includes/js-formularios.php");
 ?>
 <?php include("includes/texto-editor.php");?>
+<?php include("includes/overlay.php");?>
 </head>
 <body>
 <div class="layout">
-	<?php include("includes/encabezado.php");?>
-    
+	<?php include("includes/encabezado.php");?>    
     
     
 	<div class="main-wrapper">
@@ -55,8 +58,7 @@ include("includes/js-formularios.php");
 			<div class="row-fluid ">
 				<div class="span12">
 					<div class="primary-head">
-						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
+						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>						
                         
 					</div>
 					<ul class="breadcrumb">
@@ -73,7 +75,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="bd_create/calendario-guardar.php">
+							<form class="form-horizontal" method="post" id="frmCalendario"  action="bd_create/calendario-guardar.php">
                             <input type="hidden" name="idSql" value="52">  
                                
                                
@@ -94,52 +96,14 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Hora inicio</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="inicio">
-											<option value=""></option>
-                                            <?php
-											$hora = 1;
-											$minuto = 0;
-											$i = 0;
-											while($hora<24){
-												if($i%2==0){
-													$minuto = 0;
-													if($i>0){$hora++;}
-												}else{
-													$minuto = 30;
-												}
-											?>
-                                            	<option value="<?=$i;?>"><?=$hora.":".$minuto;?></option>
-                                            <?php
-												$i++;
-											}
-											?>
-                                    	</select>
+										<input type="time" class="span2" name="inicio" id="inicio" required>
                                     </div>
                                </div>
 								
 								<div class="control-group">
 									<label class="control-label">Hora fin</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="fin">
-											<option value=""></option>
-                                            <?php
-											$hora = 1;
-											$minuto = 0;
-											$i=0;
-											while($hora<24){
-												if($i%2==0){
-													$minuto = 0;
-													if($i>0){$hora++;}
-												}else{
-													$minuto = 30;
-												}
-											?>
-                                            	<option value="<?=$i;?>"><?=$hora.":".$minuto;?></option>
-                                            <?php
-												$i++;
-											}
-											?>
-                                    	</select>
+										<input type="time" class="span2" name="fin" id="fin" required>
                                     </div>
                                </div>
 								
@@ -162,7 +126,7 @@ include("includes/js-formularios.php");
 									<label class="control-label">Invitar cliente</label>
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente">
-											<option value="0"></option>
+											<option value="0">Escoja una opción</option>
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id_empresa={$_SESSION['dataAdicional']['id_empresa']}");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
@@ -185,7 +149,7 @@ include("includes/js-formularios.php");
                                </div>
                                
 							   <div class="control-group">
-									<label class="control-label">Desea enviar un correo al cliente?</label>
+									<label class="control-label">Desea notificar al cliente?</label>
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="enviarCorreo">
 											<option value="">Escoje una opción</option>
@@ -198,7 +162,7 @@ include("includes/js-formularios.php");
                               
 								<div class="form-actions">
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-									<button type="button" class="btn btn-danger">Cancelar</button>
+									<button type="button" id="btnCancelar" class="btn btn-danger">Cancelar</button>
 								</div>
                               
                                 
@@ -207,7 +171,32 @@ include("includes/js-formularios.php");
 					</div>
 				</div>
 			</div>
-            
+            <script>
+				document.getElementById('frmCalendario').addEventListener('submit', function(e) {
+					e.preventDefault(); // evita que el formulario se envíe					
+			
+					const [h1, m1] = this.inicio.value.split(':').map(Number);
+					const [h2, m2] = this.fin.value.split(':').map(Number);
+					const minutosInicio = h1 * 60 + m1;
+					const minutosFin = h2 * 60 + m2;
+
+					if (minutosFin <= minutosInicio) {
+						alert('⚠️ La hora de fin debe ser posterior a la hora de inicio.');
+						return; // Detiene el envío
+					}
+
+					document.getElementById("overlay").style.display = "flex";
+ 					// Si la validación pasa, enviar el formulario manualmente
+					this.submit();
+				});
+
+				document.getElementById('btnCancelar').addEventListener('click', function(e) {
+					e.preventDefault(); // evita que el formulario se envíe		
+					
+					window.location.href = 'calendario.php';
+					
+				});
+			</script>
 
 		</div>
 	</div>

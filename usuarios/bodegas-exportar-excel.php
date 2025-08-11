@@ -17,7 +17,7 @@ $hojaActiva = $excel->getActiveSheet();
 
 $hojaActiva->setTitle("Productos en bodegas");
 
-$hojaActiva->getStyle('A1:F1')->getFont()->setBold('Bold')->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_DARKBLUE);
+$hojaActiva->getStyle('A1:G1')->getFont()->setBold('Bold')->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_DARKBLUE);
 
 $hojaActiva->getColumnDimension('A')->setWidth(10);
 $hojaActiva->setCellValue([1,1], 'COD');
@@ -31,13 +31,16 @@ $hojaActiva->setCellValue([3,1], 'BODEGA');
 $hojaActiva->getColumnDimension('D')->setWidth(30);
 $hojaActiva->setCellValue([4,1], 'COD. PRODUCTO');
 
-$hojaActiva->getColumnDimension('E')->setWidth(80);
-$hojaActiva->setCellValue([5,1], 'PRODUCTO');
+$hojaActiva->getColumnDimension('E')->setWidth(15);
+$hojaActiva->setCellValue([5,1], 'ID. PRODUCTO');
 
-$hojaActiva->getColumnDimension('F')->setWidth(30);
-$hojaActiva->setCellValue([6,1], 'EXISTENCIAS');
+$hojaActiva->getColumnDimension('F')->setWidth(80);
+$hojaActiva->setCellValue([6,1], 'PRODUCTO');
 
-$hojaActiva->getColumnDimension('G')->setWidth(50);
+$hojaActiva->getColumnDimension('G')->setWidth(20);
+$hojaActiva->setCellValue([7,1], 'EXISTENCIAS');
+
+$hojaActiva->getColumnDimension('H')->setWidth(50);
 
 $filtro = '';
 if(isset($_GET["bod"])){
@@ -75,12 +78,13 @@ while ($res = mysqli_fetch_array($consulta, MYSQLI_ASSOC)) {
     $hojaActiva->setCellValue('B'.$i, $res['bod_id']);
     $hojaActiva->setCellValue('C'.$i, $res['bod_nombre']);
     $hojaActiva->setCellValue('D'.$i, $res['prod_referencia']);
-    $hojaActiva->setCellValue('E'.$i, $res['prod_nombre']);
-    $hojaActiva->setCellValue('F'.$i, $res['prodb_existencias']);
+    $hojaActiva->setCellValue('E'.$i, $res['prod_id']);
+    $hojaActiva->setCellValue('F'.$i, $res['prod_nombre']);
+    $hojaActiva->setCellValue('G'.$i, $res['prodb_existencias']);
 	// Set cell A4 with a formula
 	$hojaActiva->setCellValue(
-		'G'.$i,
-		'=IF(F'.$i.' < 0, "INGRESE EXISTENCIAS POSITIVAS, POR FAVOR.", "")'
+		'H'.$i,
+		'=IF(G'.$i.' < 0, "INGRESE EXISTENCIAS POSITIVAS, POR FAVOR.", "")'
 	);
 
 

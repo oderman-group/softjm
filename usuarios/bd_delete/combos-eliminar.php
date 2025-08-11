@@ -1,14 +1,22 @@
 <?php
-    require_once("../sesion.php");
+require_once("../sesion.php");
 
-	$idPagina = 218;
+$idPagina = 218;
 
-    include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
+include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
+require_once RUTA_PROYECTO.'/usuarios/class/Combo.php';
 
-	$conexionBdPrincipal->query("DELETE FROM combos WHERE combo_id='" . $_GET["id"] . "' AND combo_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
-    $conexionBdPrincipal->query("DELETE FROM combos_productos WHERE copp_combo='" . $_GET["id"] . "'");
+$numeroCotizaciones = Combo::numeroCotizacionesCombo($_GET["id"], $conexionBdPrincipal);
 
-	include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
-
+if ($numeroCotizaciones > 0) {
 	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
 	exit();
+}
+
+$conexionBdPrincipal->query("DELETE FROM combos WHERE combo_id='" . $_GET["id"] . "' AND combo_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
+$conexionBdPrincipal->query("DELETE FROM combos_productos WHERE copp_combo='" . $_GET["id"] . "'");
+
+include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
+
+echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
+exit();

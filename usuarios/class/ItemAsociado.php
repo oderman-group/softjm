@@ -195,4 +195,48 @@ class ItemAsociado extends BaseDatos {
         return $result; 
     }
 
+    /**
+     * 
+     */
+    public function listadoAsociadoTodosItems($idProceso, $tipoProceso) {
+        $listadoCombos = $this->listadoAsociadoCombos($idProceso, $tipoProceso);
+        $listadoProductos = $this->listadoAsociadoProductos($idProceso, $tipoProceso);
+
+        $todosLosItemsParaTabla = [];
+
+        while ($combos = mysqli_fetch_array($listadoCombos, MYSQLI_BOTH)) {
+
+            $itemActual  = [
+                'nombre'      => '<a href="combos-editar.php?id='.$combos['czpp_combo'].'" target="_blank" style="color:blue; text-decoration:underline;">'.$combos['combo_nombre'].'</a>',
+                'cantidad'    => $combos['czpp_cantidad'],
+                'valor'       => $combos['czpp_valor'],
+                'descuento'   => $combos['czpp_descuento'],
+                'impuesto'    => $combos['czpp_impuesto'],
+                'observacion' => $combos['czpp_observacion']
+            ];
+
+            $todosLosItemsParaTabla[] = $itemActual;
+        }
+
+        $listadoCombos->free();
+
+        while ($producto = mysqli_fetch_array($listadoProductos, MYSQLI_BOTH)) {
+
+            $itemActual  = [
+                'nombre'      => '<a href="productos-editar.php?id='.$producto['prod_id'].'" target="_blank" style="color:blue; text-decoration:underline;">'.$producto['prod_nombre'].'</a>',
+                'cantidad'    => $producto['czpp_cantidad'],
+                'valor'       => $producto['czpp_valor'],
+                'descuento'   => $producto['czpp_descuento'],
+                'impuesto'    => $producto['czpp_impuesto'],
+                'observacion' => $producto['czpp_observacion']
+            ];
+
+            $todosLosItemsParaTabla[] = $itemActual;
+        }
+
+        $listadoProductos->free();
+
+        return $todosLosItemsParaTabla;
+    }
+
 }

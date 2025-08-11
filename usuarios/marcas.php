@@ -99,7 +99,7 @@ include("includes/head.php");
 																	<?php if (Modulos::validarRol([35], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="marcas-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
 																	<?php } ?>
-																	<?php if (Modulos::validarRol([194], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																	<?php if (Modulos::validarRol([194], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) {?>
                                     <a href="bd_delete/marcas-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 																	<?php } ?>
                                 </h4></td>

@@ -45,7 +45,11 @@ class BaseDatos {
         $sql = "UPDATE {$infoActualizar['tabla']} SET ";
         foreach ($post as $campos => $valores) {
             if($campos != 'id'){
-                $sql .= "{$campos}='{$valores}',";
+                if ($valores === 'INCREMENT_BY_ONE') {
+                    $sql .= "{$campos} = {$campos} + 1,";
+                } else {
+                    $sql .= "{$campos}='{$valores}',";
+                }
             }
         }
         $sql = substr($sql, 0, -1)." WHERE {$infoActualizar['clave_primaria']} = '{$infoActualizar['id_registro']}'";

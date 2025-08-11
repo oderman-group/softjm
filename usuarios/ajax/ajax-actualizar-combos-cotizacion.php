@@ -14,7 +14,8 @@ if(!empty($_POST["combo"])){
     $contador = 0;
     while ($contador < $numero) {
 
-        $consulta=$conexionBdPrincipal->query("SELECT ROUND((SUM(copp_cantidad)*prod_precio),0), combo_descuento, combo_descuento_dealer FROM combos
+        $consulta=$conexionBdPrincipal->query("SELECT ROUND((SUM(copp_cantidad)*copp_precio),0), combo_descuento, combo_descuento_dealer, copp_producto 
+        FROM combos
         INNER JOIN combos_productos ON copp_combo=combo_id
         INNER JOIN productos ON prod_id=copp_producto
         WHERE combo_id='" . $_POST["combo"][$contador] . "'
@@ -22,12 +23,17 @@ if(!empty($_POST["combo"])){
         ");
         $precioCombo = 0;
         $dctoCombo = 0;
+        $productosEnCombo = "";
         while ($dCombos = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
             $precioCombo += $dCombos[0];
             $dctoCombo = $dCombos[1];
 
             $dctoComboDealer = $dCombos[2];
+
+            $productosEnCombo .= $dCombos['copp_producto'] .",";
         }
+
+        $productosEnCombo = substr($productosEnCombo, 0, -1);
 
 
         //Si el cliente es DEALER
@@ -54,7 +60,7 @@ if(!empty($_POST["combo"])){
                 $valorProducto = round(($precioCombo / $configuracion['conf_trm_compra']), 0);
             }
 
-            $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo)VALUES('" . $_POST["id"] . "','" . $_POST["combo"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', 1)");
+            $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_combo, czpp_cantidad, czpp_impuesto, czpp_descuento, czpp_valor, czpp_orden, czpp_tipo, czpp_nombre_original, czpp_descuento_maximo_original, czpp_productos_en_combo, czpp_precio_original)VALUES('" . $_POST["id"] . "','" . $_POST["combo"][$contador] . "', 1, 19, 0, '" . $valorProducto . "', '" . $numero . "', ".CZPP_TIPO_COTZ.", '".$productoDatos['combo_nombre']."', '".$productoDatos['combo_descuento_maximo']."', '".$productosEnCombo."', '" . $valorProducto . "')");
         } else {
             if ($_POST["monedaActual"] != $_POST["moneda"]) {
                 //Si cambió a pesos colombianos
@@ -96,4 +102,15 @@ if(!empty($_POST["combo"])){
 } else {
     $conexionBdPrincipal->query("DELETE FROM cotizacion_productos WHERE czpp_cotizacion='" . $_POST["id"] . "' AND czpp_servicio IS NULL AND czpp_producto IS NULL");
 }
-?>
+
+$infoActualizar = [
+    'tabla'          => 'cotizacion',
+    'clave_primaria' => 'cotiz_id',
+    'id_registro'    => $_POST["id"],
+    'sucp_id_empresa'=> $idEmpresa
+];
+$camposActualizar = [
+    'cotiz_version' => 'INCREMENT_BY_ONE'
+];
+
+Cotizacion::actualizarRegistro($infoActualizar, $camposActualizar);

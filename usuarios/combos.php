@@ -4,6 +4,8 @@ $idPagina = 172;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+
+require_once RUTA_PROYECTO.'/usuarios/class/Combo.php';
 ?>
 <!-- styles -->
 <link href="css/tablecloth.css" rel="stylesheet">
@@ -59,6 +61,17 @@ include("includes/head.php");
     
 	<div class="main-wrapper">
 		<div class="container-fluid">
+			<div class="row-fluid">
+				<div class="span12">
+					<div class="hero-unit">
+						<h2>Eliminación de combos</h2>
+						<p>
+							Los combos que están incluidos en procesos de cotización, pedido, remisión y/o factura no podrán ser eliminados.
+						</p>
+					</div>
+				</div>
+			</div>
+					
             <?php include("includes/notificaciones.php");?>
             <p>
 						<?php if (Modulos::validarRol([174], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
@@ -115,6 +128,8 @@ include("includes/head.php");
 
 								$dctoDealer = $res['combo_descuento_dealer']/100;
 								$precioFinalDealer = round($precioCombo - ($precioCombo*$dctoDealer),0);
+
+								$numeroCotizaciones = Combo::numeroCotizacionesCombo($res['combo_id'], $conexionBdPrincipal);
 							?>
 							<tr>
 								<td><?=$no;?></td>
@@ -141,10 +156,11 @@ include("includes/head.php");
 										<?php } ?>
 										<?php if (Modulos::validarRol([175], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 										<a href="combos-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-										<?php } ?>						
-										<?php if (Modulos::validarRol([218], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-										<a href="bd_delete/combos-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-										<?php } ?>						
+										<?php } ?>
+
+										<?php if (Modulos::validarRol([218], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $numeroCotizaciones == 0) {?>
+											<a href="bd_delete/combos-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+										<?php } ?>
                                 </h4>
 								</td>
 							</tr>

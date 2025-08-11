@@ -196,6 +196,14 @@ include("includes/head.php");
 							</div>
 						</div>
 					<?php } ?>
+
+					<?php if (Modulos::validarRol([419], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+						<div class="span3">
+							<div class="board-widgets small-widget" style="background-color:skyblue;">
+								<a href="listado-prospeccion.php" target="_blank"><span class="widget-icon icon-phone-sign"></span><span class="widget-label">Listado de prospección</span></a>
+							</div>
+						</div>
+					<?php } ?>
 				</div>
 
 

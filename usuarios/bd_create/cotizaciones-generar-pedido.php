@@ -19,7 +19,43 @@ while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
     if ($prod['czpp_orden'] == "") $prod['czpp_orden'] = 1;
     if ($prod['czpp_cantidad'] == "") $prod['czpp_cantidad'] = 1;
 
-    $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_servicio, czpp_combo, czpp_descuento)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '" . $prod['czpp_cantidad'] . "', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_PED.", '" . $prod['czpp_servicio'] . "', '" . $prod['czpp_combo'] . "', '" . $prod['czpp_descuento'] . "')");
+    $jsonProductosCombo = null;
+
+    if (!empty($prod['czpp_combo'])) {
+        $combos = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos_productos 
+        INNER JOIN productos ON prod_id=copp_producto
+        INNER JOIN combos ON combo_id=copp_combo
+        WHERE copp_combo='" . $prod['czpp_combo'] . "'");
+
+        $productosComboArray = [];
+
+        //Construir JSON con los productos
+        while ($comProd = mysqli_fetch_array($combos)) {
+
+            $subtotalLinea = $comProd['copp_cantidad'] * $comProd['copp_precio'];
+
+            $productosComboArray[] = [
+                "id_producto"              => (int)$comProd['prod_id'],
+                "nombre_producto"          => $comProd['prod_nombre'],
+                "existencias_actuales"     => $comProd['prod_existencias'],
+                "cantidad_en_combo"        => (int)$comProd['copp_cantidad'],
+                "precio_unitario_cotizado" => (float)$comProd['copp_precio'],
+                "descuento_del_combo"      => (float)$comProd['combo_descuento'],
+                "subtotal_linea_cotizado"  => (float)$subtotalLinea
+            ];
+        }
+
+        // --- 2. Codificar el array PHP a formato JSON ---
+        $jsonProductosCombo = json_encode($productosComboArray, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+        // Manejo de errores de JSON (opcional, pero recomendado)
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log("Error al generar JSON para el combo $idInsert: " . json_last_error_msg());
+            $jsonProductosCombo = '[]'; // O manejar el error de otra forma
+        }
+    }
+
+    $conexionBdPrincipal->query("INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_servicio, czpp_combo, czpp_descuento, czpp_productos_en_combo_generar_pedido, czpp_productos_en_combo, czpp_nombre_original)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '" . $prod['czpp_cantidad'] . "', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_PED.", '" . $prod['czpp_servicio'] . "', '" . $prod['czpp_combo'] . "', '" . $prod['czpp_descuento'] . "', '".$jsonProductosCombo."', '" . $prod['czpp_productos_en_combo'] . "', '" . $prod['czpp_nombre_original'] . "')");
 
     $contador++;
 }

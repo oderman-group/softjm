@@ -161,7 +161,7 @@ while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 				<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 					<a href="clientes-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
 				<?php } ?>
-				<?php if (Modulos::validarRol([55], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+				<?php if (Modulos::validarRol([55], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) { ?>
 					<a href="bd_delete/clientes-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;
 				<?php } ?>
 				<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
@@ -177,7 +177,7 @@ while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 					<a href="clientes-seguimiento.php?cte=<?= $res[0]; ?>&emg=1" data-toggle="tooltip" title="Seguimiento de clientes" target="new"><i class="icon-list-alt"></i></a>&nbsp;
 				<?php } ?>
 				<?php if (Modulos::validarRol([259], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
-					<a href="facturacion.php?cte=<?= $res[0]; ?>&emg=1" data-toggle="tooltip" title="Facturación" target="new"><i class="icon-money"></i></a>&nbsp;
+					<a href="facturas.php?cte=<?= $res[0]; ?>&emg=1" data-toggle="tooltip" title="Facturación" target="new"><i class="icon-money"></i></a>&nbsp;
 				<?php } ?>
 				<?php if (Modulos::validarRol([110], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 					<a href="enviar-portafolios.php?cte=<?= $res[0]; ?>" data-toggle="tooltip" title="Enviar portafolios" target="_blank"><i class="icon-list-ul"></i></a>&nbsp;

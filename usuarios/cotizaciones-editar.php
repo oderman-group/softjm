@@ -23,6 +23,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Remision.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Factura.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Combo.php';
 ?>
 
 <link href="css/chosen.css" rel="stylesheet">
@@ -54,22 +55,32 @@ include("includes/js-formularios.php");
 
 	<script type="text/javascript">
 		function productos(enviada){
-			var tipoCliente = enviada.alt;
-			var campo       = enviada.title;
-			var producto    = enviada.name;
-			var proceso     = 2;
-			var valor       = enviada.value;
+			var tipoCliente   = enviada.alt;
+			var campo         = enviada.title;
+			var producto      = enviada.name;
+			var proceso       = 2;
+			var valor         = enviada.value;
+			var valorAnterior = enviada.getAttribute('data-valor-actual');
+			
 			
 			$('#resp').empty().hide().html("Esperando...").show(1);
-				datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&tipoCliente="+(tipoCliente);
-					$.ajax({
-						type: "POST",
-						url: "ajax/ajax-productos.php",
-						data: datos,
-						success: function(data){
-						$('#resp').empty().hide().html(data).show(1);
-						}
-					});
+			datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&tipoCliente="+(tipoCliente);
+			$.ajax({
+				type: "POST",
+				url: "ajax/ajax-productos.php",
+				data: datos,
+				success: function(data) {
+					var response = JSON.parse(data);
+					if(response.success) {
+						$('#resp').empty().hide().html(response.message).show(1);
+					} else {
+						$('#resp').empty().hide().html('').show(1);
+						alert(response.message);
+						enviada.value = valorAnterior;
+					}
+
+				}
+			});
 		}
 
 
@@ -268,13 +279,15 @@ include("includes/js-formularios.php");
 				<p style="color: black; background-color: gold; padding: 10px; font-weight: bold;"> No es posible hacer más cambios en esta cotización.</p>
 			<?php
 			}
+
+			$versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultadoD['cotiz_version']);
 			?>
 			
 			<div class="row-fluid">
 				<div class="span12">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> <?=$paginaActual['pag_nombre'];?></h3>
+							<h3> <?=$paginaActual['pag_nombre'];?> #<?=$resultadoD['cotiz_id'];?> <?=$versionActualCotizacion;?></h3>
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="bd_update/cotizaciones-actualizar.php">
@@ -529,9 +542,10 @@ include("includes/js-formularios.php");
 										<div class="controls">
 											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="producto[]" multiple id="product-select" <?=$camposCotizacionDisabled;?>>
 											<?php
-            									$consultaProductos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad FROM cotizacion_productos
+            									$consultaProductos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad, czpp_tipo FROM cotizacion_productos
 												INNER JOIN productos ON prod_id=czpp_producto AND prod_id_empresa='".$idEmpresa."'
-												WHERE czpp_cotizacion='" . $_GET["id"] . "' ORDER BY prod_nombre");
+												WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=".CZPP_TIPO_COTZ."
+												ORDER BY prod_nombre");
 
 												while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
 												?>
@@ -676,7 +690,7 @@ include("includes/js-formularios.php");
 							<?php
 							if(Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 
-								<p style="color: black; background-color: <?=$colorCredito;?>; padding: 15px; font-weight: bold; font-size: 16px;">Esta cotización deja una utilidad aproximada de $<span id="utilidadTotal">0</span>
+								<p style="color: black; background-color: #d8ff0038; padding: 15px; font-weight: bold; font-size: 16px;">Esta cotización deja una utilidad aproximada de $<span id="utilidadTotal">0</span>
 							<?php }?>
 							
 							

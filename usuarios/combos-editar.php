@@ -5,6 +5,8 @@ $idPagina = 175;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
+require_once RUTA_PROYECTO.'/usuarios/class/Combo.php';
+
 $consultaCombos=$conexionBdPrincipal->query("SELECT * FROM combos WHERE combo_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consultaCombos, MYSQLI_BOTH);
 
@@ -78,11 +80,11 @@ include("includes/js-formularios.php");
 			</div>
 			
 			<?php
-			$consultaCotizProducto=$conexionBdPrincipal->query("SELECT * FROM cotizacion_productos WHERE czpp_combo='".$_GET["id"]."'");
-			$combosCotizacion = $consultaCotizProducto->num_rows;
-			if($combosCotizacion>0){
+			$combosCotizacion = Combo::numeroCotizacionesCombo($_GET["id"], $conexionBdPrincipal);
+
+			if($combosCotizacion > 0){
 				$msjCombo = "";
-				$msjCombo = "Este combo se encuentra incluído en <b>".$combosCotizacion."</b> cotizaciones.";
+				$msjCombo = "Este combo se encuentra incluído en <b>".$combosCotizacion."</b> documentos.";
 				$colorCombo = 'gold';
 			?>	
 				<p style="color: black; background-color: <?=$colorCombo;?>; padding: 10px; font-weight: bold;"><?=$msjCombo;?></p>
@@ -205,7 +207,18 @@ include("includes/js-formularios.php");
 			
 			<div class="row-fluid">
 				<div class="span12">
-					
+
+					<div class="row-fluid">
+						<div class="span12">
+							<div class="hero-unit">
+								<h2>Valores originales VS valores actuales</h2>
+								<p>
+									Los valores marcados como <b>(original)</b> se refiere al momento cuando el combo fue creado por primera vez. Si desea actualizarlos con los valores actuales de los productos haga click sobre el ícono de sincronización <i class="icon-refresh "></i>, que está ubicado al lado de cada producto.
+								</p>
+							</div>
+						</div>
+					</div>
+
 					<span id="resp"></span>
 					
 					<div class="content-widgets light-gray" id="productos">
@@ -220,9 +233,10 @@ include("includes/js-formularios.php");
 								<th>No</th>
                                 <th>Producto</th>
                                 <th>Cant.</th>
-                                <th>Precio original</th>
-                                <th>Precio lista</th>
-                                <th>SUBTOTAL</th>
+                                <th>Precio (original)</th>
+								<th>SUBTOTAL (Original)</th>
+                                <th style="border-left: solid;">Precio lista (Actual)</th>
+                                <th>SUBTOTAL (Actual)</th>
                                 <th style="color: darkblue; border-left: solid;">Precio dealer</th>
                                 <th style="color: darkblue;">SUBTOTAL DEALER</th>
 							</tr>
@@ -233,6 +247,8 @@ include("includes/js-formularios.php");
 							$totalDealer=0;
 							$total=0;
 							$totalCantidad=0;
+							$totalOriginal = 0;
+							$subtotalOriginal = 0;
 							$productos = $conexionBdPrincipal->query("SELECT * FROM productos 
 							INNER JOIN productos_categorias ON catp_id=prod_categoria
 							INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='".$_GET["id"]."'
@@ -246,7 +262,9 @@ include("includes/js-formularios.php");
 
 									
 								$subtotal = ($prod['prod_precio'] * $prod['copp_cantidad']);
+								$subtotalOriginal = ($prod['copp_precio'] * $prod['copp_cantidad']);
 								$total +=$subtotal;
+								$totalOriginal += $subtotalOriginal;
 								
 								$totalCantidad += $prod['copp_cantidad'];
 
@@ -258,15 +276,19 @@ include("includes/js-formularios.php");
 									<?php if (Modulos::validarRol([305], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 										<a href="bd_delete/combo-productos-eliminar.php?get=55&idItem=<?=$prod['copp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
 									<?php } ?>
+									<?php if (Modulos::validarRol([418], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $prod['copp_precio'] <> $prod['prod_precio']) {?>
+										<a href="bd_update/combo-productos-sincronizar.php?idItem=<?=$prod['copp_id'];?>&nuevoPrecio=<?=$prod['prod_precio'];?>" onClick="if(!confirm('Desea sincronizar este producto con los valores actuales?')){return false;}"><i class="icon-refresh "></i></a>
+									<?php } ?>
 									<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_id']." - ".$prod['prod_nombre'];?></a>
+									<a href="productos-editar.php?id=<?=$prod['prod_id'];?>" target="_blank"><?=$prod['prod_id']." - ".$prod['prod_nombre']." <b>(Quedan ".$prod['prod_existencias']." unds.)</b>";?></a>
 									<?php } else {?>
 									<span><?=$prod['prod_id']." - ".$prod['prod_nombre'];?></span>
 									<?php } ?>
 								</td>
                                 <td><input type="number" title="copp_cantidad" name="<?=$prod['copp_id'];?>" value="<?=$prod['copp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;" <?=$disabled;?> translate="no"></td>
                                 <td>$<?=number_format($prod['copp_precio'],0,",",".");?></td>
-                                <td>$<?=number_format($prod['prod_precio'],0,",",".");?></td>
+								<td>$<?=number_format($subtotalOriginal,0,",",".");?></td>
+                                <td style="border-left: solid;">$<?=number_format($prod['prod_precio'],0,",",".");?></td>
 								<td>$<?=number_format($subtotal,0,",",".");?></td>
 								<td style="color: darkblue; border-left: solid;">$<?=number_format($precioDealer,0,",",".");?></td>
 								<td style="color: darkblue;">$<?=number_format($subtotalDealer,0,",",".");?></td>
@@ -287,21 +309,23 @@ include("includes/js-formularios.php");
 							</tbody>
 							<tfoot>
 								<tr style="font-weight: bold; font-size: 16px;">
-									<td style="text-align: right;" colspan="5">SUBTOTAL</td>
+									<td style="text-align: right;" colspan="4">SUBTOTAL ORIGINAL</td>
+									<td>$<?=number_format($totalOriginal,0,",",".");?></td>
+									<td style="text-align: right; border-left: solid;">SUBTOTAL ACTUAL</td>
 									<td>$<?=number_format($total,0,",",".");?></td>
 
 									<td style="text-align: right; color: darkblue; border-left: solid;">SUBTOTAL DEALER</td>
 									<td style="color: darkblue;">$<?=number_format($totalDealer,0,",",".");?></td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
-									<td style="text-align: right;" colspan="5">DESCUENTO</td>
+									<td style="text-align: right;" colspan="6">DESCUENTO</td>
 									<td>$<?=number_format($descuento,0,",",".");?></td>
 
 									<td style="text-align: right; color: darkblue; border-left: solid;">DESCUENTO DEALER</td>
 									<td style="color: darkblue;">$<?=number_format($descuentoDealer,0,",",".");?></td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
-									<td style="text-align: right;" colspan="5">TOTAL NETO</td>
+									<td style="text-align: right;" colspan="6">TOTAL NETO</td>
 									<td>$<?=number_format($totalNeto,0,",",".");?></td>
 
 									<td style="text-align: right; color: darkblue; border-left: solid;">TOTAL NETO DEALER</td>

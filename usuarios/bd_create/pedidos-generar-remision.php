@@ -2,6 +2,10 @@
 require_once("../sesion.php");
 $idPagina = 374;
 
+require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
+
+$conexionBdPrincipal->begin_transaction();
+
 //Verificamos que el pedido actual no haya generado ya otra remisión
 $generoRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg WHERE remi_pedido='" . $_GET["id"] . "' AND remi_id_empresa='".$idEmpresa."'"));
 if($generoRemision[0]!=""){
@@ -15,7 +19,8 @@ WHERE pedid_id='" . $_GET["id"] . "'");
 
 $idInsert = mysqli_insert_id($conexionBdPrincipal);
 
-$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
+$productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos
+INNER JOIN productos ON prod_id=czpp_producto
 WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."' AND czpp_producto!=''");
 
 
@@ -24,7 +29,15 @@ while ($prod = mysqli_fetch_array($productos)) {
     if ($prod['czpp_orden'] == "") $prod['czpp_orden'] = 1;
     if ($prod['czpp_cantidad'] == "") $prod['czpp_cantidad'] = 1;
 
-    mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '".$prod['czpp_cantidad']."', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_REM.", 1, '" . $prod['czpp_descuento'] . "')");
+    mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento, czpp_productos_existencias)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '".$prod['czpp_cantidad']."', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_REM.", 1, '" . $prod['czpp_descuento'] . "', '" . $prod['prod_existencias'] . "')");
+
+    $resultado = Producto::sacarExistenciasProductoMultiBodega($prod['czpp_producto'], $prod['czpp_cantidad'], $conexionBdPrincipal);
+
+    if ($resultado['status'] === 'success') {
+        Producto::sincronizarExistenciasConBodegas($prod['czpp_producto'], $conexionBdPrincipal);
+    } else {
+        $conexionBdPrincipal->rollback();
+    }
     
     $contador++;
 }
@@ -34,24 +47,106 @@ while ($prod = mysqli_fetch_array($productos)) {
 $productosCombos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
 WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_PED."' AND czpp_combo!=''");
 
-while ($combo = mysqli_fetch_array($productosCombos)) {
-    if ($combo['czpp_orden'] == "") $combo['czpp_orden'] = 1;
-    if ($combo['czpp_cantidad'] == "") $combo['czpp_cantidad'] = 1;
+while ($combo = mysqli_fetch_array($productosCombos, MYSQLI_ASSOC)) { // Usar MYSQLI_ASSOC para mejor acceso por nombre
+    // Establecer valores predeterminados si están vacíos
+    $ordenCombo = !empty($combo['czpp_orden']) ? $combo['czpp_orden'] : 1;
+    $cantidadCombosPedidos = !empty($combo['czpp_cantidad']) ? $combo['czpp_cantidad'] : 1;
+    $idImpuestoCombo = !empty($combo['czpp_impuesto']) ? $combo['czpp_impuesto'] : 0; // Asumo un valor por defecto si no hay impuesto
+    $descuentoCombo = !empty($combo['czpp_descuento']) ? $combo['czpp_descuento'] : 0; // Asumo un valor por defecto si no hay descuento
 
-    $combos = mysqli_query($conexionBdPrincipal,"SELECT * FROM combos_productos 
-    INNER JOIN productos ON prod_id=copp_producto
-    INNER JOIN combos ON combo_id=copp_combo
-    WHERE copp_combo='" . $combo['czpp_combo'] . "'");
+    // === INICIO DEL CAMBIO CLAVE ===
+    // Verificar si esta línea de pedido es un combo y tiene el JSON de detalles
+    if (!empty($combo['czpp_productos_en_combo_generar_pedido'])) {
+        $productosDelComboJSON = json_decode($combo['czpp_productos_en_combo_generar_pedido'], true);
 
-    //Ingresar todos los productos de forma individual cuando son combos (SE ELIMINA EL CONCEPTO DE COMBO. TOD PASA A SER PRODUCTOS)
-    while($comProd = mysqli_fetch_array($combos)){
+        // Verificar si el JSON se decodificó correctamente y es un array
+        if (json_last_error() === JSON_ERROR_NONE && is_array($productosDelComboJSON)) {
+            // Iterar sobre cada producto dentro del JSON del combo
+            foreach ($productosDelComboJSON as $comProd) {
 
-        $porcentajeDcto = ($comProd['combo_descuento'] / 100);
-        $precioConDctoCombo = $comProd['prod_precio'] - ($comProd['prod_precio'] * $porcentajeDcto);
+                $resultado = Producto::sacarExistenciasProductoMultiBodega($comProd['id_producto'], $comProd['cantidad_en_combo'], $conexionBdPrincipal);
 
-        mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento)VALUES('" . $idInsert . "','" . $comProd['prod_id'] . "', '" . $precioConDctoCombo. "', '" . $combo['czpp_orden'] . "', '".$comProd['copp_cantidad']."', '" . $combo['czpp_impuesto'] . "', ".CZPP_TIPO_REM.", 1, '".$combo['czpp_descuento']."')");
+                if ($resultado['status'] === 'success') {
+                    Producto::sincronizarExistenciasConBodegas($comProd['id_producto'], $conexionBdPrincipal);
+                } else {
+                    $conexionBdPrincipal->rollback();
+                }
+
+                $predicado = [
+                    'prod_id'         => $comProd['id_producto'],
+                    'prod_id_empresa' => $idEmpresa
+                ];
+
+                $datosDelProductoActual = mysqli_fetch_assoc(Producto::Select($predicado, 'prod_existencias'));
+
+                // Cantidad total del producto en la remisión: (cantidad del producto en 1 combo) * (cantidad de combos pedidos)
+                $cantidadTotalProductoRemision = $comProd['cantidad_en_combo'] * $cantidadCombosPedidos;
+                $descuentoDelCombo = !empty($comProd['descuento_del_combo']) ? ($comProd['descuento_del_combo']/100) : 0;
+
+                // El precio ya viene "cotizado" y ajustado en el JSON
+                // Si el precio unitario ya incluye descuentos o ajustes, lo tomamos directamente.
+                // Si necesitas aplicar un descuento adicional del combo a nivel de remisión,
+                // ese cálculo debería basarse en el precio_unitario_cotizado que ya está en el JSON.
+                // Aquí usamos directamente el precio_unitario_cotizado del JSON.
+                $precioUnitarioFinalProducto = $comProd['precio_unitario_cotizado'] - ($comProd['precio_unitario_cotizado'] * $descuentoDelCombo);
+                //$descuento
+
+
+                // Preparar y ejecutar la inserción para cada producto desglosado en la remisión
+                $stmt = $conexionBdPrincipal->prepare("
+                    INSERT INTO cotizacion_productos(
+                        czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, 
+                        czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento, czpp_productos_existencias, czpp_combo, czpp_precio_original
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ");
+
+                if ($stmt === false) {
+                    // Manejar error de preparación de la consulta
+                    error_log("Error al preparar INSERT para remisión (combo): " . $conexionBdPrincipal->error);
+                    continue; // Saltar a la siguiente iteración de combo
+                }
+
+                // czpp_tipo = CZPP_TIPO_REM (asumo que es una constante definida en tu código)
+                $tipoRemision = CZPP_TIPO_REM;
+                $bodegaDefault = 1; // Asumo 1 como valor por defecto
+
+                $valorComboEnPedido      = ($combo['czpp_valor'] * $combo['czpp_cantidad']);
+                // $descuentoComboEnPedido  = !empty($combo['czpp_descuento']) ? $valorComboEnPedido * ($combo['czpp_descuento'] / 100) : 0;
+                // $valorFinalComboEnPedido = $valorComboEnPedido - $descuentoComboEnPedido;
+
+                // 'isdiiisid' - s:string (czpp_cotizacion), i:int (czpp_producto), d:decimal/float (czpp_valor), etc.
+                // Ajusta los tipos según tus columnas reales y el orden
+                $stmt->bind_param(
+                    "iidiiisidiii", // Ejemplo de tipos, revisa los tuyos. 'i' para INT, 'd' para DECIMAL/FLOAT, 's' para STRING
+                    $idInsert, // ID de la remisión
+                    $comProd['id_producto'], // ID del producto individual
+                    $precioUnitarioFinalProducto, // Precio ya calculado
+                    $ordenCombo, // Orden de la línea del combo en la remisión
+                    $cantidadTotalProductoRemision, // Cantidad total calculada
+                    $idImpuestoCombo, // Impuesto del combo
+                    $tipoRemision, // Tipo (remisión)
+                    $bodegaDefault, // Bodega
+                    $descuentoCombo, // Descuento del combo en la cotización
+                    $datosDelProductoActual['prod_existencias'], // Existencias actuales
+                    $combo['czpp_combo'], // ID del combo para saber la procedencia de los productos
+                    $valorComboEnPedido // Precio del combo cuando se generó el pedido para replicarlo en la remisión
+                );
+
+                if (!$stmt->execute()) {
+                    error_log("Error al ejecutar INSERT para remisión (producto de combo): " . $stmt->error);
+                }
+
+                $conexionBdPrincipal->commit();
+
+                $stmt->close();
+            }
+        } else {
+            $conexionBdPrincipal->rollback();
+            error_log("Error decodificando JSON para combo en pedido ID: " . $_GET["id"] . " - Error: " . json_last_error_msg());
+            // Manejar caso donde el JSON es inválido o no es un array
+            // Podrías registrar un error y tal vez insertar el combo como una línea genérica si no puedes desglosarlo.
+        }
     }
-
 }
 
 echo '<script type="text/javascript">window.location.href="../remisionbdg.php?busqueda=' . $idInsert . '";</script>';

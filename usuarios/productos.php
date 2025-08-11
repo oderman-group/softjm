@@ -7,6 +7,8 @@ $tabla = 'productos';
 $pk = 'prod_id';
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+
+require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 ?>
 <!-- styles -->
 <link href="css/tablecloth.css" rel="stylesheet">
@@ -335,6 +337,17 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 				</p>
 				<div class="row-fluid">
 					<div class="span12">
+						<div class="row-fluid">
+							<div class="span12">
+								<div class="hero-unit">
+									<h2>Eliminación de productos</h2>
+									<p>
+										Los productos que están incluidos en procesos de cotización, pedido, remisión y/o factura, o en combos, no podrán ser eliminados.
+									</p>
+								</div>
+							</div>
+						</div>
+
 						<div class="content-widgets light-gray">
 							<div class="widget-head green">
 								<h3><?= $paginaActual['pag_nombre']; ?></h3>
@@ -574,7 +587,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 														<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 															<a href="productos-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
 														<?php } ?>
-														<?php if (Modulos::validarRol([61], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+														<?php if (Modulos::validarRol([61], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && Producto::numeroProcesosComerciales($res[0], $conexionBdPrincipal) == 0 && Producto::numeroCombos($res[0], $conexionBdPrincipal) == 0) {?>
 															<a href="bd_delete/productos-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 														<?php } ?>
 															<!--<a href="productos-materiales.php?pdto=<?= $res[0]; ?>" data-toggle="tooltip" title="Materiales"><i class="icon-folder-open"></i></a>-->

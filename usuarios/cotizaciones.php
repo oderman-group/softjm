@@ -149,7 +149,7 @@ include("includes/head.php");
 											<th>ID</th>
 											<th>Fecha Propuesta</th>
 											<th>Cliente</th>
-											<th>Descripción</th>
+											<th>Items inluídos</th>
 											<th>Responsable</th>
 											<th>Vendedor</th>
 											<th></th>
@@ -274,9 +274,8 @@ include("includes/head.php");
 																<?php if (Modulos::validarRol([80], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																<li><a href="bd_delete/cotizaciones-eliminar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 																<?php } ?>
-																
 																<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-																<li><a href="reportes/formato-cotizacion-1.php?id=<?= $res['cotiz_id']; ?>" target="_blank">Imprimir</a></li>
+																<li><a href="reportes/formato-cotizacion-1_pdf.php?id=<?= $res['cotiz_id']; ?>" target="_blank">Generar PDF</a></li>
 																<?php } ?>
 																<?php if (Modulos::validarRol([253], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																<li><a href="bd_create/cotizaciones-replicar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
