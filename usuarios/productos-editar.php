@@ -5,6 +5,13 @@ $idPagina = 38;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+
+require_once RUTA_PROYECTO.'/usuarios/class/Utilidades.php';
+
+if (!Utilidades::isValidaThisGetNumericParameter("id")) {
+	Utilidades::redirect('productos.php', 2);
+}
+
 $consulta=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='" . $_GET["id"] . "' AND prod_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 $prodUtilidad=!empty($resultadoD['prod_utilidad']) ? $resultadoD['prod_utilidad'] : 0;
