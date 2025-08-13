@@ -185,22 +185,28 @@ $html = '
 
 			$infoComboProductos = '';
 			$productosCombo = $conexionBdPrincipal->query("
-														SELECT prod_id, prod_nombre, copp_cantidad FROM productos 
-														INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='" . $prod['combo_id'] . "'
-														WHERE prod_id_empresa='".$idEmpresa."'
-														ORDER BY copp_id");
+								SELECT prod_id, prod_nombre, copp_cantidad FROM productos 
+								INNER JOIN combos_productos ON copp_producto=prod_id AND copp_combo='" . $prod['combo_id'] . "'
+								WHERE prod_id_empresa='".$idEmpresa."'
+								ORDER BY copp_id");
 			$c = 1;
+
 			while ($prodCombo = mysqli_fetch_array($productosCombo, MYSQLI_BOTH)) {
+
 				if ($c == 1) {
-					$infoComboProductos .= "<br><b>INCLUYE:</b>";
+					$infoComboProductos .= "<br><b>INCLUYE:</b><ul>";
 				}
-				$infoComboProductos .= " <br>(" . $prodCombo['copp_cantidad'] . " Unds) " . $prodCombo['prod_nombre'];
+
+				$infoComboProductos .= "<li>" . $prodCombo['prod_nombre'] . " (" . $prodCombo['copp_cantidad'] . " Unds). </li>";
+
 				$c++;
 			}
 
+			$infoComboProductos .= "</ul>";
+
 			$descripcionCombo = $prod['combo_nombre'].'<br>'.$infoComboDescuento.'
 				<span style="font-size: 9px; color: darkblue;">'.$prod['combo_descripcion'].'</span><br>
-				<span style="font-size: 9px; color: teal;">'.$infoComboProductos.'</span><br>
+				<span style="font-size: 5px; color: teal;">'.$infoComboProductos.'</span><br>
 				<span style="font-size: 9px; color: darkblue;">'.$prod['czpp_observacion'].'</span>
 			';
 
