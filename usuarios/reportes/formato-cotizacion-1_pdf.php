@@ -194,13 +194,13 @@ $html = '
 				if ($c == 1) {
 					$infoComboProductos .= "<br><b>INCLUYE:</b>";
 				}
-				$infoComboProductos .= " <br>(" . $prodCombo['copp_cantidad'] . " Unds) " . $prodCombo['prod_nombre'];
+				$infoComboProductos .= " <br> * (" . $prodCombo['copp_cantidad'] . " Unds) " . $prodCombo['prod_nombre'];
 				$c++;
 			}
 
 			$descripcionCombo = $prod['combo_nombre'].'<br>'.$infoComboDescuento.'
 				<span style="font-size: 9px; color: darkblue;">'.$prod['combo_descripcion'].'</span><br>
-				<span style="font-size: 9px; color: teal;">'.$infoComboProductos.'</span><br>
+				<span style="font-size: 7px; color: teal;">'.$infoComboProductos.'</span><br>
 				<span style="font-size: 9px; color: darkblue;">'.$prod['czpp_observacion'].'</span>
 			';
 
