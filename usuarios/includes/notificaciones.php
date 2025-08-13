@@ -148,4 +148,11 @@ if(isset($_GET["warning"])){
 		</div>
 	<?php }?>
 
+	<?php if($_GET["warning"]==2){?>
+		<div class="alert alert-warning">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-exclamation-sign"></i><strong>Advertencia!</strong> El parametro para completar la solicitud debe ser correcto.
+		</div>
+	<?php }?>
+
 <?php }?>

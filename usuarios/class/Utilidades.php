@@ -61,4 +61,57 @@ class Utilidades {
         return strtoupper(substr($word, 0, 3));
 
     }
+
+    /**
+     * Redirige al usuario a una nueva página.
+     *
+     * Utiliza un encabezado HTTP 302 para realizar una redirección del lado del servidor.
+     * Se asegura de limpiar cualquier salida en el buffer antes de enviar el encabezado.
+     * La redirección es de tipo temporal.
+     *
+     * @param string $redirectPageUrl La URL de la página a la que se redirigirá al usuario.
+     * @param int $messageCode El código de mensaje (ej. de advertencia o éxito) que se añadirá a la URL.
+     * El valor por defecto es 2.
+     * @return void
+     */
+    public static function redirect(string $redirectPageUrl, int $messageCode = 2) {
+        // Limpia cualquier salida que se haya enviado antes.
+        if (ob_get_contents()) {
+            ob_end_clean();
+        }
+
+        // Construye la URL de forma segura
+        $finalUrl = $redirectPageUrl . '?warning=' . $messageCode;
+
+        // Redirige usando el encabezado Location, estableciendo el código 302 explícitamente
+        header("Location: " . $finalUrl, true, 302);
+        
+        // Termina la ejecución del script inmediatamente
+        exit();
+    }
+
+    /**
+     * Valida si un parámetro GET es un valor numérico válido.
+     *
+     * Esta función verifica que el parámetro no esté vacío y que sea un número entero válido
+     * de forma estricta. Utiliza filter_var() para una validación segura y robusta.
+     *
+     * @param string $parameterValue El nombre del parámetro GET a validar.
+     * @return bool Retorna true si el parámetro es un número entero válido, de lo contrario, false.
+     */
+    public static function isValidaThisGetNumericParameter(string $parameterValue): bool {
+        // Si el parámetro no está configurado o es una cadena vacía, retorna false.
+        if (empty($_GET[$parameterValue])) {
+            return false;
+        }
+
+        // Usa filter_var para una validación estricta de números enteros.
+        // La comparación estricta con 'false' es crucial para manejar el valor '0' correctamente.
+        if (filter_var($_GET[$parameterValue], FILTER_VALIDATE_INT) === false) {
+            return false;
+        }
+
+        // Si todas las validaciones pasan, retorna true.
+        return true;
+    }
 }
