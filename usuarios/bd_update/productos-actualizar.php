@@ -4,6 +4,8 @@
     $idPagina = 202;
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
+	require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
+
     $consultaProductos=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_id='".$_POST["id"]."' AND prod_id_empresa={$idEmpresa}");
     $datos = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH);
 
@@ -27,7 +29,8 @@
 		$conexionBdPrincipal->query("UPDATE productos SET prod_foto='" . $fileName . "' WHERE prod_id='" . $_POST["id"] ."' AND prod_id_empresa={$idEmpresa}");
 	}
 	$utilidad=!empty($_POST['utilidad']) ? $_POST['utilidad']/100 : 0;
-	$precio1 = $_POST["costo"] + ($_POST["costo"] * $utilidad);
+
+	$precio1  = Producto::CalcularPrecioLista($_POST["costo"], $utilidad);
 	
 	if($origen > 0){
 
