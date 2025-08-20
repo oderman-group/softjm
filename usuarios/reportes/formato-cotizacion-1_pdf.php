@@ -305,7 +305,7 @@ $html .= '
         <tfoot>
             <tr style="line-height:8px">
                 <th colspan="5" rowspan="5" align="left" width="395px" style="font-weight: bold;border: 1px solid #dee2e6;">
-                   <strong>Observaciones:</strong><br>
+                   <strong>Observaciones:</strong>
                     <span style="font-size: 11px; font-weight: normal;">'.$resultado['cotiz_observaciones'].'</span>
                 </th>
                 <th style="font-weight: bold;border: 1px solid #dee2e6;" width="80px" align="right">Subtotal:</th>
