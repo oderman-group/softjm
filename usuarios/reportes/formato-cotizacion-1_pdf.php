@@ -160,7 +160,7 @@ $html = '
 		$no = 1;
 		$productos = $conexionBdPrincipal->query("
 													SELECT * FROM combos 
-													INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "'
+													INNER JOIN cotizacion_productos ON czpp_combo=combo_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_COTZ."'
 													WHERE combo_id_empresa='".$idEmpresa."'
 													ORDER BY czpp_orden");
 		$totalIva = 0;
@@ -227,7 +227,7 @@ $html = '
 		$productos = $conexionBdPrincipal->query("
 												SELECT * FROM productos 
 												INNER JOIN productos_categorias ON catp_id=prod_categoria
-												INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "'
+												INNER JOIN cotizacion_productos ON czpp_producto=prod_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_COTZ."'
 												WHERE prod_id_empresa='".$idEmpresa."'
 												ORDER BY czpp_orden");
 		while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
@@ -262,7 +262,7 @@ $html = '
 		//<!-- SERVICIOS -->
 		$productos = $conexionBdPrincipal->query("
 												SELECT * FROM servicios
-												INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='" . $_GET["id"] . "'
+												INNER JOIN cotizacion_productos ON czpp_servicio=serv_id AND czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_COTZ."'
 												WHERE serv_id_empresa='".$idEmpresa."'
 												ORDER BY czpp_orden");
 		while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
@@ -305,7 +305,8 @@ $html .= '
         <tfoot>
             <tr style="line-height:8px">
                 <th colspan="5" rowspan="5" align="left" width="395px" style="font-weight: bold;border: 1px solid #dee2e6;">
-                   <strong>Observaciones:</strong>
+                   <strong>Observaciones:</strong><br>
+                    <span style="font-size: 11px; font-weight: normal;">'.$resultado['cotiz_observaciones'].'</span>
                 </th>
                 <th style="font-weight: bold;border: 1px solid #dee2e6;" width="80px" align="right">Subtotal:</th>
                 <td align="right" style="border: 1px solid #dee2e6;" width="80px">$'.number_format($subTotal, 0, ',', '.').'</td>
