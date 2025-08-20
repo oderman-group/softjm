@@ -23,7 +23,7 @@ $fin .= '
                     <p style="color:' . $configuracion["conf_color_letra"] . ';">' . $_POST['mensaje'] . '<br>
                     Haga click en el siguiente enlace para revisar la cotización.</p>
                     
-                    <p align="center"><a href="' . $configuracion["conf_url_encuestas"] . '/usuarios/reportes/formato-cotizacion-1.php?cte=1&id=' . base64_encode($_POST["id"]) . '" target="_blank" style="color:' . $configuracion["conf_color_link"] . ';">REVISAR COTIZACIÓN</a></p>
+                    <p align="center"><a href="' . $configuracion["conf_url_encuestas"] . '/usuarios/reportes/formato-cotizacion-1_pdf.php?cte=1&id=' . base64_encode($_POST["id"]) . '" target="_blank" style="color:' . $configuracion["conf_color_link"] . ';">REVISAR COTIZACIÓN</a></p>
                     
                     <p align="center" style="color:' . $configuracion["conf_color_letra"] . ';">
                         <img src="' . $configuracion["conf_url_encuestas"] . '/usuarios/files/' . $configuracion["conf_logo"] . '" width="80"><br>
