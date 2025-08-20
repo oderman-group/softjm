@@ -169,7 +169,7 @@ include("head.php");
 										</button>
 										<ul class="dropdown-menu">
 											
-											<li><a href="<?=REDIRECT_ROUTE?>/usuarios/reportes/formato-cotizacion-1.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
+											<li><a href="<?=REDIRECT_ROUTE?>/usuarios/reportes/formato-cotizacion-1_pdf.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
 											
 											
 										</ul>

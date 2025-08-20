@@ -1398,7 +1398,7 @@ if($_GET["get"]==23){
 						Estamos enviando la cotización por este medio para que la revise y la pueda imprimir según su necesidad.<br>
 						Haga click en el siguiente enlace para revisar la cotización.</p>
 						
-						<p align="center"><a href="'.$configuracion["conf_url_encuestas"].'/usuarios/reportes/formato-cotizacion-1.php?id='.$_GET["id"].'" target="_blank" style="color:'.$configuracion["conf_color_link"].';">REVISAR COTIZACIÓN</a></p>
+						<p align="center"><a href="'.$configuracion["conf_url_encuestas"].'/usuarios/reportes/formato-cotizacion-1_pdf.php?id='.$_GET["id"].'" target="_blank" style="color:'.$configuracion["conf_color_link"].';">REVISAR COTIZACIÓN</a></p>
 						
 						<p align="center" style="color:'.$configuracion["conf_color_letra"].';">
 							<img src="'.$configuracion["conf_url_encuestas"].'/usuarios/files/'.$configuracion["conf_logo"].'" width="80"><br>

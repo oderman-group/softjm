@@ -166,7 +166,7 @@ include("includes/head.php");
 											<li><a href="importacion-editar.php?id=<?=$res['imp_id'];?>#productos"> Editar</a></li>
 											<?php }?>
 											
-											<li><a href="#reportes/formato-cotizacion-1.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
+											<li><a href="#reportes/formato-cotizacion-1_pdf.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
 											
 											<!--
 											<li><a href="sql.php?get=48&id=<?=$res['cotiz_id'];?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
