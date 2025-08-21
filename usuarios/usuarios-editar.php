@@ -128,13 +128,18 @@ include("includes/js-formularios.php");
 									        <button class="tooltipp">Elija el rol al cual corespende el usuario.</button>
                                             <i class="fa-solid fa-circle-question"></i>
 									</label>
+									<input type="hidden" id="hasRolAdmin" name="hasRolAdmin" value="0">
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoU[]" multiple onChange="validarRolAsignado(this)">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoU[]" multiple id="tipoU">
 											<?php
 													$roles = explode(',', $resultadoD['roles']);
 													$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos  WHERE utipo_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 													while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 														$selected = (is_array($roles) && in_array($resOp[0], $roles)) ? 'selected' : '';
+
+														if($resOp[0] == ADMIN && $selected == 'selected') {
+															echo '<script>document.getElementById("hasRolAdmin").value=1;</script>';
+														}
 
 												?>
 															<option value="<?=$resOp[0];?>" <?=$selected;?>><?=$resOp[1];?></option>
@@ -144,11 +149,38 @@ include("includes/js-formularios.php");
 											</select>
 
 											<script>
-												function validarRolAsignado(data) {
-													if(data.value == 1) {
-														alert('Este ROL cuenta con demasiados privilegios dentro de la plataforma!')
-													}
-												}
+												// Variable global para controlar si el alert ya se mostró
+												let hasRolAdmin = document.getElementById("hasRolAdmin").value;
+												let alertPara1YaMostrado = hasRolAdmin == 1 ? true : false;
+
+												console.log(hasRolAdmin, alertPara1YaMostrado);
+
+												$(document).ready(function() {
+
+													// Inicializa Chosen.js en el select
+													// Esto es crucial para que la librería funcione si no lo has hecho ya.
+													$('#tipoU').chosen();
+
+													// Escucha el evento 'change' en el elemento select original
+													$('#tipoU').on('change', function(event) {
+														// 'this' se refiere al elemento select en el contexto de jQuery
+														const valoresSeleccionados = $(this).val();
+
+														// Comprueba si el valor '1' está en el array Y si el alert no se ha mostrado
+														if (valoresSeleccionados && valoresSeleccionados.includes('1') && !alertPara1YaMostrado) {
+															alert("¡Este rol Admin Principal tiene demasiados privilegios en la plataforma. Tenga presente a qué usuarios se lo asigna.!");
+															alertPara1YaMostrado = true; // Activa la bandera
+														}
+														
+														// Si el valor '1' ya no está seleccionado, restablece la bandera
+														else if (valoresSeleccionados && !valoresSeleccionados.includes('1') && alertPara1YaMostrado) {
+															alertPara1YaMostrado = false;
+														}
+
+														console.log('Valores seleccionados en este momento:', valoresSeleccionados);
+													});
+
+												});
 											</script>
                                     </div>
                                </div>
