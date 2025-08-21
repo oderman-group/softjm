@@ -128,17 +128,18 @@ include("includes/js-formularios.php");
 									        <button class="tooltipp">Elija el rol al cual corespende el usuario.</button>
                                             <i class="fa-solid fa-circle-question"></i>
 									</label>
-									<input type="hidden" id="hasRolAdmin" name="hasRolAdmin" value="0">
+									
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoU[]" multiple id="tipoU">
 											<?php
+													$hasRolAdmin = 0;
 													$roles = explode(',', $resultadoD['roles']);
 													$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos  WHERE utipo_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 													while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 														$selected = (is_array($roles) && in_array($resOp[0], $roles)) ? 'selected' : '';
 
 														if($resOp[0] == ADMIN && $selected == 'selected') {
-															echo '<script>document.getElementById("hasRolAdmin").value=1;</script>';
+															$hasRolAdmin = 1;
 														}
 
 												?>
@@ -147,6 +148,8 @@ include("includes/js-formularios.php");
 													}
 												?>
 											</select>
+
+											<input type="hidden" id="hasRolAdmin" name="hasRolAdmin" value="<?=$hasRolAdmin;?>">
 
 											<script>
 												// Variable global para controlar si el alert ya se mostró
