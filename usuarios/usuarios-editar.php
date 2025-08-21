@@ -129,7 +129,7 @@ include("includes/js-formularios.php");
                                             <i class="fa-solid fa-circle-question"></i>
 									</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoU[]" multiple>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoU[]" multiple onChange="validarRolAsignado(this)">
 											<?php
 													$roles = explode(',', $resultadoD['roles']);
 													$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios_tipos  WHERE utipo_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
@@ -142,6 +142,14 @@ include("includes/js-formularios.php");
 													}
 												?>
 											</select>
+
+											<script>
+												function validarRolAsignado(data) {
+													if(data.value == 1) {
+														alert('Este ROL cuenta con demasiados privilegios dentro de la plataforma!')
+													}
+												}
+											</script>
                                     </div>
                                </div>
 

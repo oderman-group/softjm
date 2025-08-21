@@ -1,15 +1,21 @@
 <?php
 require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Combo.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Modulos.php';
 
 class CotizacionesEditar {
 
     /**
      * 
      */
-    public static function generarTablaProductos($conexionBdPrincipal, array $resultadoD, $simbolosMonedas, int $idEmpresa): string {
+    public static function generarTablaProductos(
+        $conexionBdPrincipal, 
+        array $resultadoD, 
+        $simbolosMonedas, 
+        int $idEmpresa
+    ): string {
         $htmlTabla = ''; 
-        global $datosUsuarioActual;
+        global $datosUsuarioActual, $conexionBdAdmin, $configuracion;
 
         $camposCotizacionDisabled = '';
 
@@ -89,9 +95,15 @@ class CotizacionesEditar {
             if ($resultadoD['cotiz_descuentos_especiales'] == 1) {
                 $htmlTabla .= '<td>';
                 $htmlTabla .= '<input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'>';
-                if ($datosUsuarioActual['usr_tipo'] == 1 && $prod['czpp_aprobado_usuario'] == "" && $prod['czpp_descuento_especial'] > 0) {
+
+                if (
+                    Modulos::validarRol([309], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && 
+                    $prod['czpp_aprobado_usuario'] == "" && 
+                    $prod['czpp_descuento_especial'] > 0
+                ) {
                     $htmlTabla .= '<br><a href="bd_update/descuentos-cotizaciones-actualizar.php?idItem=' . $prod['czpp_id'] . '" class="btn btn-success"> <i class="icon-ok-sign"></i> </a>';
                 }
+
                 $consultaDctoEspecial = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios WHERE usr_id='" . $prod['czpp_aprobado_usuario'] . "'");
                 $usuarioDctoEspecialAprobar = mysqli_fetch_array($consultaDctoEspecial, MYSQLI_BOTH);
                 $htmlTabla .= '<br><span style="font-size:10px; color:gray;">' . $prod['czpp_aprobado_fecha'] . '<br>' . $usuarioDctoEspecialAprobar['usr_nombre'] . '</span>';

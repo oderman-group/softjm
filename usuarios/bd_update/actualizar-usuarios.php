@@ -10,7 +10,9 @@ if ($_FILES['foto']['name'] != "") {
 
     $conexionBdPrincipal->query("UPDATE usuarios SET usr_foto='" . $fileName . "' WHERE usr_id='" . $_POST["id"] . "' AND usr_id_empresa='" . $_SESSION["dataAdicional"]["id_empresa"] . "'");
 }
+
 $usuario = $_POST["usuario"] . $_SESSION["dataAdicional"]["dominio_empresa"];
+
 $conexionBdPrincipal->query("UPDATE usuarios SET usr_login='" . $usuario . "', usr_nombre='" . $_POST["nombre"] . "', usr_email='" . $_POST["email"] . "', usr_ciudad='" . $_POST["ciudad"] . "', usr_area='" . $_POST["area"] . "', usr_bloqueado='" . $_POST["bloqueado"] . "', usr_intentos_fallidos='" . $_POST["fallidos"] . "', usr_sucursal='" . $_POST["sucursal"] . "', usr_meta_ventas='" . $_POST["metaVentas"] . "'
 WHERE usr_id='" . $_POST["id"] . "' AND usr_id_empresa='" . $_SESSION["dataAdicional"]["id_empresa"] . "'");
 
@@ -21,6 +23,7 @@ $rolesSeleccionados = $_POST['tipoU'];
 $idUsuario = $_POST["id"];
 $consultaRolesUsuario = $conexionBdAdmin->query("SELECT upr_id_rol FROM usuarios_roles WHERE upr_id_usuario = '$idUsuario'");
 $rolesExistentes = [];
+
 while ($fila = $consultaRolesUsuario->fetch_assoc()) {
     $rolesExistentes[] = $fila['upr_id_rol'];
 }
@@ -32,14 +35,25 @@ if (!empty($_POST['tipoU'])) {
     if (!empty($rolesAEliminar)) {
         $rolesAEliminarStr = implode("','", $rolesAEliminar);
         $conexionBdAdmin->query("DELETE FROM usuarios_roles WHERE upr_id_usuario = '$idUsuario' AND upr_id_rol IN ('$rolesAEliminarStr')");
+
+        if(in_array(ADMIN, $rolesAEliminar)) {
+            $conexionBdPrincipal->query("UPDATE usuarios SET usr_tipo=NULL
+            WHERE usr_id='" . $_POST["id"] . "' AND usr_id_empresa='" . $_SESSION["dataAdicional"]["id_empresa"] . "'");
+        }
     }
 
     $upr_fec = date("Y-m-d H:i:s");
     $upr_responsable = $_SESSION["id"];
     $id_empresa = $_SESSION["dataAdicional"]["id_empresa"];
+
     if (!empty($rolesAInsertar)) {
         foreach ($rolesAInsertar as $rol) {
             $conexionBdAdmin->query("INSERT INTO usuarios_roles (upr_id_usuario, upr_id_rol, upr_fec, upr_responsable,upr_id_empresa) VALUES ('$idUsuario', '$rol', '$upr_fec', '$upr_responsable', '$id_empresa')");
+
+            if($rol == ADMIN) {
+                $conexionBdPrincipal->query("UPDATE usuarios SET usr_tipo=".ADMIN."
+                WHERE usr_id='" . $_POST["id"] . "' AND usr_id_empresa='" . $_SESSION["dataAdicional"]["id_empresa"] . "'");
+            }
         }
     }
 }
