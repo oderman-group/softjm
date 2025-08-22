@@ -34,34 +34,93 @@ if ($extension == 'xlsx') {
 			$hojaActual = $documento->getSheet(0);
 			$numFilas   = $hojaActual->getHighestDataRow();
 
-			if ($_POST["filaFinal"] > 0) {
-				$numFilas = $_POST["filaFinal"];
-			}
-
 			$letraColumnas = $hojaActual->getHighestDataColumn();
 			$f             = 2;
 
-			while ($f <= $numFilas) {
+			$registrosActualizados    = 0;
+			$registrosSinCoincidencia = 0;
+			$registrosConError        = 0;
+			$detallesAdicionales      = null;
 
-				mysqli_query($conexionBdPrincipal,"UPDATE productos_bodegas 
-				SET prodb_existencias = '".$hojaActual->getCell('G'.$f)->getValue()."', 
-				prodb_fecha_actualizacion = now(), 
-				prodb_usuario_actualizacion = '".$_SESSION["id"]."' 
-				WHERE prodb_id='".$hojaActual->getCell('A'.$f)->getValue()."'
-				");
+			try {
 
-				Producto::sincronizarExistenciasConBodegas($hojaActual->getCell('E'.$f)->getValue(), $conexionBdPrincipal);
+				if ($numFilas <= 1) {
+					$message = 'No se encontraron filas a procesar en este archivo.';
+					throw new Exception("No se encontraron filas a procesar en este archivo.");
+				}
 
-				$f++;
+				while ($f <= $numFilas) {
+
+					//Buscar los datos del producto con el código de World Office: Ejemplo: ACC 108
+					if (!empty($hojaActual->getCell('D'.$f)->getValue())) {
+						$predicado = [
+							'prod_referencia' => $hojaActual->getCell('D'.$f)->getValue(),
+							'prod_id_empresa' => $idEmpresa
+						];
+
+						$datosCompletosProducto = mysqli_fetch_array(Producto::Select($predicado),MYSQLI_ASSOC);
+					} else {
+						$f++;
+						continue;
+					}
+
+					//Validar y continuar en caso tal de no encontrar coincidencia
+					if (empty($datosCompletosProducto)) {
+						$f++;
+						continue;
+					}
+
+					$existencia = intval($hojaActual->getCell('G'.$f)->getValue());
+
+					if (filter_var($existencia, FILTER_VALIDATE_INT) === false) {
+						$f++;
+						continue;
+					}
+
+					try {
+						//Actualizar las existencias basado en el ID del producto en el CRM y en el código de la Bodega
+						$result = mysqli_query($conexionBdPrincipal,"UPDATE productos_bodegas 
+						SET prodb_existencias = '".$existencia."', 
+						prodb_fecha_actualizacion = now(), 
+						prodb_usuario_actualizacion = '".$_SESSION["id"]."' 
+						WHERE 
+							prodb_producto = ".$datosCompletosProducto['prod_id']." 
+						AND prodb_bodega = ".$hojaActual->getCell('B'.$f)->getValue()."
+						");
+
+						$filasAfectadas = mysqli_affected_rows($conexionBdPrincipal);
+
+						if ($filasAfectadas > 0) {
+							$registrosActualizados ++;
+						} else {
+							$registrosSinCoincidencia ++;
+						}
+					} catch(Exception $e) {
+						$registrosConError ++;
+					}
+
+					//Sincronizar existencias con el ID del producto consultado
+					Producto::sincronizarExistenciasConBodegas($datosCompletosProducto['prod_id'], $conexionBdPrincipal);
+
+					$f++;
+				}
+
+				if(file_exists($nombreArchivo)){
+					if (unlink($nombreArchivo)) {
+						$detallesAdicionales = "✅ El archivo de importación <b>'.$fullArchivo.'</b> fue borrado del servidor después de ser procesado.";
+					} else {
+						$detallesAdicionales = "❌ El archivo de importación <b>'.$fullArchivo.'</b> no fue pudo ser borrador del servidor.";
+					}
+				} else {
+					$detallesAdicionales = '❌ El archivo de importación <b>'.$fullArchivo.'</b> no fue encontrado en el servidor.';
+				}
+
+				$message       = 'Las existencias se han actualizado correctamente.';
+				$tituloMensaje = "Exito!";
+				$tipoAlerta    = "success";
+			} catch (Exception $e) {
+					$message = 'Ha ocurrido un error.';
 			}
-
-			if(file_exists($nombreArchivo)){
-				unlink($nombreArchivo);
-			}
-
-			$message       = 'Las existencias se han actualizado correctamente.';
-			$tituloMensaje = "Exito!";
-			$tipoAlerta    = "success";
 
 		} else {
 			switch ($_FILES['planilla']['error']) {
@@ -101,9 +160,21 @@ if ($extension == 'xlsx') {
 } else {
 	$message = "Este archivo no es admitido, por favor verifique que el archivo a importar sea un excel (.xlsx)";
 }
-?>
 
-<div class="alert alert-<?=$tipoAlerta;?>">
-	<button type="button" class="close" data-dismiss="alert">&times;</button>
-	<i class="icon-exclamation-sign"></i><strong><?=$tituloMensaje;?></strong> <?=$message;?>
-</div>
+if ($tipoAlerta == 'success') {
+	echo '
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-exclamation-sign"></i><strong>Resumen del proceso</strong><br> 
+			✅ Registros Actualizados: '.$registrosActualizados.'<br>
+			⚠️ Registros sin coincidencia en esta bodega: '.$registrosSinCoincidencia.'<br>
+			❌ Registros que generaron error: '.$registrosConError.'<br>
+			'.$detallesAdicionales.'
+			</div>';
+} else {
+?>
+	<div class="alert alert-<?=$tipoAlerta;?>">
+		<button type="button" class="close" data-dismiss="alert">&times;</button>
+		<i class="icon-exclamation-sign"></i><strong><?=$tituloMensaje;?></strong> <?=$message;?>
+	</div>
+<?php }

@@ -94,33 +94,46 @@ $i=2;
 $pdt = array("NO","SI");
 
 $filtro = "";
-if(!empty($_REQUEST["grupo1"])){$filtro .=" AND prod_grupo1='".$_REQUEST["grupo1"]."'";}
-if(!empty($_REQUEST["grupo2"])){$filtro .=" AND prod_categoria='".$_REQUEST["grupo2"]."'";}
-if(!empty($_REQUEST["marca"])){$filtro .=" AND prod_marca='".$_REQUEST["marca"]."'";}
+
+if (!empty($_REQUEST["grupo1"])) {
+    $filtro .=" AND prod_grupo1='".$_REQUEST["grupo1"]."'";
+}
+
+if (!empty($_REQUEST["grupo2"])) {
+    $filtro .=" AND prod_categoria='".$_REQUEST["grupo2"]."'";
+}
+
+if (!empty($_REQUEST["marca"])) {
+    $filtro .=" AND prod_marca='".$_REQUEST["marca"]."'";
+}
+
 if(!empty($_REQUEST["tipoProductos"])){
 	if($_REQUEST["tipoProductos"]==2){$filtro .=" AND prod_descuento_web>0";}
 	if($_REQUEST["tipoProductos"]==3){$filtro .=" AND prod_precio_predeterminado=1";}
 }
 
-try{
+try {
     $consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos 
     INNER JOIN productos_categorias ON catp_id=prod_categoria 
-    WHERE prod_id=prod_id $filtro");
+    LEFT JOIN (
+                SELECT catp_id AS G2ID, catp_nombre AS G2NAME FROM productos_categorias
+    ) grupo1 ON G2ID=prod_grupo1
+    INNER JOIN marcas ON mar_id=prod_marca
+    WHERE prod_id=prod_id $filtro
+    ");
 
 } catch (Exception $e) {
     echo 'Excepción capturada: ',  $e->getMessage(), "\n";
     exit();
 }
 
-while($res=mysqli_fetch_array($consulta)){
-	$grupo1 = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos_categorias WHERE catp_id='".$res['prod_grupo1']."'"));
-	
-	$marca = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM marcas WHERE mar_id='".$res['prod_marca']."'"));
+while ($res = mysqli_fetch_array($consulta)) {
 	
 	$dctoWeb=0;
 	if(!empty($res['prod_descuento_web'])){
 		$dctoWeb = $res['prod_descuento_web']/100;
 	}
+
 	$precioWeb=0;
 	if(!empty($res['prod_costo'])){
 		$precioWeb = $res['prod_costo'] + ($res['prod_costo']*$dctoWeb);
@@ -140,7 +153,7 @@ while($res=mysqli_fetch_array($consulta)){
 	if(!empty($res['prod_costo'])){
 		$precioDealer = $res['prod_costo'] + ($res['prod_costo'] * $dctoDealer);
 	}
-	
+
 	$datosReg = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"
 	SELECT
 	(SELECT count(ppmt_id) FROM productos_materiales WHERE ppmt_producto='".$res['prod_id']."'),
@@ -152,12 +165,12 @@ while($res=mysqli_fetch_array($consulta)){
     $hojaActiva->setCellValue('C'.$i, $res['prod_referencia']);
     $hojaActiva->setCellValue('D'.$i, $res['prod_nombre']);
 
-    $hojaActiva->setCellValue('E'.$i, $grupo1['catp_id']);
-    $hojaActiva->setCellValue('F'.$i, $grupo1['catp_nombre']);
+    $hojaActiva->setCellValue('E'.$i, $res['G2ID']);
+    $hojaActiva->setCellValue('F'.$i, $res['G2NAME']);
     $hojaActiva->setCellValue('G'.$i, $res['catp_id']);
     $hojaActiva->setCellValue('H'.$i, $res['catp_nombre']);
-    $hojaActiva->setCellValue('I'.$i, $marca['mar_id']);
-    $hojaActiva->setCellValue('J'.$i, $marca['mar_nombre']);
+    $hojaActiva->setCellValue('I'.$i, $res['mar_id']);
+    $hojaActiva->setCellValue('J'.$i, $res['mar_nombre']);
     $hojaActiva->setCellValue('K'.$i, $res['prod_existencias']);
 
     $hojaActiva->setCellValue('L'.$i, $res['prod_costo_dolar']);

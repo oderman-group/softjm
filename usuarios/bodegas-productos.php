@@ -194,7 +194,7 @@ include("includes/head.php");
 											<td><input type="checkbox"></td>
 												<td><?= $no; ?></td>
 												<td><?= $res['bod_nombre']; ?></td>
-												<td><?= $res['prod_nombre']; ?></td>
+												<td><?= $res['prod_referencia']. " - ".$res['prod_nombre']; ?></td>
 												<td>
 													<input
 													    id="<?= $res['prodb_id'];?>"
