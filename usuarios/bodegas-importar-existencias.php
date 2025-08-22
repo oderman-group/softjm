@@ -40,6 +40,7 @@ if ($extension == 'xlsx') {
 			$registrosActualizados    = 0;
 			$registrosSinCoincidencia = 0;
 			$registrosConError        = 0;
+			$detallesAdicionales      = null;
 
 			try {
 
@@ -105,7 +106,13 @@ if ($extension == 'xlsx') {
 				}
 
 				if(file_exists($nombreArchivo)){
-					unlink($nombreArchivo);
+					if (unlink($nombreArchivo)) {
+						$detallesAdicionales = "✅ El archivo de importación <b>'.$fullArchivo.'</b> fue borrado del servidor después de ser procesado.";
+					} else {
+						$detallesAdicionales = "❌ El archivo de importación <b>'.$fullArchivo.'</b> no fue pudo ser borrador del servidor.";
+					}
+				} else {
+					$detallesAdicionales = '❌ El archivo de importación <b>'.$fullArchivo.'</b> no fue encontrado en el servidor.';
 				}
 
 				$message       = 'Las existencias se han actualizado correctamente.';
@@ -161,7 +168,8 @@ if ($tipoAlerta == 'success') {
 			<i class="icon-exclamation-sign"></i><strong>Resumen del proceso</strong><br> 
 			✅ Registros Actualizados: '.$registrosActualizados.'<br>
 			⚠️ Registros sin coincidencia en esta bodega: '.$registrosSinCoincidencia.'<br>
-			❌ Registros que generaron error: '.$registrosConError.'
+			❌ Registros que generaron error: '.$registrosConError.'<br>
+			'.$detallesAdicionales.'
 			</div>';
 } else {
 ?>
