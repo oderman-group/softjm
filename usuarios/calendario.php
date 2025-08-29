@@ -15,7 +15,10 @@ if(is_numeric($_GET["id"])){
 $consultaCalendario=mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_id='".$usuarioID."'");
 $usuarioCalendario = mysqli_fetch_array($consultaCalendario, MYSQLI_BOTH);
 
-$consulta = mysqli_query($conexionBdPrincipal, "SELECT cseg_id, cseg_asunto,cseg_observacion, cseg_fecha_proximo_contacto, cseg_usuario_encargado, cseg_realizado, cseg_tiket, cseg_cliente, DAY(cseg_fecha_proximo_contacto) as dia, MONTH(cseg_fecha_proximo_contacto) as mes, YEAR(cseg_fecha_proximo_contacto) as agno FROM cliente_seguimiento 
+$consulta = mysqli_query($conexionBdPrincipal, "SELECT cseg_id, cseg_asunto,TIME_FORMAT(cseg_hora_proximo_contacto, '%H:%i')cseg_hora_proximo_contacto,TIME_FORMAT(cseg_hora_fin_proximo_contacto, '%H:%i')cseg_hora_fin_proximo_contacto,cseg_observacion, cseg_fecha_proximo_contacto, cseg_usuario_encargado, cseg_realizado, cseg_tiket, cseg_cliente, DAY(cseg_fecha_proximo_contacto) as dia, MONTH(cseg_fecha_proximo_contacto) as mes, YEAR(cseg_fecha_proximo_contacto) as agno , ct.cont_nombre contacto, c.cli_nombre cliente
+FROM cliente_seguimiento sg
+JOIN contactos ct ON ct.cont_id = sg.cseg_contacto 
+JOIN clientes c ON c.cli_id = ct.cont_cliente_principal
 WHERE cseg_usuario_encargado='".$usuarioID."' AND YEAR(cseg_fecha_proximo_contacto)>='".date("Y")."' AND MONTH(cseg_fecha_proximo_contacto)>='".date("m")."'
 ");
 $contReg=1;
@@ -28,8 +31,8 @@ while($resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 	$resultado["mes"]--;
 	$eventos .= '
 		{
-			title: "'.$resultado["cseg_id"].": ".substr($resultado["cseg_asunto"], 0, 20).'...",
-			description: "'.$resultado["cseg_asunto"].' - '.$resultado["cseg_observacion"].'",
+			title: "'.$resultado["cseg_hora_proximo_contacto"]." : ". $resultado["cseg_hora_fin_proximo_contacto"] . " / ".substr($resultado["cliente"]." - " . $resultado["contacto"], 0, 20).'...",
+			description: "'.$resultado["cliente"]." - " . $resultado["contacto"].' - '.$resultado["cseg_asunto"].'",
 			start: new Date('.$resultado["agno"].', '.$resultado["mes"].', '.$resultado["dia"].', 6, 0),
 			backgroundColor: "'.$color.'",
 			url: "clientes-seguimiento-editar.php?id='.$resultado["cseg_id"].'&idTK='.$resultado["cseg_tiket"].'&cte='.$resultado["cseg_cliente"].'"
@@ -86,7 +89,7 @@ while($age = mysqli_fetch_array($agenda, MYSQLI_BOTH)){
 	
 		$eventos .= '
 			{
-				title: "'.$age["age_inicio"].": ". $age["age_fin"] . " / ".substr($age["age_evento"], 0, 22).'...",
+				title: "'.$age["age_inicio"]." : ". $age["age_fin"] . " / ".substr($age["age_evento"], 0, 22).'...",
 				description: "'.$age["age_evento"].' - '.$age["age_notas"].'",
 				start: "'.$age["age_fecha"].'T'.$age["age_inicio"].':00",
 				backgroundColor: "blue",
@@ -160,11 +163,11 @@ $eventos .= '
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <style>
-  .fc-event {
-    margin-bottom: 2px !important;
-    border-radius: 5px;
-    border: 1px solid #999;
-  }
+	.fc-event {
+		margin-bottom: 2px !important;
+		border-radius: 5px;
+		border: 1px solid #999;
+	}
 </style>
 <script type='text/javascript'>
             $(document).ready(function () {

@@ -328,6 +328,12 @@ include("includes/js-formularios.php");
 										<input type="time" class="span2" name="horaPC" value="<?=$resultadoD['cseg_hora_proximo_contacto'];?>">
 									</div>
 								</div>
+								<div class="control-group">
+									<label class="control-label">Hora fin próximo contacto</label>
+									<div class="controls">
+										<input type="time" class="span2" name="horaPCF" value="<?=$resultadoD['cseg_hora_fin_proximo_contacto'];?>">
+									</div>
+								</div>
 
 								<div class="control-group">
 									<label class="control-label">Recordatorio (Minutos antes)</label>
@@ -379,6 +385,13 @@ include("includes/js-formularios.php");
 									</div>
 									
 								</fieldset>
+
+								<div class="control-group hidden">
+									<label class="control-label">id_evento_google</label>
+									<div class="controls">
+										<input type="text" class="span12" name="id_evento_google" value="<?=$resultadoD["age_id_evento_google"];?>">
+									</div>
+								</div>
                                 
                                <?php 
 								if($resultadoD['cseg_varios']>=1 and $resultadoD['cseg_usuario_encargado']==0){

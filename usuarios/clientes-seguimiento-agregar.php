@@ -40,6 +40,8 @@ if(isset($_GET["idTK"]) and is_numeric($_GET["idTK"])){
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+
+<?php include("includes/overlay.php");?>
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
@@ -51,8 +53,7 @@ include("includes/js-formularios.php");
 <body>
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
-    
-    
+   
     
 	<div class="main-wrapper">
 		<div class="container-fluid">
@@ -191,7 +192,7 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="bd_create/clientes-seguimiento-guardar.php" enctype="multipart/form-data">
+							<form class="form-horizontal" id="frmSeguimiento" method="post" action="bd_create/clientes-seguimiento-guardar.php" enctype="multipart/form-data">
                             
                             <input type="hidden" name="idTK" value="<?=$tiketID;?>">
                             <input type="hidden" name="tipoS" value="<?=$tipoSeguimiento;?>">
@@ -201,7 +202,7 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" id="contacto">
 											<option value=""></option>
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$cliente."'");
@@ -249,8 +250,8 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">¿Cómo fue el contacto? (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="formaContacto" required>
-											<option value="1"></option>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="formaContacto" id="formaContacto">
+											<option value=""></option>
                                             <?php
 											$opciones = array("","La empresa contactó al cliente","El cliente contactó  a la empresa");
 											for($i=1; $i<=2; $i++){
@@ -265,8 +266,8 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Canal de contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal" required>
-											<option value="4"></option>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal" id="canal">
+											<option value=""></option>
                                             <?php
 											$opciones = array("","Facebook","WhatsApp","Fijo","Celular","Personal","Skype","Otro","Correo", "Sitio Web");
 											for($i=1; $i<=9; $i++){
@@ -282,7 +283,7 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Observaciones/Descripción (*)</label>
 									<div class="controls">
-										<textarea name="observaciones" style="width: 80%" required></textarea>
+										<textarea name="observaciones" style="width: 80%" id="observaciones"></textarea>
 									</div>
 								</div>
                                 
@@ -387,17 +388,24 @@ include("includes/js-formularios.php");
 								</div>
 
 								<div class="control-group">
+									<label class="control-label">Hora fin próximo contacto (*)</label>
+									<div class="controls">
+										<input type="time" class="span2" name="horaPCF" required id="horaPCF">
+									</div>
+								</div>
+
+								<div class="control-group">
 									<label class="control-label">Recordatorio (Minutos antes) (*)</label>
 									<div class="controls">
-										<input type="number" class="span2" name="minutosRecordarAntes" required id="minutosRecordarAntes">
+										<input type="number" class="span2" name="minutosRecordarAntes" required id="minutosRecordarAntes" value="30">
 									</div>
 								</div>
 								
 								<div class="control-group">
 									<label class="control-label">Medio de contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="canalPC" required id="canalPC">
-											<option value="3"></option>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="canalPC" id="canalPC">
+											<option value=""></option>
                                             <?php
 											$opciones = array("","WhatsApp","Fijo","Celular","Visitar al cliente","El cliente me visita","Skype", "Otro","Correo","Sitio Web");
 											for($i=1; $i<=9; $i++){
@@ -412,14 +420,14 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Asunto a tratar (*)</label>
 									<div class="controls">
-                                        <textarea name="asunto" style="width: 80%" required id="asunto"></textarea>
+                                        <textarea name="asunto" style="width: 80%" id="asunto"></textarea>
 									</div>
 								</div>
                                 
                                 <div class="control-group">
 									<label class="control-label">Encargado del próximo contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="encargado[]" multiple required id="encargado">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="encargado[]" multiple id="encargado">
 											<option value="0"></option>
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."'");
@@ -463,7 +471,7 @@ include("includes/js-formularios.php");
                                
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                                    <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+                                    <button type="submit" id="btnGuardar" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 								</div>
 							</form>
 						</div>
@@ -475,6 +483,6 @@ include("includes/js-formularios.php");
 	</div>
 	<?php include("includes/pie.php");?>
 </div>
-<script src="js/seguimientos.js"></script>
+<script type="module" src="js/seguimientos.js"></script>
 </body>
 </html>
