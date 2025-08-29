@@ -156,3 +156,18 @@ if(isset($_GET["warning"])){
 	<?php }?>
 
 <?php }?>
+
+<div class="alert hidden" id="msgAlerta" >
+	<button type="button" class="close" data-dismiss="alert">&times;</button>
+	<i class="icon-exclamation-sign"></i><strong id="msgAlertaTextoEncabezado">encabezado de la alerta!</strong> <span id="msgAlertaTexto">texto de la alerta.</span>
+</div>
+
+<style>
+#msgAlerta {
+  position: fixed;
+  top: 20px;        /* separación desde arriba */
+  right: 20px;      /* separación desde la derecha */
+  z-index: 9999;    /* que quede encima de todo */
+  min-width: 250px; /* ancho mínimo */
+}
+</style>

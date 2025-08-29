@@ -5,7 +5,7 @@ export class clsGenerales {
     /**
      * tipo: success - info - warning - error
      */
-    mtdMostrarMensaje(mensaje, tipo = "success", time = 3000) {
+    mtdMostrarMensaje(mensaje, tipo = "success", time = 5000) {
 
         let direction = "down-push";
         let position = "top center";
@@ -19,6 +19,55 @@ export class clsGenerales {
             position,
             direction
         });
+    }
+
+    mtdMostrarMensajeAlerta(mensaje, tipo = "success", time = 3000) {
+
+        const msgAlerta = document.getElementById("msgAlerta");
+        const msgAlertaTextoEncabezado = document.getElementById("msgAlertaTextoEncabezado");
+        const msgAlertaTexto = document.getElementById("msgAlertaTexto");
+
+       if (tipo === "success") {
+
+            msgAlerta.classList.remove("hidden");
+            msgAlerta.style.display = "block";
+            msgAlerta.classList.add("alert-success");
+
+            msgAlertaTextoEncabezado.innerText = "Éxito!";
+            msgAlertaTexto.innerText = mensaje;
+
+            setTimeout(() => {
+                msgAlerta.style.display = "none";
+            }, time);
+       }
+
+       if (tipo === "error") {
+
+            msgAlerta.classList.remove("hidden");
+            msgAlerta.style.display = "block";
+            msgAlerta.classList.add("alert-danger");
+
+            msgAlertaTextoEncabezado.innerText = "Error!";
+            msgAlertaTexto.innerText = mensaje;
+
+            setTimeout(() => {
+                msgAlerta.style.display = "none";
+            }, time);
+       }
+
+       if (tipo === "warning") {
+
+            msgAlerta.classList.remove("hidden");
+            msgAlerta.style.display = "block";
+            msgAlerta.classList.add("alert-warning");
+
+            msgAlertaTextoEncabezado.innerText = "Advertencia!";
+            msgAlertaTexto.innerText = mensaje;
+
+            setTimeout(() => {
+                msgAlerta.style.display = "none";
+            }, time);
+       }
     }
 
     fnValidarFromatoCorreo(correo) {
@@ -418,6 +467,13 @@ export class clsGenerales {
         }
 
         return anno + "-" + mes + "-" + dia;
+    }
+
+    fnHoraActualMinutos() {
+        var d = new Date();
+        var hora = d.getHours();
+        var minutos = d.getMinutes();
+        return hora * 60 + minutos;
     }
 
     fnFechaHoraActual() {
