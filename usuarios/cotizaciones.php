@@ -223,7 +223,7 @@ include("includes/head.php");
 													<?php
 													$productos = $conexionBdPrincipal->query("SELECT prod_nombre FROM cotizacion_productos
 										INNER JOIN productos ON prod_id=czpp_producto
-										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "'
+										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "' AND czpp_tipo=".CZPP_TIPO_COTZ."
 										");
 													$i = 1;
 													while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
@@ -236,7 +236,7 @@ include("includes/head.php");
 													<?php
 													$combos = $conexionBdPrincipal->query("SELECT combo_nombre FROM cotizacion_productos
 										INNER JOIN combos ON combo_id=czpp_combo
-										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "'
+										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "' AND czpp_tipo=".CZPP_TIPO_COTZ."
 										");
 													$i = 1;
 													while ($comb = mysqli_fetch_array($combos, MYSQLI_BOTH)) {
@@ -249,7 +249,7 @@ include("includes/head.php");
 										<?php
 													$servicios =$conexionBdPrincipal->query("SELECT serv_nombre FROM cotizacion_productos
 										INNER JOIN servicios ON serv_id=czpp_servicio
-										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "'
+										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "' AND czpp_tipo=".CZPP_TIPO_COTZ."
 										");
 													$i = 1;
 													while ($serv = mysqli_fetch_array($servicios, MYSQLI_BOTH)) {
