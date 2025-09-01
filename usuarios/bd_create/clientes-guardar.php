@@ -2,12 +2,14 @@
 require_once("../sesion.php");
 
 if ($_POST["fechaIngreso"] == "") $_POST["fechaIngreso"] = '0000-00-00';
+
 $consultaZona=mysqli_query($conexionBdAdmin,"SELECT * FROM localidad_ciudades WHERE ciu_id='" . $_POST["ciudad"] . "'");
 $zona = mysqli_fetch_array($consultaZona, MYSQLI_BOTH);
 
 if (trim($_POST["usuario"]) != "") {
     $consultaClientesV=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_usuario='" . trim($_POST["usuario"]) . "' AND cli_id_empresa='".$idEmpresa."'");
     $clienteV = mysqli_num_rows($consultaClientesV);
+
     if ($clienteV > 0) {
         echo "<div style='font-family:arial; text-align:center'>Ya existe un cliente con este n&uacute;mero de NIT. Verifique para que no lo registre nuevamente.<br><br>
         <a href='javascript:history.go(-1);'>[P&aacute;gina anterior]</a></span> | <a href='../clientes.php'>[Ir a clientes]</a></div>";
@@ -16,12 +18,14 @@ if (trim($_POST["usuario"]) != "") {
 }
 
 $pais=$_POST["pais"];
+
 if(empty($_POST["pais"])){
     $pais="Colombia";
 }
 
 $ciudad=$_POST["ciudad"];
 $city="";
+
 if($_POST["pais"]!="Colombia"){
     $ciudad="1122";
     $city=$_POST["ciuExtra"];
@@ -33,8 +37,13 @@ $clave2 = generarClaves();
 $direccion = $_POST["op1"] . " " . $_POST["op2"] . " " . $_POST["op3"] . " # " . $_POST["op4"] . " " . $_POST["op5"] . " - " . $_POST["op6"] . " - " . $_POST["op7"];
 
 $clienteInsitucional = 0;
+
 if ($_POST["clienteInstitucional"] == 1) {
     $clienteInsitucional = 1;
+}
+
+if ($_POST["categoria"] != CLI_CATEGORIA_PROSPECTO) {
+    $_POST["fechaIngreso"] = date("Y-m-d");
 }
 
 mysqli_query($conexionBdPrincipal,"INSERT INTO clientes(cli_nombre, cli_referencia, cli_categoria, cli_email, cli_telefono, cli_ciudad, cli_usuario, cli_clave, cli_direccion, cli_zona, cli_fecha_registro, cli_fecha_ingreso, cli_nivel, cli_celular, cli_telefonos, cli_sigla, cli_responsable, cli_clave_documentos, cli_tipo_documento, cli_pais, cli_ciudad_extranjera, cli_id_empresa, cli_usuario_acceso, cli_institucional)VALUES('" . $_POST["nombre"] . "','" . $_POST["referencia"] . "','" . $_POST["categoria"] . "','" . $_POST["email"] . "','" . $_POST["telefono"] . "','" . $_POST["ciudad"] . "','" . trim($_POST["usuario"]) . "','" . $clave1 . "','" . strtoupper($direccion) . "','" . $zona[2] . "',now(),'" . $_POST["fechaIngreso"] . "','" . $_POST["nivel"] . "','" . $_POST["celular"] . "','" . $_POST["telefonos"] . "','" . $_POST["sigla"] . "','" . $_SESSION["id"] . "','" . $clave2 . "','" . $_POST["tipoDocumento"] . "','" . $pais . "','" . $city . "','" . $idEmpresa . "','" . trim($_POST["usuarioAcceso"]) . "".$_POST["dominio"]."', '".$clienteInsitucional."')");

@@ -276,6 +276,7 @@ include("includes/js-formularios.php");
 
 												   <fieldset class="default">
 														<legend>Datos comerciales</legend>
+														<input type="hidden" value="<?=$resultadoD['cli_categoria'];?>" name="categoriaActual">
 													<div class="control-group">
 														<label class="control-label">Estado</label>
 														<div class="controls">

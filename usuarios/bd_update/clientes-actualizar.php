@@ -6,6 +6,7 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 	if ($_POST["fechaIngreso"] == "") $_POST["fechaIngreso"] = '0000-00-00';
 	if ($_POST["retiroFecha"] == "") $_POST["retiroFecha"] = '0000-00-00';
+
     $consultaZona = $conexionBdAdmin->query("SELECT * FROM localidad_ciudades WHERE ciu_id='" . $_POST["ciudad"] . "'");
 	$zona = mysqli_fetch_array($consultaZona, MYSQLI_BOTH);
 
@@ -32,6 +33,10 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 	}
 
     $clienteInsitucional = $_POST["clienteInstitucional"] == 1 ? 1 : 0;
+
+    if ($_POST["categoriaActual"] == CLI_CATEGORIA_PROSPECTO && $_POST["categoria"] != CLI_CATEGORIA_PROSPECTO) {
+        $_POST["fechaIngreso"] = date("Y-m-d");
+    }
 
 	$conexionBdPrincipal->query("UPDATE clientes SET 
     cli_nombre='" . $_POST["nombre"] . "', 
