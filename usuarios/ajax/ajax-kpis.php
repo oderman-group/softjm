@@ -126,6 +126,130 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
     }
 
     echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_4_cumplimiento_cuota_comercial" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+    SELECT
+        f.factura_id as id,
+        sucu.sucp_nombre as sucursal,
+        f.factura_vendedor,
+        usr.usr_nombre AS vendedor,
+        f.factura_id factura,
+        f.factura_fecha_creacion AS fecha,        
+        COUNT(f.factura_id) ventas,
+        um.um_meta AS meta_ventas,
+        ROUND((COUNT(f.factura_id)/um.um_meta)*100,2) tasa       
+    FROM
+        facturas f
+    JOIN
+        usuarios usr ON usr.usr_id = f.factura_vendedor
+    join sucursales_propias sucu on sucu.sucp_id=usr.usr_sucursal
+    LEFT JOIN
+        usuarios_metas um ON um.um_usuario = usr.usr_id
+        AND um.um_tipo_meta = 'NUMERO_VENTA' -- Se identifica la meta de ventas
+        AND um.um_year = YEAR(f.factura_fecha_creacion)
+        AND um.um_mes = MONTH(f.factura_fecha_creacion)
+    where
+        f.factura_tipo = 1 AND f.factura_estado = 1 AND um.um_meta IS NOT NULL
+    GROUP BY usr.usr_sucursal, f.factura_vendedor , DATE_FORMAT(f.factura_fecha_creacion,'%Y-%m')
+    ORDER BY
+        f.factura_fecha_creacion DESC;
+    ;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Listado de ventas para kpi" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_5_tasa_conversión_prospecto_cliente" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT
+            c.cli_id id,
+            u.usr_sucursal,
+            s.sucp_nombre sucursal,  
+            u.usr_id,  
+            u.usr_nombre vendedor,    
+            DATE_FORMAT(c.cli_fecha_registro,'%Y-%m') periodo,
+            c.cli_fecha_registro fecha,
+            c.cli_fecha_ingreso,
+            COUNT(c.cli_id) prospectos,
+            IFNULL(p.clientes,0) clientes,
+            ROUND(if(IFNULL(p.clientes,0)> 0, (IFNULL(p.clientes,0)/ COUNT(c.cli_id)) * 100, 0),2) tasa
+        FROM clientes c
+        join usuarios u on u.usr_id= c.cli_responsable
+        join sucursales_propias s on s.sucp_id=u.usr_sucursal
+        left JOIN(
+
+            SELECT
+                PASSWORD(cli_fecha_ingreso) id,
+                usr_sucursal,
+                sucp_nombre sucursal,  
+                cli_responsable,
+                usr_id,  
+                usr_nombre vendedor,    
+                DATE_FORMAT(cli_fecha_ingreso,'%Y-%m') periodo,
+                cli_fecha_registro fecha,
+                cli_fecha_ingreso,
+                0 prospectos,
+                COUNT(cli_id) clientes
+            FROM clientes
+            join usuarios on usr_id=cli_responsable
+            join sucursales_propias on sucp_id=usr_sucursal
+            WHERE cli_categoria IN (1,2,3) AND cli_fecha_ingreso is not null AND  cli_fecha_ingreso <> '0000-00-00'
+            GROUP BY sucp_nombre, usr_nombre , DATE_FORMAT(cli_fecha_ingreso,'%Y-%m')
+            ORDER BY cli_fecha_ingreso DESC
+        
+        ) p ON p.usr_sucursal = u.usr_sucursal AND  p.cli_responsable = c.cli_responsable AND p.periodo = DATE_FORMAT(c.cli_fecha_registro,'%Y-%m')
+        WHERE cli_categoria IN (1,2,3) AND cli_fecha_registro is not null
+        GROUP BY u.usr_sucursal, c.cli_responsable , DATE_FORMAT(c.cli_fecha_registro,'%Y-%m')
+        ORDER BY u.usr_sucursal,c.cli_responsable,c.cli_fecha_registro DESC;
+    ;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Listado de ventas para kpi" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+
 }else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_7_numero_llamadas_enviadas_ejecutivo_prospeccion" ) {
 
 
