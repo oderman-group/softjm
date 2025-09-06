@@ -493,10 +493,36 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         tooltip: {
                             enabled: true,
-                            customizeTooltip(args) {                               
-                                let valueText = args.originalValue;
+                            customizeTooltip(args) {                                  
+                                let valueText = args.originalValue;  
+                                if (args.seriesName.includes("Tasa")) {
+                                valueText = new Intl.NumberFormat('es-ES', {  
+                                        style: 'percent',
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2 
+                                    }).format(args.originalValue /100); 
+                                }                   
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
+                        }
+                    });
+
+                    grdDatos.bindChart(grdDatosChart, {
+                        dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false,
+                        customizeSeries: function(seriesName, seriesOptions) {
+
+                            if (seriesName.includes("Tasa")) {
+                                seriesOptions.label = seriesOptions.label || {};
+                                seriesOptions.label.visible = true;
+                                seriesOptions.label.customizeText = function (arg) {
+                                    return new Intl.NumberFormat('es-ES', {
+                                    style: 'percent',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                    }).format(arg.value / 100);
+                                };
+                            }
+                            return seriesOptions;
                         }
                     });
 
@@ -569,11 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             },{                                
                                 caption: "Tasa",
                                 dataType: 'number',
-                                area: 'data',                                
-                                format: '#0.00\'%\'',
-                                caption: "Tasa",
-                                dataType: 'number',
-                                area: 'data',                                
+                                area: 'data',
                                 format: '#0.00\'%\'',
                                 calculateSummaryValue: function(summaryCell) {
                                     
@@ -582,8 +604,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                     }
 
                                     var value = 0;
-                                    value = summaryCell.value("Meta") > 0 ? Number((summaryCell.value("Ventas") / summaryCell.value("Meta"))*100).toFixed(2) : 0;
-                                    return value + '%';
+                                    value = summaryCell.value("Meta") > 0 ? Number((summaryCell.value("Ventas") / summaryCell.value("Meta"))*100) : 0;
+                                    return value;
                                 }
                             }],
                             store: datosKpi
@@ -592,26 +614,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 }
                 if (this.id == "kpi5") {
-
+                   
                     grdDatosChart.option({
                         commonSeriesSettings: {
                             type: 'bar',
                             label: {
                             visible: true,
-                            format: {
-                                type: 'fixedPoint',
-                                precision: 0,
-                            },
+                                format: {
+                                    type: 'fixedPoint',
+                                    precision: 0,
+                                },
                             },
                         },
                         tooltip: {
                             enabled: true,
-                            customizeTooltip(args) {                               
-                                let valueText = args.originalValue;
+                            customizeTooltip(args) {                                  
+                                let valueText = args.originalValue;  
+                                if (args.seriesName.includes("Tasa")) {
+                                valueText = new Intl.NumberFormat('es-ES', {  
+                                        style: 'percent',
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2 
+                                    }).format(args.originalValue /100); 
+                                }                   
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
                     });
+
+                    grdDatos.bindChart(grdDatosChart, {
+                        dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false,
+                        customizeSeries: function(seriesName, seriesOptions) {
+
+                            if (seriesName.includes("Tasa")) {
+                                seriesOptions.label = seriesOptions.label || {};
+                                seriesOptions.label.visible = true;
+                                seriesOptions.label.customizeText = function (arg) {
+                                    return new Intl.NumberFormat('es-ES', {
+                                    style: 'percent',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                    }).format(arg.value / 100);
+                                };
+                            }
+                            return seriesOptions;
+                        }
+                    }); 
 
                     grdDatos.option({
                         allowSortingBySummary: true,
@@ -687,12 +735,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                 calculateSummaryValue: function(summaryCell) {
                                     
                                     if (summaryCell.value("Clientes") === undefined) {
-                                        return null;
+                                        return undefined;
                                     }
 
                                     var value = 0;
-                                    value = summaryCell.value("Clientes") > 0 ? Number((summaryCell.value("Clientes") / summaryCell.value("Prospectos"))*100).toFixed(2) : 0;
-                                    return value + '%';
+                                    value = summaryCell.value("Clientes") > 0 ? Number((summaryCell.value("Clientes") / summaryCell.value("Prospectos"))*100): 0;
+                                    return value;
                                 }
                             }],
                             store: datosKpi
