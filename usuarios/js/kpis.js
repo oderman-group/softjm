@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const clsGenerales_ = new clsGenerales();
 
     const divEncabezadoPki = document.getElementById("divEncabezadoPki");
+    const divDescripcionPki = document.getElementById("divDescripcionPki");
     const kpi1 = document.getElementById("kpi1");
     const kpi2 = document.getElementById("kpi2");
     const kpi3 = document.getElementById("kpi3");
@@ -76,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             grdDatos.option({dataSource: {store: datosKpi}});
             clsGenerales_.mtdDesactivarLoadPagina();
             divEncabezadoPki.innerText = this.innerText;
+            divDescripcionPki.innerHTML = "";
             if (respuesta["estado"] === 'ok') {               
                 
                 datosKpi = respuesta["datos"]; // respuesta["datos"]; dataRespuestaKPI[0]["datos"];
@@ -85,6 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (this.id == "kpi1") {
+
+                divDescripcionPki.innerHTML = "Cantidad: Número de facturas emitidas.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -196,6 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
                           
                 }
                 if (this.id == "kpi2") {     
+
+                    divDescripcionPki.innerHTML = "Cantidad: Número de facturas emitidas. Total: Suma del valor total de las facturas. Prom: Promedio del valor total de las facturas.";
 
                     grdDatosChart.option({   
                         commonSeriesSettings: {
@@ -349,6 +355,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi3") {
 
+                    divDescripcionPki.innerHTML = "Cantidad: Número de facturas emitidas. Duracion: Suma del número de días que tardó en cerrarse las ventas. Prom: Promedio del número de días que tardó en cerrarse una venta.";
+
                     grdDatosChart.option({
                         commonSeriesSettings: {
                             type: 'bar',
@@ -489,6 +497,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi4") {    
 
+                    divDescripcionPki.innerHTML = "Ventas: Número de ventas realizadas. Meta: Número de ventas planificadas. Tasa: Porcentaje de cumplimiento de la meta.";
+
                     grdDatosChart.option({
                         commonSeriesSettings: {
                             type: 'bar',
@@ -623,6 +633,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 }
                 if (this.id == "kpi5") {
+
+                    divDescripcionPki.innerHTML = "Clientes: Número de clientes adquiridos. Prospectos: Número de prospectos atendidos. Tasa: Porcentaje de conversión de prospectos a clientes.";
                    
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -759,6 +771,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi6") {
 
+                    divDescripcionPki.innerHTML = "Demostraciones: Número de demostraciones realizadas. Meta: Número de demostraciones planificadas. Tasa: Porcentaje de cumplimiento de la meta.";
+
                     grdDatosChart.option({
                         commonSeriesSettings: {
                             type: 'bar',
@@ -894,6 +908,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi7") {
 
+                    divDescripcionPki.innerHTML = "Cantidad: Número de llamadas realizadas.";
+
                     grdDatosChart.option({
                         commonSeriesSettings: {
                             type: 'spline',
@@ -1004,6 +1020,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 }
                 if (this.id == "kpi8") {
+
+                    divDescripcionPki.innerHTML = "Ganados: Número de clientes adquiridos. Generados: Número de clientes atendidos. Tasa: Porcentaje de conversión a clientes.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -1140,6 +1158,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi9") {
 
+                    divDescripcionPki.innerHTML = "Nuevos: Número de clientes nuevos. Actuales: Número de clientes actuales. Tasa: Porcentaje de clientes nuevos sobre el total de clientes.";
+
                     grdDatosChart.option({
                         commonSeriesSettings: {
                             type: 'bar',
@@ -1275,6 +1295,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi10") {
 
+                    divDescripcionPki.innerHTML = "Nuevos: Número de clientes nuevos. Actuales: Número de clientes actuales. Tasa: Porcentaje de clientes nuevos sobre el total de clientes.";
+
                     grdDatosChart.option({
                         commonSeriesSettings: {
                             type: 'bar',
@@ -1409,6 +1431,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 }
                 if (this.id == "kpi11") {
+
+                    divDescripcionPki.innerHTML = "Ejecutada: Número de visitas ejecutadas. Programada: Número de visitas programadas. Tasa: Porcentaje de cumplimiento de la meta.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
