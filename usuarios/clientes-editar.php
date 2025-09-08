@@ -6,6 +6,12 @@ include("includes/head.php");
 
 $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET["id"]."' AND cli_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+
+$diplayNombreEvento = 'none';
+
+if ($resultadoD['cli_referencia'] == 4) {
+	$diplayNombreEvento = 'block';
+}
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <link href="css/jquery.gritter.css" rel="stylesheet">
@@ -33,6 +39,14 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 		}else{
 			document.getElementById("local").style.display = "none";
 			document.getElementById("extrangero").style.display = "block";
+		}
+	}
+
+	function mostrarNombreEvento(data) {
+		if(data.value == 4){
+			document.getElementById("eventoNombre").style.display = "block";
+		} else {
+			document.getElementById("eventoNombre").style.display = "none";
 		}
 	}
 </script>
@@ -353,7 +367,7 @@ include("includes/js-formularios.php");
 													<div class="control-group">
 														<label class="control-label">Referencia de llegada</label>
 														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="referencia">
+															<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="referencia" onchange="mostrarNombreEvento(this)">
 																<option value=""></option>
 																<?php
 																for($i=1; $i<=12; $i++){
@@ -363,7 +377,16 @@ include("includes/js-formularios.php");
 																?>
 															</select>
 														</div>
-												   </div>   
+												   </div>
+
+												   <div id="eventoNombre" style="display: <?=$diplayNombreEvento;?>;">
+														<div class="control-group">
+															<label class="control-label">Nombre del evento</label>
+															<div class="controls">
+																<input type="text" class="span4" name="nombreEvento" value="<?=$resultadoD['cli_nombre_evento'];?>">
+															</div>
+														</div>
+													</div>
 
 													<div class="control-group">
 														<label class="control-label">Grupos</label>

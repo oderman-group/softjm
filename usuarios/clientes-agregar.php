@@ -51,6 +51,7 @@ include("includes/js-formularios.php");
 			   });
 
 	}
+
 	function mostrar(data) {
 		if(data.value == "Colombia"){
 			document.getElementById("local").style.display = "block";
@@ -58,6 +59,14 @@ include("includes/js-formularios.php");
 		}else{
 			document.getElementById("local").style.display = "none";
 			document.getElementById("extrangero").style.display = "block";
+		}
+	}
+
+	function mostrarNombreEvento(data) {
+		if(data.value == 4){
+			document.getElementById("eventoNombre").style.display = "block";
+		} else {
+			document.getElementById("eventoNombre").style.display = "none";
 		}
 	}
 </script>
@@ -328,7 +337,7 @@ include("includes/js-formularios.php");
 								 <div class="control-group">
 														<label class="control-label">Referencia de llegada</label>
 														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="referencia">
+															<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="referencia" onchange="mostrarNombreEvento(this)">
 																<option value=""></option>
 																<?php
 																for($i=1; $i<=12; $i++){
@@ -338,6 +347,15 @@ include("includes/js-formularios.php");
 															</select>
 														</div>
 												   </div>  
+
+								<div id="eventoNombre" style="display: none;">
+									<div class="control-group">
+										<label class="control-label">Nombre del evento</label>
+										<div class="controls">
+											<input type="text" class="span4" name="nombreEvento">
+										</div>
+									</div>
+								</div>
                                 
                                 <div class="control-group">
 									<label class="control-label">Grupos</label>

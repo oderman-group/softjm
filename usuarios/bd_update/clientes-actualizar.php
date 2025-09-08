@@ -67,7 +67,8 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     cli_tipo_documento='" . $_POST["tipoDocumento"] . "', 
     cli_pais='" . $pais . "', 
     cli_ciudad_extranjera='" . $city . "',
-    cli_institucional='" . $clienteInsitucional . "'
+    cli_institucional='" . $clienteInsitucional . "',
+    cli_nombre_evento='" . $_POST["nombreEvento"] . "'
     WHERE cli_id='" . $_POST["id"] . "'");
 
 if(isset($_POST["grupos"])){
