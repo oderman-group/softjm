@@ -37,6 +37,7 @@ include("includes/head.php");
 	<!-- DevExtreme libraries (reference only one of them) 
 	<script type="text/javascript" src="../assets/devexpress/web/dx.all.js"></script> -->  
 	<script type="text/javascript" src="https://cdn3.devexpress.com/jslib/23.2.5/js/dx.all.js"></script>  
+	<script src="https://cdn3.devexpress.com/jslib/22.2.3/js/localization/dx.messages.es.js"></script>
 <?php include("includes/funciones-js.php");?>
 </head>
 <body>

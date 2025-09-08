@@ -1,7 +1,8 @@
 import { clsGenerales } from './_generales.js';
 document.addEventListener('DOMContentLoaded', () => {
 
-    const clsGenerales_ = new clsGenerales();btnKpiClic
+    DevExpress.localization.locale('es');
+    const clsGenerales_ = new clsGenerales();
 
     const divEncabezadoPki = document.getElementById("divEncabezadoPki");
     const kpi1 = document.getElementById("kpi1");
@@ -47,7 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (this.id == "kpi1") { txtOpcion = "consultar_kpi_1_2_ventas"; };
         if (this.id == "kpi2") { txtOpcion = "consultar_kpi_1_2_ventas"; };
         if (this.id == "kpi3") { txtOpcion = "consultar_kpi_3_tiempo_promedio_cierre_ventas"; };
+        if (this.id == "kpi4") { txtOpcion = "consultar_kpi_4_cumplimiento_cuota_comercial"; };
+        if (this.id == "kpi5") { txtOpcion = "consultar_kpi_5_tasa_conversión_prospecto_cliente"; };
+        if (this.id == "kpi6") { txtOpcion = "consultar_kpi_6_ejecucion_demostraciones"; };
         if (this.id == "kpi7") { txtOpcion = "consultar_kpi_7_numero_llamadas_enviadas_ejecutivo_prospeccion"; };
+        if (this.id == "kpi8") { txtOpcion = "consultar_kpi_8_clientes_efectivos_por_evento"; };
+        if (this.id == "kpi9") { txtOpcion = "consultar_kpi_9_nuevos_subdistribuidores"; };
+        if (this.id == "kpi10") { txtOpcion = "consultar_kpi_10_captacion_clientes_instituciones"; };
+        if (this.id == "kpi11") { txtOpcion = "consultar_kpi_11_numero_visitas_realizadas"; };
 
         $.ajax({
             url: "ajax/ajax-kpis.php",
@@ -64,15 +72,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }).done((respuesta) => {
 
+            let datosKpi = [];
+            grdDatos.option({dataSource: {store: datosKpi}});
             clsGenerales_.mtdDesactivarLoadPagina();
             divEncabezadoPki.innerText = this.innerText;
-            if (respuesta["estado"] === 'ok') {
-               
-                let datosKpi = [];
-                grdDatos.option({dataSource: {store: datosKpi}});
-                datosKpi = respuesta["datos"]; // respuesta["datos"]; dataRespuestaKPI[0]["datos"];
+            if (respuesta["estado"] === 'ok') {               
                 
-                if (this.id == "kpi1") {
+                datosKpi = respuesta["datos"]; // respuesta["datos"]; dataRespuestaKPI[0]["datos"];
+            }
+            if (respuesta["estado"] === 'ko') {
+                clsGenerales_.mtdMostrarMensaje(respuesta["mensaje"], "error");
+            }
+
+            if (this.id == "kpi1") {
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -157,10 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 dataField: 'fecha',
                                 dataType: 'date',
                                 area: 'column',
-                                sortOrder: 'desc'
-                            },{
-                                groupName: 'date',
-                                groupInterval: 'month',
                                 sortOrder: 'desc'
                             },{
                                 summaryType: 'count',
@@ -274,10 +282,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             area: 'column',
                             sortOrder: 'desc'
                             },{
-                            groupName: 'date',
-                            groupInterval: 'month',
-                            sortOrder: 'desc'
-                            },{
                                 summaryType: 'count',
                                 caption: 'Cantidad',
                                 area: 'data',
@@ -287,13 +291,23 @@ document.addEventListener('DOMContentLoaded', () => {
                                 dataField: 'total',
                                 dataType: 'number',
                                 summaryType: 'sum',
-                                format: 'currency',
+                                format: {
+                                    formatter: function (value) {
+                                        if (value == null) return "";
+                                        return "$ " + value.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    }   
+                                },
                                 area: 'data'
                             }, {
                                 caption: 'Prom',
                                 dataField: 'total',
                                 dataType: 'number',
-                                format: 'currency',
+                                format: {
+                                    formatter: function (value) {
+                                        if (value == null) return "";
+                                        return "$ " + value.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    }    
+                                },
                                 area: 'data',
                                 summaryType: "custom",
                                 calculateCustomSummary: function(options) {
@@ -420,10 +434,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'column',
                                 sortOrder: 'desc'
                             },{
-                                groupName: 'date',
-                                groupInterval: 'month',
-                                sortOrder: 'desc'
-                            },{
                                 summaryType: 'count',
                                 caption: 'Cantidad',
                                 area: 'data',
@@ -477,19 +487,86 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                 }
-                if (this.id == "kpi4") {
+                if (this.id == "kpi4") {    
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                            format: {
+                                type: 'fixedPoint',
+                                precision: 0,
+                            },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
-                            customizeTooltip(args) {                               
-                                let valueText = args.originalValue;
+                            customizeTooltip(args) {                                  
+                                let valueText = args.originalValue;  
+                                if (args.seriesName.includes("Tasa")) {
+                                valueText = new Intl.NumberFormat('es-ES', {  
+                                        style: 'percent',
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2 
+                                    }).format(args.originalValue /100); 
+                                }                   
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
                     });
 
+                    grdDatos.bindChart(grdDatosChart, {
+                        dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false,
+                        customizeSeries: function(seriesName, seriesOptions) {
+
+                            if (seriesName.includes("Tasa")) {
+                                seriesOptions.label = seriesOptions.label || {};
+                                seriesOptions.label.visible = true;
+                                seriesOptions.label.customizeText = function (arg) {
+                                    return new Intl.NumberFormat('es-ES', {
+                                    style: 'percent',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                    }).format(arg.value / 100);
+                                };
+                            }
+                            return seriesOptions;
+                        }
+                    });
+
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                             dataField: 'id',
@@ -507,73 +584,124 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
-                                width: 150,
-                                caption: 'Cliente',
-                                dataField: 'cliente',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                caption: 'Factura',
-                                dataField: 'factura',
-                                area: 'row'
-                            },{
                                 caption: 'Fecha',
                                 dataField: 'fecha',
                                 dataType: 'date',
                                 area: 'column',
                                 sortOrder: 'desc'
                             },{
-                                groupName: 'date',
-                                groupInterval: 'month',
-                                sortOrder: 'desc'
-                            },{
-                                summaryType: 'count',
-                                caption: 'Cantidad',
-                                area: 'data',
-                                sortOrder: 'desc'
-                            },{
-                                caption: 'Total',
-                                dataField: 'total',
-                                dataType: 'number',
                                 summaryType: 'sum',
-                                format: 'currency',
+                                dataField: "ventas",
+                                dataType: 'number',
+                                caption: 'Ventas',
                                 area: 'data'
+                            },{
+                                caption: "Meta",
+                                dataField: "meta_ventas",
+                                dataType: 'number',
+                                area: "data",
+                                summaryType: "sum"
+                            },{                                
+                                caption: "Tasa",
+                                dataType: 'number',
+                                area: 'data',
+                                format: '#0.00\'%\'',
+                                calculateSummaryValue: function(summaryCell) {
+                                    
+                                    if (summaryCell.value("Meta") === undefined) {
+                                        return null;
+                                    }
+
+                                    var value = 0;
+                                    value = summaryCell.value("Meta") > 0 ? Number((summaryCell.value("Ventas") / summaryCell.value("Meta"))*100) : 0;
+                                    return value;
+                                }
                             }],
                             store: datosKpi
-                        },onCellPrepared: function(e) {
-                            if (e.area === "row" && e.cellElement && e.cell.text) {
-                                const valor = e.cell.text;
-                                if (e.cell.path?.length == 4) {
-                                    e.cellElement.empty();
-                                    $("<a>")
-                                        .attr("href", `facturas.php?busqueda=${valor}`)
-                                        .attr("target", "_blank")
-                                        .text(valor)
-                                        .appendTo(e.cellElement);
-                                }else {
-                                    e.cellElement;
-                                }
-                            }
                         }
                     });
 
                 }
                 if (this.id == "kpi5") {
-
+                   
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                                format: {
+                                    type: 'fixedPoint',
+                                    precision: 0,
+                                },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
-                            customizeTooltip(args) {                               
+                            customizeTooltip(args) {                                  
                                 let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
+                                if (args.seriesName.includes("Tasa")) {
+                                valueText = new Intl.NumberFormat('es-ES', {  
+                                        style: 'percent',
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2 
+                                    }).format(args.originalValue /100); 
+                                }                   
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
                     });
 
+                    grdDatos.bindChart(grdDatosChart, {
+                        dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false,
+                        customizeSeries: function(seriesName, seriesOptions) {
+
+                            if (seriesName.includes("Tasa")) {
+                                seriesOptions.label = seriesOptions.label || {};
+                                seriesOptions.label.visible = true;
+                                seriesOptions.label.customizeText = function (arg) {
+                                    return new Intl.NumberFormat('es-ES', {
+                                    style: 'percent',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                    }).format(arg.value / 100);
+                                };
+                            }
+                            return seriesOptions;
+                        }
+                    }); 
+
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                             dataField: 'id',
@@ -591,53 +719,40 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
-                                width: 150,
-                                caption: 'Cliente',
-                                dataField: 'cliente',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                caption: 'Factura',
-                                dataField: 'factura',
-                                area: 'row'
-                            },{
                                 caption: 'Fecha',
                                 dataField: 'fecha',
                                 dataType: 'date',
                                 area: 'column',
                                 sortOrder: 'desc'
                             },{
-                                groupName: 'date',
-                                groupInterval: 'month',
-                                sortOrder: 'desc'
-                            },{
-                                summaryType: 'count',
-                                caption: 'Cantidad',
-                                area: 'data',
-                                sortOrder: 'desc'
-                            },{
-                                caption: 'Total',
-                                dataField: 'total',
-                                dataType: 'number',
                                 summaryType: 'sum',
-                                format: 'currency',
+                                dataField: "clientes",
+                                dataType: 'number',
+                                caption: 'Clientes',
                                 area: 'data'
+                            },{
+                                caption: "Prospectos",
+                                dataField: "prospectos",
+                                dataType: 'number',
+                                area: "data",
+                                summaryType: "sum"
+                            },{                                
+                                caption: "Tasa",
+                                dataType: 'number',
+                                area: 'data',                                
+                                format: '#0.00\'%\'',
+                                calculateSummaryValue: function(summaryCell) {
+                                    
+                                    if (summaryCell.value("Clientes") === undefined) {
+                                        return undefined;
+                                    }
+
+                                    var value = 0;
+                                    value = summaryCell.value("Clientes") > 0 ? Number((summaryCell.value("Clientes") / summaryCell.value("Prospectos"))*100): 0;
+                                    return value;
+                                }
                             }],
                             store: datosKpi
-                        },onCellPrepared: function(e) {
-                            if (e.area === "row" && e.cellElement && e.cell.text) {
-                                const valor = e.cell.text;
-                                if (e.cell.path?.length == 4) {
-                                    e.cellElement.empty();
-                                    $("<a>")
-                                        .attr("href", `facturas.php?busqueda=${valor}`)
-                                        .attr("target", "_blank")
-                                        .text(valor)
-                                        .appendTo(e.cellElement);
-                                }else {
-                                    e.cellElement;
-                                }
-                            }
                         }
                     });
 
@@ -645,19 +760,83 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.id == "kpi6") {
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                                format: {
+                                    type: 'fixedPoint',
+                                    precision: 0,
+                                },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
-                            customizeTooltip(args) {                               
+                            customizeTooltip(args) {                                  
                                 let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
+                                if (args.seriesName.includes("Tasa")) {
+                                valueText = new Intl.NumberFormat('es-ES', {  
+                                        style: 'percent',
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2 
+                                    }).format(args.originalValue /100); 
+                                }                   
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
                     });
 
+                    grdDatos.bindChart(grdDatosChart, {
+                        dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false,
+                        customizeSeries: function(seriesName, seriesOptions) {
+
+                            if (seriesName.includes("Tasa")) {
+                                seriesOptions.label = seriesOptions.label || {};
+                                seriesOptions.label.visible = true;
+                                seriesOptions.label.customizeText = function (arg) {
+                                    return new Intl.NumberFormat('es-ES', {
+                                    style: 'percent',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                    }).format(arg.value / 100);
+                                };
+                            }
+                            return seriesOptions;
+                        }
+                    }); 
+
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                             dataField: 'id',
@@ -675,53 +854,40 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
-                                width: 150,
-                                caption: 'Cliente',
-                                dataField: 'cliente',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                caption: 'Factura',
-                                dataField: 'factura',
-                                area: 'row'
-                            },{
                                 caption: 'Fecha',
                                 dataField: 'fecha',
                                 dataType: 'date',
                                 area: 'column',
                                 sortOrder: 'desc'
                             },{
-                                groupName: 'date',
-                                groupInterval: 'month',
-                                sortOrder: 'desc'
-                            },{
-                                summaryType: 'count',
-                                caption: 'Cantidad',
-                                area: 'data',
-                                sortOrder: 'desc'
-                            },{
-                                caption: 'Total',
-                                dataField: 'total',
-                                dataType: 'number',
                                 summaryType: 'sum',
-                                format: 'currency',
+                                dataField: "demostraciones",
+                                dataType: 'number',
+                                caption: 'Demostraciones',
                                 area: 'data'
+                            },{
+                                caption: "Meta",
+                                dataField: "meta_demostraciones",
+                                dataType: 'number',
+                                area: "data",
+                                summaryType: "sum"
+                            },{                                
+                                caption: "Tasa",
+                                dataType: 'number',
+                                area: 'data',                                
+                                format: '#0.00\'%\'',
+                                calculateSummaryValue: function(summaryCell) {
+                                    
+                                    if (summaryCell.value("Demostraciones") === undefined) {
+                                        return undefined;
+                                    }
+
+                                    var value = 0;
+                                    value = summaryCell.value("Demostraciones") > 0 ? Number((summaryCell.value("Demostraciones") / summaryCell.value("Meta"))*100): 0;
+                                    return value;Meta
+                                }
                             }],
                             store: datosKpi
-                        },onCellPrepared: function(e) {
-                            if (e.area === "row" && e.cellElement && e.cell.text) {
-                                const valor = e.cell.text;
-                                if (e.cell.path?.length == 4) {
-                                    e.cellElement.empty();
-                                    $("<a>")
-                                        .attr("href", `facturas.php?busqueda=${valor}`)
-                                        .attr("target", "_blank")
-                                        .text(valor)
-                                        .appendTo(e.cellElement);
-                                }else {
-                                    e.cellElement;
-                                }
-                            }
                         }
                     });
 
@@ -792,20 +958,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'asc'
                             },{
                                 width: 150,
-                                caption: 'Ejecutivo',
-                                dataField: 'ejecutivo',
+                                caption: 'Responsable',
+                                dataField: 'responsable',
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
                                 width: 150,
-                                caption: 'Cliente',
-                                dataField: 'cliente',
+                                caption: 'Prospecto',
+                                dataField: 'prospecto',
                                 area: 'row',
                                 sortOrder: 'asc'
-                            },{
-                                caption: 'Seguimiento',
-                                dataField: 'seguimiento',
-                                area: 'row'
                             },{
                                 caption: 'Fecha',
                                 dataField: 'fecha',
@@ -844,19 +1006,83 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.id == "kpi8") {
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                                format: {
+                                    type: 'fixedPoint',
+                                    precision: 0,
+                                },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
-                            customizeTooltip(args) {                               
+                            customizeTooltip(args) {                                  
                                 let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
+                                if (args.seriesName.includes("Tasa")) {
+                                valueText = new Intl.NumberFormat('es-ES', {  
+                                        style: 'percent',
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2 
+                                    }).format(args.originalValue /100); 
+                                }                   
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
                     });
 
+                    grdDatos.bindChart(grdDatosChart, {
+                        dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false,
+                        customizeSeries: function(seriesName, seriesOptions) {
+
+                            if (seriesName.includes("Tasa")) {
+                                seriesOptions.label = seriesOptions.label || {};
+                                seriesOptions.label.visible = true;
+                                seriesOptions.label.customizeText = function (arg) {
+                                    return new Intl.NumberFormat('es-ES', {
+                                    style: 'percent',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                    }).format(arg.value / 100);
+                                };
+                            }
+                            return seriesOptions;
+                        }
+                    }); 
+
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                             dataField: 'id',
@@ -874,53 +1100,40 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
-                                width: 150,
-                                caption: 'Cliente',
-                                dataField: 'cliente',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                caption: 'Factura',
-                                dataField: 'factura',
-                                area: 'row'
-                            },{
                                 caption: 'Fecha',
                                 dataField: 'fecha',
                                 dataType: 'date',
                                 area: 'column',
                                 sortOrder: 'desc'
                             },{
-                                groupName: 'date',
-                                groupInterval: 'month',
-                                sortOrder: 'desc'
-                            },{
-                                summaryType: 'count',
-                                caption: 'Cantidad',
-                                area: 'data',
-                                sortOrder: 'desc'
-                            },{
-                                caption: 'Total',
-                                dataField: 'total',
-                                dataType: 'number',
                                 summaryType: 'sum',
-                                format: 'currency',
+                                dataField: "clientes",
+                                dataType: 'number',
+                                caption: 'Ganados',
                                 area: 'data'
+                            },{
+                                caption: "Generados",
+                                dataField: "prospectos",
+                                dataType: 'number',
+                                area: "data",
+                                summaryType: "sum"
+                            },{                                
+                                caption: "Tasa",
+                                dataType: 'number',
+                                area: 'data',                                
+                                format: '#0.00\'%\'',
+                                calculateSummaryValue: function(summaryCell) {
+                                    
+                                    if (summaryCell.value("Ganados") === undefined) {
+                                        return undefined;
+                                    }
+
+                                    var value = 0;
+                                    value = summaryCell.value("Ganados") > 0 ? Number((summaryCell.value("Ganados") / summaryCell.value("Generados"))*100): 0;
+                                    return value;
+                                }
                             }],
                             store: datosKpi
-                        },onCellPrepared: function(e) {
-                            if (e.area === "row" && e.cellElement && e.cell.text) {
-                                const valor = e.cell.text;
-                                if (e.cell.path?.length == 4) {
-                                    e.cellElement.empty();
-                                    $("<a>")
-                                        .attr("href", `facturas.php?busqueda=${valor}`)
-                                        .attr("target", "_blank")
-                                        .text(valor)
-                                        .appendTo(e.cellElement);
-                                }else {
-                                    e.cellElement;
-                                }
-                            }
                         }
                     });
 
@@ -928,19 +1141,83 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.id == "kpi9") {
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                                format: {
+                                    type: 'fixedPoint',
+                                    precision: 0,
+                                },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
-                            customizeTooltip(args) {                               
+                            customizeTooltip(args) {                                  
                                 let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
+                                if (args.seriesName.includes("Tasa")) {
+                                valueText = new Intl.NumberFormat('es-ES', {  
+                                        style: 'percent',
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2 
+                                    }).format(args.originalValue /100); 
+                                }                   
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
                     });
 
+                    grdDatos.bindChart(grdDatosChart, {
+                        dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false,
+                        customizeSeries: function(seriesName, seriesOptions) {
+
+                            if (seriesName.includes("Tasa")) {
+                                seriesOptions.label = seriesOptions.label || {};
+                                seriesOptions.label.visible = true;
+                                seriesOptions.label.customizeText = function (arg) {
+                                    return new Intl.NumberFormat('es-ES', {
+                                    style: 'percent',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                    }).format(arg.value / 100);
+                                };
+                            }
+                            return seriesOptions;
+                        }
+                    }); 
+
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                             dataField: 'id',
@@ -958,53 +1235,40 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
-                                width: 150,
-                                caption: 'Cliente',
-                                dataField: 'cliente',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                caption: 'Factura',
-                                dataField: 'factura',
-                                area: 'row'
-                            },{
                                 caption: 'Fecha',
                                 dataField: 'fecha',
                                 dataType: 'date',
                                 area: 'column',
                                 sortOrder: 'desc'
                             },{
-                                groupName: 'date',
-                                groupInterval: 'month',
-                                sortOrder: 'desc'
-                            },{
-                                summaryType: 'count',
-                                caption: 'Cantidad',
-                                area: 'data',
-                                sortOrder: 'desc'
-                            },{
-                                caption: 'Total',
-                                dataField: 'total',
-                                dataType: 'number',
                                 summaryType: 'sum',
-                                format: 'currency',
+                                dataField: "nuevos",
+                                dataType: 'number',
+                                caption: 'Nuevos',
                                 area: 'data'
+                            },{
+                                caption: "Actuales",
+                                dataField: "actuales",
+                                dataType: 'number',
+                                area: "data",
+                                summaryType: "sum"
+                            },{                                
+                                caption: "Tasa",
+                                dataType: 'number',
+                                area: 'data',                                
+                                format: '#0.00\'%\'',
+                                calculateSummaryValue: function(summaryCell) {
+                                    
+                                    if (summaryCell.value("Nuevos") === undefined) {
+                                        return undefined;
+                                    }
+
+                                    var value = 0;
+                                    value = summaryCell.value("Actuales") > 0 ? Number((summaryCell.value("Nuevos") / summaryCell.value("Actuales"))*100): 0;
+                                    return value;
+                                }
                             }],
                             store: datosKpi
-                        },onCellPrepared: function(e) {
-                            if (e.area === "row" && e.cellElement && e.cell.text) {
-                                const valor = e.cell.text;
-                                if (e.cell.path?.length == 4) {
-                                    e.cellElement.empty();
-                                    $("<a>")
-                                        .attr("href", `facturas.php?busqueda=${valor}`)
-                                        .attr("target", "_blank")
-                                        .text(valor)
-                                        .appendTo(e.cellElement);
-                                }else {
-                                    e.cellElement;
-                                }
-                            }
                         }
                     });
 
@@ -1012,19 +1276,83 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.id == "kpi10") {
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                                format: {
+                                    type: 'fixedPoint',
+                                    precision: 0,
+                                },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
-                            customizeTooltip(args) {                               
+                            customizeTooltip(args) {                                  
                                 let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
+                                if (args.seriesName.includes("Tasa")) {
+                                valueText = new Intl.NumberFormat('es-ES', {  
+                                        style: 'percent',
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2 
+                                    }).format(args.originalValue /100); 
+                                }                   
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
                     });
 
+                    grdDatos.bindChart(grdDatosChart, {
+                        dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false,
+                        customizeSeries: function(seriesName, seriesOptions) {
+
+                            if (seriesName.includes("Tasa")) {
+                                seriesOptions.label = seriesOptions.label || {};
+                                seriesOptions.label.visible = true;
+                                seriesOptions.label.customizeText = function (arg) {
+                                    return new Intl.NumberFormat('es-ES', {
+                                    style: 'percent',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                    }).format(arg.value / 100);
+                                };
+                            }
+                            return seriesOptions;
+                        }
+                    });
+
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                             dataField: 'id',
@@ -1042,53 +1370,40 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
-                                width: 150,
-                                caption: 'Cliente',
-                                dataField: 'cliente',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                caption: 'Factura',
-                                dataField: 'factura',
-                                area: 'row'
-                            },{
                                 caption: 'Fecha',
                                 dataField: 'fecha',
                                 dataType: 'date',
                                 area: 'column',
                                 sortOrder: 'desc'
                             },{
-                                groupName: 'date',
-                                groupInterval: 'month',
-                                sortOrder: 'desc'
-                            },{
-                                summaryType: 'count',
-                                caption: 'Cantidad',
-                                area: 'data',
-                                sortOrder: 'desc'
-                            },{
-                                caption: 'Total',
-                                dataField: 'total',
-                                dataType: 'number',
                                 summaryType: 'sum',
-                                format: 'currency',
+                                dataField: "nuevos",
+                                dataType: 'number',
+                                caption: 'Nuevos',
                                 area: 'data'
+                            },{
+                                caption: "Actuales",
+                                dataField: "actuales",
+                                dataType: 'number',
+                                area: "data",
+                                summaryType: "sum"
+                            },{                                
+                                caption: "Tasa",
+                                dataType: 'number',
+                                area: 'data',                                
+                                format: '#0.00\'%\'',
+                                calculateSummaryValue: function(summaryCell) {
+                                    
+                                    if (summaryCell.value("Nuevos") === undefined) {
+                                        return undefined;
+                                    }
+
+                                    var value = 0;
+                                    value = summaryCell.value("Actuales") > 0 ? Number((summaryCell.value("Nuevos") / summaryCell.value("Actuales"))*100): 0;
+                                    return value;
+                                }
                             }],
                             store: datosKpi
-                        },onCellPrepared: function(e) {
-                            if (e.area === "row" && e.cellElement && e.cell.text) {
-                                const valor = e.cell.text;
-                                if (e.cell.path?.length == 4) {
-                                    e.cellElement.empty();
-                                    $("<a>")
-                                        .attr("href", `facturas.php?busqueda=${valor}`)
-                                        .attr("target", "_blank")
-                                        .text(valor)
-                                        .appendTo(e.cellElement);
-                                }else {
-                                    e.cellElement;
-                                }
-                            }
                         }
                     });
 
@@ -1096,19 +1411,83 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.id == "kpi11") {
 
                     grdDatosChart.option({
+                        commonSeriesSettings: {
+                            type: 'bar',
+                            label: {
+                            visible: true,
+                                format: {
+                                    type: 'fixedPoint',
+                                    precision: 0,
+                                },
+                            },
+                        },
                         tooltip: {
                             enabled: true,
-                            customizeTooltip(args) {                               
+                            customizeTooltip(args) {                                  
                                 let valueText = args.originalValue;  
-                                if (!args.seriesName.includes("Cantidad")) {
-                                   valueText = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' }).format(args.originalValue); 
-                                } 
+                                if (args.seriesName.includes("Tasa")) {
+                                valueText = new Intl.NumberFormat('es-ES', {  
+                                        style: 'percent',
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2 
+                                    }).format(args.originalValue /100); 
+                                }                   
                                 return {html: `${args.seriesName}<div class='currency'>${valueText}</div>` };
                             },
                         }
                     });
 
+                    grdDatos.bindChart(grdDatosChart, {
+                        dataFieldsDisplayMode: 'splitPanes', alternateDataFields: false,
+                        customizeSeries: function(seriesName, seriesOptions) {
+
+                            if (seriesName.includes("Tasa")) {
+                                seriesOptions.label = seriesOptions.label || {};
+                                seriesOptions.label.visible = true;
+                                seriesOptions.label.customizeText = function (arg) {
+                                    return new Intl.NumberFormat('es-ES', {
+                                    style: 'percent',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                    }).format(arg.value / 100);
+                                };
+                            }
+                            return seriesOptions;
+                        }
+                    });
+
                     grdDatos.option({
+                        allowSortingBySummary: true,
+                        allowFiltering: true,
+                        allowSorting: true,
+                        showBorders: true,
+                        showColumnGrandTotals: true,
+                        showRowGrandTotals: true,
+                        showRowTotals: true,
+                        showColumnTotals: false,
+                        fieldPanel: {
+                            showColumnFields: true,
+                            showDataFields: true,
+                            showFilterFields: true,
+                            showRowFields: true,
+                            allowFieldDragging: true,
+                            visible: true,
+                        },                        
+                        fieldChooser: {
+                            enabled: true,
+                            allowSearch: true
+                        },
+                        headerFilter: {
+                            search: {
+                                enabled: true,
+                            },
+                            showRelevantValues: true,
+                            width: 300,
+                            height: 400,
+                        },
+                        export: {
+                            enabled: true,
+                        },
                         dataSource: {
                             fields: [{
                             dataField: 'id',
@@ -1121,20 +1500,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'asc'
                             },{
                                 width: 150,
-                                caption: 'Vendedor',
-                                dataField: 'vendedor',
+                                caption: 'Responsable',
+                                dataField: 'responsable',
                                 area: 'row',
                                 sortOrder: 'asc'
-                            },{
-                                width: 150,
-                                caption: 'Cliente',
-                                dataField: 'cliente',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                caption: 'Factura',
-                                dataField: 'factura',
-                                area: 'row'
                             },{
                                 caption: 'Fecha',
                                 dataField: 'fecha',
@@ -1142,37 +1511,34 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'column',
                                 sortOrder: 'desc'
                             },{
-                                groupName: 'date',
-                                groupInterval: 'month',
-                                sortOrder: 'desc'
-                            },{
-                                summaryType: 'count',
-                                caption: 'Cantidad',
-                                area: 'data',
-                                sortOrder: 'desc'
-                            },{
-                                caption: 'Total',
-                                dataField: 'total',
-                                dataType: 'number',
                                 summaryType: 'sum',
-                                format: 'currency',
+                                dataField: "visita_ejecutada",
+                                dataType: 'number',
+                                caption: 'Ejecutada',
                                 area: 'data'
+                            },{
+                                caption: "Planeada",
+                                dataField: "visita_planeada",
+                                dataType: 'number',
+                                area: "data",
+                                summaryType: "sum"
+                            },{                                
+                                caption: "Tasa",
+                                dataType: 'number',
+                                area: 'data',                                
+                                format: '#0.00\'%\'',
+                                calculateSummaryValue: function(summaryCell) {
+                                    
+                                    if (summaryCell.value("Ejecutada") === undefined) {
+                                        return undefined;
+                                    }
+
+                                    var value = 0;
+                                    value = summaryCell.value("Planeada") > 0 ? Number((summaryCell.value("Ejecutada") / summaryCell.value("Planeada"))*100): 0;
+                                    return value;
+                                }
                             }],
                             store: datosKpi
-                        },onCellPrepared: function(e) {
-                            if (e.area === "row" && e.cellElement && e.cell.text) {
-                                const valor = e.cell.text;
-                                if (e.cell.path?.length == 4) {
-                                    e.cellElement.empty();
-                                    $("<a>")
-                                        .attr("href", `facturas.php?busqueda=${valor}`)
-                                        .attr("target", "_blank")
-                                        .text(valor)
-                                        .appendTo(e.cellElement);
-                                }else {
-                                    e.cellElement;
-                                }
-                            }
                         }
                     });
 
@@ -1345,12 +1711,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                 }
-                
 
-            }
-            if (respuesta["estado"] === 'ko') {
-                clsGenerales_.mtdMostrarMensaje(respuesta["mensaje"], "error");
-            }
         }); 
                
     }
