@@ -74,14 +74,21 @@ class Utilidades {
      * El valor por defecto es 2.
      * @return void
      */
-    public static function redirect(string $redirectPageUrl, int $messageCode = 2) {
+    public static function redirect(string $redirectPageUrl, int $messageCode = 2, $messageType = 'warning', $messageContent = null) {
+
+        //Validar tipos de mensajes
+        // if(!in_array()) {
+
+        // }
+
         // Limpia cualquier salida que se haya enviado antes.
         if (ob_get_contents()) {
             ob_end_clean();
         }
 
         // Construye la URL de forma segura
-        $finalUrl = $redirectPageUrl . '?warning=' . $messageCode;
+        $optionalMessage = !empty($messageContent) ? '&message='.$messageContent : null;
+        $finalUrl = $redirectPageUrl . '?'.$messageType.'=' . $messageCode . $optionalMessage;
 
         // Redirige usando el encabezado Location, estableciendo el código 302 explícitamente
         header("Location: " . $finalUrl, true, 302);
