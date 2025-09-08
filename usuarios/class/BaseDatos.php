@@ -24,13 +24,16 @@ class BaseDatos {
         global $conexionBdPrincipal;
 
         $sql = "INSERT INTO {$tabla}(";
+
         foreach ($post as $campos => $valores) {
             $sql .= "{$campos},";
         }
+
         $sql = substr($sql, 0, -1).")VALUES(";
         foreach ($post as $valores) {
             $sql .= "'{$valores}',";
         }
+
         $sql = substr($sql, 0, -1).")";
 
         $conexionBdPrincipal->query($sql);
