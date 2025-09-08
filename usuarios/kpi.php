@@ -86,7 +86,8 @@ include("includes/head.php");
 							<div class="widget-container">
 								<div class="row">
 									<div class="span12" align="center">
-										<strong style="font-weight: bold; font-size: 30px;"> <span id="divEncabezadoPki">SELECCIONA UN KPI</span></strong>
+										<strong style="font-weight: bold; font-size: 30px;"> <span id="divEncabezadoPki">SELECCIONA UN KPI</span></strong><br>
+										<span style="font-size: 10px;" id="divDescripcionPki"></span>
 									</div>
 								</div>
 								<br>
