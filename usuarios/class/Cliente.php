@@ -6,6 +6,6 @@ class Cliente extends BaseDatos {
     public static $schema     = MAINBD;
     public static $tableName  = 'clientes';
     public static $primaryKey = 'cli_id';
-    public static $tableAs    = 'cli';
+    public static $tableAs    = 'cli'; 
 
 }
