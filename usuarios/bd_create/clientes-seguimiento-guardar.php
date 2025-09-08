@@ -186,7 +186,8 @@ require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
 				'usr_nombre' => $asesor['usr_nombre']
 			];
 
-			$_SESSION["dataAdicional"]["nombre_empresa"] = "JM EQUIPOS S.A.S."; // Simular sesión
+			$_SESSION["dataAdicional"]["nombre_empresa"] = "JM EQUIPOS S.A.S.";
+
 			$fin = "
 			<p>
 			Hola, te informamos que <b>".$datosUsuarioActual['usr_nombre']."</b> te ha asignado un nuevo seguimiento, relacionado al cliente <b>".$contactoCLiente['cli_nombre']."</b>, con el siguiente asunto: <br>
