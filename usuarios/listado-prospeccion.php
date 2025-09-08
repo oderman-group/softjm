@@ -1,46 +1,55 @@
 <?php
-// PHP para simular datos de 50 clientes
-function generarClientesSimulados($cantidad = 50) {
+include("sesion.php");
+
+// ================== Datos Clientes ==================
+function consultarClientes() {
+    global $conexionBdPrincipal, $idEmpresa;
     $clientes = [];
-    $nombres = ['Juan', 'María', 'Pedro', 'Ana', 'Luis', 'Sofía', 'Carlos', 'Laura', 'Diego', 'Elena'];
-    $apellidos = ['García', 'Rodríguez', 'Martínez', 'López', 'González', 'Pérez', 'Sánchez', 'Ramírez', 'Torres', 'Flores'];
-    $dominios = ['ejemplo.com', 'mail.com', 'negocio.org', 'empresa.net'];
-    $prefijosTelefono = ['300', '301', '302', '305', '310', '311', '312', '315', '320'];
+    
+    $consultaProspectos = $conexionBdPrincipal->query("SELECT *
+    FROM prospectos_importacion_detalles
+    INNER JOIN prospectos_importacion ON pi_id=pid_id_archivo AND (pi_asesor_encargado = '".$_SESSION["id"]."' || pi_created_by = '".$_SESSION["id"]."')
+    ");
 
-    for ($i = 1; $i <= $cantidad; $i++) {
-        $nombre = $nombres[array_rand($nombres)] . ' ' . $apellidos[array_rand($apellidos)];
-        $telefono = $prefijosTelefono[array_rand($prefijosTelefono)] . rand(1000000, 9999999);
-        $email = strtolower(str_replace(' ', '.', $nombre)) . '@' . $dominios[array_rand($dominios)];
-        $email = str_replace(['á','é','í','ó','ú','ñ'], ['a','e','i','o', 'u','n'], $email);
-
-        // Simular contactos adicionales para la vista detalle
-        $contactosAdicionales = [];
-        $numContactos = rand(0, 2); // 0 a 2 contactos adicionales por cliente
-        for ($j = 0; $j < $numContactos; $j++) {
-            $contactoNombre = $nombres[array_rand($nombres)] . ' ' . $apellidos[array_rand($apellidos)];
-            $contactoCargo = ['Gerente', 'Asistente', 'Secretario', 'Administrador'][array_rand(['Gerente', 'Asistente', 'Secretario', 'Administrador'])];
-            $contactoTelefono = $prefijosTelefono[array_rand($prefijosTelefono)] . rand(1000000, 9999999);
-            $contactosAdicionales[] = [
-                'nombre' => $contactoNombre,
-                'cargo' => $contactoCargo,
-                'telefono' => $contactoTelefono
-            ];
-        }
-
+    while ($prospectos = mysqli_fetch_assoc($consultaProspectos)) {
         $clientes[] = [
-            'id' => $i,
-            'nombre_cliente' => $nombre,
-            'telefono' => $telefono,
-            'email' => $email,
-            'notas_previas' => 'Posible interés en producto Y. ID: '.$i,
-            'gestion_estado' => 'none', // 'none', 'valido', 'no_valido'
-            'contactos' => $contactosAdicionales // Para la vista maestro-detalle
+            'id'             => $prospectos['pid_id'],
+            'nombre_cliente' => $prospectos['pid_nombres'],
+            'telefono'       => $prospectos['pid_telefono'],
+            'email'          => $prospectos['pid_email'],
+            'gestion_estado' => $prospectos['pid_estado'],
+            'notas_previas'  => $prospectos['pid_notas'],
+            'fuente'         => $prospectos['pi_fuente']
         ];
     }
     return $clientes;
 }
 
-$clientesData = generarClientesSimulados(50);
+$clientesData = consultarClientes();
+
+// ================== Datos Agentes ==================
+function traerAgentes() {
+    global $conexionBdPrincipal, $idEmpresa;
+    $agentes = [];
+
+    $consultaUsuarios = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre, usr_email 
+    FROM usuarios 
+    WHERE usr_bloqueado!=1 
+    AND usr_id_empresa='".$idEmpresa."' 
+    ORDER BY usr_nombre
+    ");
+
+    while ($usuarios = mysqli_fetch_array($consultaUsuarios, MYSQLI_ASSOC)) {
+        $agentes[] = [
+            'id' => $usuarios['usr_id'],
+            'nombre' => $usuarios['usr_nombre']
+        ];
+    }
+
+    return $agentes;
+}
+
+$agentesData = traerAgentes();
 ?>
 
 <!DOCTYPE html>
@@ -51,384 +60,357 @@ $clientesData = generarClientesSimulados(50);
     <title>Listado de Clientes - Prospección</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/23.2.3/css/dx.material.blue.light.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn3.devexpress.com/jslib/23.2.3/js/dx.all.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        h1 {
-            color: #3f51b5;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        #gridContainer {
-            width: 95%;
-            margin: 0 auto;
-            max-width: 1200px;
-        }
-        /* Estilos generales para DevExtreme */
-        .dx-datagrid-headers {
-            background-color: #e0e0e0;
-        }
-        .dx-datagrid-header-panel, .dx-toolbar {
-            background-color: #f0f0f0 !important;
-        }
-        /* Estilos para el botón Gestionar (combinando Bootstrap con DevExtreme) */
-        /* Aseguramos que el texto del botón custom sea blanco */
-        .dx-button.dx-datagrid-text-content {
-            color: white !important;
-        }
-        .dx-button.dx-datagrid-text-content .dx-button-text {
-            color: white !important;
-        }
-
-        /* Estilos del Popup */
-        .popup-form-content {
-            padding: 15px;
-        }
-        .dx-popup-content .dx-field-item {
-            padding-bottom: 10px;
-        }
-        .dx-popup-content label {
-            font-weight: bold;
-            color: #333;
-            display: block;
-            margin-bottom: 5px;
-        }
-        .dx-popup-content textarea,
-        .dx-popup-content select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .dx-radiobutton-wrapper {
-            margin-right: 15px;
-            display: inline-block;
-        }
-        /* Estilos para los botones de Guardar/Cancelar en el popup (sobreescribiendo Bootstrap si es necesario) */
-        .dx-toolbar-bottom .dx-toolbar-item:last-child .dx-button {
-            background-color: #f44336; /* Color rojo para Cancelar */
-        }
-        .dx-toolbar-bottom .dx-toolbar-item:nth-last-child(2) .dx-button {
-            background-color: #4CAF50; /* Color verde para Guardar */
-        }
-
-        /* --- Estilos para la coloración de filas --- */
-        .managed-invalid {
-            background-color: #ffebee !important; /* Rojo muy claro */
-        }
-        .managed-invalid:hover {
-             background-color: #ffcdd2 !important; /* Un poco más oscuro al pasar el mouse */
-        }
-        .managed-valid {
-            background-color: #e8f5e9 !important; /* Verde muy claro */
-        }
-        .managed-valid:hover {
-            background-color: #c8e6c9 !important; /* Un poco más oscuro al pasar el mouse */
-        }
-        /* Asegurarse de que el color de la fila no afecte el texto */
-        .dx-row.managed-invalid .dx-datagrid-text-content,
-        .dx-row.managed-valid .dx-datagrid-text-content {
-            color: #333; /* O un color que contraste bien */
-        }
-
-        /* Estilos para la vista maestro-detalle */
-        .master-detail-container {
-            padding: 15px;
-            border-top: 1px solid #ddd;
-            background-color: #f9f9f9;
-        }
-        .master-detail-container h5 {
-            margin-top: 0;
-            color: #555;
-        }
-        .contact-list {
-            list-style: none;
-            padding: 0;
-        }
-        .contact-list li {
-            margin-bottom: 5px;
-            border-bottom: 1px dashed #eee;
-            padding-bottom: 5px;
-        }
-        .contact-list li:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        .contact-list span {
-            font-weight: normal;
-        }
-    </style>
 </head>
-<body>
+<body class="p-3" style="background:#f5f5f5;font-family:Roboto,sans-serif;">
 
-    <h1>Listado de Clientes para Prospección</h1>
+    <h1 class="text-center text-primary mb-3">Listado de Clientes para Prospección</h1>
 
     <div id="gridContainer"></div>
 
+    <!-- Popup para Gestionar Prospecto -->
     <div id="popupContainer"></div>
 
-    <script>
-        const clientesData = <?php echo json_encode($clientesData, JSON_UNESCAPED_UNICODE); ?>;
+    <!-- Popup para Importar Nueva BD -->
+    <div id="popupImportar"></div>
 
-        $(function() {
-            const agentesComerciales = [
-                { id: 1, nombre: 'Jaime Mendoza' },
-                { id: 2, nombre: 'Joan Mendoza' },
-                { id: 3, nombre: 'Maria Fernanda' },
-            ];
+<script>
+const clientesData = <?php echo json_encode($clientesData, JSON_UNESCAPED_UNICODE); ?>;
+const agentesComerciales = <?php echo json_encode($agentesData, JSON_UNESCAPED_UNICODE); ?>;
 
-            let currentClienteData = null; // Para almacenar los datos del cliente actual gestionado
-            let gridInstance = null; // Para almacenar la instancia del DataGrid
+$(function() {
+    let currentClienteData = null;
+    let gridInstance = null;
 
-            // 1. Inicializar el DataGrid de DevExtreme
-            gridInstance = $("#gridContainer").dxDataGrid({ // Asignar la instancia a la variable
-                dataSource: clientesData,
-                keyExpr: "id",
+    // ================== GRID PRINCIPAL ==================
+    gridInstance = $("#gridContainer").dxDataGrid({
+        dataSource: clientesData,
+        keyExpr: "id",
+        showBorders: true,
+        showRowLines: true,
+        rowAlternationEnabled: true,
+        hoverStateEnabled: true,
+        height: 600,
+        headerFilter: { visible: true },
+        filterRow: { visible: true, applyFilter: "auto" },
+        searchPanel: { visible: true, width: 240, placeholder: "Buscar..." },
+        columnAutoWidth: true,
+        allowColumnResizing: true,
+        columnResizingMode: "widget",
 
-                showBorders: true,
-                showRowLines: true,
-                rowAlternationEnabled: true,
-                hoverStateEnabled: true,
-
-                scrolling: {
-                    mode: "virtual",
-                    rowRenderingMode: "virtual"
-                },
-                height: 600,
-                headerFilter: { visible: true },
-                filterRow: { visible: true, applyFilter: "auto" },
-                searchPanel: { visible: true, width: 240, placeholder: "Buscar..." },
-                columnAutoWidth: true,
-                allowColumnResizing: true,
-                columnResizingMode: "widget",
-
-                columns: [
-                    { dataField: "id", caption: "ID", width: 70, alignment: "center", allowFiltering: false },
-                    { dataField: "nombre_cliente", caption: "Nombre del Cliente", allowFiltering: true },
-                    { dataField: "telefono", caption: "Teléfono", allowFiltering: false },
-                    { dataField: "email", caption: "Email", allowFiltering: true },
-                    {
-                        caption: "Gestionar",
-                        type: "buttons",
-                        buttons: [{
-                            text: "Gestionar",
-                            // Aplica clases de Bootstrap, y DevExtreme las fusiona
-                            cssClass: "btn btn-sm btn-success dx-button", // btn-sm para un botón más pequeño
-                            onClick: function(e) {
-                                currentClienteData = e.row.data; // Almacenar los datos del cliente
-                                const popupInstance = $("#popupContainer").dxPopup("instance");
-                                console.log("Intento de mostrar Popup. Instancia:", popupInstance); // Depuración
-                                if (popupInstance) {
-                                    popupInstance.show();
-                                } else {
-                                    console.error("No se pudo obtener la instancia del dxPopup.");
-                                    DevExpress.ui.notify("Error: No se pudo iniciar el formulario de gestión.", "error", 3000);
-                                }
-                            }
-                        }]
+        // ---- Toolbar con botón Importar ----
+        toolbar: {
+            items: [{
+                location: "before",
+                widget: "dxButton",
+                options: {
+                    text: "📥 Importar nueva BD",
+                    type: "default",
+                    onClick: function() {
+                        $("#popupImportar").dxPopup("instance").show();
                     }
-                ],
-                pager: {
-                    showPageSizeSelector: true,
-                    allowedPageSizes: [10, 20, 50, 100],
-                    showInfo: true,
-                    infoText: "Página {0} de {1} ({2} elementos)"
-                },
-                paging: {
-                    pageSize: 15
-                },
+                }
+            }]
+        },
 
-                // --- Implementación de Master-Detail View ---
-                masterDetail: {
-                    enabled: true,
-                    template: function(container, options) {
-                        const cliente = options.data; // Datos de la fila principal
-                        const contactos = cliente.contactos;
+        columns: [
+            { dataField: "id", caption: "ID", width: 70, alignment: "center", allowFiltering: false },
+            { dataField: "nombre_cliente", caption: "Nombre del Cliente" },
+            { 
+                dataField: "telefono",
+                caption: "Teléfono",
+                allowFiltering: false,
+                cellTemplate: function(container, options) {
+                    if (options.value) {
+                        $("<a>")
+                            .attr("href", "tel:" + options.value)
+                            .text(options.value)
+                            .appendTo(container);
+                    } else {
+                        container.text(""); // vacío si no hay teléfono
+                    }
+                }
+            },
+            { dataField: "email", caption: "Email" },
+            { dataField: "fuente", caption: "Fuente", width: 150, alignment: "center"},
+            { dataField: "gestion_estado", caption: "Estado", alignment: "center"},
 
-                        const detailContent = $('<div>').addClass('master-detail-container');
-                        detailContent.append('<h5>Contactos Adicionales:</h5>');
-
-                        if (contactos && contactos.length > 0) {
-                            const ul = $('<ul>').addClass('contact-list');
-                            contactos.forEach(contacto => {
-                                ul.append(`<li>
-                                    <strong>${contacto.nombre}</strong> (${contacto.cargo})<br>
-                                    <span>Teléfono: ${contacto.telefono}</span>
-                                </li>`);
-                            });
-                            detailContent.append(ul);
+            {
+                caption: "Gestionar",
+                type: "buttons",
+                buttons: [{
+                    text: "Gestionar",
+                    cssClass: "btn btn-sm btn-success dx-button",
+                    onClick: function(e) {
+                        currentClienteData = e.row.data;
+                        if (currentClienteData.gestion_estado != 'VALIDO') {
+                            $("#popupContainer").dxPopup("instance").show();
                         } else {
-                            detailContent.append('<p>No hay contactos adicionales registrados.</p>');
-                        }
-
-                        detailContent.append(`<p><strong>Notas Previas:</strong> ${cliente.notas_previas || 'N/A'}</p>`);
-
-                        container.append(detailContent);
-                    }
-                },
-
-                // --- Implementación de Coloración de Filas ---
-                onRowPrepared: function(e) {
-                    if (e.rowType === "data") { // Asegurarse de que sea una fila de datos
-                        // Remover clases previas para evitar conflictos si el estado cambia
-                        $(e.rowElement).removeClass('managed-valid managed-invalid');
-                        
-                        if (e.data.gestion_estado === 'valido') {
-                            $(e.rowElement).addClass('managed-valid');
-                        } else if (e.data.gestion_estado === 'no_valido') {
-                            $(e.rowElement).addClass('managed-invalid');
+                            DevExpress.ui.notify("El prospecto "+currentClienteData.nombre_cliente+" fue marcado como válido y ya fue asignado a un asesor.", "info", 3000);
+                            return;
                         }
                     }
-                }
-            });
+                }]
+            }
+        ],
+        paging: { pageSize: 15 },
+        pager: { showPageSizeSelector: true, allowedPageSizes: [10,20,50], showInfo: true },
 
-            // 2. Inicializar el Pop-up (modal) de DevExtreme
-            $("#popupContainer").dxPopup({
-                width: 600,
-                height: "auto",
-                showTitle: true,
-                title: "Gestionar Prospecto",
-                visible: false,
-                dragEnabled: false,
-                closeOnOutsideClick: true,
-                toolbarItems: [{
-                    toolbar: 'bottom',
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        text: 'Guardar',
-                        type: 'success',
-                        elementAttr: { class: 'btn btn-success' }, // Clases Bootstrap para el botón
-                        onClick: function() {
-                            const clasificacionRadioGroup = $('#clasificacionGroup').dxRadioGroup('instance');
-                            const clasificacion = clasificacionRadioGroup.option('value');
-                            const agente = $('#selectAgenteComercial').val();
-                            const notas = $('#notasProspecto').val();
+        // Vista detalle
+        masterDetail: {
+            enabled: true,
+            template: function(container, options) {
+                const cliente = options.data;
 
-                            if (!clasificacion) {
-                                DevExpress.ui.notify("Por favor, selecciona una clasificación.", "error", 2000);
-                                return;
-                            }
-                            if (clasificacion === 'valido' && !agente) {
-                                DevExpress.ui.notify("Por favor, asigna un agente comercial para prospectos válidos.", "error", 2000);
-                                return;
-                            }
-
-                            // 1. Actualizar el estado de gestión en los datos del cliente (currentClienteData)
-                            if (currentClienteData) {
-                                currentClienteData.gestion_estado = clasificacion;
-                                // console.log("Datos del cliente actualizados:", currentClienteData); // Depuración
-                            }
-
-                            // Aquí iría tu llamada AJAX a PHP para guardar en la DB
-                            // Incluye currentClienteData.id, clasificacion, agente, notas
-
-                            DevExpress.ui.notify("¡Gestión guardada con éxito!", "success", 2000);
-                            $("#popupContainer").dxPopup("instance").hide(); // Ocultar el modal inmediatamente
-                        }
-                    }
-                }, {
-                    toolbar: 'bottom',
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        text: 'Cancelar',
-                        elementAttr: { class: 'btn btn-danger' }, // Clases Bootstrap para el botón
-                        onClick: function() {
-                            $("#popupContainer").dxPopup("instance").hide(); // Ocultar el modal inmediatamente
-                        }
-                    }
-                }],
-                // contentTemplate se encarga de CONSTRUIR el HTML del formulario UNA VEZ.
-                contentTemplate: function(contentElement) {
-                    const content = $('<div>').addClass('popup-form-content');
-                    content.append('<p><b>Cliente: </b> <span id="popupClientName"></span> (ID: <span id="popupClientId"></span>)</p>');
-                    content.append('<p><b>Notas Previas: </b> <span id="popupClientNotasPrevias"></span></p>');
-
-                    content.append('<div class="mb-3"><label class="form-label">Clasificar Prospecto:</label>' +
-                                   '<div id="clasificacionGroup"></div></div>');
-
-                    content.append('<div class="mb-3"><label for="selectAgenteComercial" class="form-label">Asignar a Agente Comercial:</label>' +
-                                   '<select id="selectAgenteComercial" class="form-select"></select></div>'); // Clase form-select de Bootstrap
-
-                    content.append('<div class="mb-3"><label for="notasProspecto" class="form-label">Notas de Gestión:</label>' +
-                                   '<textarea id="notasProspecto" rows="5" class="form-control" placeholder="Añade tus notas aquí..."></textarea></div>'); // Clase form-control de Bootstrap
-
-                    // Inicializar dxRadioGroup
-                    content.find('#clasificacionGroup').dxRadioGroup({
-                        items: [
-                            { text: 'Válido para Siguiente Fase', value: 'valido' },
-                            { text: 'No Válido (Descartar)', value: 'no_valido' }
-                        ],
-                        valueExpr: 'value',
-                        displayExpr: 'text',
-                        layout: 'horizontal',
-                        onValueChanged: function(e) {
-                            const $agenteSelect = $('#selectAgenteComercial');
-                            if (e.value === 'valido') {
-                                $agenteSelect.prop('disabled', false).prop('required', true);
+                let notasHtml = "<li>No hay notas.</li>";
+                if (cliente.notas_previas) {
+                    // asumimos que las notas vienen separadas por saltos de línea
+                    const notasArray = cliente.notas_previas.split("\n").filter(n => n.trim());
+                    notasHtml = notasArray
+                        .map(n => {
+                            // ejemplo de nota en BD: "2025-09-02 14:20:35|Llamada realizada"
+                            const partes = n.split("|");
+                            if (partes.length === 2) {
+                                const fecha = partes[0].trim();
+                                const texto = partes[1].trim();
+                                return `<li>[${fecha}] ${texto}.</li>`;
                             } else {
-                                $agenteSelect.prop('disabled', true).prop('required', false).val('');
+                                // si no está en el formato esperado, lo mostramos como está
+                                return `<li>${n}</li>`;
                             }
-                        }
-                    });
+                        })
+                        .join("");
+                }
 
-                    // Poblar el Dropdown de Agentes Comerciales (HTML Select)
-                    const $selectAgenteComercial = content.find('#selectAgenteComercial');
-                    $selectAgenteComercial.append($('<option>', { value: '', text: 'Selecciona un agente' }));
-                    agentesComerciales.forEach(agente => {
-                        $selectAgenteComercial.append($('<option>', {
-                            value: agente.id,
-                            text: agente.nombre
-                        }));
-                    });
-                    $selectAgenteComercial.prop('disabled', true);
+                container.append(`
+                    <div class='p-2 bg-light'>
+                        <p><strong>Notas:</strong></p>
+                        <ul style="padding-left:18px; margin:0">${notasHtml}</ul>
+                    </div>
+                `);
+            }
+        },
 
-                    return content;
-                },
-                // onShowing se encarga de POBLAR Y RESETEAR los valores de los elementos cada vez que se va a mostrar el popup
-                onShowing: function(e) {
-                    if (currentClienteData) {
-                        // Poblar detalles del cliente en el popup
-                        $('#popupClientId').text(currentClienteData.id);
-                        $('#popupClientName').text(currentClienteData.nombre_cliente);
-                        $('#popupClientNotasPrevias').text(currentClienteData.notas_previas || 'No hay notas previas.');
+        // Colorear filas según estado
+        onRowPrepared: function(e) {
+            if (e.rowType === "data") {
+                $(e.rowElement).removeClass('managed-valid managed-invalid managed-waiting');
+                if (e.data.gestion_estado === 'VALIDO') $(e.rowElement).addClass('managed-valid');
+                if (e.data.gestion_estado === 'NO_VALIDO') $(e.rowElement).addClass('managed-invalid');
+                if (e.data.gestion_estado === 'ESPERA') $(e.rowElement).addClass('managed-waiting');
+            }
+        }
+    }).dxDataGrid('instance');
 
-                        // Resetear los componentes del formulario
-                        const radioGroupInstance = $('#clasificacionGroup').dxRadioGroup('instance');
-                        if (radioGroupInstance) {
-                            radioGroupInstance.option('value', null); // Limpiar la selección del radio
-                        }
-                        $('#selectAgenteComercial').val('').prop('disabled', true); // Resetear select de agente
-                        $('#notasProspecto').val(''); // Limpiar textarea de notas
+    // ================== POPUP GESTIONAR ==================
+    $("#popupContainer").dxPopup({
+        width: 600,
+        height: "auto",
+        title: "Gestionar Prospecto",
+        visible: false,
+        dragEnabled: false,
+        closeOnOutsideClick: true,
+        toolbarItems: [{
+            toolbar: 'bottom',
+            location: 'after',
+            widget: 'dxButton',
+            options: {
+                text: 'Guardar',
+                type: 'success',
+                onClick: function() {
+                    const clasificacion = $('#clasificacionGroup').dxRadioGroup('instance').option('value');
+                    const agente = $('#selectAgenteComercial').val();
+                    const notas = $('#notasProspecto').val();
+
+                    if (!clasificacion) {
+                        DevExpress.ui.notify("Por favor selecciona una clasificación.", "error", 2000);
+                        return;
                     }
-                },
-                // onHidden se ejecuta DESPUÉS de que el popup se ha ocultado completamente
-                onHidden: function(e) {
-                    // Refrescar el DataGrid para que se aplique el nuevo color de fila
-                    // Esto es necesario porque 'gestion_estado' se actualiza en currentClienteData
-                    // y el grid necesita saber que sus datos han cambiado para re-renderizar la fila.
-                    if (gridInstance) {
-                        gridInstance.refresh(); // O gridInstance.getDataSource().reload();
+                    if (clasificacion === 'VALIDO' && !agente) {
+                        DevExpress.ui.notify("Debes asignar un agente.", "error", 2000);
+                        return;
                     }
-                    currentClienteData = null; // Limpiar los datos después de que el popup se esconde
+
+                    // Actualizar estado local
+                    currentClienteData.gestion_estado = clasificacion;
+
+                    // ====== FETCH hacia guardar_gestion.php ======
+                    fetch("guardar_gestion.php", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            id_cliente: currentClienteData.id,
+                            clasificacion: clasificacion,
+                            agente: agente,
+                            notas: notas,
+                            email: currentClienteData.email,
+                            telefono: currentClienteData.telefono,
+                            fuente: currentClienteData.fuente,
+                            nombre_cliente: currentClienteData.nombre_cliente,
+                        })
+                    })
+                    .then(r => r.json())
+                    .then(res => {
+                        DevExpress.ui.notify(res.mensaje || "Gestión guardada.", "success", 2000);
+
+                        // Refrescar el grid automáticamente
+                        gridInstance.option({
+                            dataSource: res.datos
+                        });
+                        gridInstance.refresh();
+
+                        $("#popupContainer").dxPopup("instance").hide();
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        DevExpress.ui.notify("Error al guardar.", "error", 2000);
+                    });
+                }
+            }
+        },{
+            toolbar: 'bottom',
+            location: 'after',
+            widget: 'dxButton',
+            options: { text: 'Cancelar', onClick: () => $("#popupContainer").dxPopup("instance").hide() }
+        }],
+        contentTemplate: function(contentElement) {
+            const content = $('<div class="p-3">');
+            content.append('<p><b>Cliente:</b> <span id="popupClientName"></span> (ID: <span id="popupClientId"></span>)</p>');
+            content.append('<div id="popupNotasPreviasContainer" class="mb-3"></div>');
+
+            content.append('<div class="mb-3"><label>Clasificar Prospecto:</label><div id="clasificacionGroup"></div></div>');
+            content.append('<div class="mb-3"><label>Agente Comercial:</label><select id="selectAgenteComercial" class="form-select"></select></div>');
+            content.append('<div class="mb-3"><label>Notas:</label><textarea id="notasProspecto" rows="4" class="form-control"></textarea></div>');
+
+            content.find('#clasificacionGroup').dxRadioGroup({
+                items: [
+                    { text: 'Válido para Siguiente Fase', value: 'VALIDO' },
+                    { text: 'No Válido (Descartar)', value: 'NO_VALIDO' },
+                    { text: 'En Espera', value: 'ESPERA' }
+                ],
+                valueExpr: 'value',
+                displayExpr: 'text',
+                layout: 'horizontal',
+                onValueChanged: e => {
+                    $('#selectAgenteComercial').prop('disabled', e.value !== 'VALIDO');
                 }
             });
-        });
-    </script>
+
+            const $sel = content.find('#selectAgenteComercial');
+            $sel.append(`<option value="">Selecciona un agente</option>`);
+            agentesComerciales.forEach(a => $sel.append(`<option value="${a.id}">${a.nombre}</option>`));
+            $sel.prop('disabled', true);
+
+            return content;
+        },
+        onShowing: function() {
+            $('#popupClientId').text(currentClienteData.id);
+            $('#popupClientName').text(currentClienteData.nombre_cliente);
+
+            // Mostrar notas como lista
+            let notasHtml = "<li>No hay notas.</li>";
+            if (currentClienteData.notas_previas) {
+                // asumimos que las notas están separadas por saltos de línea o guardadas con un delimitador
+                const notasArray = currentClienteData.notas_previas.split("\n").filter(n => n.trim());
+
+                notasHtml = notasArray
+                    .map(n => {
+                        // ejemplo esperado: "2025-09-02 14:20:35|Llamada realizada"
+                        const partes = n.split("|");
+                        if (partes.length === 2) {
+                            const fecha = partes[0].trim();
+                            const texto = partes[1].trim();
+                            return `<li>[${fecha}] ${texto}.</li>`;
+                        } else {
+                            return `<li>${n}</li>`;
+                        }
+                    })
+                    .join("");
+            }
+
+            $('#popupNotasPreviasContainer').html(`
+                <p><b>Notas previas:</b></p>
+                <ul style="padding-left:18px; margin:0">${notasHtml}</ul>
+            `);
+
+
+            $('#selectAgenteComercial').val('').prop('disabled', true);
+            $('#notasProspecto').val('');
+            $('#clasificacionGroup').dxRadioGroup('instance').option('value', null);
+        },
+        onHidden: function() {
+            gridInstance.refresh();
+            currentClienteData = null;
+        }
+    });
+
+    // ================== POPUP IMPORTAR ==================
+    $("#popupImportar").dxPopup({
+        width: 600,
+        height: "auto",
+        title: "Importar nueva base de datos",
+        visible: false,
+        dragEnabled: false,
+        closeOnOutsideClick: true,
+        contentTemplate: function(contentElement) {
+            const content = $('<form id="formImportar" class="p-3" enctype="multipart/form-data">');
+            
+            content.append('<div class="mb-3"><label>Seleccionar archivo Excel:</label><input type="file" name="archivo" class="form-control" required></div>');
+            content.append('<div class="mb-3"><a href="plantilla_prospectos.xlsx" target="_blank" class="btn btn-link">📄 Descargar plantilla de muestra</a></div>');
+            content.append('<div class="mb-3"><label>Fuente de los datos:</label><input type="text" name="fuente" class="form-control" required></div>');
+
+            // Agentes
+            const $sel = $('<select name="asesor" class="form-select" required></select>');
+            $sel.append(`<option value="">Seleccione asesor</option>`);
+            agentesComerciales.forEach(a => $sel.append(`<option value="${a.id}">${a.nombre}</option>`));
+            content.append('<div class="mb-3"><label>Asesor encargado:</label></div>').append($sel);
+
+            content.append('<button type="submit" class="btn btn-primary mt-3">Importar datos</button>');
+            
+            // Submit
+            content.on("submit", function(e){
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                fetch("procesar_importacion.php", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(res => {
+                    DevExpress.ui.notify(res.mensaje || "Importación completada.", "success", 2000);
+
+                    // Refrescar el grid automáticamente
+                    gridInstance.option({
+                        dataSource: res.datos
+                    });
+                    gridInstance.refresh();
+
+                    $("#popupImportar").dxPopup("instance").hide();
+                })
+                .catch(err => {
+                    console.error(err);
+                    DevExpress.ui.notify("Error en importación.", "error", 2000);
+                });
+            });
+
+            return content;
+        }
+    });
+
+});
+</script>
+
+<style>
+.managed-invalid { background-color: #ffebee !important; }
+.managed-waiting { background-color: #a5acf8ff !important; }
+.managed-valid { background-color: #e8f5e9 !important; }
+</style>
 
 </body>
 </html>
