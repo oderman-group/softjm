@@ -14,6 +14,7 @@ try {
     $fuente  = $conexionBdPrincipal->real_escape_string($_POST['fuente']);
     $asesor  = intval($_POST['asesor']);
     $usuario = intval($_SESSION["id"]); // Usuario que importa
+    $ciudad  = $_POST['ciudad'];
 
     // Guardar archivo subido en carpeta "files/excel/"
     $nombreArchivo = time() . "_" . basename($_FILES['archivo']['name']);
@@ -23,9 +24,9 @@ try {
     // Insertar en tabla principal (prospectos_importacion)
     $conexionBdPrincipal->query("
         INSERT INTO prospectos_importacion
-        (pi_nombre_archivo, pi_fuente, pi_asesor_encargado, pi_id_empresa, pi_created_by)
+        (pi_nombre_archivo, pi_fuente, pi_asesor_encargado, pi_id_empresa, pi_created_by, pi_ciudad_evento)
         VALUES
-        ('$nombreArchivo', '$fuente', $asesor, ".$idEmpresa.", $usuario)
+        ('$nombreArchivo', '$fuente', $asesor, ".$idEmpresa.", $usuario, '$ciudad')
     ");
     $idArchivo = $conexionBdPrincipal->insert_id;
 
