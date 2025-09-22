@@ -34,7 +34,6 @@ cseg_observacion='" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["obs
 cseg_fecha_proximo_contacto='" . $_POST["fechaPC"] . "', 
 cseg_asunto='" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "', 
 cseg_usuario_encargado='" . $_POST["encargado"] . "', 
-cseg_cotizacion='" . $_POST["cotizacion"] . "', 
 cseg_fecha_contacto='" . $_POST["fechaContacto"] . "', 
 cseg_tipo='" . $_POST["tipoS"] . "', 
 cseg_contacto='" . $_POST["contacto"] . "', 
