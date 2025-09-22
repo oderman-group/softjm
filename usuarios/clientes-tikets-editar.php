@@ -78,11 +78,14 @@ include("includes/js-formularios.php");
 			<div class="row-fluid">
 				<div class="span9">
 					
+					
 					<p>
-						
-						
+						<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+						<!--
 						<a href="bd_delete/clientes-tikets-eliminar.php?cte=<?=$_GET["cte"];?>&id=<?=$_GET["id"];?>" class="btn btn-danger" onClick="if(!confirm('Desea eliminar este ticket?')){return false;}"><i class="icon icon-trash"></i> Eliminar Ticket</a>
+						-->
 					</p>
+					
 					
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
@@ -129,7 +132,7 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Fecha de inicio</label>
 									<div class="controls">
-										<input type="date" class="span6" name="fechaInicio" value="<?=$resultadoD['tik_fecha_creacion'];?>">
+										<input type="date" disabled class="span2" name="fechaInicio" value="<?=$resultadoD['tik_fecha_creacion'];?>">
 									</div>
 								</div>
                                
@@ -170,12 +173,19 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Etapa</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="etapa" onChange="razones(this)">
-											<option value="1"></option>
+										<select data-placeholder="Escoja una opción..." class="span6" tabindex="2" name="etapa" onChange="razones(this)">
+											<option value="1">--Escoja una etapa--</option>
                                             <?php
-											for($i=1; $i<=6; $i++){
-												if($resultadoD['tik_etapa']==$i)echo '<option value="'.$i.'" selected>'.$opcionesEtapa[$i].'</option>';
-												else echo '<option value="'.$i.'">'.$opcionesEtapa[$i].'</option>';	
+											for ($i=1; $i<=6; $i++) {
+												$disabled = '';
+												if($i == 1 || $i == 5) {
+													$disabled = 'disabled';
+												}
+
+												if($resultadoD['tik_etapa'] == $i)
+													echo '<option value="'.$i.'" selected>'.$opcionesEtapa[$i].'</option>';
+												else 
+													echo '<option value="'.$i.'" '.$disabled.'>'.$opcionesEtapa[$i].'</option>';	
 											}
 											?>
                                     	</select>
@@ -186,24 +196,24 @@ include("includes/js-formularios.php");
 											function razones(datos){
 												var opcionEscogida = datos.value;
 												if(opcionEscogida == 5){
-													document.getElementById("razonGanado").style.visibility="visible";
+													document.getElementById("razonGanado").style.display="block";
 												}else{
-													document.getElementById("razonGanado").style.visibility="hidden";
+													document.getElementById("razonGanado").style.display="none";
 												}
 												
 												if(opcionEscogida == 6){
-													document.getElementById("razonPerdido").style.visibility="visible";
+													document.getElementById("razonPerdido").style.display="block";
 												}else{
-													document.getElementById("razonPerdido").style.visibility="hidden";
+													document.getElementById("razonPerdido").style.display="none";
 												}
 											}
 										</script>	
 									
-								<div class="control-group" id="razonGanado" style="visibility: hidden;">
+								<div class="control-group" id="razonGanado" style="display: none;">
 									<label class="control-label">¿Por qué se ganó el negocio?</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="razonGanado">
-											<option value="0"></option>
+										<select data-placeholder="Escoja una opción..." class="span6" tabindex="2" name="razonGanado">
+											<option value="0">--Escoja una opción--</option>
                                             <?php
 											for($i=1; $i<=3; $i++){
 												if($resultadoD['tik_razon_ganado']==$i)echo '<option value="'.$i.'" selected>'.$negociosGanados[$i].'</option>';
@@ -214,11 +224,11 @@ include("includes/js-formularios.php");
                                     </div>
                                </div>
 									
-								<div class="control-group" id="razonPerdido" style="visibility: hidden;">
+								<div class="control-group" id="razonPerdido" style="display: none;">
 									<label class="control-label">¿Por qué se perdió el negocio?</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="razonPerdido">
-											<option value="0"></option>
+										<select data-placeholder="Escoja una opción..." class="span6" tabindex="2" name="razonPerdido">
+											<option value="0">--Escoja una opción--</option>
                                             <?php
 											for($i=1; $i<=4; $i++){
 												if($resultadoD['tik_razon_perdido']==$i)echo '<option value="'.$i.'" selected>'.$negociosPerdidos[$i].'</option>';
@@ -233,7 +243,7 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Tipo negocio</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="tipoNegocio">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="tipoNegocio" disabled>
 											<option value="1"></option>
                                             <?php
 											for($i=1; $i<=3; $i++){
@@ -266,7 +276,7 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Estado ticket</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="estado">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="estado" disabled>
 											<option value="0"></option>
 																<option value="<?= TIK_ESTADO_ABIERTO ?>" <?php if($resultadoD['tik_estado'] == TIK_ESTADO_ABIERTO){echo "selected";} ?>>Abierto</option>
 																<option value="<?= TIK_ESTADO_CERRADO ?>" <?php if($resultadoD['tik_estado'] == TIK_ESTADO_CERRADO){echo "selected";} ?>>Cerrado</option>
@@ -277,7 +287,7 @@ include("includes/js-formularios.php");
                                <div class="control-group">
 									<label class="control-label">Tipo de ticket</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoS">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoS" disabled>
 											<option value="1"></option>
                                             <option value="1" <?php if($resultadoD['tik_tipo_tiket']==1){echo "selected";}?>>Comercial</option>
                                             <option value="3" <?php if($resultadoD['tik_tipo_tiket']==3){echo "selected";}?>>Soporte operativo</option>
@@ -338,19 +348,47 @@ include("includes/js-formularios.php");
 								</div>
 								
                                
+								<?php if($resultadoD['tik_estado'] == TIK_ESTADO_ABIERTO) {?>
 								<div class="form-actions">
 									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                                    <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+									
+                                    	<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+									
 								</div>
+								<?php } else {?>
+									<div class="alert alert-info">
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+										<i class="icon-exclamation-sign"></i><strong>Ticket cerrado!</strong> No es posible hacer cambios en un ticket cerrado.
+									</div>
+								<?php }?>
 							</form>
 						</div>
 					</div>
 				</div>
+
+				<?php if (!empty($resultadoD['tik_id_cotizacion'])) {?>
+				<div class="span3">
+					<div class="board-widgets green">
+						<div class="board-widgets-head clearfix">
+							<h4 class="pull-left"><i class="icon-inbox"></i> Cotización Asociada </h4>
+							
+						</div>
+						<div class="board-widgets-content">
+							<span class="n-counter">#<?=$resultadoD['tik_id_cotizacion'];?></span><span class="n-sources">Número de cotización</span>
+						</div>
+						<div class="board-widgets-botttom">
+							<a href="cotizaciones-editar.php?id=<?=$resultadoD['tik_id_cotizacion'];?>">Ir a la cotización <i class="icon-double-angle-right"></i></a>
+						</div>
+					</div>
+				</div>
+				<?php }?>
 				
 				<div class="span3">
-					<p>
-						<a href="clientes-seguimiento-agregar.php?idTK=<?=$_GET["id"];?>" class="btn btn-info"><i class="icon icon-plus"></i> Agregar seguimiento</a>
-					</p>
+					<?php if($resultadoD['tik_estado'] == TIK_ESTADO_ABIERTO) {?>
+						<p>
+							<a href="clientes-seguimiento-agregar.php?idTK=<?=$_GET["id"];?>" class="btn btn-info"><i class="icon icon-plus"></i> Agregar seguimiento</a>
+						</p>
+					<?php }?>
 					
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
@@ -362,7 +400,7 @@ include("includes/js-formularios.php");
 							INNER JOIN clientes ON cli_id=cseg_cliente
 							INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
 							WHERE cseg_tiket='".$_GET["id"]."'
-							ORDER BY cseg_id DESC
+							ORDER BY cseg_id ASC
 							");
 							while($seg = mysqli_fetch_array($seguimientos, MYSQLI_BOTH)){
 							?>
