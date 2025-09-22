@@ -6,12 +6,16 @@ $paginaActual['pag_nombre'] = "Editar Seguimiento de clientes";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
+require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
+
 $consultaTiket=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["idTK"]."'");
 $tiket = mysqli_fetch_array($consultaTiket, MYSQLI_BOTH);
 $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM cliente_seguimiento WHERE cseg_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 $consultaCliente=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$resultadoD["cseg_cliente"]."' AND cli_id_empresa='".$idEmpresa."'");
 $cliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
+
+$estadoTicket = Ticket::getEstado($_GET["idTK"], $conexionBdPrincipal);
 ?>
 <!-- styles -->
 <link href="css/chosen.css" rel="stylesheet">
@@ -124,7 +128,7 @@ include("includes/js-formularios.php");
 												
 												if($infoTicket['tik_etapa']==$i) {echo '<span style="color:green; font-weight:bold; font-size:13px;">'.$opcionesEtapa[$i].'</span><br>';}
 												
-												else {echo '<a href="bd_update/cliente-tikets-actualizar.php?get=41&idtk='.$infoTicket['tik_id'].'&etapa='.$i.'">'.$opcionesEtapa[$i].'</a><br>';}
+												else {echo $opcionesEtapa[$i].'<br>';}
 											}
 											?>
                                     </div>
@@ -162,6 +166,15 @@ include("includes/js-formularios.php");
 									<?=$infoTicket['usr_nombre'];?>
 								</div>
 							</div>
+
+							<?php if (!empty($tiket['tik_id_cotizacion'])) {?>
+								<div class="control-group">
+									<label class="control-label" style="font-weight: bold;">Cotización asociada</label>
+									<div class="controls">
+										<a href='cotizaciones-editar.php?id=<?=$tiket['tik_id_cotizacion'];?>'><?=$tiket['tik_id_cotizacion'];?></a>
+									</div>
+								</div>
+							<?php }?>
 							
 							<div align="center" style="padding: 5px;">
 								<?php if (Modulos::validarRol([90], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
@@ -174,7 +187,7 @@ include("includes/js-formularios.php");
 				</div>
 				
 				<div class="span9">
-				<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+				<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $estadoTicket == 1) {?>
 					<p><a href="clientes-seguimiento-agregar.php?idTK=<?=$_GET["idTK"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a></p>
 				<?php } ?>
 
@@ -292,10 +305,10 @@ include("includes/js-formularios.php");
 									</div>
 								</div>
 								
-                                <div class="control-group">
+								<div class="control-group">
 									<label class="control-label"># Cotización</label>
 									<div class="controls">
-										<input type="text" class="span4" name="cotizacion" value="<?=$resultadoD[8];?>" style="font-weight:bold;">
+										<input type="text" class="span4" name="cotizacion" value="<?=$resultadoD[8];?>" style="font-weight:bold;" disabled>
 									</div>
 								</div>
 								<?php }?>
@@ -384,10 +397,17 @@ include("includes/js-formularios.php");
 								if($resultadoD['cseg_varios']>=1 and $resultadoD['cseg_usuario_encargado']==0){
 									echo "<span style='color:blue; font-size:14px;'>Los encargados aún no han revisado este pendiente. Por ahora no es posible hacer cambios.</span>";
 								}else{?>
-								<div class="form-actions">
-									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-									<button type="button" class="btn btn-danger">Cancelar</button>
-								</div>
+									<?php if ($estadoTicket == 1) {?>
+										<div class="form-actions">
+											<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+											<button type="button" class="btn btn-danger">Cancelar</button>
+										</div>
+									<?php } else {?>
+										<div class="alert alert-info">
+											<button type="button" class="close" data-dismiss="alert">&times;</button>
+											<i class="icon-exclamation-sign"></i><strong>Ticket cerrado!</strong> No es posible hacer cambios en un ticket cerrado.
+										</div>
+									<?php }?>
 								<?php }?>
 								
 							</form>
