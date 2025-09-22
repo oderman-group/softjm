@@ -141,9 +141,9 @@ if(!empty($_GET["idTK"])){
 					$filtro .= " AND (cseg_id LIKE '%" . $_GET["busqueda"] . "%' OR cseg_observacion LIKE '%" . $_GET["busqueda"] . "%' OR cseg_asunto LIKE '%" . $_GET["busqueda"] . "%' OR cli_nombre LIKE '%" . $_GET["busqueda"] . "%')";
 				}
 
-				$orden = 'ORDER BY cseg_id DESC';
+				$orden = 'ORDER BY cseg_id ASC';
 				if (isset($_GET["seg"]) and $_GET["seg"] != "" and is_numeric($_GET["seg"])) {
-					$orden = 'ORDER BY cseg_id=' . $_GET["seg"] . ' DESC';
+					$orden = 'ORDER BY cseg_id=' . $_GET["seg"] . ' ASC';
 				}
 
 				if ($_GET["estado"] == 1) {
