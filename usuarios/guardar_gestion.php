@@ -31,7 +31,7 @@ try {
 
     if ($clasificacion == 'VALIDO') {
         //Crear al cliente
-        mysqli_query($conexionBdPrincipal,"INSERT INTO clientes(cli_nombre, cli_categoria, cli_email, cli_telefono, cli_fecha_registro, cli_nivel, cli_responsable, cli_id_empresa, cli_ciudad)VALUES('" . $data["nombre_cliente"] . "', ".CLI_CATEGORIA_PROSPECTO.",'" . $data["email"] . "','" . $data["telefono"] . "', now(), 1, '" . $_SESSION["id"] . "', '" . $idEmpresa . "', ".CIUDAD_DESCONOCIDA.")");
+        mysqli_query($conexionBdPrincipal,"INSERT INTO clientes(cli_nombre, cli_categoria, cli_email, cli_telefono, cli_fecha_registro, cli_nivel, cli_responsable, cli_id_empresa, cli_ciudad, cli_referencia, cli_forma_creacion)VALUES('" . $data["nombre_cliente"] . "', ".CLI_CATEGORIA_PROSPECTO.",'" . $data["email"] . "','" . $data["telefono"] . "', now(), 3, '" . $_SESSION["id"] . "', '" . $idEmpresa . "', ".CIUDAD_DESCONOCIDA.", '" . $data["fuente_id"] . "', 'EJECUTIVO_PROSPECCION')");
         $idCliente = mysqli_insert_id($conexionBdPrincipal);
 
         //Crear automáticamente la sucursal
@@ -121,7 +121,8 @@ try {
             'email'          => $prospectos['pid_email'],
             'gestion_estado' => $prospectos['pid_estado'],
             'notas_previas'  => $prospectos['pid_notas'],
-            'fuente'         => $prospectos['pi_fuente']
+            'fuente'         => $referenciaLlegada[$prospectos['pi_fuente']],
+            'ciudad'         => $prospectos['pi_ciudad_evento'],
         ];
     }
 
