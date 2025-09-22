@@ -4,6 +4,7 @@ $idPagina = 377;
 
 require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Factura.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Cliente.php';
 
 //Verificamos que la remisión actual no haya generado ya otra factura
 $generoFactura = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM facturas WHERE factura_remision='" . $_GET["id"] . "'"));
@@ -23,8 +24,23 @@ WHERE remi_id='" . $_GET["id"] . "'");
 
 $idInsert = mysqli_insert_id($conexionBdPrincipal);
 
+$datosRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg WHERE remi_id='" . $_GET["id"] . "'"));
+
+Cliente::convertirACliente($datosRemision['remi_cliente'], $idEmpresa);
+
+
 $productos = mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
 WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo='".CZPP_TIPO_REM."'");
+
+$trazabilidadFactura = Factura::trazabilidadFactura($idInsert, $conexionBdPrincipal);
+
+if (!empty($trazabilidadFactura)) {
+    mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET 
+    tik_estado='".TIK_ESTADO_CERRADO."', 
+    tik_fecha_cierre=NOW(), 
+    tik_etapa=5
+    WHERE tik_id='" . $trazabilidadFactura['tik_id'] . "'");
+}
 
 while ($prod = mysqli_fetch_array($productos)) {
     if ($prod['czpp_orden'] == "") $prod['czpp_orden'] = 1;
