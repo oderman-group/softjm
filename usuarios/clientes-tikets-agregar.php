@@ -184,68 +184,6 @@ include("includes/js-formularios.php");
 										<span style="color:#009;">Digite sólo el valor numérico. Sin puntos, ni comas, ni simbolos.</span>
 									</div>
 								</div>
-									
-								<div class="control-group">
-									<label class="control-label">Etapa</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="etapa" onChange="razones(this)">
-											<option value="1"></option>
-                                            <?php
-											for($i=1; $i<=6; $i++){
-												if($resultadoD['tik_etapa']==$i)echo '<option value="'.$i.'" selected>'.$opcionesEtapa[$i].'</option>';
-												else echo '<option value="'.$i.'">'.$opcionesEtapa[$i].'</option>';	
-											}
-											?>
-                                    	</select>
-                                    </div>
-                               </div>
-									
-								<script type="application/javascript">
-											function razones(datos){
-												var opcionEscogida = datos.value;
-												if(opcionEscogida == 5){
-													document.getElementById("razonGanado").style.visibility="visible";
-												}else{
-													document.getElementById("razonGanado").style.visibility="hidden";
-												}
-												
-												if(opcionEscogida == 6){
-													document.getElementById("razonPerdido").style.visibility="visible";
-												}else{
-													document.getElementById("razonPerdido").style.visibility="hidden";
-												}
-											}
-										</script>	
-									
-								<div class="control-group" id="razonGanado" style="visibility: hidden;">
-									<label class="control-label">¿Por qué se ganó el negocio?</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="razonGanado">
-											<option value="0"></option>
-                                            <?php
-											for($i=1; $i<=3; $i++){
-												if($resultadoD['tik_razon_ganado']==$i)echo '<option value="'.$i.'" selected>'.$negociosGanados[$i].'</option>';
-												else echo '<option value="'.$i.'">'.$negociosGanados[$i].'</option>';	
-											}
-											?>
-                                    	</select>
-                                    </div>
-                               </div>
-									
-								<div class="control-group" id="razonPerdido" style="visibility: hidden;">
-									<label class="control-label">¿Por qué se perdió el negocio?</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="razonPerdido">
-											<option value="0"></option>
-                                            <?php
-											for($i=1; $i<=3; $i++){
-												if($resultadoD['tik_razon_ganado']==$i)echo '<option value="'.$i.'" selected>'.$negociosGanados[$i].'</option>';
-												else echo '<option value="'.$i.'">'.$negociosGanados[$i].'</option>';	
-											}
-											?>
-                                    	</select>
-                                    </div>
-                               </div>	
 								
 								<div class="control-group">
 									<label class="control-label">Tipo negocio</label>
@@ -286,8 +224,8 @@ include("includes/js-formularios.php");
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoS">
 											<option value="1"></option>
-                                            <option value="1" <?php if($tipoTicket==1){echo "selected";}?>>Comercial</option>
-                                            <option value="3" <?php if($tipoTicket==3){echo "selected";}?>>Soporte operativo</option>
+                                            <option value="1" selected>Comercial</option>
+                                            <option value="3">Soporte operativo</option>
                                     	</select>
                                     </div>
                                </div>
