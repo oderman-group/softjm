@@ -8,7 +8,7 @@ class Ticket extends BaseDatos {
     public static $primaryKey = 'tik_id';
     public static $tableAs    = 'tik';
 
-    public $campoEstado = 'tik_estado';
+    public static $campoEstado = 'tik_estado';
 
     const ESTADO_ABIERTO = 1;
     const ESTADO_CERRADO = 2;
@@ -25,7 +25,19 @@ class Ticket extends BaseDatos {
                     WHERE ".self::$primaryKey." = " . $idTicket)
                 );
 
-        return $campo[0];
+        return $campo['tik_estado'];
+    }
+
+    /**
+     * 
+     */
+    public static function obtenerDatosTikcetPorIdCotizacion(int $idCotizacion, $conexionBdPrincipal) {
+        $datos = mysqli_fetch_assoc(
+                    mysqli_query($conexionBdPrincipal,"SELECT * FROM ".self::$schema.".".self::$tableName." 
+                    WHERE tik_id_cotizacion = " . $idCotizacion)
+                );
+
+        return $datos;
     }
 
 }
