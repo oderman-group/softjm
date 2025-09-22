@@ -34,14 +34,9 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
     $clienteInsitucional = $_POST["clienteInstitucional"] == 1 ? 1 : 0;
 
-    if ($_POST["categoriaActual"] == CLI_CATEGORIA_PROSPECTO && $_POST["categoria"] != CLI_CATEGORIA_PROSPECTO) {
-        $_POST["fechaIngreso"] = date("Y-m-d");
-    }
-
 	$conexionBdPrincipal->query("UPDATE clientes SET 
     cli_nombre='" . $_POST["nombre"] . "', 
     cli_referencia='" . $_POST["referencia"] . "', 
-    cli_categoria='" . $_POST["categoria"] . "', 
     cli_email='" . $_POST["email"] . "', 
     cli_telefono='" . $_POST["telefono"] . "', 
     cli_ciudad='" . $ciudad . "', 
@@ -49,8 +44,6 @@ include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
     cli_clave='" . $_POST["claveCliente"] . "', 
     cli_direccion='" . $_POST["direccion"] . "', 
     cli_zona='" . $zona[2] . "', 
-    cli_fecha_ingreso='" . $_POST["fechaIngreso"] . "', 
-    cli_nivel='" . $_POST["nivel"] . "', 
     cli_celular='" . $_POST["celular"] . "', 
     cli_telefonos='" . $_POST["telefonos"] . "', 
     cli_sigla='" . $_POST["sigla"] . "', 
