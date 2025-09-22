@@ -291,49 +291,7 @@ include("includes/js-formularios.php");
                                
                                <fieldset class="default">
                                 	<legend>Datos comerciales</legend>
-                               <div class="control-group">
-									<label class="control-label">Estado</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="categoria">
-											<option value=""></option>
-                                            <option value="1" selected>Prospecto</option>
-                                            <option value="2">Cliente</option>
-											<option value="3">Dealer</option>
-                                    	</select>
-                                    </div>
-                               </div>
-                               
-                               <div class="control-group">
-									<label class="control-label">Nivel</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="nivel">
-											<option value=""></option>
-                                            <option value="1">Leads (Seguidor o Suscripor)</option>
-                                            <option value="2">Interesado (Cotiza o llama)</option>
-                                            <option value="3" selected>Prospecto (En proceso)</option>
-                                            <option value="4">Cliente A (Compró 1 vez)</option>
-                                            <option value="5">Cliente B (Compró 2 veces)</option>
-                                            <option value="6">Cliente C (Compró 3 o más veces)</option>
-                                    	</select>
-                                    </div>
-                               </div>
-                               
-                               <div class="control-group">
-									<label class="control-label">Fecha que se volvió cliente (En caso de que sea cliente)</label>
-									<div class="controls">
-										<input type="date" class="span4" name="fechaIngreso">
-									</div>
-								</div>
-                               
-								   <!--
-                               <div class="control-group">
-									<label class="control-label">Referencia de llegada</label>
-									<div class="controls">
-										<input type="text" class="span4" name="referencia">
-									</div>
-								</div>
-								-->
-								   
+
 								 <div class="control-group">
 														<label class="control-label">Referencia de llegada</label>
 														<div class="controls">
@@ -358,9 +316,9 @@ include("includes/js-formularios.php");
 								</div>
                                 
                                 <div class="control-group">
-									<label class="control-label">Grupos</label>
+									<label class="control-label">Grupos (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" multiple tabindex="2" name="grupos[]">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" multiple tabindex="2" name="grupos[]" required>
 											<option value=""></option>
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
