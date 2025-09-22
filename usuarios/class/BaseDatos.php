@@ -41,7 +41,13 @@ class BaseDatos {
         return mysqli_affected_rows($conexionBdPrincipal);
     }
 
-    public static function actualizarRegistro(array $infoActualizar, $post)
+    /**
+     * @param $infoActualizar - Información de la tabla, clave primaria y demás datos
+     * necesarios para actualizar
+     * 
+     * @param $post - Array de campos y valores a actualizar
+     */
+    public static function actualizarRegistro(array $infoActualizar, array $post)
     {  
         global $conexionBdPrincipal;
 
