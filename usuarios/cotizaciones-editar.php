@@ -24,6 +24,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Remision.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Factura.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Combo.php';
+require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
 ?>
 
 <link href="css/chosen.css" rel="stylesheet">
@@ -264,12 +265,17 @@ include("includes/js-formularios.php");
 					$linkFactura = 'remisionbdg.php?busqueda='.$facturaAsociadaDatos[Factura::$primaryKey];
 					$breadCrumbFactura = 'Factura Nro. '.$facturaAsociadaDatos[Factura::$primaryKey];
 				}
+
+				$ticketAsociado = Ticket::obtenerDatosTikcetPorIdCotizacion($resultadoD['cotiz_id'], $conexionBdPrincipal);
 			?>
 				<p style="color: black; background-color: aquamarine; padding: 10px; font-weight: bold;">
 					Esta cotización ya generó pedido en la siguiente fecha: <?=$resultadoD['cotiz_fecha_vendida'];?>. 
 				</p>
 
 				<ul class="breadcrumb" style="background: antiquewhite;">
+					<?php if (!empty($ticketAsociado)) {?>
+						<li><a href="clientes-tikets-editar.php?id=<?=$ticketAsociado['tik_id'];?>">Ticket Nro. <?=$ticketAsociado['tik_id'];?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
+					<?php }?>
 					<li><a href="#">Cotización Nro. <?=$resultadoD['cotiz_id'];?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
 					<li><a href="pedidos.php?busqueda=<?=$pedidoAsociadoDatos[Pedido::$primaryKey];?>" target="_blank">Pedido Nro.<?=$pedidoAsociadoDatos[Pedido::$primaryKey];?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
 					<li><a href="<?=$linkRemision;?>" target="_blank"><?=$breadCrumbRemision;?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
