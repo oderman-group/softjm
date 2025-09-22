@@ -3,7 +3,7 @@ include("sesion.php");
 
 // ================== Datos Clientes ==================
 function consultarClientes() {
-    global $conexionBdPrincipal, $idEmpresa;
+    global $conexionBdPrincipal, $idEmpresa, $referenciaLlegada;
     $clientes = [];
     
     $consultaProspectos = $conexionBdPrincipal->query("SELECT *
@@ -19,7 +19,9 @@ function consultarClientes() {
             'email'          => $prospectos['pid_email'],
             'gestion_estado' => $prospectos['pid_estado'],
             'notas_previas'  => $prospectos['pid_notas'],
-            'fuente'         => $prospectos['pi_fuente']
+            'fuente'         => $referenciaLlegada[$prospectos['pi_fuente']],
+            'fuente_id'      => $prospectos['pi_fuente'],
+            'ciudad'         => $prospectos['pi_ciudad_evento'],
         ];
     }
     return $clientes;
@@ -50,6 +52,25 @@ function traerAgentes() {
 }
 
 $agentesData = traerAgentes();
+
+// ================== Datos Agentes ==================
+function traerFuentes() {
+    global $referenciaLlegada;
+    $fuentes = [];
+
+    foreach ($referenciaLlegada as $key => $ref) {
+        if($key == 0) continue;
+
+        $fuentes[] = [
+            'id'     => $key,
+            'nombre' => $ref
+        ];
+    }
+
+    return $fuentes;
+}
+
+$fuentesData = traerFuentes();
 ?>
 
 <!DOCTYPE html>
@@ -80,8 +101,9 @@ $agentesData = traerAgentes();
     <div id="popupImportar"></div>
 
 <script>
-const clientesData = <?php echo json_encode($clientesData, JSON_UNESCAPED_UNICODE); ?>;
+const clientesData       = <?php echo json_encode($clientesData, JSON_UNESCAPED_UNICODE); ?>;
 const agentesComerciales = <?php echo json_encode($agentesData, JSON_UNESCAPED_UNICODE); ?>;
+const fuentes            = <?php echo json_encode($fuentesData, JSON_UNESCAPED_UNICODE); ?>;
 
 $(function() {
     let currentClienteData = null;
@@ -138,6 +160,7 @@ $(function() {
             },
             { dataField: "email", caption: "Email" },
             { dataField: "fuente", caption: "Fuente", width: 150, alignment: "center"},
+            { dataField: "ciudad", caption: "Ciudad", width: 150, alignment: "center"},
             { dataField: "gestion_estado", caption: "Estado", alignment: "center"},
 
             {
@@ -251,7 +274,9 @@ $(function() {
                             email: currentClienteData.email,
                             telefono: currentClienteData.telefono,
                             fuente: currentClienteData.fuente,
+                            fuente_id: currentClienteData.fuente_id,
                             nombre_cliente: currentClienteData.nombre_cliente,
+                            ciudad_evento: currentClienteData.ciudad,
                         })
                     })
                     .then(r => r.json())
@@ -362,13 +387,35 @@ $(function() {
             
             content.append('<div class="mb-3"><label>Seleccionar archivo Excel:</label><input type="file" name="archivo" class="form-control" required></div>');
             content.append('<div class="mb-3"><a href="plantilla_prospectos.xlsx" target="_blank" class="btn btn-link">📄 Descargar plantilla de muestra</a></div>');
-            content.append('<div class="mb-3"><label>Fuente de los datos:</label><input type="text" name="fuente" class="form-control" required></div>');
+
+            //fuentes
+            const $self = $('<select name="fuente" class="form-select" required></select>');
+            $self.append(`<option value="">Seleccione una fuente</option>`);
+            fuentes.forEach(a => $self.append(`<option value="${a.id}">${a.nombre}</option>`));
+            content.append('<div class="mb-3"><label>Fuente:</label></div>').append($self);
+
+            // Contenedor para el campo dinámico
+            const $extraField = $('<div class="mb-3 mt-3" id="ciudad-container" style="display:none;">' +
+                '<label>Ciudad:</label>' +
+                '<input type="text" name="ciudad" class="form-control" placeholder="Digite la ciudad">' +
+            '</div>');
+            content.append($extraField);
+
+            // Evento al seleccionar
+            $self.on('change', function () {
+                if ($(this).val() === "4") {
+                    $("#ciudad-container").show();
+                } else {
+                    $("#ciudad-container").hide();
+                    $("#ciudad-container input").val(""); // limpiar si cambia
+                }
+            });
 
             // Agentes
             const $sel = $('<select name="asesor" class="form-select" required></select>');
             $sel.append(`<option value="">Seleccione asesor</option>`);
             agentesComerciales.forEach(a => $sel.append(`<option value="${a.id}">${a.nombre}</option>`));
-            content.append('<div class="mb-3"><label>Asesor encargado:</label></div>').append($sel);
+            content.append('<div class="mb-3 mt-4"><label>Asesor encargado:</label></div>').append($sel);
 
             content.append('<button type="submit" class="btn btn-primary mt-3">Importar datos</button>');
             
