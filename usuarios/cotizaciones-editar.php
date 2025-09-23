@@ -184,7 +184,7 @@ include("includes/js-formularios.php");
 				?>
 					<a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $resultadoD['cotiz_id']; ?>" class="btn btn-info" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}"><i class="icon-money"></i> Generar pedido</a>
 				<?php
-				} else {
+				} else if ($resultadoD['cotiz_vendida']!=1 && empty($ticketAsociado)) {
 				?>
 					<div class="alert alert-warning">
 						<button type="button" class="close" data-dismiss="alert">&times;</button>
