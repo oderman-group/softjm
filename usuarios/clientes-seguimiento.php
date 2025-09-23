@@ -318,9 +318,11 @@ if(!empty($_GET["idTK"])){
 														<?php if (Modulos::validarRol([14], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="clientes-seguimiento-editar.php?id=<?= $res[0]; ?>&idTK=<?= $_GET["idTK"]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
 														<?php } ?>
-														<?php if (Modulos::validarRol([56], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-														<a href="bd_delete/clientes-seguimiento-eliminar.php?id=<?=$res[0]; ?>&cte=<?=$_GET["cte"];?>&idTK=<?= $_GET["idTK"]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-														<?php } ?>
+														<?php 
+														//if (Modulos::validarRol([56], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+														?>
+														<!-- <a href="bd_delete/clientes-seguimiento-eliminar.php?id=<?=$res[0]; ?>&cte=<?=$_GET["cte"];?>&idTK=<?= $_GET["idTK"]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>-->
+														<?php //} ?>
 
 													</h4>
 												</td>

@@ -61,7 +61,12 @@ require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
 	}
 
 	if (!empty($_POST["cotizacion"])) {
-		mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET tik_id_cotizacion=".$_POST["cotizacion"]." WHERE tik_id='" . $tiketID . "'");
+		mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET 
+		tik_id_cotizacion=".$_POST["cotizacion"].",
+		tik_etapa = 3
+		WHERE tik_id='" . $tiketID . "'");
+
+		mysqli_query($conexionBdPrincipal,"UPDATE cotizacion SET cotiz_ticket=".$tiketID." WHERE cotiz_id='" . $_POST["cotizacion"] . "'");
 	}
 
 

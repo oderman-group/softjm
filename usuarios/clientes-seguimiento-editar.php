@@ -125,10 +125,9 @@ include("includes/js-formularios.php");
 										
                                             <?php
 											for($i=1; $i<=6; $i++){
-												
-												if($infoTicket['tik_etapa']==$i) {echo '<span style="color:green; font-weight:bold; font-size:13px;">'.$opcionesEtapa[$i].'</span><br>';}
-												
-												else {echo $opcionesEtapa[$i].'<br>';}
+												if($infoTicket['tik_etapa']==$i) {
+													echo '<span style="color:green; font-weight:bold; font-size:13px;">'.$opcionesEtapa[$i].'</span><br>';
+												}
 											}
 											?>
                                     </div>

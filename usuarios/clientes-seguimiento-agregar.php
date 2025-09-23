@@ -78,7 +78,7 @@ include("includes/js-formularios.php");
 				<div class="span3">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> Ticket</h3>
+							<h3> Ticket <b><?php if(!empty($tiketID)) echo "Nro. ".$tiketID;?></b></h3>
 							<?php
 							$consultaInfoTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets
 							INNER JOIN clientes ON cli_id=tik_cliente
@@ -139,9 +139,9 @@ include("includes/js-formularios.php");
                                             <?php
 											for($i=1; $i<=6; $i++){
 												
-												if($infoTicket['tik_etapa']==$i) {echo '<span style="color:green; font-weight:bold; font-size:13px;">'.$opcionesEtapa[$i].'</span><br>';}
-												
-												else {echo $opcionesEtapa[$i].'<br>';}
+												if($infoTicket['tik_etapa']==$i) {
+													echo '<span style="color:green; font-weight:bold; font-size:13px;">'.$opcionesEtapa[$i].'</span><br>';
+												}
 											}
 											?>
                                     </div>
@@ -180,14 +180,6 @@ include("includes/js-formularios.php");
 								</div>
 							</div>
 
-							<?php if (!empty($tiket['tik_id_cotizacion'])) {?>
-							<div class="control-group">
-								<label class="control-label" style="font-weight: bold;">Cotización asociada</label>
-								<div class="controls">
-									<a href='cotizaciones-editar.php?id=<?=$tiket['tik_id_cotizacion'];?>'><?=$tiket['tik_id_cotizacion'];?></a>
-								</div>
-							</div>
-							<?php }?>
 							
 							<div align="center" style="padding: 5px;">
 									<a href="clientes-tikets-editar.php?id=<?=$infoTicket['tik_id'];?>" class="btn btn-primary">Editar ticket</a>
@@ -195,7 +187,24 @@ include("includes/js-formularios.php");
 							
 						</div>
 					</div>
+
+					<?php if (!empty($tiket['tik_id_cotizacion'])) {?>
+						<div class="board-widgets green">
+							<div class="board-widgets-head clearfix">
+								<h4 class="pull-left"><i class="icon-inbox"></i> Cotización Asociada </h4>
+								
+							</div>
+							<div class="board-widgets-content">
+								<span class="n-counter">#<?=$tiket['tik_id_cotizacion'];?></span><span class="n-sources">Número de cotización</span>
+							</div>
+							<div class="board-widgets-botttom">
+								<a href="cotizaciones-editar.php?id=<?=$tiket['tik_id_cotizacion'];?>">Ir a la cotización <i class="icon-double-angle-right"></i></a>
+							</div>
+						</div>
+					<?php }?>
 				</div>
+
+				
 				
 				<div class="span9">
 					<p>Los campos marcados con (*) son obligatorios.</p>
@@ -329,21 +338,26 @@ include("includes/js-formularios.php");
 									</div>
 								</div>
 								
-								<?php if (empty($tiket['tik_id_cotizacion'])) {?>
+								<?php if (empty($tiket['tik_id_cotizacion'])) {
+									$conOp = mysqli_query($conexionBdPrincipal,"SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 
+											cli_id, cli_nombre, cli_zona,
+											usr_id, usr_nombre 
+											FROM cotizacion
+											INNER JOIN clientes ON cli_id=cotiz_cliente
+											INNER JOIN usuarios ON usr_id=cotiz_creador
+											WHERE cotiz_id=cotiz_id AND cotiz_id_empresa='".$idEmpresa."'
+											AND cotiz_cliente=".$cliente."
+											AND cotiz_ticket IS NULL
+											ORDER BY cotiz_id DESC");
+									$numCotizaciones = $conOp->num_rows;
+									if ($numCotizaciones > 0) {
+								?>
 									<div class="control-group">
 										<label class="control-label"># Cotización</label>
 										<div class="controls">
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cotizacion">
 												<option value=""></option>
 												<?php
-												$conOp = mysqli_query($conexionBdPrincipal,"SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 
-													cli_id, cli_nombre, cli_zona,
-													usr_id, usr_nombre 
-													FROM cotizacion
-													INNER JOIN clientes ON cli_id=cotiz_cliente
-													INNER JOIN usuarios ON usr_id=cotiz_creador
-													WHERE cotiz_id=cotiz_id AND cotiz_id_empresa='".$idEmpresa."'
-													ORDER BY cotiz_id DESC");
 												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 												?>
 													<option value="<?=$resOp['cotiz_id'];?>"><?=$resOp['cotiz_id']." - ".$resOp['cotiz_fecha_propuesta']." (".$resOp['cli_nombre'].")";?></option>
@@ -353,6 +367,12 @@ include("includes/js-formularios.php");
 											</select>
 										</div>
 									</div>
+								<?php } else { ?>
+									<div class="alert alert-info">
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+										<i class="icon-exclamation-sign"></i><strong>Sin cotización!</strong> No hay cotizaciones para este cliente que podamos asociar a este proceso. Pero no se preocupe, puede crear una y asociarla más tarde. <a href="cotizaciones-agregar.php?cte=<?=$tiket['tik_cliente'];?>&ticket=<?=$tiket['tik_id'];?>" target="_blank" class="btn btn-danger">Crear cotización</a>
+									</div>
+								<?php }?>
 								<?php } else {?>
 									<input type="hidden" class="span4" name="cotizacion" value="<?=$tiket['tik_id_cotizacion'];?>">
 								<?php }?>
