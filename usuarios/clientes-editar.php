@@ -881,8 +881,11 @@ include("includes/js-formularios.php");
 																			<li><a href="sql.php?get=46&id=<?=$res['cotiz_id'];?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
 																			<?php } ?>		
 																			<?php //el codigo 46 no se encontro en el archivo sql ?> 
-																			<?php if (Modulos::validarRol([381], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-																			<li><a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
+																			<?php if (
+																				Modulos::validarRol([381], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
+																				!empty($res['cotiz_ticket'])
+																				) {?>
+																					<li><a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
 																			<?php } ?>		
 																			<?php //el codigo 48 no se encontro en el archivo sql ?> 
 																		</ul>
