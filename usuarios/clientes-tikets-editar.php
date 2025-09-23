@@ -174,11 +174,10 @@ include("includes/js-formularios.php");
 									<label class="control-label">Etapa</label>
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="span6" tabindex="2" name="etapa" onChange="razones(this)">
-											<option value="1">--Escoja una etapa--</option>
                                             <?php
 											for ($i=1; $i<=6; $i++) {
 												$disabled = '';
-												if($i == 1 || $i == 5) {
+												if($i == 1 || $i == 3 || $i == 5 || $i == 6) {
 													$disabled = 'disabled';
 												}
 
