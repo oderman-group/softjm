@@ -60,6 +60,56 @@ include("includes/js-formularios.php");
 
 <?php include("includes/texto-editor.php");?>
 
+<style>
+    .timeline {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 50px 0;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: #dee2e6;
+      z-index: 1;
+      transform: translateY(-50%);
+    }
+    .timeline-step {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      flex: 1;
+    }
+    .timeline-step .circle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #6c63ff;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .timeline-step.active .circle {
+      background: #28a745; /* verde Bootstrap 4 */
+    }
+    .timeline-step .title {
+      font-weight: 600;
+    }
+    .timeline-step .date {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+  </style>
+
 </head>
 <body>
 <div class="layout">
@@ -81,6 +131,7 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
+			
             <p>
 						<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="clientes-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
@@ -96,6 +147,37 @@ include("includes/js-formularios.php");
 			
 			<div class="row-fluid">
 				<div class="span12">
+					<div class="container my-5">
+						<div class="container">
+						<h3 class="text-center mb-5">Evolución del Prospecto</h3>
+						<div class="timeline">
+
+							<div class="timeline-step active">
+							<div class="circle">1</div>
+							<div class="title">Registro</div>
+							<div class="date">2025-01-15</div>
+							</div>
+
+							<div class="timeline-step active">
+							<div class="circle">2</div>
+							<div class="title">Primera Cotización</div>
+							<div class="date">2025-02-10</div>
+							</div>
+
+							<div class="timeline-step">
+							<div class="circle">3</div>
+							<div class="title">Primera Compra</div>
+							<div class="date">2025-03-05</div>
+							</div>
+
+							<div class="timeline-step">
+							<div class="circle">4</div>
+							<div class="title">Segunda Compra</div>
+							<div class="date">2025-04-20</div>
+							</div>
+						</div>
+					</div>
+
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
@@ -294,7 +376,7 @@ include("includes/js-formularios.php");
 													<div class="control-group">
 														<label class="control-label">Estado</label>
 														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="categoria">
+															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="categoria" disabled>
 																<option value=""></option>
 																<option value="<?= CLI_CATEGORIA_PROSPECTO ?>" <?php if($resultadoD['cli_categoria'] == CLI_CATEGORIA_PROSPECTO){echo "selected";} ?>>Prospecto</option>
 																<option value="<?= CLI_CATEGORIA_CLIENTE ?>" <?php if($resultadoD['cli_categoria'] == CLI_CATEGORIA_CLIENTE){echo "selected";} ?>>Cliente</option>
@@ -306,7 +388,7 @@ include("includes/js-formularios.php");
 												   <div class="control-group">
 														<label class="control-label">Nivel</label>
 														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="nivel">
+															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="nivel" disabled>
 																<option value=""></option>
 																<option value="1" <?php if($resultadoD['cli_nivel']==1){echo "selected";}?>>Leads (Seguidor o Suscripor)</option>
 																<option value="2" <?php if($resultadoD['cli_nivel']==2){echo "selected";}?>>Interesado (Cotiza o llama)</option>
@@ -350,9 +432,9 @@ include("includes/js-formularios.php");
 													</div>
 
 												   <div class="control-group">
-														<label class="control-label">Fecha que se volvió cliente (En caso de que sea cliente)</label>
+														<label class="control-label">Fecha que se volvió cliente</label>
 														<div class="controls">
-															<input type="date" class="span4" name="fechaIngreso" value="<?=$resultadoD['cli_fecha_ingreso'];?>">
+															<?=$resultadoD['cli_fecha_ingreso'];?>
 														</div>
 													</div>
 													   
@@ -389,7 +471,7 @@ include("includes/js-formularios.php");
 													</div>
 
 													<div class="control-group">
-														<label class="control-label">Grupos</label>
+														<label class="control-label">Grupos (*)</label>
 														<div class="controls">
 															<select data-placeholder="Escoja una opción..." class="chzn-select span8" multiple tabindex="2" name="grupos[]">
 																<option value=""></option>
@@ -420,7 +502,7 @@ include("includes/js-formularios.php");
 															<i class="fa-solid fa-circle-question"></i>
 														</label>
 														<div class="controls">
-															<input type="text" class="span4" name="saldo" value="<?=$resultadoD['cli_saldo'];?>" maxlength="10">
+															<input type="text" class="span4" name="saldo" value="<?=$resultadoD['cli_saldo'];?>" maxlength="10" readonly>
 															<span style="color:#F03;">Este valor sin puntos ni espacios. (10000)</span>
 														</div>
 													</div>
