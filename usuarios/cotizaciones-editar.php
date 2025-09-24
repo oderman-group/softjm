@@ -271,7 +271,7 @@ include("includes/js-formularios.php");
 			?>
 
 			<ul class="nav nav-tabs" id="myTab1">
-				<li class="active"><a href="#cotizacion"><i class="icon-file-alt"></i> Cotización</a></li>
+				<li class="active"><a href="#cotizacion"><i class="icon-file-alt"></i> Información de la cotización</a></li>
 				<li><a href="#itemsCotizados"><i class="icon-list"></i> Items cotizados</a></li>
 				<li><a href="#enviarCotizacion"><i class="icon-envelope"></i> Enviar cotización por correo</a></li>
 			</ul>
