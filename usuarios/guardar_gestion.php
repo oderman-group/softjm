@@ -42,8 +42,8 @@ try {
         $idContacto = mysqli_insert_id($conexionBdPrincipal);
 
         //Crear ticket
-        mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_tikets(tik_asunto_principal, tik_tipo_tiket, tik_fecha_creacion, tik_usuario_responsable, tik_estado, tik_cliente, tik_prioridad, tik_canal)
-        VALUES('NUEVO PROSPECTO VÁLIDO - (".$data["nombre_cliente"].")', ".TICKET_COMERCIAL.", now(), ".$_SESSION["id"].", ".TIK_ESTADO_ABIERTO.", ".$idCliente.", ".TICKET_PRIORIDAD_URGENTE.", 7)");
+        mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_tikets(tik_asunto_principal, tik_tipo_tiket, tik_fecha_creacion, tik_usuario_responsable, tik_estado, tik_cliente, tik_prioridad, tik_canal, tik_etapa, tik_tipo_negocio)
+        VALUES('NUEVO PROSPECTO VÁLIDO - (".$data["nombre_cliente"].")', ".TICKET_COMERCIAL.", now(), ".$_SESSION["id"].", ".TIK_ESTADO_ABIERTO.", ".$idCliente.", ".TICKET_PRIORIDAD_URGENTE.", 7, 1, 1)");
         
         $tiketID = mysqli_insert_id($conexionBdPrincipal);
         
