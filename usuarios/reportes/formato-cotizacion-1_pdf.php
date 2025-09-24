@@ -142,7 +142,7 @@ $html = '
 <br>
 '.$cotizacionEnPresentacion.'
 <br>
-<table  cellpadding="5" style="width:100%; border-collapse: collapse;" >
+<table  cellpadding="5" style="width:100%; border-collapse: collapse;">
     <thead>
         <tr style="line-height:10px;background-color: #e9ecef; font-weight: bold;">
             <th style="border: 1px solid #dee2e6;" scope="col" width="20px">#</th>
@@ -301,35 +301,43 @@ $html = '
 		$totalPagarP = $total;
 
 $html .= '
+    </tbody>
+</table>';
+
+$pdf->SetFont('helvetica', '', 8);
+$pdf->writeHTML($html, true, false, true, false, '');
+
+$html = '
         <hr style="color:#dee2e6;line-height:5px;">
-        <tfoot>
+		<table nobr="true">
             <tr style="line-height:8px">
-                <th colspan="5" rowspan="5" align="left" width="395px" style="font-weight: bold;border: 1px solid #dee2e6;">
+                <th colspan="5" rowspan="6" align="left" width="395px" style="font-weight: bold;border: 1px solid #dee2e6;">
                    <strong>Observaciones:</strong>
                     <span style="font-size: 11px; font-weight: normal;">'.$resultado['cotiz_observaciones'].'</span>
                 </th>
                 <th style="font-weight: bold;border: 1px solid #dee2e6;" width="80px" align="right">Subtotal:</th>
                 <td align="right" style="border: 1px solid #dee2e6;" width="80px">$'.number_format($subTotal, 0, ',', '.').'</td>
             </tr>
-            <tr style="line-height:8px;">
+            <tr style="line-height:10px;">
                 <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">Descuento:</th>
                 <td align="right" style="border: 1px solid #dee2e6;">-$'.number_format($totalDescuento, 0, ',', '.').'</td>
             </tr>
-            <tr style="line-height:8px;">
+            <tr style="line-height:10px;">
                 <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">IVA:</th>
                 <td align="right" style="border: 1px solid #dee2e6;">$'.number_format($totalIvaP, 0, ',', '.').'</td>
             </tr>
-			 <tr style="line-height:8px;">
+			 <tr style="line-height:10px;">
                 <th style="font-weight: bold;border: 1px solid #dee2e6;" align="right">ENVÍO:</th>
                 <td align="right" style="border: 1px solid #dee2e6;">$'.number_format(floatval($totalEnvioP), 0, ',', '.').'</td>
             </tr>
-            <tr style="line-height:8px;"> 
+            <tr style="line-height:10px;"> 
                 <th style="font-weight: bold;border: 1px solid #dee2e6;background-color:#0033a0;color:white;" align="right">Total a Pagar:</th>
                 <td style="font-weight: bold;border: 1px solid #dee2e6;background-color:#0033a0;color:white;" align="right">$'.number_format($totalPagarP, 0, ',', '.').'</td>
             </tr>
-        </tfoot>
-    </tbody>
-</table>';
+			<tr style="line-height:1px;"> 
+                <th colspan="2" style="font-weight: bold;border: 0px solid #dee2e6;color:white;" align="right"></th>
+            </tr>
+		</table>';
 
 
 $pdf->SetFont('helvetica', '', 8);
@@ -338,7 +346,7 @@ $pdf->writeHTML($html, true, false, true, false, '');
 $pdf->Ln(5);
 
 $htmlFirma = '
-<table width="100%" border="0" cellspacing="0" cellpadding="5">
+<table width="100%" border="0" cellspacing="0" cellpadding="5" nobr="true">
     <tr>
         <td width="100%" align="center">
 			<img src="condicionesCoti.png" >
