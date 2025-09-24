@@ -463,17 +463,19 @@ include("includes/js-formularios.php");
 										</div>
 										
 										<?php
-										if(isset($clienteInfo['cli_credito'])){
-											if($clienteInfo['cli_credito']==1){
-												$msjCredito = "Este cliente tiene crédito con la compañía.";
-												$colorCredito = 'aquamarine';
+										if (!Cotizacion::esCotizacionVendida($resultadoD['cotiz_id'], $idEmpresa)) {
+											if(isset($clienteInfo['cli_credito'])){
+												if($clienteInfo['cli_credito']==1){
+													$msjCredito = "Este cliente tiene crédito con la compañía.";
+													$colorCredito = 'aquamarine';
+												}
+											}else{
+												$msjCredito = "Este cliente aún NO tiene crédito con la compañía.";
+												$colorCredito = 'gold';
 											}
-										}else{
-											$msjCredito = "Este cliente aún NO tiene crédito con la compañía.";
-											$colorCredito = 'gold';
-										}
-										?>	
-										<p style="color: black; background-color: <?=$colorCredito;?>; padding: 10px; font-weight: bold;"><?=$msjCredito;?></p>
+											?>
+											<p style="color: black; background-color: <?=$colorCredito;?>; padding: 10px; font-weight: bold;"><?=$msjCredito;?></p>
+										<?php }?>
 										
 										<div class="control-group">
 											<label class="control-label">Forma de pago</label>
@@ -564,8 +566,9 @@ include("includes/js-formularios.php");
 											</div>
 									</div>
 
-
-									<p style="color: black; background-color: mediumaquamarine; padding: 10px; font-weight: bold;">Escoja SÍ, si desea solicitar a la Administración, que a esta cotización se le hagan algunos descuentos especiales en los items cotizados.</p>
+									<?php if (!Cotizacion::esCotizacionVendida($resultadoD['cotiz_id'], $idEmpresa)) {?>
+										<p style="color: black; background-color: mediumaquamarine; padding: 10px; font-weight: bold;">Escoja SÍ, si desea solicitar a la Administración, que a esta cotización se le hagan algunos descuentos especiales en los items cotizados.</p>
+									<?php }?>
 
 									<div class="control-group">
 											<label class="control-label">Requiere un descuento especial?</label>
@@ -609,7 +612,7 @@ include("includes/js-formularios.php");
 											<div class="control-group">
 												<label class="control-label">Asociar a un ticket</label>
 												<div class="controls">
-													<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="ticket">
+													<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="ticket" <?=$camposCotizacionDisabled;?>>
 														<option value="TICKET_AUTO">Deseo que el ticket se cree automáticamente</option>
 														<option value="NO_TICKET" selected>NO deseo asociar ningun ticket a esta cotización por el momento</option>
 														<?php
