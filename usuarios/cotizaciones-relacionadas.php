@@ -20,7 +20,7 @@
                 <tbody>
                 <?php
                 $consulta = $conexionBdPrincipal->query("SELECT * FROM cotizacion
-                INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='".$_GET["cte"]."'
+                INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='".$cliente."'
                 INNER JOIN usuarios ON usr_id=cotiz_creador
                 WHERE cotiz_id_empresa='".$idEmpresa."'
                 ");
