@@ -313,6 +313,13 @@ include("includes/js-formularios.php");
 								</div>
 								
 								<div class="control-group">
+									<label class="control-label">¿Hubo visita?</label>
+									<div class="controls">
+                                        <input type="checkbox" value="1" name="visita" <?php if($resultadoD['cseg_visita']==1) echo "checked";?>>
+									</div>
+								</div>
+								
+								<div class="control-group">
 									<label class="control-label"># Cotización</label>
 									<div class="controls">
 										<input type="text" class="span4" name="cotizacion" value="<?=$resultadoD[8];?>" style="font-weight:bold;" disabled>
