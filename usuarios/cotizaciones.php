@@ -150,7 +150,7 @@ include("includes/head.php");
 											<th>TIPO</th>
 											<th>Fecha Propuesta</th>
 											<th>Cliente</th>
-											<th>Items inluídos</th>
+											<th>Items incluídos</th>
 											<th>Responsable</th>
 											<th>Vendedor</th>
 											<th></th>
@@ -221,7 +221,7 @@ include("includes/head.php");
 										?>
 											<tr>
 											<td><?= $no; ?></td>
-												<td style="background-color: <?= $fondoCotiz; ?>;" title="<?=$infoPedido;?>"><?= $res['cotiz_id']; ?></td>
+												<td style="background-color: <?= $fondoCotiz; ?>;" title="<?=$infoPedido;?>"><a href="cotizaciones-editar.php?id=<?=$res['cotiz_id'];?>"><?= $res['cotiz_id']; ?></a></td>
 												<td><?= $tipoCotizacion; ?></td>
 												<td><?= $res['cotiz_fecha_propuesta']; ?></td>
 												<td><a href="clientes-editar.php?id=<?=$res['cli_id'];?>"><?= strtoupper($res['cli_nombre']); ?></td>
@@ -278,7 +278,7 @@ include("includes/head.php");
 																<li><a href="cotizaciones-editar.php?id=<?= $res['cotiz_id']; ?>#productos"> Editar</a></li>
 																<?php } ?>
 																
-																<?php if (Modulos::validarRol([80], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																<?php if (Modulos::validarRol([80], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) {?>
 																<li><a href="bd_delete/cotizaciones-eliminar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 																<?php } ?>
 																<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
