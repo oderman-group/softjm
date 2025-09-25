@@ -859,7 +859,7 @@ include("includes/js-formularios.php");
 																			<?php if (Modulos::validarRol([14], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<a href="clientes-seguimiento-editar.php?id=<?=$res[0];?>&cte=<?=$_GET["id"];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
 																			<?php } ?>
-																			<?php if (Modulos::validarRol([382], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																			<?php if (Modulos::validarRol([382], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) {?>
 																			<a href="sql.php?id=<?=$res[0];?>&get=4" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 																			<?php // codigo 4 no se encontro en el archivo sql.php ?>
 																			<?php } ?>
@@ -900,6 +900,7 @@ include("includes/js-formularios.php");
 															<thead>
 															<tr>
 																<th>ID</th>
+																<th>TIPO</th>
 																<th>Fecha Propuesta</th>
 																<th>Productos</th>
 																<th>Responsable</th>
@@ -923,9 +924,15 @@ include("includes/js-formularios.php");
 																if($res['cotiz_vendida']==1){
 																	$fondoCotiz = 'aquamarine';
 																}
+
+																$tipoCotizacion = 'COTIZACIÓN';
+																if ($res['cotiz_es_precotizacion'] == 1) {
+																	$tipoCotizacion = '<span style="background-color:yellow;">PRE-COTIZACIÓN</span>';
+																}
 															?>
 															<tr>
 																<td style="background-color: <?=$fondoCotiz;?>;"><?=$res['cotiz_id'];?></td>
+																<td><?= $tipoCotizacion; ?></td>
 																<td><?=$res['cotiz_fecha_propuesta'];?></td>
 																<td>
 																	<?php
@@ -940,6 +947,19 @@ include("includes/js-formularios.php");
 																		}
 																	?>
 
+																	<?php
+																	$combos = $conexionBdPrincipal->query("SELECT combo_nombre FROM cotizacion_productos
+																	INNER JOIN combos ON combo_id=czpp_combo
+																	WHERE czpp_cotizacion='" . $res['cotiz_id'] . "' AND czpp_tipo=".CZPP_TIPO_COTZ."
+																	");
+																				$i = 1;
+																				while ($comb = mysqli_fetch_array($combos, MYSQLI_BOTH)) {
+																					if($i==1){echo "<br><b>Combos:</b><br>";}
+																					echo "<b>" . $i . ".</b> " . $comb['combo_nombre'] . ", ";
+																					$i++;
+																				}
+																				?>
+
 																</td>
 																<td><?php if(isset($res['usr_nombre'])) echo strtoupper($res['usr_nombre']);?></td>
 																<td><?php if(isset($vendedor['usr_nombre'])) echo strtoupper($vendedor['usr_nombre']);?></td>
@@ -953,7 +973,8 @@ include("includes/js-formularios.php");
 																			<li><a href="cotizaciones-editar.php?id=<?=$res['cotiz_id'];?>#productos"> Editar</a></li>
 																			<?php } ?>
 
-																			<li><a href="sql.php?id=<?=$res['cotiz_id'];?>&get=22" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
+																			<!--<li><a href="sql.php?id=<?=$res['cotiz_id'];?>&get=22" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>-->
+
 																			<?php } //el codigo 22 no se encontro en el archivo sql?>
 																			<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<li><a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
@@ -965,7 +986,8 @@ include("includes/js-formularios.php");
 																			<?php //el codigo 46 no se encontro en el archivo sql ?> 
 																			<?php if (
 																				Modulos::validarRol([381], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
-																				!empty($res['cotiz_ticket'])
+																				!empty($res['cotiz_ticket']) &&
+																				$res['cotiz_es_precotizacion'] != 1
 																				) {?>
 																					<li><a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
 																			<?php } ?>		
