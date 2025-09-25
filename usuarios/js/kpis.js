@@ -39,6 +39,24 @@ document.addEventListener('DOMContentLoaded', () => {
     kpi12.addEventListener('click', btnKpiClic);
     kpi13.addEventListener('click', btnKpiClic);
 
+    $("#miPopup").dxPopup({
+        title: "Detalles del KPI",
+        visible: false,
+        showCloseButton: true,
+        width: "80%",
+        height: "80%",
+        contentTemplate: function(container) {
+            $("<div id='detalleGrid'>")
+                .appendTo(container)
+                .dxDataGrid({
+                    dataSource: [],
+                    showBorders: true,
+                    columnAutoWidth: true
+                });
+        }
+    });
+
+
 
     function btnKpiClic(e) {
         e.preventDefault();
@@ -159,16 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
-                                width: 150,
-                                caption: 'Cliente',
-                                dataField: 'cliente',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                caption: 'Factura',
-                                dataField: 'factura',
-                                area: 'row'
-                            },{
                                 caption: 'Fecha',
                                 dataField: 'fecha',
                                 dataType: 'date',
@@ -195,9 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                     e.cellElement;
                                 }
                             }
-                        }  
-                    });           
-                          
+                        }       
+                    });
                 }
                 if (this.id == "kpi2") {     
 
@@ -421,20 +428,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'asc'
                             },{
                                 width: 150,
-                                caption: 'Vendedor',
-                                dataField: 'vendedor',
+                                caption: 'Asesor',
+                                dataField: 'asesor',
                                 area: 'row',
                                 sortOrder: 'asc'
-                            },{
-                                width: 150,
-                                caption: 'Cliente',
-                                dataField: 'cliente',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                caption: 'Factura',
-                                dataField: 'factura',
-                                area: 'row'
                             },{
                                 caption: 'Fecha',
                                 dataField: 'fecha',
@@ -448,13 +445,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'desc'
                             },{
                                 caption: 'Duracion',
-                                dataField: 'duracion_cierre_dias',
+                                dataField: 'dias',
                                 dataType: 'number',
                                 summaryType: 'sum',
                                 area: 'data'
                             },{
                                 caption: 'Prom',
-                                dataField: 'duracion_cierre_dias',
+                                dataField: 'dias',
                                 dataType: 'number',
                                 area: 'data',
                                 summaryType: "custom",
@@ -863,8 +860,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'asc'
                             },{
                                 width: 150,
-                                caption: 'Vendedor',
-                                dataField: 'vendedor',
+                                caption: 'Asesor',
+                                dataField: 'asesor',
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
@@ -875,13 +872,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'desc'
                             },{
                                 summaryType: 'sum',
-                                dataField: "demostraciones",
+                                dataField: "ejecutada",
                                 dataType: 'number',
-                                caption: 'Demostraciones',
+                                caption: 'Ejecutada',
                                 area: 'data'
                             },{
-                                caption: "Meta",
-                                dataField: "meta_demostraciones",
+                                caption: "Planeada",
+                                dataField: "planeada",
                                 dataType: 'number',
                                 area: "data",
                                 summaryType: "sum"
@@ -892,12 +889,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                 format: '#0.00\'%\'',
                                 calculateSummaryValue: function(summaryCell) {
                                     
-                                    if (summaryCell.value("Demostraciones") === undefined) {
+                                    if (summaryCell.value("Ejecutada") === undefined) {
                                         return undefined;
                                     }
 
                                     var value = 0;
-                                    value = summaryCell.value("Demostraciones") > 0 ? Number((summaryCell.value("Demostraciones") / summaryCell.value("Meta"))*100): 0;
+                                    value = summaryCell.value("Ejecutada") > 0 ? Number((summaryCell.value("Ejecutada") / summaryCell.value("Planeada"))*100): 0;
                                     return value;Meta
                                 }
                             }],
@@ -974,14 +971,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'asc'
                             },{
                                 width: 150,
-                                caption: 'Responsable',
-                                dataField: 'responsable',
-                                area: 'row',
-                                sortOrder: 'asc'
-                            },{
-                                width: 150,
-                                caption: 'Prospecto',
-                                dataField: 'prospecto',
+                                caption: 'Asesor',
+                                dataField: 'asesor',
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
@@ -1524,8 +1515,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'asc'
                             },{
                                 width: 150,
-                                caption: 'Responsable',
-                                dataField: 'responsable',
+                                caption: 'Asesor',
+                                dataField: 'asesor',
                                 area: 'row',
                                 sortOrder: 'asc'
                             },{
@@ -1536,13 +1527,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 sortOrder: 'desc'
                             },{
                                 summaryType: 'sum',
-                                dataField: "visita_ejecutada",
+                                dataField: "ejecutada",
                                 dataType: 'number',
                                 caption: 'Ejecutada',
                                 area: 'data'
                             },{
                                 caption: "Planeada",
-                                dataField: "visita_planeada",
+                                dataField: "planeada",
                                 dataType: 'number',
                                 area: "data",
                                 summaryType: "sum"
@@ -1735,6 +1726,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                 }
+
+                const currentYear = new Date().getFullYear();
+
+                    // 2. Buscar el campo que tiene el área de YEAR
+                  
+                const ds = grdDatos.getDataSource();
+                const fields = ds.fields();
+                const yearFieldIndex = fields.findIndex(f => f.caption === "Fecha");
+
+                // 3. Aplicar el filtro en ese campo
+                if (yearFieldIndex >= 0) {
+                    fields[yearFieldIndex].filterValues = [[currentYear]];;
+                    fields[yearFieldIndex].filterType = "include";
+                    ds.reload().done(() => {
+                        // 4. Expandir automáticamente la columna del año actual
+                        ds.expandHeaderItem("column", [currentYear]);
+                    });
+                }   
+                
+                grdDatos.option({
+                    onCellClick: function(e) {
+                        if(e.area === "data") {
+                            const ds = e.component.getDataSource();
+                            const drillDownDS = ds.createDrillDownDataSource(e.cell);
+
+                            // Actualizar el grid dentro del popup
+                            //$("#detalleGrid").dxDataGrid("instance").option({dataSource: drillDownDS});
+
+                            // Mostrar popup
+                            $("#miPopup").dxPopup("instance").show();
+                        }
+                    }
+                });  
 
         }); 
                
