@@ -76,13 +76,14 @@ if ($_POST["proceso"] == 2) {
 			}
 		}
 
-		if ($_POST["campo"]=='czpp_valor') {
-			if($_POST["valor"] < $datosProducto['prod_precio'] && $_POST['tipoCliente'] == 1) {
+		if ($_POST["campo"] == 'czpp_valor') {
+			if($_POST["valor"] < $datosProducto['prod_precio']) {
 
 				$response = [
 					'success' => false,
-					'message' => "El precio que está otorgando es menor al máximo permitido para este producto, el cual es de $" . number_format($datosProducto['prod_precio'],0,".",".")
+					'message' => "El precio que está otorgando es menor al permitido para este producto, el cual es de $" . number_format($datosProducto['prod_precio'],0,".",".")
 				];
+
 				echo json_encode($response);
 				exit();
 			}
@@ -389,7 +390,7 @@ if($_POST["proceso"]==11){
 
 	if($_POST["campo"]=='czpp_descuento'){
 		
-		if($_POST["valor"]>$datosProducto['combo_descuento_maximo']){
+		if($_POST["valor"] > $datosProducto['combo_descuento_maximo']){
 			echo '<script type="text/javascript">alert("El descuento que está otorgando es mayor al máximo permitido para este combo, el cual es de '.$datosProducto['combo_descuento_maximo'].'%.");</script>';
 			exit();	
 		}
