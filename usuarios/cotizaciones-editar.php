@@ -298,7 +298,24 @@ include("includes/js-formularios.php");
 									<script type="application/javascript">
 											function clientes(datos){
 												id = datos.value;
-												location.href = "cotizaciones-editar.php?id=<?=$_GET["id"];?>&cte="+id+"#productos";
+												idCotizacion = <?=$_GET["id"];?>;
+												datos = "idCotizacion="+(idCotizacion)+"&idCliente="+(id);
+
+												$.ajax({
+													type: "POST",
+													url: "ajax/ajax-cotizaciones-actualizar.php",
+													data: datos,
+													success: function(data) {
+														var response = JSON.parse(data);
+														if(response.success) {
+															location.href = "cotizaciones-editar.php?id="+idCotizacion+"&cte="+id+"#productos";
+														} else {
+															alert(response.message);
+														}
+
+													}
+												});
+												
 											}
 										</script>
 										
@@ -355,12 +372,26 @@ include("includes/js-formularios.php");
 															WHEN cli_categoria = '".CLI_CATEGORIA_DEALER."' THEN '(DEALER)'
 															ELSE ''
 														END AS 'categoria'	
-														FROM clientes WHERE cli_id_empresa='".$idEmpresa."'");
+														FROM clientes 
+														WHERE cli_id_empresa='".$idEmpresa."'
+														ORDER BY cli_categoria ASC
+														");
+
+														$categoriaActual = 1;
+														$nombreCategoria = ['','Prospectos', 'Clientes', 'Dealer'];
+														echo '<optgroup label="'.$nombreCategoria[1].'">';
+
 													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+
+														if ($categoriaActual != $resOp['cli_categoria']) {
+															echo '</optgroup>';
+															echo '<optgroup label="'.$nombreCategoria[$resOp['cli_categoria']].'">';
+															$categoriaActual = $resOp['cli_categoria'];
+														}
 
 														$disabled = '';
 														
-														if(!Modulos::validarRol([393], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) and $resOp['cli_categoria']== CLI_CATEGORIA_DEALER){
+														if(!Modulos::validarRol([393], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) and $resOp['cli_categoria']== CLI_CATEGORIA_DEALER) {
 															$disabled = 'disabled';
 														}	
 														
@@ -373,7 +404,7 @@ include("includes/js-formularios.php");
 												</select>
 											</div>
 											<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA) {?>
-										<a href="clientes-editar.php?id=<?=$cliente;?>" class="btn btn-info" target="_blank">Editar cliente</a>
+													<a href="clientes-editar.php?id=<?=$cliente;?>" class="btn btn-info" target="_blank">Editar cliente</a>
 											<?php } ?>
 									</div>
 									
@@ -392,10 +423,11 @@ include("includes/js-formularios.php");
 														echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
 														exit();
 													}
+
 													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 														
 													?>
-														<option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_sucursal']==$resOp[0]){echo "selected";} echo $disabled; ?>><?=$resOp['sucu_nombre'];?></option>
+														<option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_sucursal']==$resOp[0] || $numOp == 1){echo "selected";} echo $disabled; ?>><?=$resOp['sucu_nombre'];?></option>
 													<?php 
 													}
 													?>
@@ -424,7 +456,7 @@ include("includes/js-formularios.php");
 													}
 													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 													?>
-														<option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_contacto']==$resOp[0]){echo "selected";}?>><?=strtoupper($resOp['cont_nombre'])." (".$resOp['cont_email'].")";?></option>
+														<option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_contacto']==$resOp[0] || $numOp == 1){echo "selected";}?>><?=strtoupper($resOp['cont_nombre'])." (".$resOp['cont_email'].")";?></option>
 													<?php
 													}
 													?>

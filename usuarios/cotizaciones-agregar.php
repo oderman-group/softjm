@@ -82,17 +82,31 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
 											WHERE cli_ciudad != ".CIUDADES_INTERNACIONALES."
-											AND cli_id_empresa='".$idEmpresa."'");
+											AND cli_id_empresa='".$idEmpresa."'
+											ORDER BY cli_categoria
+											");
 
 											//Permiso para mostrar todos los clientes, incluyendo los internacionales.
 											$paginasParaValidar = [389];
 
 											if (Modulos::validarRol($paginasParaValidar, $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
-												WHERE cli_id_empresa='".$idEmpresa."'");
+												WHERE cli_id_empresa='".$idEmpresa."'
+												ORDER BY cli_categoria
+												");
 											}
 
+											$categoriaActual = 1;
+											$nombreCategoria = ['','Prospectos', 'Clientes', 'Dealer'];
+											echo '<optgroup label="'.$nombreCategoria[1].'">';
+
 											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
+
+												if ($categoriaActual != $resOp['cli_categoria']) {
+													echo '</optgroup>';
+													echo '<optgroup label="'.$nombreCategoria[$resOp['cli_categoria']].'">';
+													$categoriaActual = $resOp['cli_categoria'];
+												}
 
 												if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 													$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
@@ -123,6 +137,7 @@ include("includes/js-formularios.php");
                                             	<option value="<?=$resOp[0];?>" <?php if(isset($_GET["cte"]) and $_GET["cte"]!="" and $_GET["cte"]==$resOp[0]) echo "selected"; echo $disabled; ?>><?=$resOp[1]." ".$categoria;?></option>
                                             <?php
 											}
+											echo '</optgroup>';
 											?>
                                     	</select>
                                     </div>
@@ -186,16 +201,20 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_GET["cte"]."'");
 											$numOp = $conOp->num_rows;
-											if($numOp==0){
+											$selectedSucursal = '';
+											if($numOp == 0) {
 												//Crear automáticamente la sucursal
 												$conexionBdPrincipal->query("INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$_GET["cte"]."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')");
 												
 												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
 												exit();
+											} else if ($numOp == 1) {
+												$selectedSucursal = 'selected';
 											}
+
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
-                                            	<option value="<?=$resOp[0];?>"><?=$resOp[7];?></option>
+                                            	<option value="<?=$resOp[0];?>" <?=$selectedSucursal;?>><?=$resOp[7];?></option>
                                             <?php
 											}
 											?>
@@ -214,16 +233,21 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM contactos WHERE cont_cliente_principal='".$_GET["cte"]."'");
 											$numOp = $conOp->num_rows;
+											$selectedContacto = '';
+
 											if($numOp==0){
 												//Crear automáticamente el contacto
 												$conexionBdPrincipal->query("INSERT INTO contactos(cont_nombre, cont_cliente_principal)VALUES('Contacto principal (Automático)', '".$_GET["cte"]."')");
 												
 												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
 												exit();
+											} else if ($numOp == 1) {
+												$selectedContacto = 'selected';
 											}
+
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
-                                            	<option value="<?=$resOp[0];?>"><?=strtoupper($resOp[1])." (".$resOp[3].")";?></option>
+                                            	<option value="<?=$resOp[0];?>" <?=$selectedContacto;?>><?=strtoupper($resOp[1])." (".$resOp[3].")";?></option>
                                             <?php
 											}
 											?>
@@ -240,10 +264,18 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente" required>
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios 
+											WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."' 
+											ORDER BY usr_nombre");
+
+											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
+												$selectedInfluyente = '';
+
+												if ($resOp[0] == $_SESSION['id']) {
+													$selectedInfluyente = 'selected';
+												}
 											?>
-                                            	<option value="<?=$resOp[0];?>"><?=strtoupper($resOp[4])." (".$resOp[5].")";?></option>
+                                            	<option value="<?=$resOp[0];?>" <?=$selectedInfluyente;?>><?=strtoupper($resOp[4])." (".$resOp[5].")";?></option>
                                             <?php
 											}
 											?>
