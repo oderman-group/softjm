@@ -19,6 +19,7 @@ if(isset($_GET["idTK"]) and is_numeric($_GET["idTK"])){
 	$estadoTicket = Ticket::getEstado($tiketID, $conexionBdPrincipal);
 }elseif(isset($_GET["cte"]) and is_numeric($_GET["cte"])){
 	$tiketID = ""; // vacío porque lo vamos a crear
+	$estadoTicket = 1; //Asumimos que está abierto para que lo deje crear o asociar a uno existente.
 	$cliente = $_GET["cte"];
 	$tipoSeguimiento = 1; //Comercial por defecto
 }else{
@@ -227,9 +228,16 @@ include("includes/js-formularios.php");
 											<option value=""></option>
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$cliente."'");
+											$numContactos = mysqli_num_rows($conOp);
+											$selected = '';
+
+											if ($numContactos == 1) {
+												$selected = 'selected';
+											}
+
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
-                                            	<option value="<?=$resOp[0];?>"><?=$resOp['cont_nombre']." (".$resOp['cont_email']." - ".$resOp['cont_telefono'].")";?></option>
+                                            	<option value="<?=$resOp[0];?>" <?=$selected;?>><?=$resOp['cont_nombre']." (".$resOp['cont_email']." - ".$resOp['cont_telefono'].")";?></option>
                                             <?php
 											}
 											?>
@@ -239,14 +247,22 @@ include("includes/js-formularios.php");
                                     <p style="margin-top:10px; font-weight:bold;">Cuando termine de crear el contacto, cierre la ventana emergente y actualice esta pantalla (F5)</p>
                                </div>
 								
-								<?php if($tiketID==""){?>
+								<?php if(empty($tiketID)){?>
+									<div class="alert alert-info">
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+										<i class="icon-exclamation-sign"></i><strong>Ticket automático!</strong> Si no desea asociar este seguimiento a un ticket ya creado entonces se creará uno automáticamente para este seguimiento.
+									</div>
+
 								   <div class="control-group">
 									<label class="control-label"><b>¿Asociar a un Ticket ya existente?</b></label>
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tiketCreado">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_cliente='".$cliente."'");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets 
+											WHERE tik_cliente='".$cliente."'
+											AND tik_estado=1
+											");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['tik_asunto_principal'];?></option>
@@ -254,7 +270,6 @@ include("includes/js-formularios.php");
 											}
 											?>
                                     	</select>
-										<span style="color:#009;">Opcional.</span>
                                     </div>
 									   
                                	  </div>
@@ -276,8 +291,10 @@ include("includes/js-formularios.php");
                                             <?php
 											$opciones = array("","La empresa contactó al cliente","El cliente contactó  a la empresa");
 											for($i=1; $i<=2; $i++){
-												if($resultadoD['cseg_canal_proximo_contacto']==$i)echo '<option value="'.$i.'" selected>'.$opciones[$i].'</option>';
-												else echo '<option value="'.$i.'">'.$opciones[$i].'</option>';	
+												if ($i == 1)
+													echo '<option value="'.$i.'" selected>'.$opciones[$i].'</option>';
+												else 
+													echo '<option value="'.$i.'">'.$opciones[$i].'</option>';	
 											}
 											?>
                                     	</select>
@@ -426,9 +443,15 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Recordatorio (Minutos antes) (*)</label>
 									<div class="controls">
-										<input type="number" class="span2" name="minutosRecordarAntes" required id="minutosRecordarAntes">
+										<input type="number" min="0" step="5" value="10" class="span2" name="minutosRecordarAntes" required id="minutosRecordarAntes">
 									</div>
 								</div>
+
+								<script>
+								document.addEventListener('DOMContentLoaded', function() {
+									document.getElementById('minutosRecordarAntes').value = 10;
+								});
+								</script>
 								
 								<div class="control-group">
 									<label class="control-label">Medio de contacto (*)</label>
@@ -461,8 +484,12 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."'");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+												$selected = '';
+												if ($resOp['usr_id'] == $_SESSION['id']) {
+													$selected = 'selected';
+												}
 											?>
-											<option value="<?=$resOp['usr_id'];?>"><?=$resOp['usr_nombre'];?></option>
+											<option value="<?=$resOp['usr_id'];?>" <?=$selected;?>><?=$resOp['usr_nombre'];?></option>
                                             <?php
 											}
 											?>

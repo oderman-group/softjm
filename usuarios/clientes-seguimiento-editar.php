@@ -10,12 +10,20 @@ require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
 
 $consultaTiket=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["idTK"]."'");
 $tiket = mysqli_fetch_array($consultaTiket, MYSQLI_BOTH);
+
 $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM cliente_seguimiento WHERE cseg_id='".$_GET["id"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+
 $consultaCliente=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$resultadoD["cseg_cliente"]."' AND cli_id_empresa='".$idEmpresa."'");
 $cliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 
-$estadoTicket = Ticket::getEstado($_GET["idTK"], $conexionBdPrincipal);
+$idTicket = isset($resultadoD['cseg_tiket']) ? $resultadoD['cseg_tiket'] : "NULL";
+
+$estadoTicket = 2;
+
+if (!empty($idTicket)) {
+	$estadoTicket = Ticket::getEstado($idTicket, $conexionBdPrincipal);
+}
 ?>
 <!-- styles -->
 <link href="css/chosen.css" rel="stylesheet">
