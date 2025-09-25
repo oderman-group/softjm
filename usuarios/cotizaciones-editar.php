@@ -177,18 +177,24 @@ include("includes/js-formularios.php");
 				
 				<?php
 				if(
-					$resultadoD['cotiz_vendida']!=1 && 
+					$resultadoD['cotiz_vendida'] != 1 && 
 					Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
-					!empty($ticketAsociado)
+					!empty($ticketAsociado) && 
+					$resultadoD['cotiz_es_precotizacion'] != 1
 				) {
 				?>
 					<a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $resultadoD['cotiz_id']; ?>" class="btn btn-info" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}"><i class="icon-money"></i> Generar pedido</a>
 				<?php
-				} else if ($resultadoD['cotiz_vendida']!=1 && empty($ticketAsociado)) {
+				} else if ($resultadoD['cotiz_vendida'] != 1 && empty($ticketAsociado) && $resultadoD['cotiz_es_precotizacion'] != 1) {
 				?>
 					<div class="alert alert-warning">
 						<button type="button" class="close" data-dismiss="alert">&times;</button>
 						<i class="icon-warning-sign"></i><strong>Ticket pendiente!</strong> No es posible generar pedido en una cotización sin ticket comercial asociado.
+					</div>
+				<?php } else if ($resultadoD['cotiz_es_precotizacion'] == 1) {?>
+					<div class="alert alert-warning">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+						<i class="icon-warning-sign"></i><strong>Precotización!</strong> No es posible generar pedido con una PRE-cotización.
 					</div>
 				<?php }?>
 			</p>

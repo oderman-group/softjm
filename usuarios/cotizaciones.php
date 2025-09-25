@@ -147,6 +147,7 @@ include("includes/head.php");
 										<tr>
 										<th>No.</th>
 											<th>ID</th>
+											<th>TIPO</th>
 											<th>Fecha Propuesta</th>
 											<th>Cliente</th>
 											<th>Items inluídos</th>
@@ -158,7 +159,7 @@ include("includes/head.php");
 									<tbody>
 										<?php
 										if (isset($_GET["cte"]) and $_GET["cte"] != "") {
-											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cli_id, cli_nombre, cli_zona
+											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cli_id, cli_nombre, cli_zona, cotiz_es_precotizacion
 												FROM cotizacion
 								INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='" . $_GET["cte"] . "'
 								WHERE cotiz_id_empresa='".$idEmpresa."'
@@ -166,7 +167,7 @@ include("includes/head.php");
 								LIMIT $inicio, $limite
 								");
 										} else {
-											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 
+											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cotiz_es_precotizacion,
 												cli_id, cli_nombre, cli_zona,
 												usr_id, usr_nombre 
 												FROM cotizacion
@@ -212,12 +213,18 @@ include("includes/head.php");
 													$IdGeneroPedido = $generoPedido['pedid_id'];
 												}
 											}
+
+											$tipoCotizacion = 'COTIZACIÓN';
+											if ($res['cotiz_es_precotizacion'] == 1) {
+												$tipoCotizacion = '<span style="background-color:yellow;">PRE-COTIZACIÓN</span>';
+											}
 										?>
 											<tr>
 											<td><?= $no; ?></td>
 												<td style="background-color: <?= $fondoCotiz; ?>;" title="<?=$infoPedido;?>"><?= $res['cotiz_id']; ?></td>
+												<td><?= $tipoCotizacion; ?></td>
 												<td><?= $res['cotiz_fecha_propuesta']; ?></td>
-												<td><?= strtoupper($res['cli_nombre']); ?></td>
+												<td><a href="clientes-editar.php?id=<?=$res['cli_id'];?>"><?= strtoupper($res['cli_nombre']); ?></td>
 												<td>
 													
 													<?php
@@ -284,7 +291,8 @@ include("includes/head.php");
 																<?php if(
 																	$IdGeneroPedido == '' && 
 																	Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
-																	!empty($res['cotiz_ticket'])
+																	!empty($res['cotiz_ticket']) &&
+																	$res['cotiz_es_precotizacion'] != 1
 																	) {
 																?>
 																		<li><a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>

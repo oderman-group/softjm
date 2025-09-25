@@ -363,6 +363,16 @@ include("includes/js-formularios.php");
 											</select>
 										</div>
 									</div>
+
+									<div class="control-group">
+										<label class="control-label">¿Es PRE-cotización?
+											<button class="tooltipp">No será tenida en cuenta como una cotización oficial y no es apta para generar pedido. Esta opción no se podrá cambiar después.</button>
+											<i class="fa-solid fa-circle-question"></i>
+										</label>
+										<div class="controls">
+											<input type="checkbox" value="1" name="precotizacion">
+										</div>
+									</div>
 								
 								<div class="form-actions">
 									<button type="submit" class="btn btn-info"><i class="icon-arrow-right"></i> Continuar</button>

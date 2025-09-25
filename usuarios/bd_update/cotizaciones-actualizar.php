@@ -18,7 +18,7 @@ try {
     mysqli_query($conexionBdPrincipal, "START TRANSACTION");
 
     if (isset($_POST["ticket"])) {
-        $ticketId = "NULL";
+        $ticketId =  "NULL";
 
         if ($_POST["ticket"] == 'TICKET_AUTO') {
             //Creamos un ticket automáticamente
@@ -28,7 +28,7 @@ try {
         } else if ($_POST["ticket"] != 'NO_TICKET') {
             $ticketId = $_POST["ticket"];
             mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets 
-            SET tik_id_cotizacion = ".$idInsert.",
+            SET tik_id_cotizacion = ".$_POST["id"]."
             WHERE tik_id=".$ticketId);
         }
     }
@@ -77,6 +77,8 @@ try {
 } catch (Exception $e) {
     mysqli_query($conexionBdPrincipal, "ROLLBACK");
     $parmetros = '&error=3&message=Hubo problemas para actualizar esta cotización!';
+    echo $e->getMessage();
+    exit();
 }
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");

@@ -20,7 +20,12 @@ if ($_POST["ticket"] == 'TICKET_AUTO') {
     $ticketId = $_POST["ticket"];
 }
 
-$conexionBdPrincipal->query("INSERT INTO cotizacion(cotiz_fecha_propuesta, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, cotiz_creador, cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, cotiz_fecha_creacion, cotiz_moneda, cotiz_observaciones, cotiz_envio, cotiz_proveedor, cotiz_id_empresa, cotiz_ticket)VALUES('" . $_POST["fechaPropuesta"] . "','" . $_POST["cliente"] . "','" . $_POST["fechaVencimiento"] . "','" . $_POST["influyente"] . "','" . $_SESSION["id"] . "','" . $_POST["sucursal"] . "','" . $_POST["contacto"] . "','" . $_POST["formaPago"] . "',now(),'" . $_POST["moneda"] . "','" . $_POST["notas"] . "','" . $envio . "','" . $_POST["proveedor"] . "','" . $idEmpresa . "', ".$ticketId.")");
+$precotizacion = 0;
+if (isset($_POST["precotizacion"]) && $_POST["precotizacion"] == 1) {
+    $precotizacion = 1;
+}
+
+$conexionBdPrincipal->query("INSERT INTO cotizacion(cotiz_fecha_propuesta, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, cotiz_creador, cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, cotiz_fecha_creacion, cotiz_moneda, cotiz_observaciones, cotiz_envio, cotiz_proveedor, cotiz_id_empresa, cotiz_ticket, cotiz_es_precotizacion)VALUES('" . $_POST["fechaPropuesta"] . "','" . $_POST["cliente"] . "','" . $_POST["fechaVencimiento"] . "','" . $_POST["influyente"] . "','" . $_SESSION["id"] . "','" . $_POST["sucursal"] . "','" . $_POST["contacto"] . "','" . $_POST["formaPago"] . "',now(),'" . $_POST["moneda"] . "','" . $_POST["notas"] . "','" . $envio . "','" . $_POST["proveedor"] . "','" . $idEmpresa . "', ".$ticketId.", ".$precotizacion.")");
 $idInsert = mysqli_insert_id($conexionBdPrincipal);
 
 if ($_POST["ticket"] != 'NO_TICKET') {
