@@ -354,6 +354,13 @@ include("includes/js-formularios.php");
                                         <input type="checkbox" value="1" name="demostracion">
 									</div>
 								</div>
+
+								<div class="control-group">
+									<label class="control-label">¿Hubo visita?</label>
+									<div class="controls">
+                                        <input type="checkbox" value="1" name="visita">
+									</div>
+								</div>
 								
 								<?php if (empty($tiket['tik_id_cotizacion'])) {
 									$sql = "SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 

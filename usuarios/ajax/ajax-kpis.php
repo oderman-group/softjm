@@ -72,38 +72,35 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
     $e_dato = json_decode($_POST["e_datos"]);
 
     $sql = "
-    SELECT
-        f.factura_id as id,
-        c.cli_id,
-        c.cli_nombre AS cliente, -- Se añadió el nombre del cliente para mayor detalle
-        c.cli_fecha_registro AS fecha,
-        f.factura_id factura,
-        f.factura_fecha_propuesta AS fecha_cierre_venta,
-        f.factura_tipo,
-        f.factura_estado,
-        -- Calcula la duración en días para cada venta individual
-        DATEDIFF(f.factura_fecha_propuesta, c.cli_fecha_registro) AS duracion_cierre_dias,
-        u.usr_id AS id_vendedor,
-        u.usr_nombre AS vendedor,
-        sp.sucp_id AS id_sucursal,
-        sp.sucp_nombre AS sucursal,
-        sp.sucp_ciudad AS ciudad_sucursal,
-        sp.sucp_id_empresa AS id_empresa_sucursal
-    FROM
-        clientes AS c
-    INNER JOIN
-        facturas AS f ON c.cli_id = f.factura_cliente
-    INNER JOIN
-        usuarios AS u ON f.factura_vendedor = u.usr_id -- Se une con la tabla de usuarios para obtener información del vendedor
-    INNER JOIN
-        sucursales_propias AS sp ON u.usr_sucursal = sp.sucp_id -- Se une con la tabla de sucursales para obtener información de la sucursal
-    WHERE
-        f.factura_tipo = 1 -- Asumiendo 1 para 'venta'
-        AND f.factura_estado = 1 -- Asumiendo 1 para 'cerrada'
-        AND f.factura_fecha_propuesta IS NOT NULL
-        AND c.cli_fecha_registro IS NOT NULL
-        AND f.factura_fecha_propuesta >= c.cli_fecha_registro;
-    ;
+        SELECT
+            c.cli_id,
+            c.cli_nombre AS cliente, -- Se añadió el nombre del cliente para mayor detalle
+            -- Calcula la duración en días para cada venta individual
+            ct.tik_fecha_creacion fecha,
+            ct.tik_fecha_cierre,
+            DATEDIFF(ct.tik_fecha_cierre, ct.tik_fecha_creacion) AS dias,
+            u.usr_id AS id_vendedor,
+            u.usr_nombre AS asesor,
+            sp.sucp_id AS id_sucursal,
+            sp.sucp_nombre AS sucursal,
+            sp.sucp_ciudad AS ciudad_sucursal,
+            sp.sucp_id_empresa AS id_empresa_sucursal
+        FROM
+            clientes AS c
+        INNER JOIN
+            clientes_tikets AS ct ON ct.tik_cliente = c.cli_id
+        INNER JOIN
+            usuarios AS u ON ct.tik_usuario_responsable = u.usr_id -- Se une con la tabla de usuarios para obtener información del vendedor
+        INNER JOIN
+            sucursales_propias AS sp ON u.usr_sucursal = sp.sucp_id -- Se une con la tabla de sucursales para obtener información de la sucursal
+        WHERE
+            ct.tik_estado = 2 -- Ticket Cerrado
+            AND ct.tik_etapa = 5 -- Cerrado y ganado
+            AND ct.tik_fecha_cierre IS NOT NULL
+            AND ct.tik_fecha_cierre >= ct.tik_fecha_creacion
+            AND ct.tik_tipo_negocio = 1 -- Tipo venta
+            AND ct.tik_id_cotizacion IS NOT NULL
+        ;
     ";
     $result = mysqli_query($conexionBdPrincipal, $sql);
 
@@ -257,28 +254,37 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
 
     $sql = "
         SELECT
-            cs.cseg_id,
-            cs.cseg_fecha_reporte fecha,
-            COUNT(cs.cseg_demostracion) demostraciones,
-            u.usr_id,
-            u.usr_nombre AS vendedor,
-            um.um_meta AS meta_demostraciones,
-            sucu.sucp_nombre AS sucursal
-        FROM
-            cliente_seguimiento cs
-        JOIN
-            usuarios u ON u.usr_id = cs.cseg_usuario_responsable
-        JOIN
-            sucursales_propias sucu on sucu.sucp_id=usr_sucursal
-        JOIN
-            usuarios_metas um ON u.usr_id = um.um_usuario
-            AND um.um_tipo_meta = 'DEMO'
-            AND um.um_year = YEAR(cs.cseg_fecha_reporte)
-            AND um.um_mes = MONTH(cs.cseg_fecha_reporte)
+        um.um_id,
+        CONCAT(um.um_year,'-',if(um.um_mes < 10, CONCAT('0',um.um_mes),um.um_mes),'-01') fecha,
+        u.usr_sucursal id_sucural,
+        sp.sucp_nombre sucursal,
+        um.um_usuario id_asesor,
+        u.usr_nombre asesor,
+        um.um_meta planeada,
+        IFNULL(cs.ejecutada,0) ejecutada
+        FROM usuarios_metas um 
+        INNER JOIN usuarios u ON u.usr_id = um.um_usuario
+        INNER JOIN sucursales_propias sp ON sp.sucp_id= u.usr_sucursal
+        LEFT JOIN(
+        SELECT 
+            cs.cseg_id id,
+            DATE_FORMAT(cs.cseg_fecha_contacto,'%Y-%m') periodo,
+            cs.cseg_fecha_contacto fecha,
+            u.usr_sucursal id_sucural,
+            sp.sucp_nombre sucursal,
+            cs.cseg_usuario_responsable id_asesor,
+            u.usr_nombre asesor,
+            cs.cseg_cliente id_cliente,
+            c.cli_nombre cliente,
+            COUNT(cs.cseg_id) ejecutada
+        FROM cliente_seguimiento cs
+        INNER JOIN clientes c ON c.cli_id = cs.cseg_cliente
+        INNER JOIN usuarios u ON u.usr_id = cs.cseg_usuario_responsable
+        INNER JOIN sucursales_propias sp ON sp.sucp_id= u.usr_sucursal
         WHERE cs.cseg_demostracion = 1
-        GROUP BY usr_sucursal, usr_id , DATE_FORMAT(cs.cseg_fecha_reporte,'%Y-%m')
-        ORDER BY
-            cs.cseg_fecha_reporte DESC
+        GROUP BY u.usr_sucursal, cs.cseg_usuario_responsable , DATE_FORMAT(cs.cseg_fecha_contacto,'%Y-%m')
+        )cs ON cs.id_sucural = u.usr_sucursal AND cs.id_asesor = um.um_usuario AND CONCAT(um.um_year,'-',if(um.um_mes < 10, CONCAT('0',um.um_mes),um.um_mes)) = cs.periodo
+        WHERE um.um_tipo_meta = 'NUMERO_DEMOSTRACIONES';
     ;
     ";
     $result = mysqli_query($conexionBdPrincipal, $sql);
@@ -309,16 +315,19 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
     $e_dato = json_decode($_POST["e_datos"]);
 
     $sql = "
-    SELECT 
-        pid.pid_id id,
-        pid.pid_ultima_modificacion fecha,
-        pid.pid_responsable_ultima_modificacion,
-        pid.pid_nombres as prospecto,
-        u.usr_nombre AS responsable,
-        sucu.sucp_nombre sucursal
-    FROM prospectos_importacion_detalles pid
-    INNER JOIN usuarios u ON u.usr_id = pid.pid_responsable_ultima_modificacion
-    INNER JOIN sucursales_propias sucu ON sucp_id=usr_sucursal;
+        select
+        cseg_fecha_reporte as fecha,
+        cli_nombre as cliente,
+        usr_nombre as asesor,
+        sucp_nombre as sucursal
+        FROM cliente_seguimiento
+        INNER JOIN clientes cli ON cli.cli_id=cseg_cliente 
+            and cli.cli_forma_creacion = 'EJECUTIVO_PROSPECCION' 
+            and (cli_fecha_ingreso >= DATE(cseg_fecha_reporte) or cli_fecha_ingreso is NULL)
+        INNER JOIN usuarios u ON u.usr_id = cseg_usuario_responsable
+        INNER JOIN sucursales_propias sucu ON sucp_id=usr_sucursal
+        WHERE cseg_tipo = 1 and cseg_forma_contacto = 1
+        ; 
     ";
     $result = mysqli_query($conexionBdPrincipal, $sql);
 
@@ -544,29 +553,38 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
     $e_dato = json_decode($_POST["e_datos"]);
 
     $sql = "
-          SELECT 
-            cs.cseg_id id,
-            cs.cseg_cliente,
-            c.cli_nombre,
-            cs.cseg_usuario_responsable,
-            u.usr_nombre AS responsable,
-            cs.cseg_fecha_contacto AS fecha,
-            sum(CASE 
-                WHEN cs.cseg_forma_contacto = 1 -- la empresa contactó al cliente
-                AND cs.cseg_canal = 5 -- Personal
-                THEN 1 ELSE 0 
-            END) AS visita_ejecutada, 
-            sum(CASE 
-                WHEN cs.cseg_canal_proximo_contacto = 4 -- visitar al cliente
-                THEN 1 ELSE 0 
-            END) AS visita_planeada,   
-            sucp_nombre sucursal
-        FROM cliente_seguimiento cs
-        INNER JOIN clientes c ON c.cli_id = cs.cseg_cliente
-        INNER JOIN usuarios u ON u.usr_id = cs.cseg_usuario_responsable
-        INNER JOIN sucursales_propias ON sucp_id=usr_sucursal
-        GROUP BY usr_sucursal, u.usr_id , DATE_FORMAT(cs.cseg_fecha_contacto,'%Y-%m')
-        HAVING (visita_planeada + visita_ejecutada) > 0;
+          SELECT
+            um.um_id,
+            CONCAT(um.um_year,'-',if(um.um_mes < 10, CONCAT('0',um.um_mes),um.um_mes),'-01') fecha,
+            u.usr_sucursal id_sucural,
+            sp.sucp_nombre sucursal,
+            um.um_usuario id_asesor,
+            u.usr_nombre asesor,
+            um.um_meta planeada,
+            IFNULL(cs.ejecutada,0) ejecutada
+            FROM usuarios_metas um 
+            INNER JOIN usuarios u ON u.usr_id = um.um_usuario
+            INNER JOIN sucursales_propias sp ON sp.sucp_id= u.usr_sucursal
+            LEFT JOIN(
+            SELECT 
+                cs.cseg_id id,
+                DATE_FORMAT(cs.cseg_fecha_contacto,'%Y-%m') periodo,
+                cs.cseg_fecha_contacto fecha,
+                u.usr_sucursal id_sucural,
+                sp.sucp_nombre sucursal,
+                cs.cseg_usuario_responsable id_asesor,
+                u.usr_nombre asesor,
+                cs.cseg_cliente id_cliente,
+                c.cli_nombre cliente,
+                COUNT(cs.cseg_id) ejecutada
+            FROM cliente_seguimiento cs
+            INNER JOIN clientes c ON c.cli_id = cs.cseg_cliente
+            INNER JOIN usuarios u ON u.usr_id = cs.cseg_usuario_responsable
+            INNER JOIN sucursales_propias sp ON sp.sucp_id= u.usr_sucursal
+            WHERE cs.cseg_visita = 1
+            GROUP BY u.usr_sucursal, cs.cseg_usuario_responsable , DATE_FORMAT(cs.cseg_fecha_contacto,'%Y-%m')
+            )cs ON cs.id_sucural = u.usr_sucursal AND cs.id_asesor = um.um_usuario AND CONCAT(um.um_year,'-',if(um.um_mes < 10, CONCAT('0',um.um_mes),um.um_mes)) = cs.periodo
+            WHERE um.um_tipo_meta = 'NUMERO_VISITAS';
     ";
     $result = mysqli_query($conexionBdPrincipal, $sql);
 
