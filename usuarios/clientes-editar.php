@@ -761,8 +761,7 @@ include("includes/js-formularios.php");
 																<?php if (Modulos::validarRol([90], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																	<a href="clientes-tikets-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>
 																<?php } ?>
-																	<!– codigo 24 no se encontro en el archivo sql.php–>
-																	<a href="sql.php?id=<?=$res[0];?>&get=24" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																	<!--<a href="sql.php?id=<?=$res[0];?>&get=24" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>-->
 																</h4></td>
 															</tr>
 															<?php $no++;}?>
@@ -1081,7 +1080,7 @@ include("includes/js-formularios.php");
                                 	<a href="facturacion-editar.php?id=<?=$res['fact_id'];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
 																<?php } ?>
                                     <?php //el codigo 6 no se encontro en el archivo sql ?> 
-									<a href="sql.php?id=<?=$res['fact_id'];?>&get=6" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;
+									<!--<a href="sql.php?id=<?=$res['fact_id'];?>&get=6" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;-->
 																<?php if (Modulos::validarRol([92], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="#" onClick='window.open("facturacion-abonos.php?fact=<?=$res['fact_id'];?>","abonos","width=1200,height=800,menubar=no")' data-toggle="tooltip" title="Abonos"><i class="icon-money"></i></a>&nbsp;
 																<?php } ?>
