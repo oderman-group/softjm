@@ -273,12 +273,12 @@ include("includes/head.php");
 								<div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
 									<h4 align="center">-Busqueda general y paginación-</h4>
 									<p>
-									<form class="form-horizontal" style="text-align: right;" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
+									<form class="form-horizontal" style="text-align: right;" action="#<?=$_SERVER['PHP_SELF'];?>" method="get">
 										<div class="search-box">
 											<div class="input-append input-icon">
 												<input placeholder="Buscar..." id="btn_buscar" type="text" name="busqueda" value="<?php if(isset($_GET["buscar"])) echo $_GET["buscar"]; ?>">
 												<i class=" icon-search"></i>
-												<input class="btn" type="button" value="Buscar">
+												<input class="btn" id="btnSubmitBuscar" type="button" value="Buscar">
 											</div>
 											<?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
 										</div>
@@ -313,7 +313,7 @@ include("includes/head.php");
 			</div>
 		</div>
 		<script>
-			btn_buscar.addEventListener('keyup',function(event){buscar()});
+			btnSubmitBuscar.addEventListener('click',function(event){buscar()});
 			function buscar(){
 				var valor = document.getElementById('btn_buscar').value;
 				var tbody = document.getElementById('clientes_buscar');
