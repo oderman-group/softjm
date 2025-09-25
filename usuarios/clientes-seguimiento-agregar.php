@@ -9,7 +9,7 @@ include("includes/head.php");
 
 require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
 
-if(isset($_GET["idTK"]) and is_numeric($_GET["idTK"])){
+if(isset($_GET["idTK"]) and is_numeric($_GET["idTK"]) && $_GET["idTK"] > 0){
 	$consultaTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["idTK"]."'");
 	$tiket = mysqli_fetch_array($consultaTikets, MYSQLI_BOTH);
 	$tiketID = $_GET["idTK"];
@@ -356,16 +356,18 @@ include("includes/js-formularios.php");
 								</div>
 								
 								<?php if (empty($tiket['tik_id_cotizacion'])) {
-									$conOp = mysqli_query($conexionBdPrincipal,"SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 
-											cli_id, cli_nombre, cli_zona,
-											usr_id, usr_nombre 
-											FROM cotizacion
-											INNER JOIN clientes ON cli_id=cotiz_cliente
-											INNER JOIN usuarios ON usr_id=cotiz_creador
-											WHERE cotiz_id=cotiz_id AND cotiz_id_empresa='".$idEmpresa."'
-											AND cotiz_cliente=".$cliente."
-											AND cotiz_ticket IS NULL
-											ORDER BY cotiz_id DESC");
+									$sql = "SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 
+									cli_id, cli_nombre, cli_zona,
+									usr_id, usr_nombre 
+									FROM cotizacion
+									INNER JOIN clientes ON cli_id=cotiz_cliente
+									INNER JOIN usuarios ON usr_id=cotiz_creador
+									WHERE cotiz_id=cotiz_id AND cotiz_id_empresa='".$idEmpresa."'
+									AND cotiz_ticket IS NULL
+									AND cotiz_cliente=".$cliente."
+									ORDER BY cotiz_id DESC
+									";
+									$conOp = mysqli_query($conexionBdPrincipal, $sql);
 									$numCotizaciones = $conOp->num_rows;
 									if ($numCotizaciones > 0) {
 								?>
@@ -479,17 +481,25 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Encargado del próximo contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="encargado[]" multiple required id="encargado">
-											<option value="0"></option>
+										<select 
+											class="chzn-select span8" 
+											tabindex="2" 
+											name="encargado[]" 
+											multiple 
+											id="encargado"
+										>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."'");
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios 
+											WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."'");
+
+											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												$selected = '';
+
 												if ($resOp['usr_id'] == $_SESSION['id']) {
 													$selected = 'selected';
 												}
 											?>
-											<option value="<?=$resOp['usr_id'];?>" <?=$selected;?>><?=$resOp['usr_nombre'];?></option>
+												<option value="<?=$resOp['usr_id'];?>" <?=$selected;?>><?=$resOp['usr_nombre'];?></option>
                                             <?php
 											}
 											?>
