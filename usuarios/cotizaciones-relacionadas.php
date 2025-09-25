@@ -22,7 +22,7 @@
                 $consulta = $conexionBdPrincipal->query("SELECT * FROM cotizacion
                 INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='".$cliente."'
                 INNER JOIN usuarios ON usr_id=cotiz_creador
-                WHERE cotiz_id_empresa='".$idEmpresa."'
+                WHERE cotiz_id_empresa='".$idEmpresa."' AND cotiz_id != ".$_GET["id"]."
                 ");
                 $no = 1;
                 while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
