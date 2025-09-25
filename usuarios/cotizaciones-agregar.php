@@ -83,7 +83,7 @@ include("includes/js-formularios.php");
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
 											WHERE cli_ciudad != ".CIUDADES_INTERNACIONALES."
 											AND cli_id_empresa='".$idEmpresa."'
-											ORDER BY cli_categoria
+											ORDER BY cli_categoria, cli_nombre
 											");
 
 											//Permiso para mostrar todos los clientes, incluyendo los internacionales.
@@ -92,7 +92,7 @@ include("includes/js-formularios.php");
 											if (Modulos::validarRol($paginasParaValidar, $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
 												WHERE cli_id_empresa='".$idEmpresa."'
-												ORDER BY cli_categoria
+												ORDER BY cli_categoria, cli_nombre
 												");
 											}
 

@@ -374,7 +374,7 @@ include("includes/js-formularios.php");
 														END AS 'categoria'	
 														FROM clientes 
 														WHERE cli_id_empresa='".$idEmpresa."'
-														ORDER BY cli_categoria ASC
+														ORDER BY cli_categoria, cli_nombre
 														");
 
 														$categoriaActual = 1;
