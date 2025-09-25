@@ -280,6 +280,7 @@ include("includes/js-formularios.php");
 				<li class="active"><a href="#cotizacion"><i class="icon-file-alt"></i> Información de la cotización</a></li>
 				<li><a href="#itemsCotizados"><i class="icon-list"></i> Items cotizados</a></li>
 				<li><a href="#enviarCotizacion"><i class="icon-envelope"></i> Enviar cotización por correo</a></li>
+				<li><a href="#cotizacionesAsociadas"><i class="icon-retweet"></i> Cotizaciones asociadas</a></li>
 			</ul>
 
 			<div class="tab-content">
@@ -827,6 +828,10 @@ include("includes/js-formularios.php");
 							</div>
 						</div>
 					</div>
+				</div>
+
+				<div class="tab-pane" id="cotizacionesAsociadas">
+					<?php include("cotizaciones-relacionadas.php");?>
 				</div>
 			</div>
 
