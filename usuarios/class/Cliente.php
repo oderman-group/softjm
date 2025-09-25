@@ -56,4 +56,37 @@ class Cliente extends BaseDatos {
         }
     }
 
+    /**
+     * 
+     */
+    public static function consultarPrimeraCotizacionCliente(int $idRegistro, int $idEmpresa, $conexionBdPrincipal) {
+        $consulta = $conexionBdPrincipal->query("SELECT MIN(cotiz_fecha_propuesta) as fecha FROM cotizacion 
+        INNER JOIN clientes ON cli_id=cotiz_cliente AND cotiz_cliente = ".$idRegistro."
+        WHERE cotiz_es_precotizacion = 0 AND cotiz_id_empresa='".$idEmpresa."'");
+
+        return mysqli_fetch_array($consulta, MYSQLI_ASSOC)['fecha'];
+    }
+
+    /**
+     * 
+     */
+    public static function consultarPrimeraCompraCliente(int $idRegistro, int $idEmpresa, $conexionBdPrincipal) {
+        $consulta = $conexionBdPrincipal->query("SELECT MIN(factura_fecha_creacion) as fecha FROM facturas 
+        INNER JOIN clientes ON cli_id=factura_cliente AND factura_cliente = ".$idRegistro."
+        WHERE factura_tipo = ".FACTURA_TIPO_VENTA." AND factura_estado = 1");
+
+        return mysqli_fetch_array($consulta, MYSQLI_ASSOC)['fecha'];
+    }
+
+    /**
+     * 
+     */
+    public static function consultarUltimaCompraCliente(int $idRegistro, int $idEmpresa, $conexionBdPrincipal) {
+        $consulta = $conexionBdPrincipal->query("SELECT MAX(factura_fecha_creacion) as fecha FROM facturas 
+        INNER JOIN clientes ON cli_id=factura_cliente AND factura_cliente = ".$idRegistro."
+        WHERE factura_tipo = ".FACTURA_TIPO_VENTA." AND factura_estado = 1");
+
+        return mysqli_fetch_array($consulta, MYSQLI_ASSOC)['fecha'];
+    }
+
 }

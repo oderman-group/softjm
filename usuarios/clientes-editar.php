@@ -4,6 +4,8 @@ $idPagina = 11;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
+include(RUTA_PROYECTO."/usuarios/class/Cliente.php");
+
 $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET["id"]."' AND cli_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
@@ -101,6 +103,12 @@ include("includes/js-formularios.php");
     .timeline-step.active .circle {
       background: #28a745; /* verde Bootstrap 4 */
     }
+	.timeline-step.registro .circle {
+      background: #ffd001ff; /* verde Bootstrap 4 */
+    }
+	.timeline-step.ultima .circle {
+      background: #006de9ff; /* verde Bootstrap 4 */
+    }
     .timeline-step .title {
       font-weight: 600;
     }
@@ -144,38 +152,43 @@ include("includes/js-formularios.php");
 			</p>
 
             <?php include("includes/notificaciones.php");?>
+
+			<?php
+			$fechaPrimeraCotizacion = Cliente::consultarPrimeraCotizacionCliente($resultadoD['cli_id'], $idEmpresa, $conexionBdPrincipal);
+			$fechaPrimeraCompra = Cliente::consultarPrimeraCompraCliente($resultadoD['cli_id'], $idEmpresa, $conexionBdPrincipal);
+			$fechaUltimaCompra = Cliente::consultarUltimaCompraCliente($resultadoD['cli_id'], $idEmpresa, $conexionBdPrincipal);
+			?>
 			
 			<div class="row-fluid">
 				<div class="span12">
 					<div class="container my-5">
 						<div class="container">
-						<h3 class="text-center mb-5">Evolución del Prospecto</h3>
+						<h3 class="text-center mb-5">Evolución comercial</h3>
 						<div class="timeline">
 
-							<div class="timeline-step active">
-							<div class="circle">1</div>
-							<div class="title">Registro</div>
-							<div class="date">2025-01-15</div>
-							</div>
-
-							<div class="timeline-step active">
-							<div class="circle">2</div>
-							<div class="title">Primera Cotización</div>
-							<div class="date">2025-02-10</div>
+							<div class="timeline-step registro">
+								<div class="circle">1</div>
+								<div class="title">Registro</div>
+								<div class="date"><?=$resultadoD['cli_fecha_registro'];?></div>
 							</div>
 
 							<div class="timeline-step">
-							<div class="circle">3</div>
-							<div class="title">Primera Compra</div>
-							<div class="date">2025-03-05</div>
+								<div class="circle">2</div>
+								<div class="title">Primera Cotización</div>
+								<div class="date"><?=$fechaPrimeraCotizacion;?></div>
 							</div>
 
-							<div class="timeline-step">
-							<div class="circle">4</div>
-							<div class="title">Segunda Compra</div>
-							<div class="date">2025-04-20</div>
+							<div class="timeline-step active">
+								<div class="circle">3</div>
+								<div class="title">Primera Compra</div>
+								<div class="date"><?=$fechaPrimeraCompra;?></div>
 							</div>
-						</div>
+
+							<div class="timeline-step ultima">
+								<div class="circle">4</div>
+								<div class="title">Última Compra</div>
+								<div class="date"><?=$fechaUltimaCompra;?></div>
+							</div>
 					</div>
 
 					<div class="content-widgets gray">
@@ -423,20 +436,6 @@ include("includes/js-formularios.php");
 															</select>
 														</div>
 												   </div> 
-
-												   <div class="control-group">
-														<label class="control-label">Fecha de registro</label>
-														<div class="controls">
-															<?=$resultadoD['cli_fecha_registro'];?>
-														</div>
-													</div>
-
-												   <div class="control-group">
-														<label class="control-label">Fecha que se volvió cliente</label>
-														<div class="controls">
-															<?=$resultadoD['cli_fecha_ingreso'];?>
-														</div>
-													</div>
 													   
 													 <div class="control-group">
 														<label class="control-label">Fecha Incio (Uso CRM)</label>
@@ -473,7 +472,7 @@ include("includes/js-formularios.php");
 													<div class="control-group">
 														<label class="control-label">Grupos (*)</label>
 														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span8" multiple tabindex="2" name="grupos[]">
+															<select data-placeholder="Escoja una opción..." class="chzn-select span8" multiple tabindex="2" name="grupos[]" required>
 																<option value=""></option>
 																<?php
 																$conOp = $conexionBdPrincipal->query("SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
@@ -882,8 +881,8 @@ include("includes/js-formularios.php");
 											</div>
 										</div>
 					
-					<div class="tab-pane" id="cotizacion">
-										<div class="row-fluid">
+										<div class="tab-pane" id="cotizacion">
+											<div class="row-fluid">
 												<div class="span12">
 													<div class="content-widgets light-gray">
 														<div class="widget-head green">
