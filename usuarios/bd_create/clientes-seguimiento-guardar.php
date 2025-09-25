@@ -6,8 +6,8 @@ require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
 
 
 	if (empty($_POST["idTK"]) && empty($_POST["tiketCreado"])) {
-		mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_tikets(tik_asunto_principal, tik_tipo_tiket, tik_fecha_creacion, tik_usuario_responsable, tik_estado, tik_cliente, tik_prioridad, tik_observaciones, tik_canal)
-		VALUES('TIKCET AUTOMÁTICO',1,'" . $_POST["fechaContacto"] . "','" . $_SESSION["id"] . "',2,'" . $_POST["cliente"] . "',1,'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_POST["canal"] . "')");
+		mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_tikets(tik_asunto_principal, tik_tipo_tiket, tik_fecha_creacion, tik_usuario_responsable, tik_estado, tik_cliente, tik_prioridad, tik_observaciones, tik_canal, tik_etapa, tik_tipo_negocio)
+		VALUES('TIKCET AUTOMÁTICO',1,'" . $_POST["fechaContacto"] . "','" . $_SESSION["id"] . "',2,'" . $_POST["cliente"] . "',1,'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_POST["canal"] . "', 3, 1)");
 		$tiketID = mysqli_insert_id($conexionBdPrincipal);
 	} else {
 		if (!empty($_POST["idTK"])) {

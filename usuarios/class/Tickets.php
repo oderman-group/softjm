@@ -18,7 +18,7 @@ class Ticket extends BaseDatos {
      * al convertir una cotización en pedido. Este listado se usa
      * como oficial en todas las operaciones asociadas a este pedido.
      */
-    public static function getEstado($idTicket, $conexionBdPrincipal) {
+    public static function getEstado(int $idTicket, $conexionBdPrincipal) {
 
         $campo = mysqli_fetch_assoc(
                     mysqli_query($conexionBdPrincipal,"SELECT ".self::$campoEstado." FROM ".self::$schema.".".self::$tableName." 
