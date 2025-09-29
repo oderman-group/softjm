@@ -204,7 +204,7 @@ include("includes/js-formularios.php");
 										<li><a href="#task"><i class=" icon-group"></i> Contactos</a></li>
 										<li><a href="#tickets"><i class=" icon-list"></i> Tickets</a></li>
 										<li><a href="#seguimientos"><i class=" icon-list-alt"></i> Seguimientos</a></li>
-										<li><a href="#cotizacion"><i class=" icon-list"></i> Cotizaciones</a></li>
+										<li><a href="#cotizacion"><i class=" icon-file"></i> Cotizaciones</a></li>
 										<!--<li><a href="#facturas"><i class=" icon-list-alt"></i> Facturas</a></li>-->
 									</ul>
 									<div class="tab-content">
@@ -244,7 +244,12 @@ include("includes/js-formularios.php");
 														<label class="control-label">Usuario de acceso</label>
 														<div class="controls">
 															<input type="text" class="span4" value="<?=$resultadoD['cli_usuario_acceso'];?>"  readonly name="usuarioAcceso" autocomplete="off">
-															Contraseña
+														</div>
+													</div>
+
+													<div class="control-group">
+														<label class="control-label">Contraseña</label>
+														<div class="controls">
 															<input type="<?php echo $campoC;?>" class="span4" name="claveCliente" value="<?=$resultadoD['cli_clave'];?>" autocomplete="off" placeholder="Contraseña" title="Contraseña">
 														</div>
 													</div>
@@ -264,7 +269,12 @@ include("includes/js-formularios.php");
 														<label class="control-label">Nombre (*)</label>
 														<div class="controls">
 															<input type="text" class="span6" name="nombre" value="<?=$resultadoD['cli_nombre'];?>" style="text-transform:uppercase;" required>
-															SIGLA  (Nombre corto)
+														</div>
+													</div>
+
+													<div class="control-group">
+														<label class="control-label">SIGLA  (Nombre corto)</label>
+														<div class="controls">
 															<input type="text" class="span4" name="sigla" style="text-transform:uppercase;" value="<?=$resultadoD['cli_sigla'];?>">
 														</div>
 													</div>
@@ -272,7 +282,7 @@ include("includes/js-formularios.php");
 													<div class="control-group">
 														<label class="control-label">Email</label>
 														<div class="controls">
-															<input type="email" class="span6" name="email" value="<?=$resultadoD['cli_email'];?>" style="text-transform:lowercase;">
+															<input type="email" class="span4" name="email" value="<?=$resultadoD['cli_email'];?>" style="text-transform:lowercase;">
 														</div>
 													</div>
 
@@ -290,14 +300,14 @@ include("includes/js-formularios.php");
 														<label class="control-label">Celular</label>
 														<div class="controls">
 															<input type="text" class="span4" name="celular" value="<?=$resultadoD['cli_celular'];?>" maxlength="10">
-															<span style="color:#F03;">Este valor sin puntos ni espacios. (3135912073)</span>
+															<span style="color:darkblue;">Este valor sin puntos ni espacios. (3135912073)</span>
 														</div>
 													</div>
 
 													<div class="control-group">
 														<label class="control-label">Teléfonos complementarios</label>
 														<div class="controls">
-															<input type="text" class="span8" name="telefonos" value="<?=$resultadoD['cli_telefonos'];?>">
+															<input type="text" class="span4" name="telefonos" value="<?=$resultadoD['cli_telefonos'];?>">
 														</div>
 													</div>
 
@@ -413,19 +423,6 @@ include("includes/js-formularios.php");
 														</div>
 												   </div>
 													   
-													<div class="control-group">
-														<label class="control-label">¿Ha realizado servicios?</label>
-														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="servicios">
-																<option value="1">--</option>
-																<option value="1" <?php if($resultadoD['cli_servicios']==1){echo "selected";}?>>Aún no</option>
-																<option value="2" <?php if($resultadoD['cli_servicios']==2){echo "selected";}?>>1 Vez</option>
-																<option value="3" <?php if($resultadoD['cli_servicios']==3){echo "selected";}?>>2 veces</option>
-																<option value="4" <?php if($resultadoD['cli_servicios']==4){echo "selected";}?>>3 o más veces</option>
-															</select>
-														</div>
-												   </div>
-													   
 													  <div class="control-group">
 														<label class="control-label">¿Tiene crédito?</label>
 														<div class="controls">
@@ -436,14 +433,6 @@ include("includes/js-formularios.php");
 															</select>
 														</div>
 												   </div> 
-													   
-													 <div class="control-group">
-														<label class="control-label">Fecha Incio (Uso CRM)</label>
-														<div class="controls">
-															<input type="date" class="span4" name="fechaInicioUso" value="<?=$resultadoD['cli_inicio_uso'];?>" readonly>
-														</div>
-														 <span style="color: navy;">A partirde esta fecha tiene un año de acceso al CRM.</span>
-													</div> 
 													   
 													<div class="control-group">
 														<label class="control-label">Referencia de llegada</label>
@@ -502,7 +491,6 @@ include("includes/js-formularios.php");
 														</label>
 														<div class="controls">
 															<input type="text" class="span4" name="saldo" value="<?=$resultadoD['cli_saldo'];?>" maxlength="10" readonly>
-															<span style="color:#F03;">Este valor sin puntos ni espacios. (10000)</span>
 														</div>
 													</div>
 													   
@@ -529,46 +517,7 @@ include("includes/js-formularios.php");
 														</div>
 												   </div>
 														
-												   </fieldset> 
-												
-												   <fieldset class="default">
-														<legend>Datos de retiro</legend>
-
-														<div class="control-group">
-															<label class="control-label">Retirado</label>
-															<div class="controls">
-																<select data-placeholder="Escoja una opción..." class="chzn-select span2" tabindex="2" name="retirado">
-																	<option value=""></option>
-																	<option value="1" <?php if($resultadoD['cli_retirado']==1){echo "selected";}?>>SI</option>
-																	<option value="0" <?php if($resultadoD['cli_retirado']!=1){echo "selected";}?>>NO</option>
-																</select>
-															</div>
-														</div>
-
-														<div class="control-group">
-															<label class="control-label">Fecha del retiro</label>
-															<div class="controls">
-																<input type="date" class="span4" name="retiroFecha" value="<?=$resultadoD['cli_fecha_retiro'];?>">
-															</div>
-														</div>
-
-														<div class="control-group">
-															<label class="control-label">Responsables del retiro
-															<button class="tooltipp">Responsable jefe inmediato.</button>
-															<i class="fa-solid fa-circle-question"></i>
-															</label>
-															<div class="controls">
-																<input type="text" class="span6" name="retiroResponsable" value="<?=$resultadoD['cli_responsable_retiro'];?>">
-															</div>
-														</div>
-
-														<div class="control-group">
-															<label class="control-label">Causa del retiro</label>
-															<div class="controls">
-																<textarea rows="5" cols="80" style="width: 80%" class="tinymce-simple" name="retiroCausa"><?=$resultadoD['cli_causa_retiro'];?></textarea>
-															</div>
-														</div>
-												   </fieldset> 
+												   </fieldset>
 
 													<div class="form-actions">
 														<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
