@@ -281,6 +281,7 @@ include("includes/js-formularios.php");
 				<li><a href="#itemsCotizados"><i class="icon-list"></i> Items cotizados</a></li>
 				<li><a href="#enviarCotizacion"><i class="icon-envelope"></i> Enviar cotización por correo</a></li>
 				<li><a href="#cotizacionesAsociadas"><i class="icon-retweet"></i> Cotizaciones asociadas</a></li>
+				<li><a href="#seguimientos"><i class="icon-list-ol"></i> Seguimientos</a></li>
 			</ul>
 
 			<div class="tab-content">
@@ -833,6 +834,34 @@ include("includes/js-formularios.php");
 				<div class="tab-pane" id="cotizacionesAsociadas">
 					<?php include("cotizaciones-relacionadas.php");?>
 				</div>
+
+				<div class="tab-pane" id="seguimientos">
+					<?php
+					$consulta = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
+					INNER JOIN clientes ON cli_id=cseg_cliente
+					INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
+					INNER JOIN clientes_tikets ON tik_id=cseg_tiket AND tik_id_cotizacion = ".$resultadoD['cotiz_id']);
+					$no = 1;
+					?>
+					<div class="row-fluid">
+						<div class="span12">
+							<?php
+							while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
+							?>
+								<div class="media">
+									<a href="#" class="pull-left media-thumb">
+										<img src="images/item-pic.png" width="34" height="34" alt="user">
+									</a>
+									<div class="media-body ">
+										<h4 class="media-heading"><?=$res['cseg_fecha_reporte'];?> - <?=$res['usr_nombre'];?></h4>
+										<p><?=$res['cseg_observacion'];?></p>
+									</div>
+								</div>
+							<?php }?>
+						</div>
+					</div>
+				</div>
+
 			</div>
 
 
