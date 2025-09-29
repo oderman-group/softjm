@@ -6,10 +6,12 @@ $filtro = "";
 $dpto="";
 $inicio = isset($_GET["inicio"]) && $_GET["inicio"] != "" ? $_GET["inicio"] : $inicio;
 $limite = !empty($_GET["limite"]) ? $_GET["limite"] : $limite;
+
 if (isset($_GET["buscar"]) and $_GET["buscar"] != "") {
 	$filtro .= " AND (cli_usuario LIKE '%" . $_GET["buscar"] . "%' OR cli_nombre LIKE '%" . $_GET["buscar"] . "%')"; 
 	
 }
+
 $tipoDoc="";
 if (isset($_GET["tipoDoc"]) and is_numeric($_GET["tipoDoc"])) {
 	$filtro .= " AND cli_tipo_documento='" . $_GET["tipoDoc"] . "'";
@@ -19,6 +21,11 @@ $filtroGrupos = '';
 if (isset($_GET["grupo"]) and is_numeric($_GET["grupo"])) {
 	$filtroGrupos .= "LEFT JOIN clientes_categorias ON cpcat_cliente=cli_id AND cpcat_categoria='" . $_GET["grupo"] . "'";
 }
+
+if (isset($_GET["clientesNuevos"])) {
+	$filtro .= " AND year(cli_fecha_ingreso)=".date("Y")." AND month(cli_fecha_ingreso)=".date("m");
+}
+
 $dpto="";
 if (isset($_GET["dpto"]) and $_GET["dpto"] != "") {
 	$consulta = $conexionBdPrincipal->query("SELECT * FROM " . MAINBD . ".clientes
