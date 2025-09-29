@@ -3,6 +3,11 @@ include("sesion.php");
 $idPagina = 9;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+
+include(RUTA_PROYECTO."/usuarios/class/Cliente.php");
+
+$clienteConMasVenta = Cliente::obtenerDatosClienteConMasComprasAgnoActual($idEmpresa, $conexionBdPrincipal);
+$clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBdPrincipal);
 ?>
 <!-- styles -->
 
@@ -119,21 +124,57 @@ include("includes/head.php");
 		<div class="main-wrapper">
 			<div class="container-fluid">
 				<?php include("includes/notificaciones.php");?>
-				<p>
-					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-					<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-						<a href="clientes-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-					<?php } ?>
-					<?php if (Modulos::validarRol([252], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-						<a href="clientes-importar.php" class="btn btn-success"><i class="icon-upload"></i> Cargar masivamente</a>
-					<?php } ?>
 
-				<div class="btn-group">
-					<button class="btn btn-primary">Acciones</button>
-					<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu">
-						<?php if (Modulos::validarRol([103], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+				<div class="row-fluid">
+					<div class="span3">
+						<div class="board-widgets magenta">
+							<div class="board-widgets-head clearfix">
+								<h4 class="pull-left"><i class="icon-user"></i> Cliente con más compras este año </h4>
+							</div>
+							<div class="board-widgets-content">
+								<span class="n-counter"><?=$clienteConMasVenta['cantidad'];?></span><span class="n-sources">Compras</span>
+							</div>
+							<div class="board-widgets-botttom">
+								<a href="clientes-editar.php?id=<?=$clienteConMasVenta['factura_cliente'];?>" target="_blank"><?=$clienteConMasVenta['nombreCliente'];?><i class="icon-double-angle-right"></i></a>
+							</div>
+						</div>
+					</div>
+
+					<div class="span3">
+						<div class="board-widgets green">
+							<div class="board-widgets-head clearfix">
+								<h4 class="pull-left"><i class="icon-star"></i> Cliente nuevos este mes </h4>
+							</div>
+							<div class="board-widgets-content">
+								<span class="n-counter"><?=$clientesNuevosEsteMes;?></span><span class="n-sources">Nuevos</span>
+							</div>
+							<div class="board-widgets-botttom">
+								<a href="clientes.php?clientesNuevos=1">Ver clientes recientes</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row-fluid">
+					<div class="span12">
+							<div class="navbar">
+						<div class="navbar-inner">
+							<div class="container">
+								<div class="nav-collapse collapse navbar-responsive-collapse">
+									<ul class="nav">
+										<li><a href="clientes.php"><i class="icon-group"></i> Todos los clientes</a></li>
+										<li><a href="javascript:history.go(-1);"><i class="icon-arrow-left"></i> Regresar</a></li>
+										<li>
+											<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+												<a href="clientes-agregar.php"><i class="icon-plus"></i> Agregar nuevo</a>
+											<?php } ?>
+										</li>
+										<li><?php if (Modulos::validarRol([252], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+						<a href="clientes-importar.php"><i class="icon-upload"></i> Cargar masivamente</a>
+					<?php } ?></li>
+										<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Más opciones <b class="caret"></b></a>
+										<ul class="dropdown-menu">
+											<?php if (Modulos::validarRol([103], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 							<li><a href="clientes-filtro.php">Imprimir informe</a></li>
 						<?php } ?>
 						<?php if (Modulos::validarRol([264], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
@@ -145,12 +186,59 @@ include("includes/head.php");
 						<?php if (Modulos::validarRol([2], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 							<li><a href="clientes.php?pap=1">Ver clientes en papelera</a></li>
 						<?php } ?>
-
-					</ul>
+										</ul>
+										</li>
+									</ul>
+									<form action="#<?=$_SERVER['PHP_SELF'];?>" method="get" class="navbar-search pull-left">
+										<div class="input-append input-icon">	
+											<input type="text" name="busqueda" placeholder="Buscar..." id="btn_buscar" class="search-query span12" value="<?php if(isset($_GET["buscar"])) echo $_GET["buscar"]; ?>">
+											<input class="btn" id="btnSubmitBuscar" type="button" value="Buscar">
+										</div>
+									</form>
+									<ul class="nav pull-right">
+										<li class="divider-vertical"></li>
+										<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Grupos <b class="caret"></b></a>
+											<ul class="dropdown-menu">
+												<li><a href="clientes.php">Todos</a></li>
+												<?php
+												$grupos = $conexionBdPrincipal->query("SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
+												while($grupo = mysqli_fetch_array($grupos, MYSQLI_BOTH)){
+													
+													$color = 'white';
+													if(isset($_GET["grupo"])){
+														if($grupo[0]==$_GET["grupo"]) $color = 'black' ;
+													}
+									
+													$consultaContarClientes = $conexionBdPrincipal->query("SELECT COUNT(*) FROM clientes_categorias
+													INNER JOIN clientes ON cli_id=cpcat_cliente AND (cli_papelera=0 OR  cli_papelera IS NULL)
+													WHERE cpcat_categoria='".$grupo[0]."' AND cli_id_empresa='".$idEmpresa."'
+													");
+													$contarClientes = mysqli_fetch_array($consultaContarClientes, MYSQLI_BOTH);
+												?>
+												<li><a href="clientes.php?grupo=<?=$grupo[0];?>" style="color:<?=$color;?>"><?=$grupo['deal_nombre']." (".$contarClientes[0].")";?></a></li>
+												<?php }?>
+											</ul>
+										</li>
+										<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Tipo documento <b class="caret"></b></a>
+											<ul class="dropdown-menu">
+												<li><a href="clientes.php">Todos</a></li>
+												<li><a href="clientes.php?tipoDoc=2&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">NIT</a></li>
+												<li><a href="clientes.php?tipoDoc=3&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Cédula</a></li>
+											</ul>
+										</li>
+										
+									</ul>
+								</div>
+								<!-- /.nav-collapse -->
+							</div>
+						</div>
+						<!-- /navbar-inner -->
+					</div>
+					</div>
 				</div>
-				</p>
 
 				<div class="row-fluid">
+
 					<div class="span2">
 						<div class="content-widgets light-gray">
 							<div class="widget-head green">
@@ -184,49 +272,6 @@ include("includes/head.php");
 					</div>
 
 					<div class="span10">
-						<p style="font-size: 11px;">
-							TK = Tickets | SG = Seguimientos | SC = Sucursales | CT = Contactos | FC = Facturas | RM = Remisiones
-						</p>
-
-						<p>
-						<div class="btn-group">
-							<button class="btn btn-primary">Grupos</button>
-							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span>
-							</button>
-							<ul class="dropdown-menu">
-								<li><a href="clientes.php">Todos</a></li>
-								<?php
-								$grupos = $conexionBdPrincipal->query("SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
-								while($grupo = mysqli_fetch_array($grupos, MYSQLI_BOTH)){
-									
-									$color = 'white';
-									if(isset($_GET["grupo"])){
-										if($grupo[0]==$_GET["grupo"]) $color = 'black' ;
-									}
-					
-									$consultaContarClientes = $conexionBdPrincipal->query("SELECT COUNT(*) FROM clientes_categorias
-									INNER JOIN clientes ON cli_id=cpcat_cliente AND (cli_papelera=0 OR  cli_papelera IS NULL)
-									WHERE cpcat_categoria='".$grupo[0]."' AND cli_id_empresa='".$idEmpresa."'
-									");
-									$contarClientes = mysqli_fetch_array($consultaContarClientes, MYSQLI_BOTH);
-								?>
-								<li><a href="clientes.php?grupo=<?=$grupo[0];?>" style="color:<?=$color;?>"><?=$grupo['deal_nombre']." (".$contarClientes[0].")";?></a></li>
-								<?php }?>
-							</ul>
-						</div>
-
-						<div class="btn-group">
-							<button class="btn btn-primary">Tipo Documento</button>
-							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span>
-							</button>
-							<ul class="dropdown-menu">
-								<li><a href="clientes.php">Todos</a></li>
-								<li><a href="clientes.php?tipoDoc=2&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">NIT</a></li>
-								<li><a href="clientes.php?tipoDoc=3&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Cédula</a></li>
-							</ul>
-						</div>
-						</p>
-
 						<div class="content-widgets light-gray">
 							<div class="widget-head green">
 								<h3><?=$paginaActual['pag_nombre'];?></h3>
@@ -236,17 +281,24 @@ include("includes/head.php");
 							if (isset($_GET["pap"]) and $_GET["pap"] == 1) {
 								$filtro .= " AND cli_papelera=1";
 							}
+
 							$filtroGrupos = '';
 							if (isset($_GET["grupo"]) and is_numeric($_GET["grupo"])) {
 								$filtroGrupos .= "LEFT JOIN clientes_categorias ON cpcat_cliente=cli_id AND cpcat_categoria='" . $_GET["grupo"] . "'";
 							}
+
 							$tipoDoc="";
 							if (isset($_GET["tipoDoc"]) and is_numeric($_GET["tipoDoc"])) {
 								$filtro .= " AND cli_tipo_documento='" . $_GET["tipoDoc"] . "'";
 								$tipoDoc=$_GET["tipoDoc"];
 							}
+
 							if(Modulos::validarRol([385], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 								$filtro.=' AND cli_ciudad!="1122"';
+							}
+
+							if (isset($_GET["clientesNuevos"])) {
+								$filtro .= " AND year(cli_fecha_ingreso)=".date("Y")." AND month(cli_fecha_ingreso)=".date("m");
 							}
 							?>
 
@@ -271,19 +323,9 @@ include("includes/head.php");
 
 							<div class="widget-container">
 								<div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
-									<h4 align="center">-Busqueda general y paginación-</h4>
-									<p>
-									<form class="form-horizontal" style="text-align: right;" action="#<?=$_SERVER['PHP_SELF'];?>" method="get">
-										<div class="search-box">
-											<div class="input-append input-icon">
-												<input placeholder="Buscar..." id="btn_buscar" type="text" name="busqueda" value="<?php if(isset($_GET["buscar"])) echo $_GET["buscar"]; ?>">
-												<i class=" icon-search"></i>
-												<input class="btn" id="btnSubmitBuscar" type="button" value="Buscar">
-											</div>
-											<?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
-										</div>
-									</form>
 									<p style="margin: 10px;"><?php include("includes/paginacion.php");?></p>
+									<p style="font-size: 11px; text-align:center; margin-top:40px;">
+										TK = Tickets | SG = Seguimientos | SC = Sucursales | CT = Contactos | FC = Facturas | RM = Remisiones
 									</p>
 								</div>
 								<table class="table table-striped table-bordered">
