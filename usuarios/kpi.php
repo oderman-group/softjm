@@ -68,11 +68,7 @@ include("includes/head.php");
 								<a href="#" style="margin-bottom:10px;" id="kpi8">8. Clientes efectivos por evento</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi9">9. Nuevos subdistribuidores</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi10">10. Captación de clientes instituciones</a><br>
-
-								<a href="#" style="margin-bottom:10px;" id="kpi11">11. Número de visitas realizadas</a><br>
-								<a href="#" style="margin-bottom:10px;" id="kpi12">12. Tasa de éxito de las licitaciones</a><br>
-								<a href="#" style="margin-bottom:10px;" id="kpi13">13. Participación en Eventos</a><br>
-
+								<a href="#" style="margin-bottom:10px;" id="kpi11">11. Número de visitas realizadas</a>
 							</div>
 						</div>
 					</div>
