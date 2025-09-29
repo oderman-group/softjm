@@ -298,7 +298,6 @@ include("includes/head.php");
 											<th>CT</th>
 											<th>FC</th>
 											<th>RM</th>
-											<th>Sesión<br>Último ingreso</th>
 										</tr>
 									</thead>
 									<tbody id="clientes_buscar">	

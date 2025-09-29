@@ -199,7 +199,6 @@ while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 				<td align="center" style="background:<?= $pagina['color'] ?>;"><a href="<?= $pagina['url'] ?>" target="_blank"><?= $pagina['numero'] ?></a></td>
 			<?php } ?>
 		<?php } ?>
-		<td><img src="files/<?= $estadoSesion; ?>"><br><?= $res['cli_ultimo_ingreso']; ?></td>
 	</tr>
 <?php $no++;
 } ?>
