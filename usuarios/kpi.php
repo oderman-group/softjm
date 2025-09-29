@@ -64,7 +64,7 @@ include("includes/head.php");
 								<a href="#" style="margin-bottom:10px;" id="kpi4">4. Cumplimiento de la cuota comercial</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi5">5. Tasa de conversión de prospecto a cliente</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi6">6. Ejecución de Demostraciones</a><br>
-								<a href="#" style="margin-bottom:10px;" id="kpi7">7. Número de llamadas enviadas por ejecutivo de prospección</a><br>
+								<a href="#" style="margin-bottom:10px;" id="kpi7">7. Número de gestión a leads de prospección</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi8">8. Clientes efectivos por evento</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi9">9. Nuevos subdistribuidores</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi10">10. Captación de clientes instituciones</a><br>

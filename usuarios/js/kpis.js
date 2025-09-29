@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (this.id == "kpi1") {
 
-                divDescripcionPki.innerHTML = "Cantidad: Número de facturas emitidas.";
+                divDescripcionPki.innerHTML = "<b>Cantidad:</b> Número de facturas emitidas.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi2") {     
 
-                    divDescripcionPki.innerHTML = "Cantidad: Número de facturas emitidas. Total: Suma del valor total de las facturas. Prom: Promedio del valor total de las facturas.";
+                    divDescripcionPki.innerHTML = "<b>Cantidad:</b> Número de facturas emitidas. <b>Total:</b> Suma del valor total de las facturas. <b>Prom:</b> Promedio del valor total de las facturas.";
 
                     grdDatosChart.option({   
                         commonSeriesSettings: {
@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi3") {
 
-                    divDescripcionPki.innerHTML = "Cantidad: Número de facturas emitidas. Duracion: Suma del número de días que tardó en cerrarse las ventas. Prom: Promedio del número de días que tardó en cerrarse una venta.";
+                    divDescripcionPki.innerHTML = "<b>Cantidad:</b> Número de facturas emitidas. <b>Duracion:</b> Suma del número de días que tardó en cerrarse las ventas. <b>Prom:</b> Promedio del número de días que tardó en cerrarse una venta.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi4") {    
 
-                    divDescripcionPki.innerHTML = "Ventas: Número de ventas realizadas. Meta: Número de ventas planificadas. Tasa: Porcentaje de cumplimiento de la meta.";
+                    divDescripcionPki.innerHTML = "<b>Ventas:</b> Número de ventas realizadas. <b>Meta:</b> Número de ventas planificadas. <b>Tasa:</b> Porcentaje de cumplimiento de la meta.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -631,7 +631,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi5") {
 
-                    divDescripcionPki.innerHTML = "Clientes: Número de clientes adquiridos. Prospectos: Número de prospectos atendidos. Tasa: Porcentaje de conversión de prospectos a clientes.";
+                    divDescripcionPki.innerHTML = "<b>Clientes:</b> Número de clientes adquiridos. <b>Prospectos:</b> Número de prospectos atendidos. <b>Tasa:</b> Porcentaje de conversión de prospectos a clientes.";
                    
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -768,7 +768,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi6") {
 
-                    divDescripcionPki.innerHTML = "Demostraciones: Número de demostraciones realizadas. Meta: Número de demostraciones planificadas. Tasa: Porcentaje de cumplimiento de la meta.";
+                    divDescripcionPki.innerHTML = "<b>Demostraciones:</b> Número de demostraciones realizadas. <b>Meta:</b> Número de demostraciones planificadas. <b>Tasa:</b> Porcentaje de cumplimiento de la meta.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -905,7 +905,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi7") {
 
-                    divDescripcionPki.innerHTML = "Cantidad: Número de llamadas realizadas.";
+                    divDescripcionPki.innerHTML = "<b>Cantidad:</b> Número de llamadas realizadas.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -1012,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi8") {
 
-                    divDescripcionPki.innerHTML = "Ganados: Número de clientes adquiridos. Generados: Número de clientes atendidos. Tasa: Porcentaje de conversión a clientes.";
+                    divDescripcionPki.innerHTML = "<b>Ganados:</b> Número de clientes adquiridos. <b>Generados:</b> Número de clientes atendidos. <b>Tasa:</b> Porcentaje de conversión a clientes.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -1149,7 +1149,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi9") {
 
-                    divDescripcionPki.innerHTML = "Nuevos: Número de clientes nuevos. Actuales: Número de clientes actuales. Tasa: Porcentaje de clientes nuevos sobre el total de clientes.";
+                    divDescripcionPki.innerHTML = "<b>Nuevos:</b> Número de clientes nuevos. <b>Actuales:</b> Número de clientes actuales. <b>Tasa:</b> Porcentaje de clientes nuevos sobre el total de clientes.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -1286,7 +1286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi10") {
 
-                    divDescripcionPki.innerHTML = "Nuevos: Número de clientes nuevos. Actuales: Número de clientes actuales. Tasa: Porcentaje de clientes nuevos sobre el total de clientes.";
+                    divDescripcionPki.innerHTML = "<b>Nuevos:</b> Número de clientes nuevos. <b>Actuales:</b> Número de clientes actuales. <b>Tasa:</b> Porcentaje de clientes nuevos sobre el total de clientes.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
@@ -1423,7 +1423,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.id == "kpi11") {
 
-                    divDescripcionPki.innerHTML = "Ejecutada: Número de visitas ejecutadas. Programada: Número de visitas programadas. Tasa: Porcentaje de cumplimiento de la meta.";
+                    divDescripcionPki.innerHTML = "<b>Ejecutada:</b> Número de visitas ejecutadas. <b>Programada:</b> Número de visitas programadas. <b>Tasa:</b> Porcentaje de cumplimiento de la meta.";
 
                     grdDatosChart.option({
                         commonSeriesSettings: {
