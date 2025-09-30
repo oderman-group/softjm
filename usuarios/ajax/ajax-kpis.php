@@ -129,32 +129,40 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
     $e_dato = json_decode($_POST["e_datos"]);
 
     $sql = "
-    SELECT
-        f.factura_id as id,
-        sucu.sucp_nombre as sucursal,
-        f.factura_vendedor,
-        usr.usr_nombre AS vendedor,
-        f.factura_id factura,
-        f.factura_fecha_creacion AS fecha,        
-        COUNT(f.factura_id) ventas,
-        um.um_meta AS meta_ventas,
-        ROUND((COUNT(f.factura_id)/um.um_meta)*100,2) tasa       
-    FROM
-        facturas f
-    JOIN
-        usuarios usr ON usr.usr_id = f.factura_vendedor
-    join sucursales_propias sucu on sucu.sucp_id=usr.usr_sucursal
-    LEFT JOIN
-        usuarios_metas um ON um.um_usuario = usr.usr_id
-        AND um.um_tipo_meta = 'NUMERO_VENTA' -- Se identifica la meta de ventas
-        AND um.um_year = YEAR(f.factura_fecha_creacion)
-        AND um.um_mes = MONTH(f.factura_fecha_creacion)
-    where
-        f.factura_tipo = 1 AND f.factura_estado = 1 AND um.um_meta IS NOT NULL
-    GROUP BY usr.usr_sucursal, f.factura_vendedor , DATE_FORMAT(f.factura_fecha_creacion,'%Y-%m')
-    ORDER BY
-        f.factura_fecha_creacion DESC;
-    ;
+        SELECT
+        um.um_id,
+        CONCAT(um.um_year,'-',if(um.um_mes < 10, CONCAT('0',um.um_mes),um.um_mes),'-01') fecha,
+        u.usr_sucursal id_sucural,
+        sp.sucp_nombre sucursal,
+        um.um_usuario id_asesor,
+        u.usr_nombre asesor,
+        um.um_meta planeada,
+        IFNULL(v.valor,0) ejecutada
+        FROM usuarios_metas um 
+        INNER JOIN usuarios u ON u.usr_id = um.um_usuario
+        INNER JOIN sucursales_propias sp ON sp.sucp_id= u.usr_sucursal
+        LEFT JOIN(
+        SELECT
+            fac.factura_id as id,
+            DATE_FORMAT(fac.factura_fecha_creacion,'%Y-%m') periodo,
+            fac.factura_fecha_creacion as fecha,  
+            us.usr_sucursal id_sucural,      
+            sp.sucp_nombre as sucursal,
+            us.usr_id id_asesor,
+            us.usr_nombre as asesor,
+            fac.factura_cliente,
+            cli.cli_nombre as cliente,
+            ROUND(SUM(cp.czpp_cantidad * cp.czpp_valor),2) AS valor
+        FROM facturas fac
+        INNER JOIN cotizacion_productos cp ON cp.czpp_cotizacion = fac.factura_id AND cp.czpp_tipo = 4
+        INNER JOIN  clientes cli ON cli.cli_id=fac.factura_cliente
+        INNER JOIN  usuarios us ON us.usr_id=fac.factura_vendedor
+        INNER JOIN  sucursales_propias sp ON sp.sucp_id=us.usr_sucursal
+        WHERE fac.factura_tipo = 1 AND fac.factura_id_empresa = 1
+        GROUP BY us.usr_sucursal, us.usr_id , DATE_FORMAT(fac.factura_fecha_creacion,'%Y-%m')
+        ORDER BY fac.factura_fecha_creacion DESC
+        )v ON v.id_sucural = u.usr_sucursal AND v.id_asesor = um.um_usuario AND CONCAT(um.um_year,'-',if(um.um_mes < 10, CONCAT('0',um.um_mes),um.um_mes)) = v.periodo
+        WHERE um.um_tipo_meta = 'VALOR_VENTAS';
     ";
     $result = mysqli_query($conexionBdPrincipal, $sql);
 
