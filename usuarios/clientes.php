@@ -157,83 +157,86 @@ $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBd
 
 				<div class="row-fluid">
 					<div class="span12">
-							<div class="navbar">
-						<div class="navbar-inner">
-							<div class="container">
-								<div class="nav-collapse collapse navbar-responsive-collapse">
-									<ul class="nav">
-										<li><a href="clientes.php"><i class="icon-group"></i> Todos los clientes</a></li>
-										<li><a href="javascript:history.go(-1);"><i class="icon-arrow-left"></i> Regresar</a></li>
-										<li>
-											<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-												<a href="clientes-agregar.php"><i class="icon-plus"></i> Agregar nuevo</a>
-											<?php } ?>
-										</li>
-										<li><?php if (Modulos::validarRol([252], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-						<a href="clientes-importar.php"><i class="icon-upload"></i> Cargar masivamente</a>
-					<?php } ?></li>
-										<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Más opciones <b class="caret"></b></a>
-										<ul class="dropdown-menu">
-											<?php if (Modulos::validarRol([103], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-							<li><a href="clientes-filtro.php">Imprimir informe</a></li>
-						<?php } ?>
-						<?php if (Modulos::validarRol([264], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-							<li><a href="excel_exportar/clientes-exportar.php?dpto=<?php if(isset($_GET["dpto"])) echo $_GET["dpto"];?>" target="_blank">Exportar a Excel</a></li>
-						<?php } ?>
-						<?php if (Modulos::validarRol([57], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-							<li><a href="bd_update/clientes-actualizar-claves.php" onClick="if(!confirm('Desea ejecutar esta accion?')){return false;}">Cambiar todas las claves</a></li>
-						<?php } ?>
-						<?php if (Modulos::validarRol([2], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-							<li><a href="clientes.php?pap=1">Ver clientes en papelera</a></li>
-						<?php } ?>
+						<div class="navbar">
+							<div class="navbar-inner">
+								<div class="container">
+									<div class="nav-collapse collapse navbar-responsive-collapse">
+										<ul class="nav">
+											<li><a href="clientes.php"><i class="icon-group"></i> Todos los clientes</a></li>
+											<li><a href="javascript:history.go(-1);"><i class="icon-arrow-left"></i> Regresar</a></li>
+											<li>
+												<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<a href="clientes-agregar.php"><i class="icon-plus"></i> Agregar nuevo</a>
+												<?php } ?>
+											</li>
+											<li>
+												<?php if (Modulos::validarRol([252], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<a href="clientes-importar.php"><i class="icon-upload"></i> Cargar masivamente</a>
+												<?php } ?>
+											</li>
+											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Más opciones <b class="caret"></b></a>
+												<ul class="dropdown-menu">
+													<?php if (Modulos::validarRol([103], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+														<li><a href="clientes-filtro.php">Imprimir informe</a></li>
+													<?php } ?>
+													<?php if (Modulos::validarRol([264], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+														<li><a href="excel_exportar/clientes-exportar.php?dpto=<?php if(isset($_GET["dpto"])) echo $_GET["dpto"];?>" target="_blank">Exportar a Excel</a></li>
+													<?php } ?>
+													<?php if (Modulos::validarRol([57], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+														<li><a href="bd_update/clientes-actualizar-claves.php" onClick="if(!confirm('Desea ejecutar esta accion?')){return false;}">Cambiar todas las claves</a></li>
+													<?php } ?>
+													<?php if (Modulos::validarRol([2], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+														<li><a href="clientes.php?pap=1">Ver clientes en papelera</a></li>
+													<?php } ?>
+												</ul>
+											</li>
 										</ul>
-										</li>
-									</ul>
-									<form action="#<?=$_SERVER['PHP_SELF'];?>" method="get" class="navbar-search pull-left">
-										<div class="input-append input-icon">	
-											<input type="text" name="busqueda" placeholder="Buscar..." id="btn_buscar" class="search-query span12" value="<?php if(isset($_GET["buscar"])) echo $_GET["buscar"]; ?>">
-											<input class="btn" id="btnSubmitBuscar" type="button" value="Buscar">
-										</div>
-									</form>
-									<ul class="nav pull-right">
-										<li class="divider-vertical"></li>
-										<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Grupos <b class="caret"></b></a>
-											<ul class="dropdown-menu">
-												<li><a href="clientes.php">Todos</a></li>
-												<?php
-												$grupos = $conexionBdPrincipal->query("SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
-												while($grupo = mysqli_fetch_array($grupos, MYSQLI_BOTH)){
-													
-													$color = 'white';
-													if(isset($_GET["grupo"])){
-														if($grupo[0]==$_GET["grupo"]) $color = 'black' ;
-													}
-									
-													$consultaContarClientes = $conexionBdPrincipal->query("SELECT COUNT(*) FROM clientes_categorias
-													INNER JOIN clientes ON cli_id=cpcat_cliente AND (cli_papelera=0 OR  cli_papelera IS NULL)
-													WHERE cpcat_categoria='".$grupo[0]."' AND cli_id_empresa='".$idEmpresa."'
-													");
-													$contarClientes = mysqli_fetch_array($consultaContarClientes, MYSQLI_BOTH);
-												?>
-												<li><a href="clientes.php?grupo=<?=$grupo[0];?>" style="color:<?=$color;?>"><?=$grupo['deal_nombre']." (".$contarClientes[0].")";?></a></li>
-												<?php }?>
-											</ul>
-										</li>
-										<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Tipo documento <b class="caret"></b></a>
-											<ul class="dropdown-menu">
-												<li><a href="clientes.php">Todos</a></li>
-												<li><a href="clientes.php?tipoDoc=2&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">NIT</a></li>
-												<li><a href="clientes.php?tipoDoc=3&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Cédula</a></li>
-											</ul>
-										</li>
+
+										<form action="#<?=$_SERVER['PHP_SELF'];?>" method="get" class="navbar-search pull-left">
+											<div class="input-append input-icon">	
+												<input type="text" name="busqueda" placeholder="Buscar..." id="btn_buscar" class="search-query span12" value="<?php if(isset($_GET["buscar"])) echo $_GET["buscar"]; ?>">
+												<input class="btn" id="btnSubmitBuscar" type="button" value="Buscar">
+											</div>
+										</form>
+
+										<ul class="nav pull-right">
+											<li class="divider-vertical"></li>
+											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Grupos <b class="caret"></b></a>
+												<ul class="dropdown-menu">
+													<li><a href="clientes.php">Todos</a></li>
+													<?php
+													$grupos = $conexionBdPrincipal->query("SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
+													while($grupo = mysqli_fetch_array($grupos, MYSQLI_BOTH)){
+														
+														$color = 'white';
+														if(isset($_GET["grupo"])){
+															if($grupo[0]==$_GET["grupo"]) $color = 'black' ;
+														}
 										
-									</ul>
+														$consultaContarClientes = $conexionBdPrincipal->query("SELECT COUNT(*) FROM clientes_categorias
+														INNER JOIN clientes ON cli_id=cpcat_cliente AND (cli_papelera=0 OR  cli_papelera IS NULL)
+														WHERE cpcat_categoria='".$grupo[0]."' AND cli_id_empresa='".$idEmpresa."'
+														");
+														$contarClientes = mysqli_fetch_array($consultaContarClientes, MYSQLI_BOTH);
+													?>
+													<li><a href="clientes.php?grupo=<?=$grupo[0];?>" style="color:<?=$color;?>"><?=$grupo['deal_nombre']." (".$contarClientes[0].")";?></a></li>
+													<?php }?>
+												</ul>
+											</li>
+											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Tipo documento <b class="caret"></b></a>
+												<ul class="dropdown-menu">
+													<li><a href="clientes.php">Todos</a></li>
+													<li><a href="clientes.php?tipoDoc=2&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">NIT</a></li>
+													<li><a href="clientes.php?tipoDoc=3&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Cédula</a></li>
+												</ul>
+											</li>
+										</ul>
+									</div>
+									<!-- /.nav-collapse -->
 								</div>
-								<!-- /.nav-collapse -->
 							</div>
+							<!-- /navbar-inner -->
 						</div>
-						<!-- /navbar-inner -->
-					</div>
 					</div>
 				</div>
 
