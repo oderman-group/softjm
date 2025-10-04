@@ -113,4 +113,4 @@ include("includes/head.php");
 </body>
 </html>
 
-<div id="miPopup"></div>
+<div id="modalDetalle"></div>

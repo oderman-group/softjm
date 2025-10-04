@@ -16,8 +16,12 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
     SELECT
         fac.factura_id as id,
         fac.factura_fecha_creacion as fecha,
-        us.usr_nombre as vendedor,
+        fac.factura_vendedor id_asesor,
+        us.usr_nombre as asesor,
+        us.usr_sucursal id_sucural,
         sp.sucp_nombre as sucursal,
+        fac.factura_cliente id_cliente,
+        cli.cli_usuario identificacion,
         cli.cli_nombre as cliente,
         fac.factura_id factura,
         ROUND(SUM(cp.czpp_cantidad * cp.czpp_valor),2) AS total
@@ -79,12 +83,10 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
             ct.tik_fecha_creacion fecha,
             ct.tik_fecha_cierre,
             DATEDIFF(ct.tik_fecha_cierre, ct.tik_fecha_creacion) AS dias,
-            u.usr_id AS id_vendedor,
+            u.usr_id AS id_asesor,
             u.usr_nombre AS asesor,
             sp.sucp_id AS id_sucursal,
-            sp.sucp_nombre AS sucursal,
-            sp.sucp_ciudad AS ciudad_sucursal,
-            sp.sucp_id_empresa AS id_empresa_sucursal
+            sp.sucp_nombre AS sucursal
         FROM
             clientes AS c
         INNER JOIN
@@ -195,8 +197,8 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
             c.cli_id id,
             u.usr_sucursal,
             s.sucp_nombre sucursal,  
-            u.usr_id,  
-            u.usr_nombre vendedor,    
+            u.usr_id id_asesor,  
+            u.usr_nombre asesor,    
             DATE_FORMAT(c.cli_fecha_registro,'%Y-%m') periodo,
             c.cli_fecha_registro fecha,
             c.cli_fecha_ingreso,
@@ -370,7 +372,7 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
             u.usr_sucursal,
             s.sucp_nombre sucursal,  
             u.usr_id,  
-            u.usr_nombre vendedor,    
+            u.usr_nombre asesor,    
             DATE_FORMAT(c.cli_fecha_registro,'%Y-%m') periodo,
             c.cli_fecha_registro fecha,
             c.cli_fecha_ingreso,
@@ -616,5 +618,489 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
 
     echo json_encode($resultado,512);
 
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_1_2_ventas" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT
+            fac.factura_id as id,
+            fac.factura_fecha_creacion as fecha,
+            fac.factura_vendedor id_asesor,
+            us.usr_nombre as asesor,
+            us.usr_sucursal id_sucural,
+            sp.sucp_nombre as sucursal,
+            fac.factura_cliente id_cliente,
+            cli.cli_usuario identificacion,
+            cli.cli_nombre as cliente,
+            fac.factura_id factura,
+            ROUND(SUM(cp.czpp_cantidad * cp.czpp_valor),2) AS valor
+        FROM facturas fac
+        INNER JOIN cotizacion_productos cp ON cp.czpp_cotizacion = fac.factura_id AND cp.czpp_tipo = 4
+        INNER JOIN  clientes cli ON cli.cli_id=fac.factura_cliente
+        INNER JOIN  usuarios us ON us.usr_id=fac.factura_vendedor
+        INNER JOIN  sucursales_propias sp ON sp.sucp_id=us.usr_sucursal
+        WHERE fac.factura_tipo = 1 AND fac.factura_id_empresa = 1  AND".$_POST["condicion"] ."
+        GROUP BY
+            fac.factura_id,
+            fac.factura_fecha_creacion,
+            us.usr_nombre,
+            sp.sucp_nombre,
+            cli.cli_nombre
+        ORDER BY fac.factura_id DESC ;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 1 y 2 de ventas" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_3_tiempo_promedio_cierre_ventas" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT
+            ct.tik_id id,
+            c.cli_id,
+            c.cli_usuario identificacion,
+            c.cli_nombre AS cliente, -- Se añadió el nombre del cliente para mayor detalle
+            -- Calcula la duración en días para cada venta individual
+            ct.tik_fecha_creacion fecha_inicial,
+            ct.tik_fecha_cierre fecha_cierre,
+            DATEDIFF(ct.tik_fecha_cierre, ct.tik_fecha_creacion) AS dias,
+            u.usr_id AS id_asesor,
+            u.usr_nombre AS asesor,
+            sp.sucp_id AS id_sucursal,
+            sp.sucp_nombre AS sucursal,
+            ct.tik_id as ticket,
+            ct.tik_id_cotizacion as cotizacion,
+            pd.pedid_id as pedido,
+            rm.remi_id as remision,
+            fc.factura_id as factura
+        FROM clientes AS c
+        INNER JOIN clientes_tikets AS ct ON ct.tik_cliente = c.cli_id
+        INNER JOIN  usuarios AS u ON ct.tik_usuario_responsable = u.usr_id -- Se une con la tabla de usuarios para obtener información del vendedor
+        INNER JOIN sucursales_propias AS sp ON u.usr_sucursal = sp.sucp_id -- Se une con la tabla de sucursales para obtener información de la sucursal
+        INNER JOIN pedidos AS pd ON pd.pedid_cotizacion = ct.tik_id_cotizacion -- Se obtiene el pedido generado a partir de la cotización
+        INNER JOIN remisionbdg AS rm ON rm.remi_pedido = pd.pedid_id -- Se obtiene la remisión generada a partir del pedido
+        INNER JOIN facturas AS fc ON fc.factura_remision = rm.remi_id -- Se obtiene la factura generada a partir de la remisión
+        WHERE
+            ct.tik_estado = 2 -- Ticket Cerrado
+            AND ct.tik_etapa = 5 -- Cerrado y ganado
+            AND ct.tik_fecha_cierre IS NOT NULL
+            AND ct.tik_fecha_cierre >= ct.tik_fecha_creacion
+            AND ct.tik_tipo_negocio = 1 -- Tipo venta
+            AND ct.tik_id_cotizacion IS NOT NULL AND ".$_POST["condicion"]."
+        ;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 3 tiempo promedio cierre ventas" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_4_cumplimiento_cuota_comercial" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT
+            fac.factura_id as id,
+            fac.factura_fecha_creacion as fecha,
+            fac.factura_vendedor id_asesor,
+            us.usr_nombre as asesor,
+            us.usr_sucursal id_sucural,
+            sp.sucp_nombre as sucursal,
+            fac.factura_cliente id_cliente,
+            cli.cli_usuario identificacion,
+            cli.cli_nombre as cliente,
+            fac.factura_id factura,
+            ROUND(SUM(cp.czpp_cantidad * cp.czpp_valor),2) AS valor
+        FROM facturas fac
+        INNER JOIN cotizacion_productos cp ON cp.czpp_cotizacion = fac.factura_id AND cp.czpp_tipo = 4
+        INNER JOIN  clientes cli ON cli.cli_id=fac.factura_cliente
+        INNER JOIN  usuarios us ON us.usr_id=fac.factura_vendedor
+        INNER JOIN  sucursales_propias sp ON sp.sucp_id=us.usr_sucursal
+        INNER JOIN usuarios_metas um ON um.um_usuario = fac.factura_vendedor AND um.um_tipo_meta = 'VALOR_VENTAS' AND CONCAT(um.um_year,'-',if(um.um_mes < 10, CONCAT('0',um.um_mes),um.um_mes)) = DATE_FORMAT(fac.factura_fecha_creacion, '%Y-%m')
+        WHERE fac.factura_tipo = 1 AND fac.factura_id_empresa = 1  AND".$_POST["condicion"] ."
+        GROUP BY
+            fac.factura_id,
+            fac.factura_fecha_creacion,
+            us.usr_nombre,
+            sp.sucp_nombre,
+            cli.cli_nombre
+        ORDER BY fac.factura_id DESC ;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 4 cumplimiento cuota comercial" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_5_tasa_conversión_prospecto_cliente_prospectos" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT
+            c.cli_id id,
+            c.cli_usuario identificacion,
+            c.cli_nombre prospecto,
+            u.usr_sucursal id_sucursal,
+            s.sucp_nombre sucursal,  
+            u.usr_id id_asesor,  
+            u.usr_nombre asesor,    
+            DATE_FORMAT(c.cli_fecha_registro,'%Y-%m') periodo,
+            c.cli_fecha_registro fecha,
+            c.cli_fecha_ingreso
+        FROM clientes c
+        join usuarios u on u.usr_id= c.cli_responsable
+        join sucursales_propias s on s.sucp_id=u.usr_sucursal
+        WHERE cli_categoria IN (1,2,3) AND cli_fecha_registro is not null AND ".$_POST["condicion"]." ;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 4 cumplimiento cuota comercial" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_5_tasa_conversión_prospecto_cliente_clientes" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT
+            cli_id id,
+            c.cli_usuario identificacion,
+            c.cli_nombre cliente,
+            usr_sucursal,
+            u.usr_sucursal id_sucursal,
+            sucp_nombre sucursal,  
+            cli_responsable id_asesor,  
+            u.usr_nombre asesor,   
+            DATE_FORMAT(cli_fecha_ingreso,'%Y-%m') periodo,
+            cli_fecha_registro,
+            cli_fecha_ingreso fecha
+        FROM clientes c
+        join usuarios u on usr_id=cli_responsable
+        join sucursales_propias s on sucp_id=usr_sucursal
+        WHERE cli_categoria IN (1,2,3) AND cli_fecha_ingreso is not null AND  cli_fecha_ingreso <> '0000-00-00' AND ".$_POST["condicion"]." ;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 4 cumplimiento cuota comercial" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_6_ejecucion_demostraciones" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT 
+            cs.cseg_id id,
+            cs.cseg_fecha_contacto fecha,
+            u.usr_sucursal id_sucural,
+            sp.sucp_nombre sucursal,
+            cs.cseg_usuario_responsable id_asesor,
+            u.usr_nombre asesor,
+            cs.cseg_cliente id_cliente,
+            c.cli_usuario identificacion,
+            c.cli_nombre cliente,
+            cs.cseg_id seguimiento
+        FROM cliente_seguimiento cs
+        INNER JOIN clientes c ON c.cli_id = cs.cseg_cliente
+        INNER JOIN usuarios u ON u.usr_id = cs.cseg_usuario_responsable
+        INNER JOIN sucursales_propias sp ON sp.sucp_id= u.usr_sucursal
+        INNER JOIN usuarios_metas um ON um.um_usuario = cs.cseg_usuario_responsable AND um.um_tipo_meta = 'NUMERO_DEMOSTRACIONES' AND CONCAT(um.um_year,'-',if(um.um_mes < 10, CONCAT('0',um.um_mes),um.um_mes)) = DATE_FORMAT(cs.cseg_fecha_contacto, '%Y-%m')
+        WHERE cs.cseg_demostracion = 1 AND ".$_POST["condicion"] .";
+            ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 6 de ejecución de demostraciones" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_7_numero_llamadas_enviadas_ejecutivo_prospeccion" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        select
+            cseg_id id,
+            cseg_fecha_reporte as fecha,
+            cli_usuario identificacion,
+            cli_nombre cliente,
+            cli_nombre as cliente,
+            usr_nombre as asesor,
+            sucp_nombre as sucursal,
+            cseg_id seguimiento
+        FROM cliente_seguimiento
+        INNER JOIN clientes cli ON cli.cli_id=cseg_cliente 
+            and cli.cli_forma_creacion = 'EJECUTIVO_PROSPECCION' 
+            and (cli_fecha_ingreso >= DATE(cseg_fecha_reporte) or cli_fecha_ingreso is NULL)
+        INNER JOIN usuarios u ON u.usr_id = cseg_usuario_responsable
+        INNER JOIN sucursales_propias s ON sucp_id=usr_sucursal
+        WHERE cseg_tipo = 1 and cseg_forma_contacto = 1 AND ".$_POST["condicion"] .";
+            ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 6 de ejecución de demostraciones" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_8_clientes_efectivos_por_evento_generados" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT
+            c.cli_id id,
+            c.cli_usuario identificacion,
+            c.cli_nombre generados,
+            u.usr_sucursal id_sucursal,
+            s.sucp_nombre sucursal,  
+            u.usr_id id_asesor,  
+            u.usr_nombre asesor,    
+            DATE_FORMAT(c.cli_fecha_registro,'%Y-%m') periodo,
+            c.cli_fecha_registro fecha,
+            c.cli_fecha_ingreso,
+            c.cli_nombre_evento evento
+        FROM clientes c
+        join usuarios u on u.usr_id= c.cli_responsable
+        join sucursales_propias s on s.sucp_id=u.usr_sucursal
+        WHERE cli_categoria IN (1,2,3) AND cli_fecha_registro is not null AND cli_referencia = 4 AND ".$_POST["condicion"]." ;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 8 clientes efectivos por evento generados" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_8_clientes_efectivos_por_evento_ganados" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT
+            cli_id id,
+            c.cli_usuario identificacion,
+            c.cli_nombre ganados,
+            usr_sucursal,
+            u.usr_sucursal id_sucursal,
+            sucp_nombre sucursal,  
+            cli_responsable id_asesor,  
+            u.usr_nombre asesor,   
+            DATE_FORMAT(cli_fecha_ingreso,'%Y-%m') periodo,
+            cli_fecha_registro,
+            cli_fecha_ingreso fecha,
+            c.cli_nombre_evento evento
+        FROM clientes c
+        join usuarios u on usr_id=cli_responsable
+        join sucursales_propias s on sucp_id=usr_sucursal
+        WHERE cli_categoria IN (1,2,3) AND cli_fecha_ingreso is not null AND  cli_fecha_ingreso <> '0000-00-00' AND cli_referencia = 4 AND ".$_POST["condicion"]." ;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 8 clientes efectivos por evento ganados" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_11_numero_visitas_realizadas" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT 
+            cs.cseg_id id,
+            cs.cseg_fecha_contacto fecha,
+            u.usr_sucursal id_sucural,
+            sp.sucp_nombre sucursal,
+            cs.cseg_usuario_responsable id_asesor,
+            u.usr_nombre asesor,
+            cs.cseg_cliente id_cliente,
+            c.cli_usuario identificacion,
+            c.cli_nombre cliente,
+            cs.cseg_id seguimiento
+        FROM cliente_seguimiento cs
+        INNER JOIN clientes c ON c.cli_id = cs.cseg_cliente
+        INNER JOIN usuarios u ON u.usr_id = cs.cseg_usuario_responsable
+        INNER JOIN sucursales_propias sp ON sp.sucp_id= u.usr_sucursal
+        INNER JOIN usuarios_metas um ON um.um_usuario = cs.cseg_usuario_responsable AND um.um_tipo_meta = 'NUMERO_VISITAS' AND CONCAT(um.um_year,'-',if(um.um_mes < 10, CONCAT('0',um.um_mes),um.um_mes)) = DATE_FORMAT(cs.cseg_fecha_contacto, '%Y-%m')
+        WHERE cs.cseg_visita = 1 AND ".$_POST["condicion"] .";
+            ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 11 de visitas realizadas" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else{
+    echo json_encode(array(
+        'estado' => 'ko',
+        'datos' => [],
+        'mensaje' => 'No se enviaron parametros correctos para la consulta'
+    ),512);
 }
 ?>
