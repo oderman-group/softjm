@@ -3,6 +3,10 @@
 if($_POST["combo"]!=''){
     $numero = (count($_POST["combo"]));
     if ($numero > 0) {
+
+        $consulta     = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_POST["cliente"]."'");
+        $datosCliente = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+
         $contador = 0;
         while ($contador < $numero) {
 

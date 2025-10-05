@@ -1,9 +1,9 @@
 <?php
 
 // Asegúrate de que las rutas a PHPMailer sean correctas para tu estructura de directorios
-require '../../librerias/phpmailer/Exception.php';
-require '../../librerias/phpmailer/PHPMailer.php';
-require '../../librerias/phpmailer/SMTP.php';
+require RUTA_PROYECTO.'/librerias/phpmailer/Exception.php';
+require RUTA_PROYECTO.'/librerias/phpmailer/PHPMailer.php';
+require RUTA_PROYECTO.'/librerias/phpmailer/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;

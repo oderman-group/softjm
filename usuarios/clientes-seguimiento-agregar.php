@@ -7,14 +7,19 @@ $paginaActual['pag_nombre'] = "Agregar Seguimiento de clientes";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-if(isset($_GET["idTK"]) and is_numeric($_GET["idTK"])){
+require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
+
+if(isset($_GET["idTK"]) and is_numeric($_GET["idTK"]) && $_GET["idTK"] > 0){
 	$consultaTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_id='".$_GET["idTK"]."'");
 	$tiket = mysqli_fetch_array($consultaTikets, MYSQLI_BOTH);
 	$tiketID = $_GET["idTK"];
 	$cliente = $tiket["tik_cliente"];
 	$tipoSeguimiento = $tiket["tik_tipo_tiket"];
+
+	$estadoTicket = Ticket::getEstado($tiketID, $conexionBdPrincipal);
 }elseif(isset($_GET["cte"]) and is_numeric($_GET["cte"])){
 	$tiketID = ""; // vacío porque lo vamos a crear
+	$estadoTicket = 1; //Asumimos que está abierto para que lo deje crear o asociar a uno existente.
 	$cliente = $_GET["cte"];
 	$tipoSeguimiento = 1; //Comercial por defecto
 }else{
@@ -74,7 +79,7 @@ include("includes/js-formularios.php");
 				<div class="span3">
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
-							<h3> Ticket</h3>
+							<h3> Ticket <b><?php if(!empty($tiketID)) echo "Nro. ".$tiketID;?></b></h3>
 							<?php
 							$consultaInfoTikets=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets
 							INNER JOIN clientes ON cli_id=tik_cliente
@@ -135,9 +140,9 @@ include("includes/js-formularios.php");
                                             <?php
 											for($i=1; $i<=6; $i++){
 												
-												if($infoTicket['tik_etapa']==$i) {echo '<span style="color:green; font-weight:bold; font-size:13px;">'.$opcionesEtapa[$i].'</span><br>';}
-												
-												else {echo '<a href="bd_update/cliente-tikets-actualizar.php?get=41&idtk='.$infoTicket['tik_id'].'&etapa='.$i.'">'.$opcionesEtapa[$i].'</a><br>';}
+												if($infoTicket['tik_etapa']==$i) {
+													echo '<span style="color:green; font-weight:bold; font-size:13px;">'.$opcionesEtapa[$i].'</span><br>';
+												}
 											}
 											?>
                                     </div>
@@ -175,6 +180,7 @@ include("includes/js-formularios.php");
 									<?=$infoTicket['usr_nombre'];?>
 								</div>
 							</div>
+
 							
 							<div align="center" style="padding: 5px;">
 									<a href="clientes-tikets-editar.php?id=<?=$infoTicket['tik_id'];?>" class="btn btn-primary">Editar ticket</a>
@@ -182,7 +188,24 @@ include("includes/js-formularios.php");
 							
 						</div>
 					</div>
+
+					<?php if (!empty($tiket['tik_id_cotizacion'])) {?>
+						<div class="board-widgets green">
+							<div class="board-widgets-head clearfix">
+								<h4 class="pull-left"><i class="icon-inbox"></i> Cotización Asociada </h4>
+								
+							</div>
+							<div class="board-widgets-content">
+								<span class="n-counter">#<?=$tiket['tik_id_cotizacion'];?></span><span class="n-sources">Número de cotización</span>
+							</div>
+							<div class="board-widgets-botttom">
+								<a href="cotizaciones-editar.php?id=<?=$tiket['tik_id_cotizacion'];?>">Ir a la cotización <i class="icon-double-angle-right"></i></a>
+							</div>
+						</div>
+					<?php }?>
 				</div>
+
+				
 				
 				<div class="span9">
 					<p>Los campos marcados con (*) son obligatorios.</p>
@@ -205,9 +228,16 @@ include("includes/js-formularios.php");
 											<option value=""></option>
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$cliente."'");
+											$numContactos = mysqli_num_rows($conOp);
+											$selected = '';
+
+											if ($numContactos == 1) {
+												$selected = 'selected';
+											}
+
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
-                                            	<option value="<?=$resOp[0];?>"><?=$resOp['cont_nombre']." (".$resOp['cont_email']." - ".$resOp['cont_telefono'].")";?></option>
+                                            	<option value="<?=$resOp[0];?>" <?=$selected;?>><?=$resOp['cont_nombre']." (".$resOp['cont_email']." - ".$resOp['cont_telefono'].")";?></option>
                                             <?php
 											}
 											?>
@@ -217,14 +247,22 @@ include("includes/js-formularios.php");
                                     <p style="margin-top:10px; font-weight:bold;">Cuando termine de crear el contacto, cierre la ventana emergente y actualice esta pantalla (F5)</p>
                                </div>
 								
-								<?php if($tiketID==""){?>
+								<?php if(empty($tiketID)){?>
+									<div class="alert alert-info">
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+										<i class="icon-exclamation-sign"></i><strong>Ticket automático!</strong> Si no desea asociar este seguimiento a un ticket ya creado entonces se creará uno automáticamente para este seguimiento.
+									</div>
+
 								   <div class="control-group">
 									<label class="control-label"><b>¿Asociar a un Ticket ya existente?</b></label>
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tiketCreado">
 											<option value=""></option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets WHERE tik_cliente='".$cliente."'");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes_tikets 
+											WHERE tik_cliente='".$cliente."'
+											AND tik_estado=1
+											");
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['tik_asunto_principal'];?></option>
@@ -232,7 +270,6 @@ include("includes/js-formularios.php");
 											}
 											?>
                                     	</select>
-										<span style="color:#009;">Opcional.</span>
                                     </div>
 									   
                                	  </div>
@@ -254,8 +291,10 @@ include("includes/js-formularios.php");
                                             <?php
 											$opciones = array("","La empresa contactó al cliente","El cliente contactó  a la empresa");
 											for($i=1; $i<=2; $i++){
-												if($resultadoD['cseg_canal_proximo_contacto']==$i)echo '<option value="'.$i.'" selected>'.$opciones[$i].'</option>';
-												else echo '<option value="'.$i.'">'.$opciones[$i].'</option>';	
+												if ($i == 1)
+													echo '<option value="'.$i.'" selected>'.$opciones[$i].'</option>';
+												else 
+													echo '<option value="'.$i.'">'.$opciones[$i].'</option>';	
 											}
 											?>
                                     	</select>
@@ -315,30 +354,54 @@ include("includes/js-formularios.php");
                                         <input type="checkbox" value="1" name="demostracion">
 									</div>
 								</div>
-								
+
 								<div class="control-group">
-									<label class="control-label"># Cotización</label>
+									<label class="control-label">¿Hubo visita?</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cotizacion">
-											<option value=""></option>
-                                            <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 
-												cli_id, cli_nombre, cli_zona,
-												usr_id, usr_nombre 
-												FROM cotizacion
-												INNER JOIN clientes ON cli_id=cotiz_cliente
-												INNER JOIN usuarios ON usr_id=cotiz_creador
-												WHERE cotiz_id=cotiz_id AND cotiz_id_empresa='".$idEmpresa."'
-												ORDER BY cotiz_id DESC");
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-											?>
-                                            	<option value="<?=$resOp['cotiz_id'];?>"><?=$resOp['cotiz_id']." - ".$resOp['cotiz_fecha_propuesta']." (".$resOp['cli_nombre'].")";?></option>
-                                            <?php
-											}
-											?>
-                                    	</select>
+                                        <input type="checkbox" value="1" name="visita">
 									</div>
 								</div>
+								
+								<?php if (empty($tiket['tik_id_cotizacion'])) {
+									$sql = "SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 
+									cli_id, cli_nombre, cli_zona,
+									usr_id, usr_nombre 
+									FROM cotizacion
+									INNER JOIN clientes ON cli_id=cotiz_cliente
+									INNER JOIN usuarios ON usr_id=cotiz_creador
+									WHERE cotiz_id=cotiz_id AND cotiz_id_empresa='".$idEmpresa."'
+									AND cotiz_ticket IS NULL
+									AND cotiz_cliente=".$cliente."
+									ORDER BY cotiz_id DESC
+									";
+									$conOp = mysqli_query($conexionBdPrincipal, $sql);
+									$numCotizaciones = $conOp->num_rows;
+									if ($numCotizaciones > 0) {
+								?>
+									<div class="control-group">
+										<label class="control-label"># Cotización</label>
+										<div class="controls">
+											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cotizacion">
+												<option value=""></option>
+												<?php
+												while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+												?>
+													<option value="<?=$resOp['cotiz_id'];?>"><?=$resOp['cotiz_id']." - ".$resOp['cotiz_fecha_propuesta']." (".$resOp['cli_nombre'].")";?></option>
+												<?php
+												}
+												?>
+											</select>
+										</div>
+									</div>
+								<?php } else { ?>
+									<div class="alert alert-info">
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+										<i class="icon-exclamation-sign"></i><strong>Sin cotización!</strong> No hay cotizaciones para este cliente que podamos asociar a este proceso. Pero no se preocupe, puede crear una y asociarla más tarde. <a href="cotizaciones-agregar.php?cte=<?=$tiket['tik_cliente'];?>&ticket=<?=$tiket['tik_id'];?>" target="_blank" class="btn btn-danger">Crear cotización</a>
+									</div>
+								<?php }?>
+								<?php } else {?>
+									<input type="hidden" class="span4" name="cotizacion" value="<?=$tiket['tik_id_cotizacion'];?>">
+								<?php }?>
 
 								<?php
 								include_once(RUTA_PROYECTO."/usuarios/class/Api/JmEquipos.php");
@@ -389,9 +452,15 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 									<label class="control-label">Recordatorio (Minutos antes) (*)</label>
 									<div class="controls">
-										<input type="number" class="span2" name="minutosRecordarAntes" required id="minutosRecordarAntes">
+										<input type="number" min="0" step="5" value="10" class="span2" name="minutosRecordarAntes" required id="minutosRecordarAntes">
 									</div>
 								</div>
+
+								<script>
+								document.addEventListener('DOMContentLoaded', function() {
+									document.getElementById('minutosRecordarAntes').value = 10;
+								});
+								</script>
 								
 								<div class="control-group">
 									<label class="control-label">Medio de contacto (*)</label>
@@ -419,13 +488,25 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Encargado del próximo contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="encargado[]" multiple required id="encargado">
-											<option value="0"></option>
+										<select 
+											class="chzn-select span8" 
+											tabindex="2" 
+											name="encargado[]" 
+											multiple 
+											id="encargado"
+										>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."'");
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios 
+											WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."'");
+
+											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
+												$selected = '';
+
+												if ($resOp['usr_id'] == $_SESSION['id']) {
+													$selected = 'selected';
+												}
 											?>
-											<option value="<?=$resOp['usr_id'];?>"><?=$resOp['usr_nombre'];?></option>
+												<option value="<?=$resOp['usr_id'];?>" <?=$selected;?>><?=$resOp['usr_nombre'];?></option>
                                             <?php
 											}
 											?>
@@ -461,10 +542,17 @@ include("includes/js-formularios.php");
 								</div>
 								</fieldset>
                                
-								<div class="form-actions">
-									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-                                    <button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-								</div>
+								<?php if ($estadoTicket == 1) {?>
+									<div class="form-actions">
+										<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+										<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+									</div>
+								<?php } else {?>
+									<div class="alert alert-info">
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+										<i class="icon-exclamation-sign"></i><strong>Ticket cerrado!</strong> No es posible hacer cambios en un ticket cerrado.
+									</div>
+								<?php }?>
 							</form>
 						</div>
 					</div>

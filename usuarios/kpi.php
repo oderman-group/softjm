@@ -5,12 +5,7 @@ include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
 	<script src="js/jquery.js"></script>
-
-	<!-- Exportar a excel -->
-	<script src="../librerias/devexpress/web/polyfill.min.js"></script>
-	<script src="../librerias/devexpress/web/exceljs.min.js"></script>
-	<script src="../librerias/devexpress/web/FileSaver.min.js"></script>
-
+	
 	<link href="css/tablecloth.css" rel="stylesheet">
 
 	<script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -37,6 +32,12 @@ include("includes/head.php");
 	<!-- DevExtreme libraries (reference only one of them) 
 	<script type="text/javascript" src="../assets/devexpress/web/dx.all.js"></script> -->  
 	<script type="text/javascript" src="https://cdn3.devexpress.com/jslib/23.2.5/js/dx.all.js"></script>  
+	<script src="https://cdn3.devexpress.com/jslib/22.2.3/js/localization/dx.messages.es.js"></script>
+
+	<!-- Exportar a excel -->
+	<script src="../librerias/devexpress/web/polyfill.min.js"></script>
+	<script src="../librerias/devexpress/web/exceljs.min.js"></script>
+	<script src="../librerias/devexpress/web/FileSaver.min.js"></script>
 <?php include("includes/funciones-js.php");?>
 </head>
 <body>
@@ -63,15 +64,11 @@ include("includes/head.php");
 								<a href="#" style="margin-bottom:10px;" id="kpi4">4. Cumplimiento de la cuota comercial</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi5">5. Tasa de conversión de prospecto a cliente</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi6">6. Ejecución de Demostraciones</a><br>
-								<a href="#" style="margin-bottom:10px;" id="kpi7">7. Número de llamadas enviadas por ejecutivo de prospección</a><br>
+								<a href="#" style="margin-bottom:10px;" id="kpi7">7. Número de gestión a leads de prospección</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi8">8. Clientes efectivos por evento</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi9">9. Nuevos subdistribuidores</a><br>
 								<a href="#" style="margin-bottom:10px;" id="kpi10">10. Captación de clientes instituciones</a><br>
-
-								<a href="#" style="margin-bottom:10px;" id="kpi11">11. Número de visitas realizadas</a><br>
-								<a href="#" style="margin-bottom:10px;" id="kpi12">12. Tasa de éxito de las licitaciones</a><br>
-								<a href="#" style="margin-bottom:10px;" id="kpi13">13. Participación en Eventos</a><br>
-
+								<a href="#" style="margin-bottom:10px;" id="kpi11">11. Número de visitas realizadas</a>
 							</div>
 						</div>
 					</div>
@@ -85,7 +82,8 @@ include("includes/head.php");
 							<div class="widget-container">
 								<div class="row">
 									<div class="span12" align="center">
-										<strong style="font-weight: bold; font-size: 30px;"> <span id="divEncabezadoPki">SELECCIONA UN KPI</span></strong>
+										<strong style="font-weight: bold; font-size: 30px;"> <span id="divEncabezadoPki">SELECCIONA UN KPI</span></strong><br>
+										<span style="font-size: 10px;" id="divDescripcionPki"></span>
 									</div>
 								</div>
 								<br>
@@ -114,3 +112,5 @@ include("includes/head.php");
 
 </body>
 </html>
+
+<div id="modalDetalle"></div>

@@ -147,9 +147,10 @@ include("includes/head.php");
 										<tr>
 										<th>No.</th>
 											<th>ID</th>
+											<th>TIPO</th>
 											<th>Fecha Propuesta</th>
 											<th>Cliente</th>
-											<th>Items inluídos</th>
+											<th>Items incluídos</th>
 											<th>Responsable</th>
 											<th>Vendedor</th>
 											<th></th>
@@ -158,7 +159,7 @@ include("includes/head.php");
 									<tbody>
 										<?php
 										if (isset($_GET["cte"]) and $_GET["cte"] != "") {
-											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cli_id, cli_nombre, cli_zona
+											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cli_id, cli_nombre, cli_zona, cotiz_es_precotizacion
 												FROM cotizacion
 								INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='" . $_GET["cte"] . "'
 								WHERE cotiz_id_empresa='".$idEmpresa."'
@@ -166,7 +167,7 @@ include("includes/head.php");
 								LIMIT $inicio, $limite
 								");
 										} else {
-											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, 
+											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cotiz_es_precotizacion,
 												cli_id, cli_nombre, cli_zona,
 												usr_id, usr_nombre 
 												FROM cotizacion
@@ -212,18 +213,24 @@ include("includes/head.php");
 													$IdGeneroPedido = $generoPedido['pedid_id'];
 												}
 											}
+
+											$tipoCotizacion = 'COTIZACIÓN';
+											if ($res['cotiz_es_precotizacion'] == 1) {
+												$tipoCotizacion = '<span style="background-color:yellow;">PRE-COTIZACIÓN</span>';
+											}
 										?>
 											<tr>
 											<td><?= $no; ?></td>
-												<td style="background-color: <?= $fondoCotiz; ?>;" title="<?=$infoPedido;?>"><?= $res['cotiz_id']; ?></td>
+												<td style="background-color: <?= $fondoCotiz; ?>;" title="<?=$infoPedido;?>"><a href="cotizaciones-editar.php?id=<?=$res['cotiz_id'];?>"><?= $res['cotiz_id']; ?></a></td>
+												<td><?= $tipoCotizacion; ?></td>
 												<td><?= $res['cotiz_fecha_propuesta']; ?></td>
-												<td><?= strtoupper($res['cli_nombre']); ?></td>
+												<td><a href="clientes-editar.php?id=<?=$res['cli_id'];?>"><?= strtoupper($res['cli_nombre']); ?></td>
 												<td>
 													
 													<?php
 													$productos = $conexionBdPrincipal->query("SELECT prod_nombre FROM cotizacion_productos
 										INNER JOIN productos ON prod_id=czpp_producto
-										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "'
+										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "' AND czpp_tipo=".CZPP_TIPO_COTZ."
 										");
 													$i = 1;
 													while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
@@ -236,7 +243,7 @@ include("includes/head.php");
 													<?php
 													$combos = $conexionBdPrincipal->query("SELECT combo_nombre FROM cotizacion_productos
 										INNER JOIN combos ON combo_id=czpp_combo
-										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "'
+										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "' AND czpp_tipo=".CZPP_TIPO_COTZ."
 										");
 													$i = 1;
 													while ($comb = mysqli_fetch_array($combos, MYSQLI_BOTH)) {
@@ -249,7 +256,7 @@ include("includes/head.php");
 										<?php
 													$servicios =$conexionBdPrincipal->query("SELECT serv_nombre FROM cotizacion_productos
 										INNER JOIN servicios ON serv_id=czpp_servicio
-										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "'
+										WHERE czpp_cotizacion='" . $res['cotiz_id'] . "' AND czpp_tipo=".CZPP_TIPO_COTZ."
 										");
 													$i = 1;
 													while ($serv = mysqli_fetch_array($servicios, MYSQLI_BOTH)) {
@@ -271,7 +278,7 @@ include("includes/head.php");
 																<li><a href="cotizaciones-editar.php?id=<?= $res['cotiz_id']; ?>#productos"> Editar</a></li>
 																<?php } ?>
 																
-																<?php if (Modulos::validarRol([80], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																<?php if (Modulos::validarRol([80], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) {?>
 																<li><a href="bd_delete/cotizaciones-eliminar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 																<?php } ?>
 																<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
@@ -281,8 +288,14 @@ include("includes/head.php");
 																<li><a href="bd_create/cotizaciones-replicar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
 																<?php } ?>
 
-																<?php if($IdGeneroPedido == '' && Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ){?>
-															<li><a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
+																<?php if(
+																	$IdGeneroPedido == '' && 
+																	Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
+																	!empty($res['cotiz_ticket']) &&
+																	$res['cotiz_es_precotizacion'] != 1
+																	) {
+																?>
+																		<li><a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
 															<?php }?>
 
 

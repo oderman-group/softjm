@@ -241,111 +241,113 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 				<?php include("includes/notificaciones.php"); ?>
 				<span id="resp"></span>
 
-
-				<p>
-					<?php if (Modulos::validarRol([37], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-						<a href="productos-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-					<?php } ?>
-					<?php if (Modulos::validarRol([153], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-						<a href="productos-condiciones.php" class="btn btn-warning"><i class="icon-random"></i> Condicionar productos</a>
-					<?php } ?>
-					<?php if (Modulos::validarRol([152], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-						<a href="productos-store.php" class="btn btn-info"><i class="icon-th-large"></i> Editar Productos Store JM</a>
-					<?php } ?>
-					<?php if (Modulos::validarRol([121], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-						<a href="productos-predeterminados.php" class="btn btn-danger"><i class="icon-th-large"></i> Editar Productos predeterminados</a>
-					<?php } ?>
-					<?php if (Modulos::validarRol([21], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-						<a href="productos-importar.php" class="btn btn-success"><i class="icon-file"></i> Importar excel</a>
-					<?php } ?>
-					<?php if (Modulos::validarRol([208], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-						<a href="guardar-precios.php" class="btn btn-danger" onClick="if(!confirm('Desea guardar los precios actuales en el historial?')){return false;}"><i class="icon-save"></i> Guardar precios en historial</a>
-					<?php } ?>
-				</p>
-
-
-
-				<p><b>Precio de lista</b> = Costo + la utilidad. | <b>Descuentos</b> = Se aplican sobre el precio de lista.</p>
-
-				<p>
-					<a href="productos.php?todo=1" style="text-decoration: underline; font-weight: bold; color: navy; font-size: 16px;">[VER TODOS]</a>&nbsp;|&nbsp;
-					<?php if (Modulos::validarRol([401], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
-						<a href="productos.php?web=1" style="text-decoration: underline;">Tienda/Visible Web</a>&nbsp;|&nbsp;
-						<a href="productos.php?pdt=1" style="text-decoration: underline;">Predeterminados</a>&nbsp;|&nbsp;
-						<a href="productos.php?nopdt=1" style="text-decoration: underline;">No predeterminados</a>&nbsp;|&nbsp;
-						<a href="productos.php?utilidad=1" style="text-decoration: underline;">Sin utilidad</a>&nbsp;|&nbsp;
-						<a href="productos.php?stock=1" style="text-decoration: underline;">Sin existencias</a>&nbsp;|&nbsp;
-						<a href="productos.php?nodctomax=1" style="text-decoration: underline;">Sin descuento máximo</a>&nbsp;|&nbsp;
-					<?php } ?>
-				</p>
-
-
-				<p>
-					<div class="btn-group">
-						<button class="btn btn-primary">Grupo 1</button>
-						<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<?php
-							$grupos1 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_id_empresa='".$idEmpresa."'");
-							while ($grupo1 = mysqli_fetch_array($grupos1, MYSQLI_BOTH)) {
-							?>
-								<li><a href="productos.php?grupo1=<?= $grupo1[0]; ?>" style="color:<?= $color; ?>"><?= $grupo1['catp_nombre']; ?></a></li>
-							<?php } ?>
-						</ul>
-					</div>
-
-					<div class="btn-group">
-						<button class="btn btn-primary">Grupo 2</button>
-						<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<?php
-							$grupos2 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2 AND catp_id_empresa='".$idEmpresa."'");
-							while ($grupo2 = mysqli_fetch_array($grupos2, MYSQLI_BOTH)) {
-							?>
-								<li><a href="productos.php?grupo2=<?= $grupo2[0]; ?>" style="color:<?= $color; ?>"><?= $grupo2['catp_nombre']; ?></a></li>
-							<?php } ?>
-						</ul>
-					</div>
-
-					<div class="btn-group">
-						<button class="btn btn-primary">Marca</button>
-						<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<?php
-							$marcas = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."'");
-							while ($marca = mysqli_fetch_array($marcas, MYSQLI_BOTH)) {
-							?>
-								<li><a href="productos.php?marca=<?= $marca[0]; ?>" style="color:<?= $color; ?>"><?= $marca[1]; ?></a></li>
-							<?php } ?>
-						</ul>
-					</div>
-				</p>
-				<p>
-					<form method="get" action="productos.php" style="text-align: center; margin-top: 10px;">
-						<div class="control-group">
-							<div class="controls">
-								<input type="text" class="span8" name="busqueda" placeholder="Búsqueda en todos los registros..." value="<?php if(isset($_GET['busqueda'])){echo $_GET['busqueda'];}?>" required><br>
-								<button type="submit" class="btn btn-info"> Buscar</button>
-								<a href="productos.php" type="submit" class="btn btn-danger"> Quitar filtro</a>
-							</div>
-						</div>
-
-					</form>
-				</p>
 				<div class="row-fluid">
 					<div class="span12">
-						<div class="row-fluid">
-							<div class="span12">
-								<div class="hero-unit">
-									<h2>Eliminación de productos</h2>
-									<p>
-										Los productos que están incluidos en procesos de cotización, pedido, remisión y/o factura, o en combos, no podrán ser eliminados.
-									</p>
+						<div class="navbar">
+							<div class="navbar-inner">
+								<div class="container">
+									<div class="nav-collapse collapse navbar-responsive-collapse">
+										<ul class="nav">
+											<li><a href="productos.php"><i class="icon-group"></i> Todos los productos</a></li>
+											<li><a href="javascript:history.go(-1);"><i class="icon-arrow-left"></i> Regresar</a></li>
+											<li>
+												<?php if (Modulos::validarRol([37], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<a href="productos-agregar.php"><i class="icon-plus"></i> Agregar nuevo</a>
+												<?php } ?>
+											</li>
+											<li>
+												<?php if (Modulos::validarRol([153], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<a href="productos-condiciones.php"><i class="icon-random"></i> Condicionar productos</a>
+												<?php } ?>
+											</li>
+											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Más opciones <b class="caret"></b></a>
+												<ul class="dropdown-menu">
+													<?php if (Modulos::validarRol([152], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+														<li><a href="productos-store.php">Editar productos Store JM</a></li>
+													<?php } ?>
+													<?php if (Modulos::validarRol([121], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+														<li><a href="productos-predeterminados.php">Editar Productos predeterminados</a></li>
+													<?php } ?>
+													<?php if (Modulos::validarRol([21], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+														<li><a href="productos-importar.php">Importar excel</a></li>
+													<?php } ?>
+													<?php if (Modulos::validarRol([208], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+														<li><a href="guardar-precios.php" onClick="if(!confirm('Desea guardar los precios actuales en el historial?')){return false;}">Guardar precios en historial</a></li>
+													<?php } ?>
+												</ul>
+											</li>
+										</ul>
+
+										<form action="<?=$_SERVER['PHP_SELF'];?>" method="get" class="navbar-search pull-left">
+											<div class="input-append input-icon">	
+												<input type="text" name="busqueda" placeholder="Buscar..." class="search-query span12" value="<?php if(isset($_GET["busqueda"])) echo $_GET["busqueda"]; ?>">
+												<input class="btn" type="submit" value="Buscar">
+											</div>
+										</form>
+
+										<ul class="nav pull-right">
+											<li class="divider-vertical"></li>
+											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Grupo 1 <b class="caret"></b></a>
+												<ul class="dropdown-menu">
+													<li><a href="productos.php">Todos</a></li>
+													<?php
+													$grupos1 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_id_empresa='".$idEmpresa."'");
+													while ($grupo1 = mysqli_fetch_array($grupos1, MYSQLI_BOTH)) {
+													?>
+														<li><a href="productos.php?grupo1=<?= $grupo1[0]; ?>" style="color:<?= $color; ?>"><?= $grupo1['catp_nombre']; ?></a></li>
+													<?php } ?>
+												</ul>
+											</li>
+											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Grupo 2 <b class="caret"></b></a>
+												<ul class="dropdown-menu">
+													<li><a href="productos.php">Todos</a></li>
+													<?php
+													$grupos2 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2 AND catp_id_empresa='".$idEmpresa."'");
+													while ($grupo2 = mysqli_fetch_array($grupos2, MYSQLI_BOTH)) {
+													?>
+														<li><a href="productos.php?grupo2=<?= $grupo2[0]; ?>" style="color:<?= $color; ?>"><?= $grupo2['catp_nombre']; ?></a></li>
+													<?php } ?>
+												</ul>
+											</li>
+											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Marca <b class="caret"></b></a>
+												<ul class="dropdown-menu">
+													<li><a href="productos.php">Todos</a></li>
+													<?php
+													$marcas = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."'");
+													while ($marca = mysqli_fetch_array($marcas, MYSQLI_BOTH)) {
+													?>
+														<li><a href="productos.php?marca=<?= $marca[0]; ?>" style="color:<?= $color; ?>"><?= $marca[1]; ?></a></li>
+													<?php } ?>
+												</ul>
+											</li>
+											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Más filtros <b class="caret"></b></a>
+												<ul class="dropdown-menu">
+													<li><a href="productos.php?todo=1">[VER TODOS]</a></li>
+													<?php if (Modulos::validarRol([401], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+														<li><a href="productos.php?web=1">Tienda/Visible Web</a></li>
+														<li><a href="productos.php?pdt=1">Predeterminados</a></li>
+														<li><a href="productos.php?nopdt=1">No predeterminados</a></li>
+														<li><a href="productos.php?utilidad=1">Sin utilidad</a></li>
+														<li><a href="productos.php?stock=1">Sin existencias</a></li>
+														<li><a href="productos.php?nodctomax=1">Sin descuento máximo</a></li>
+													<?php } ?>
+												</ul>
+											</li>
+										</ul>
+									</div>
+									<!-- /.nav-collapse -->
 								</div>
 							</div>
+							<!-- /navbar-inner -->
+						</div>
+					</div>
+				</div>
+
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="alert alert-info">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							<i class="icon-exclamation-sign"></i><strong>Eliminación de productos</strong> Los productos que están incluidos en procesos de cotización, pedido, remisión y/o factura, o en combos, no podrán ser eliminados.
 						</div>
 
 						<div class="content-widgets light-gray">

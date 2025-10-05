@@ -107,6 +107,20 @@ if(isset($_GET["msg"])){
 		</div>
 	<?php }?>
 
+	<?php if($_GET["msg"]==16){?>
+		<div class="alert alert-success">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-exclamation-sign"></i><strong>Exito!</strong> Los recursos fueron enviados correctamente.
+		</div>
+	<?php }?>
+
+	<?php if($_GET["msg"]==17){?>
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-exclamation-sign"></i><strong>Información!</strong> <?=$_GET["msgContent"]?>
+		</div>
+	<?php }?>
+
 
 <?php }?>
 

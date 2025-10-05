@@ -4,8 +4,16 @@ $idPagina = 11;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
+include(RUTA_PROYECTO."/usuarios/class/Cliente.php");
+
 $consulta = $conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET["id"]."' AND cli_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+
+$diplayNombreEvento = 'none';
+
+if ($resultadoD['cli_referencia'] == 4) {
+	$diplayNombreEvento = 'block';
+}
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <link href="css/jquery.gritter.css" rel="stylesheet">
@@ -35,6 +43,14 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 			document.getElementById("extrangero").style.display = "block";
 		}
 	}
+
+	function mostrarNombreEvento(data) {
+		if(data.value == 4){
+			document.getElementById("eventoNombre").style.display = "block";
+		} else {
+			document.getElementById("eventoNombre").style.display = "none";
+		}
+	}
 </script>
 
 <?php 
@@ -45,6 +61,62 @@ include("includes/js-formularios.php");
 <?php include("includes/funciones-js.php");?>
 
 <?php include("includes/texto-editor.php");?>
+
+<style>
+    .timeline {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 50px 0;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: #dee2e6;
+      z-index: 1;
+      transform: translateY(-50%);
+    }
+    .timeline-step {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      flex: 1;
+    }
+    .timeline-step .circle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #6c63ff;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .timeline-step.active .circle {
+      background: #28a745; /* verde Bootstrap 4 */
+    }
+	.timeline-step.registro .circle {
+      background: #ffd001ff; /* verde Bootstrap 4 */
+    }
+	.timeline-step.ultima .circle {
+      background: #006de9ff; /* verde Bootstrap 4 */
+    }
+    .timeline-step .title {
+      font-weight: 600;
+    }
+    .timeline-step .date {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+  </style>
 
 </head>
 <body>
@@ -67,6 +139,7 @@ include("includes/js-formularios.php");
 					</ul>
 				</div>
 			</div>
+			
             <p>
 						<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="clientes-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
@@ -79,9 +152,45 @@ include("includes/js-formularios.php");
 			</p>
 
             <?php include("includes/notificaciones.php");?>
+
+			<?php
+			$fechaPrimeraCotizacion = Cliente::consultarPrimeraCotizacionCliente($resultadoD['cli_id'], $idEmpresa, $conexionBdPrincipal);
+			$fechaPrimeraCompra = Cliente::consultarPrimeraCompraCliente($resultadoD['cli_id'], $idEmpresa, $conexionBdPrincipal);
+			$fechaUltimaCompra = Cliente::consultarUltimaCompraCliente($resultadoD['cli_id'], $idEmpresa, $conexionBdPrincipal);
+			?>
 			
 			<div class="row-fluid">
 				<div class="span12">
+					<div class="container my-5">
+						<div class="container">
+						<h3 class="text-center mb-5">Evolución comercial</h3>
+						<div class="timeline">
+
+							<div class="timeline-step registro">
+								<div class="circle">1</div>
+								<div class="title">Registro</div>
+								<div class="date"><?=$resultadoD['cli_fecha_registro'];?></div>
+							</div>
+
+							<div class="timeline-step">
+								<div class="circle">2</div>
+								<div class="title">Primera Cotización</div>
+								<div class="date"><?=$fechaPrimeraCotizacion;?></div>
+							</div>
+
+							<div class="timeline-step active">
+								<div class="circle">3</div>
+								<div class="title">Primera Compra</div>
+								<div class="date"><?=$fechaPrimeraCompra;?></div>
+							</div>
+
+							<div class="timeline-step ultima">
+								<div class="circle">4</div>
+								<div class="title">Última Compra</div>
+								<div class="date"><?=$fechaUltimaCompra;?></div>
+							</div>
+					</div>
+
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
@@ -95,7 +204,7 @@ include("includes/js-formularios.php");
 										<li><a href="#task"><i class=" icon-group"></i> Contactos</a></li>
 										<li><a href="#tickets"><i class=" icon-list"></i> Tickets</a></li>
 										<li><a href="#seguimientos"><i class=" icon-list-alt"></i> Seguimientos</a></li>
-										<li><a href="#cotizacion"><i class=" icon-list"></i> Cotizaciones</a></li>
+										<li><a href="#cotizacion"><i class=" icon-file"></i> Cotizaciones</a></li>
 										<!--<li><a href="#facturas"><i class=" icon-list-alt"></i> Facturas</a></li>-->
 									</ul>
 									<div class="tab-content">
@@ -135,7 +244,12 @@ include("includes/js-formularios.php");
 														<label class="control-label">Usuario de acceso</label>
 														<div class="controls">
 															<input type="text" class="span4" value="<?=$resultadoD['cli_usuario_acceso'];?>"  readonly name="usuarioAcceso" autocomplete="off">
-															Contraseña
+														</div>
+													</div>
+
+													<div class="control-group">
+														<label class="control-label">Contraseña</label>
+														<div class="controls">
 															<input type="<?php echo $campoC;?>" class="span4" name="claveCliente" value="<?=$resultadoD['cli_clave'];?>" autocomplete="off" placeholder="Contraseña" title="Contraseña">
 														</div>
 													</div>
@@ -155,7 +269,12 @@ include("includes/js-formularios.php");
 														<label class="control-label">Nombre (*)</label>
 														<div class="controls">
 															<input type="text" class="span6" name="nombre" value="<?=$resultadoD['cli_nombre'];?>" style="text-transform:uppercase;" required>
-															SIGLA  (Nombre corto)
+														</div>
+													</div>
+
+													<div class="control-group">
+														<label class="control-label">SIGLA  (Nombre corto)</label>
+														<div class="controls">
 															<input type="text" class="span4" name="sigla" style="text-transform:uppercase;" value="<?=$resultadoD['cli_sigla'];?>">
 														</div>
 													</div>
@@ -163,7 +282,7 @@ include("includes/js-formularios.php");
 													<div class="control-group">
 														<label class="control-label">Email</label>
 														<div class="controls">
-															<input type="email" class="span6" name="email" value="<?=$resultadoD['cli_email'];?>" style="text-transform:lowercase;">
+															<input type="email" class="span4" name="email" value="<?=$resultadoD['cli_email'];?>" style="text-transform:lowercase;">
 														</div>
 													</div>
 
@@ -181,14 +300,14 @@ include("includes/js-formularios.php");
 														<label class="control-label">Celular</label>
 														<div class="controls">
 															<input type="text" class="span4" name="celular" value="<?=$resultadoD['cli_celular'];?>" maxlength="10">
-															<span style="color:#F03;">Este valor sin puntos ni espacios. (3135912073)</span>
+															<span style="color:darkblue;">Este valor sin puntos ni espacios. (3135912073)</span>
 														</div>
 													</div>
 
 													<div class="control-group">
 														<label class="control-label">Teléfonos complementarios</label>
 														<div class="controls">
-															<input type="text" class="span8" name="telefonos" value="<?=$resultadoD['cli_telefonos'];?>">
+															<input type="text" class="span4" name="telefonos" value="<?=$resultadoD['cli_telefonos'];?>">
 														</div>
 													</div>
 
@@ -276,10 +395,11 @@ include("includes/js-formularios.php");
 
 												   <fieldset class="default">
 														<legend>Datos comerciales</legend>
+														<input type="hidden" value="<?=$resultadoD['cli_categoria'];?>" name="categoriaActual">
 													<div class="control-group">
 														<label class="control-label">Estado</label>
 														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="categoria">
+															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="categoria" disabled>
 																<option value=""></option>
 																<option value="<?= CLI_CATEGORIA_PROSPECTO ?>" <?php if($resultadoD['cli_categoria'] == CLI_CATEGORIA_PROSPECTO){echo "selected";} ?>>Prospecto</option>
 																<option value="<?= CLI_CATEGORIA_CLIENTE ?>" <?php if($resultadoD['cli_categoria'] == CLI_CATEGORIA_CLIENTE){echo "selected";} ?>>Cliente</option>
@@ -291,7 +411,7 @@ include("includes/js-formularios.php");
 												   <div class="control-group">
 														<label class="control-label">Nivel</label>
 														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="nivel">
+															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="nivel" disabled>
 																<option value=""></option>
 																<option value="1" <?php if($resultadoD['cli_nivel']==1){echo "selected";}?>>Leads (Seguidor o Suscripor)</option>
 																<option value="2" <?php if($resultadoD['cli_nivel']==2){echo "selected";}?>>Interesado (Cotiza o llama)</option>
@@ -299,19 +419,6 @@ include("includes/js-formularios.php");
 																<option value="4" <?php if($resultadoD['cli_nivel']==4){echo "selected";}?>>Cliente A (Compró 1 vez)</option>
 																<option value="5" <?php if($resultadoD['cli_nivel']==5){echo "selected";}?>>Cliente B (Compró 2 veces)</option>
 																<option value="6" <?php if($resultadoD['cli_nivel']==6){echo "selected";}?>>Cliente C (Compró 3 o más veces)</option>
-															</select>
-														</div>
-												   </div>
-													   
-													<div class="control-group">
-														<label class="control-label">¿Ha realizado servicios?</label>
-														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="servicios">
-																<option value="1">--</option>
-																<option value="1" <?php if($resultadoD['cli_servicios']==1){echo "selected";}?>>Aún no</option>
-																<option value="2" <?php if($resultadoD['cli_servicios']==2){echo "selected";}?>>1 Vez</option>
-																<option value="3" <?php if($resultadoD['cli_servicios']==3){echo "selected";}?>>2 veces</option>
-																<option value="4" <?php if($resultadoD['cli_servicios']==4){echo "selected";}?>>3 o más veces</option>
 															</select>
 														</div>
 												   </div>
@@ -326,33 +433,11 @@ include("includes/js-formularios.php");
 															</select>
 														</div>
 												   </div> 
-
-												   <div class="control-group">
-														<label class="control-label">Fecha de registro</label>
-														<div class="controls">
-															<?=$resultadoD['cli_fecha_registro'];?>
-														</div>
-													</div>
-
-												   <div class="control-group">
-														<label class="control-label">Fecha que se volvió cliente (En caso de que sea cliente)</label>
-														<div class="controls">
-															<input type="date" class="span4" name="fechaIngreso" value="<?=$resultadoD['cli_fecha_ingreso'];?>">
-														</div>
-													</div>
-													   
-													 <div class="control-group">
-														<label class="control-label">Fecha Incio (Uso CRM)</label>
-														<div class="controls">
-															<input type="date" class="span4" name="fechaInicioUso" value="<?=$resultadoD['cli_inicio_uso'];?>" readonly>
-														</div>
-														 <span style="color: navy;">A partirde esta fecha tiene un año de acceso al CRM.</span>
-													</div> 
 													   
 													<div class="control-group">
 														<label class="control-label">Referencia de llegada</label>
 														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="referencia">
+															<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="referencia" onchange="mostrarNombreEvento(this)">
 																<option value=""></option>
 																<?php
 																for($i=1; $i<=12; $i++){
@@ -362,12 +447,21 @@ include("includes/js-formularios.php");
 																?>
 															</select>
 														</div>
-												   </div>   
+												   </div>
+
+												   <div id="eventoNombre" style="display: <?=$diplayNombreEvento;?>;">
+														<div class="control-group">
+															<label class="control-label">Nombre del evento</label>
+															<div class="controls">
+																<input type="text" class="span4" name="nombreEvento" value="<?=$resultadoD['cli_nombre_evento'];?>">
+															</div>
+														</div>
+													</div>
 
 													<div class="control-group">
-														<label class="control-label">Grupos</label>
+														<label class="control-label">Grupos (*)</label>
 														<div class="controls">
-															<select data-placeholder="Escoja una opción..." class="chzn-select span8" multiple tabindex="2" name="grupos[]">
+															<select data-placeholder="Escoja una opción..." class="chzn-select span8" multiple tabindex="2" name="grupos[]" required>
 																<option value=""></option>
 																<?php
 																$conOp = $conexionBdPrincipal->query("SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
@@ -396,8 +490,7 @@ include("includes/js-formularios.php");
 															<i class="fa-solid fa-circle-question"></i>
 														</label>
 														<div class="controls">
-															<input type="text" class="span4" name="saldo" value="<?=$resultadoD['cli_saldo'];?>" maxlength="10">
-															<span style="color:#F03;">Este valor sin puntos ni espacios. (10000)</span>
+															<input type="text" class="span4" name="saldo" value="<?=$resultadoD['cli_saldo'];?>" maxlength="10" readonly>
 														</div>
 													</div>
 													   
@@ -424,46 +517,7 @@ include("includes/js-formularios.php");
 														</div>
 												   </div>
 														
-												   </fieldset> 
-												
-												   <fieldset class="default">
-														<legend>Datos de retiro</legend>
-
-														<div class="control-group">
-															<label class="control-label">Retirado</label>
-															<div class="controls">
-																<select data-placeholder="Escoja una opción..." class="chzn-select span2" tabindex="2" name="retirado">
-																	<option value=""></option>
-																	<option value="1" <?php if($resultadoD['cli_retirado']==1){echo "selected";}?>>SI</option>
-																	<option value="0" <?php if($resultadoD['cli_retirado']!=1){echo "selected";}?>>NO</option>
-																</select>
-															</div>
-														</div>
-
-														<div class="control-group">
-															<label class="control-label">Fecha del retiro</label>
-															<div class="controls">
-																<input type="date" class="span4" name="retiroFecha" value="<?=$resultadoD['cli_fecha_retiro'];?>">
-															</div>
-														</div>
-
-														<div class="control-group">
-															<label class="control-label">Responsables del retiro
-															<button class="tooltipp">Responsable jefe inmediato.</button>
-															<i class="fa-solid fa-circle-question"></i>
-															</label>
-															<div class="controls">
-																<input type="text" class="span6" name="retiroResponsable" value="<?=$resultadoD['cli_responsable_retiro'];?>">
-															</div>
-														</div>
-
-														<div class="control-group">
-															<label class="control-label">Causa del retiro</label>
-															<div class="controls">
-																<textarea rows="5" cols="80" style="width: 80%" class="tinymce-simple" name="retiroCausa"><?=$resultadoD['cli_causa_retiro'];?></textarea>
-															</div>
-														</div>
-												   </fieldset> 
+												   </fieldset>
 
 													<div class="form-actions">
 														<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
@@ -655,8 +709,7 @@ include("includes/js-formularios.php");
 																<?php if (Modulos::validarRol([90], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																	<a href="clientes-tikets-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>
 																<?php } ?>
-																	<!– codigo 24 no se encontro en el archivo sql.php–>
-																	<a href="sql.php?id=<?=$res[0];?>&get=24" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+																	<!--<a href="sql.php?id=<?=$res[0];?>&get=24" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>-->
 																</h4></td>
 															</tr>
 															<?php $no++;}?>
@@ -753,7 +806,7 @@ include("includes/js-formularios.php");
 																			<?php if (Modulos::validarRol([14], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<a href="clientes-seguimiento-editar.php?id=<?=$res[0];?>&cte=<?=$_GET["id"];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
 																			<?php } ?>
-																			<?php if (Modulos::validarRol([382], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+																			<?php if (Modulos::validarRol([382], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) {?>
 																			<a href="sql.php?id=<?=$res[0];?>&get=4" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
 																			<?php // codigo 4 no se encontro en el archivo sql.php ?>
 																			<?php } ?>
@@ -777,8 +830,8 @@ include("includes/js-formularios.php");
 											</div>
 										</div>
 					
-					<div class="tab-pane" id="cotizacion">
-										<div class="row-fluid">
+										<div class="tab-pane" id="cotizacion">
+											<div class="row-fluid">
 												<div class="span12">
 													<div class="content-widgets light-gray">
 														<div class="widget-head green">
@@ -794,6 +847,7 @@ include("includes/js-formularios.php");
 															<thead>
 															<tr>
 																<th>ID</th>
+																<th>TIPO</th>
 																<th>Fecha Propuesta</th>
 																<th>Productos</th>
 																<th>Responsable</th>
@@ -817,9 +871,15 @@ include("includes/js-formularios.php");
 																if($res['cotiz_vendida']==1){
 																	$fondoCotiz = 'aquamarine';
 																}
+
+																$tipoCotizacion = 'COTIZACIÓN';
+																if ($res['cotiz_es_precotizacion'] == 1) {
+																	$tipoCotizacion = '<span style="background-color:yellow;">PRE-COTIZACIÓN</span>';
+																}
 															?>
 															<tr>
 																<td style="background-color: <?=$fondoCotiz;?>;"><?=$res['cotiz_id'];?></td>
+																<td><?= $tipoCotizacion; ?></td>
 																<td><?=$res['cotiz_fecha_propuesta'];?></td>
 																<td>
 																	<?php
@@ -834,6 +894,19 @@ include("includes/js-formularios.php");
 																		}
 																	?>
 
+																	<?php
+																	$combos = $conexionBdPrincipal->query("SELECT combo_nombre FROM cotizacion_productos
+																	INNER JOIN combos ON combo_id=czpp_combo
+																	WHERE czpp_cotizacion='" . $res['cotiz_id'] . "' AND czpp_tipo=".CZPP_TIPO_COTZ."
+																	");
+																				$i = 1;
+																				while ($comb = mysqli_fetch_array($combos, MYSQLI_BOTH)) {
+																					if($i==1){echo "<br><b>Combos:</b><br>";}
+																					echo "<b>" . $i . ".</b> " . $comb['combo_nombre'] . ", ";
+																					$i++;
+																				}
+																				?>
+
 																</td>
 																<td><?php if(isset($res['usr_nombre'])) echo strtoupper($res['usr_nombre']);?></td>
 																<td><?php if(isset($vendedor['usr_nombre'])) echo strtoupper($vendedor['usr_nombre']);?></td>
@@ -847,7 +920,8 @@ include("includes/js-formularios.php");
 																			<li><a href="cotizaciones-editar.php?id=<?=$res['cotiz_id'];?>#productos"> Editar</a></li>
 																			<?php } ?>
 
-																			<li><a href="sql.php?id=<?=$res['cotiz_id'];?>&get=22" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
+																			<!--<li><a href="sql.php?id=<?=$res['cotiz_id'];?>&get=22" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>-->
+
 																			<?php } //el codigo 22 no se encontro en el archivo sql?>
 																			<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																			<li><a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
@@ -857,8 +931,12 @@ include("includes/js-formularios.php");
 																			<li><a href="sql.php?get=46&id=<?=$res['cotiz_id'];?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
 																			<?php } ?>		
 																			<?php //el codigo 46 no se encontro en el archivo sql ?> 
-																			<?php if (Modulos::validarRol([381], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-																			<li><a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
+																			<?php if (
+																				Modulos::validarRol([381], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
+																				!empty($res['cotiz_ticket']) &&
+																				$res['cotiz_es_precotizacion'] != 1
+																				) {?>
+																					<li><a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
 																			<?php } ?>		
 																			<?php //el codigo 48 no se encontro en el archivo sql ?> 
 																		</ul>
@@ -950,7 +1028,7 @@ include("includes/js-formularios.php");
                                 	<a href="facturacion-editar.php?id=<?=$res['fact_id'];?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>&nbsp;
 																<?php } ?>
                                     <?php //el codigo 6 no se encontro en el archivo sql ?> 
-									<a href="sql.php?id=<?=$res['fact_id'];?>&get=6" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;
+									<!--<a href="sql.php?id=<?=$res['fact_id'];?>&get=6" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>&nbsp;-->
 																<?php if (Modulos::validarRol([92], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="#" onClick='window.open("facturacion-abonos.php?fact=<?=$res['fact_id'];?>","abonos","width=1200,height=800,menubar=no")' data-toggle="tooltip" title="Abonos"><i class="icon-money"></i></a>&nbsp;
 																<?php } ?>

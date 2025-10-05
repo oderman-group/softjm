@@ -91,6 +91,16 @@ $producto = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
 							Puedes añadir varios materiales a cada uno de tus productos, pueden ser documentos (PDF, Word, Excel) o videos de YouTube, con el objetivo de que el cliente pueda acceder a ellos cuando adquiera el producto.
 						</p>
 					</div>
+
+					<form method="post" action="productos-materiales-enviar.php">
+						<input type="hidden" name="idProducto" value="<?=$_GET["pdto"];?>">
+						<input type="hidden" name="nombreProducto" value="<?=$producto['prod_nombre'];?>">
+						<div class="form-group">
+							<label for="emailCliente">Email para enviar recursos</label>
+							<input type="email" class="form-control" name="emailCliente" aria-describedby="emailHelp" placeholder="Email">
+							<button type="submit" class="btn btn-primary">Enviar recursos</button>
+						</div>
+					</form>
 				</div>
 			</div>
             

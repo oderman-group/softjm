@@ -234,7 +234,14 @@ class CotizacionesEditar {
                 $htmlTabla .= '<b>Precio Dealer: $' . number_format($totalDealer, 0, ",", ".") . '</b><br>';
             }
 
-            $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no" disabled><br>';
+            $disabledValorCombos = 'disabled';
+
+            if ($resultadoD['cotiz_es_precotizacion'] == 1) {
+                $disabledValorCombos = '';
+            }
+
+            $htmlTabla .= '<input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no" '.$disabledValorCombos.'><br>';
+
             if ($datosUsuarioActual['usr_tipo'] == 1) {
                 $htmlTabla .= '<b>Costo: $' . number_format($sumaCostosProductosCombos, 0, ",", ".") . '</b><br>';
                 $htmlTabla .= '<b class="valor-utilidad" data-utilidad="' . ($prod['czpp_valor'] - $sumaCostosProductosCombos) . '">Valor Utilidad: $' . number_format(($prod['czpp_valor'] - $sumaCostosProductosCombos), 0, ",", ".") . '</b><br>';

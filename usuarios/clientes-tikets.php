@@ -148,6 +148,7 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 											<th>Sucursal</th>
 											<th>Asunto</th>
 											<th>Resposable</th>
+											<th>Nro. Cotización</th>
 											<th>Estado</th>
 											<th>Prioridad</th>
 											<th>Seg.</th>
@@ -240,6 +241,7 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 												<td><?= $sucursal['sucu_nombre']; ?></td>
 												<td><?= $res['tik_asunto_principal']; ?></td>
 												<td><?= $res['usr_nombre'];?></td>
+												<td><a href='cotizaciones-editar.php?id=<?= $res['tik_id_cotizacion'];?>'><?= $res['tik_id_cotizacion'];?></a></td>
 												<td>
 													<?php if( Modulos::validarRol(['301'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
 														<a href="bd_update/clientes-tikets-actualizar-estado.php?get=29&id=<?= $res[0]; ?>" onClick="if(!confirm('Recuerde completar todos los seguimientos pendientes, en caso de tenerlos, antes de cerrar el ticket. Desea continuar con el cierre del ticket?')){return false;}"><span class="label label-<?= $etiquetaE; ?>"><?= $estado; ?></span></a>

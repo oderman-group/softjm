@@ -82,17 +82,31 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
 											WHERE cli_ciudad != ".CIUDADES_INTERNACIONALES."
-											AND cli_id_empresa='".$idEmpresa."'");
+											AND cli_id_empresa='".$idEmpresa."'
+											ORDER BY cli_categoria, cli_nombre
+											");
 
 											//Permiso para mostrar todos los clientes, incluyendo los internacionales.
 											$paginasParaValidar = [389];
 
 											if (Modulos::validarRol($paginasParaValidar, $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 												$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
-												WHERE cli_id_empresa='".$idEmpresa."'");
+												WHERE cli_id_empresa='".$idEmpresa."'
+												ORDER BY cli_categoria, cli_nombre
+												");
 											}
 
+											$categoriaActual = 1;
+											$nombreCategoria = ['','Prospectos', 'Clientes', 'Dealer'];
+											echo '<optgroup label="'.$nombreCategoria[1].'">';
+
 											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
+
+												if ($categoriaActual != $resOp['cli_categoria']) {
+													echo '</optgroup>';
+													echo '<optgroup label="'.$nombreCategoria[$resOp['cli_categoria']].'">';
+													$categoriaActual = $resOp['cli_categoria'];
+												}
 
 												if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 													$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
@@ -104,10 +118,14 @@ include("includes/js-formularios.php");
 												}
 
 												$disabled = '';
-												$dealer   = '';
+												$categoria   = '';
 
-												if ($resOp['cli_categoria']== CLI_CATEGORIA_DEALER) {
-													$dealer = '(DEALER)';
+												if ($resOp['cli_categoria']== CLI_CATEGORIA_PROSPECTO) {
+													$timestamp = strtotime($resOp['cli_fecha_registro']);
+													$solo_fecha = date("Y-m-d", $timestamp);
+													$categoria = '(PROSPECTO DESDE '.$solo_fecha.')';
+												} else if ($resOp['cli_categoria']== CLI_CATEGORIA_DEALER) {
+													$categoria = '(DEALER)';
 
 													if (!Modulos::validarRol([415], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 														$disabled = 'disabled';
@@ -116,9 +134,10 @@ include("includes/js-formularios.php");
 
 
 											?>
-                                            	<option value="<?=$resOp[0];?>" <?php if(isset($_GET["cte"]) and $_GET["cte"]!="" and $_GET["cte"]==$resOp[0]) echo "selected"; echo $disabled; ?>><?=$resOp[1]." ".$dealer;?></option>
+                                            	<option value="<?=$resOp[0];?>" <?php if(isset($_GET["cte"]) and $_GET["cte"]!="" and $_GET["cte"]==$resOp[0]) echo "selected"; echo $disabled; ?>><?=$resOp[1]." ".$categoria;?></option>
                                             <?php
 											}
+											echo '</optgroup>';
 											?>
                                     	</select>
                                     </div>
@@ -182,16 +201,20 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_GET["cte"]."'");
 											$numOp = $conOp->num_rows;
-											if($numOp==0){
+											$selectedSucursal = '';
+											if($numOp == 0) {
 												//Crear automáticamente la sucursal
 												$conexionBdPrincipal->query("INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$_GET["cte"]."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')");
 												
 												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
 												exit();
+											} else if ($numOp == 1) {
+												$selectedSucursal = 'selected';
 											}
+
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
-                                            	<option value="<?=$resOp[0];?>"><?=$resOp[7];?></option>
+                                            	<option value="<?=$resOp[0];?>" <?=$selectedSucursal;?>><?=$resOp[7];?></option>
                                             <?php
 											}
 											?>
@@ -210,16 +233,21 @@ include("includes/js-formularios.php");
                                             <?php
 											$conOp = $conexionBdPrincipal->query("SELECT * FROM contactos WHERE cont_cliente_principal='".$_GET["cte"]."'");
 											$numOp = $conOp->num_rows;
+											$selectedContacto = '';
+
 											if($numOp==0){
 												//Crear automáticamente el contacto
 												$conexionBdPrincipal->query("INSERT INTO contactos(cont_nombre, cont_cliente_principal)VALUES('Contacto principal (Automático)', '".$_GET["cte"]."')");
 												
 												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
 												exit();
+											} else if ($numOp == 1) {
+												$selectedContacto = 'selected';
 											}
+
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
-                                            	<option value="<?=$resOp[0];?>"><?=strtoupper($resOp[1])." (".$resOp[3].")";?></option>
+                                            	<option value="<?=$resOp[0];?>" <?=$selectedContacto;?>><?=strtoupper($resOp[1])." (".$resOp[3].")";?></option>
                                             <?php
 											}
 											?>
@@ -236,10 +264,18 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente" required>
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM usuarios 
+											WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."' 
+											ORDER BY usr_nombre");
+
+											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
+												$selectedInfluyente = '';
+
+												if ($resOp[0] == $_SESSION['id']) {
+													$selectedInfluyente = 'selected';
+												}
 											?>
-                                            	<option value="<?=$resOp[0];?>"><?=strtoupper($resOp[4])." (".$resOp[5].")";?></option>
+                                            	<option value="<?=$resOp[0];?>" <?=$selectedInfluyente;?>><?=strtoupper($resOp[4])." (".$resOp[5].")";?></option>
                                             <?php
 											}
 											?>
@@ -316,7 +352,59 @@ include("includes/js-formularios.php");
 										<div class="controls">
 											<textarea rows="5" cols="80" style="width: 80%" class="tinymce-simple" name="notas"></textarea>
 										</div>
-									</div>	
+									</div>
+
+									<?php
+									$consultaTickets = $conexionBdPrincipal->query("SELECT * FROM clientes_tikets 
+									WHERE tik_cliente='".$_GET["cte"]."'
+									AND tik_id_cotizacion IS NULL
+									AND tik_tipo_tiket = 1
+									AND tik_estado = 1
+									AND tik_tipo_negocio = 1
+									");
+									$numTickets = $consultaTickets->num_rows;
+									?>
+
+									<div class="alert alert-info">
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+										<i class="icon-exclamation-sign"></i><strong>Asociar Ticket!</strong> Se debe asociar un ticket comercial ya existente o se creará uno nuevo automáticamente para esta cotización.<br>
+										En caso que quiera dejar esta cotización sin ticket, por el momento, escoja la opción <b>No deseo asociar ningun ticket a esta cotización por el momento</b>.
+									</div>
+
+									<div class="control-group">
+										<label class="control-label">Asociar a un ticket</label>
+										<div class="controls">
+											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="ticket">
+												<option value="TICKET_AUTO">Deseo que el ticket se cree automáticamente</option>
+												<option value="NO_TICKET">NO deseo asociar ningun ticket a esta cotización por el momento</option>
+												<?php
+												if ($numTickets > 0) {
+													echo '<optgroup label="Tickets disponibles">';
+													while ($resOp = mysqli_fetch_array($consultaTickets, MYSQLI_BOTH)) {
+														$selected = '';
+														if(isset($_GET['ticket']) && $resOp[0] == $_GET['ticket']) {
+															$selected = 'selected';
+														}
+												?>
+														<option value="<?=$resOp[0];?>" <?=$selected;?>><?="Ticket # ".$resOp[0]." - ".strtoupper($resOp[1])." (".$resOp[3].")";?></option>
+												<?php
+												}
+													echo '</optgroup>';
+													}
+												?>
+											</select>
+										</div>
+									</div>
+
+									<div class="control-group">
+										<label class="control-label">¿Es PRE-cotización?
+											<button class="tooltipp">No será tenida en cuenta como una cotización oficial y no es apta para generar pedido. Esta opción no se podrá cambiar después.</button>
+											<i class="fa-solid fa-circle-question"></i>
+										</label>
+										<div class="controls">
+											<input type="checkbox" value="1" name="precotizacion">
+										</div>
+									</div>
 								
 								<div class="form-actions">
 									<button type="submit" class="btn btn-info"><i class="icon-arrow-right"></i> Continuar</button>

@@ -24,13 +24,16 @@ class BaseDatos {
         global $conexionBdPrincipal;
 
         $sql = "INSERT INTO {$tabla}(";
+
         foreach ($post as $campos => $valores) {
             $sql .= "{$campos},";
         }
+
         $sql = substr($sql, 0, -1).")VALUES(";
         foreach ($post as $valores) {
             $sql .= "'{$valores}',";
         }
+
         $sql = substr($sql, 0, -1).")";
 
         $conexionBdPrincipal->query($sql);
@@ -38,7 +41,13 @@ class BaseDatos {
         return mysqli_affected_rows($conexionBdPrincipal);
     }
 
-    public static function actualizarRegistro(array $infoActualizar, $post)
+    /**
+     * @param $infoActualizar - Información de la tabla, clave primaria y demás datos
+     * necesarios para actualizar
+     * 
+     * @param $post - Array de campos y valores a actualizar
+     */
+    public static function actualizarRegistro(array $infoActualizar, array $post)
     {  
         global $conexionBdPrincipal;
 

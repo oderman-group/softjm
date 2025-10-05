@@ -5,7 +5,7 @@ $(document).ready(function() {
     const $fieldsetContainer = $('#' + fieldsetContainerId);
 
     const $checkboxControl = $('#miCheckboxControl'); // Selecciona el checkbox
-    const fieldIdsToControl = ['fechaPC', 'horaPC', 'minutosRecordarAntes', 'canalPC', 'asunto', 'encargado']; // Los IDs de tus campos
+    const fieldIdsToControl = ['fechaPC', 'horaPC', 'minutosRecordarAntes', 'canalPC', 'asunto']; // Los IDs de tus campos
 
     // Define la lógica de toggle (puede ser anónima o una función nombrada)
     const applyToggleLogic = function() {
