@@ -117,10 +117,8 @@ require_once RUTA_PROYECTO.'/usuarios/class/UsuarioMeta.php';
 												<th>Imagen</th>
 												<th>Datos</th>
 												<th>Tipo usuario</th>
-												<th>Área</th>
 												<th>Usuario de acceso</th>
 												<th>Bloq.</th>
-												<th>Sesión</th>
 												<th>Último ingreso</th>
 												<th>Meta <br>(Valor ventas)</th>
 												<th>Meta <br>(Número de ventas)</th>
@@ -192,10 +190,8 @@ require_once RUTA_PROYECTO.'/usuarios/class/UsuarioMeta.php';
 															}
 															?>
 												</td>
-												<td><a href="#areas-editar.php?id=<?=$res['usr_area'];?>"><?=$res['ar_nombre'];?></a></td>
 												<td><?=$res['usr_login'];?></td>
 												<td><?=$opcionesSINO[$res['usr_bloqueado']];?></td>
-												<td><img src="files/<?=$estadoSesion;?>" width="20"></td>
 												<td><?=$res['usr_ultimo_ingreso'];?></td>
 
 												<td>
