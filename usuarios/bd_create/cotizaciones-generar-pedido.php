@@ -4,7 +4,23 @@ require_once("../sesion.php");
 $idPagina = 263;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-$generoPedido = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM pedidos WHERE pedid_cotizacion='" . $_GET["id"] . "'"), MYSQLI_BOTH);
+require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
+
+
+$esPrecotizacion = Cotizacion::esPrecotizacion($_GET["id"], $idEmpresa);
+
+if ($esPrecotizacion) {
+    echo "<span style='font-family:arial; text-align:center; color:red;'>No es posible generar pedido con una PRE-cotización.</div>";
+    exit();
+}
+
+$generoPedido = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM pedidos 
+WHERE pedid_cotizacion='" . $_GET["id"] . "'"), MYSQLI_BOTH);
+
+if (!empty($generoPedido)) {
+    echo "<span style='font-family:arial; text-align:center; color:red;'>Esta cotización ya generó el pedido con ID: ".$generoPedido[0].". En la fecha: ".$generoPedido['pedid_fecha_creacion']."</div>";
+    exit();
+}
 
 $consulta = $conexionBdPrincipal->query("INSERT INTO pedidos (pedid_fecha_propuesta, pedid_observaciones, pedid_cliente, pedid_fecha_vencimiento, pedid_vendedor, pedid_creador, pedid_sucursal, pedid_contacto, pedid_forma_pago, pedid_fecha_creacion, pedid_moneda, pedid_cotizacion, pedid_estado) SELECT now(), cotiz_observaciones, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, '" . $_SESSION["id"] . "', cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, now(), cotiz_moneda, '" . $_GET["id"] . "', 1 
 FROM cotizacion 
