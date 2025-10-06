@@ -94,7 +94,7 @@ include("includes/js-formularios.php");
 							<div class="control-group">
 								<label class="control-label" style="font-weight: bold;">Cliente</label>
 								<div class="controls">
-									<?=$infoTicket['cli_nombre'];?>
+									<a href="clientes-editar.php?id=<?=$infoTicket['cli_id'];?>"><?=$infoTicket['cli_nombre'];?></a>
 								</div>
 							</div>
 							
@@ -184,7 +184,7 @@ include("includes/js-formularios.php");
 							<?php }?>
 							
 							<div align="center" style="padding: 5px;">
-								<?php if (Modulos::validarRol([90], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+								<?php if (Modulos::validarRol([90], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $estadoTicket == 1) {?>
 									<a href="clientes-tikets-editar.php?id=<?=$infoTicket['tik_id'];?>" class="btn btn-primary">Editar ticket</a>
 								<?php } ?>
 							</div>
@@ -408,10 +408,10 @@ include("includes/js-formularios.php");
 								</fieldset>
                                 
                                <?php 
-								if($resultadoD['cseg_varios']>=1 and $resultadoD['cseg_usuario_encargado']==0){
+								if($resultadoD['cseg_varios'] >= 1 && $resultadoD['cseg_usuario_encargado'] == 0){
 									echo "<span style='color:blue; font-size:14px;'>Los encargados aún no han revisado este pendiente. Por ahora no es posible hacer cambios.</span>";
 								}else{?>
-									<?php if ($estadoTicket == 1) {?>
+									<?php if ($estadoTicket == 1 && $resultadoD['cseg_realizado'] == 0) {?>
 										<div class="form-actions">
 											<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 											<button type="button" class="btn btn-danger">Cancelar</button>
@@ -419,7 +419,7 @@ include("includes/js-formularios.php");
 									<?php } else {?>
 										<div class="alert alert-info">
 											<button type="button" class="close" data-dismiss="alert">&times;</button>
-											<i class="icon-exclamation-sign"></i><strong>Ticket cerrado!</strong> No es posible hacer cambios en un ticket cerrado.
+											<i class="icon-exclamation-sign"></i><strong>Ticket cerrado o seguimiento completado!</strong> No es posible hacer cambios en un ticket cerrado o en un seguimiento completado.
 										</div>
 									<?php }?>
 								<?php }?>
