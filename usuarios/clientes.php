@@ -230,6 +230,14 @@ $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBd
 													<li><a href="clientes.php?tipoDoc=3&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Cédula</a></li>
 												</ul>
 											</li>
+											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Categoría <b class="caret"></b></a>
+												<ul class="dropdown-menu">
+													<li><a href="clientes.php">Todos</a></li>
+													<li><a href="clientes.php?categoria=1&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Prospecto</a></li>
+													<li><a href="clientes.php?categoria=2&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Cliente</a></li>
+													<li><a href="clientes.php?categoria=3&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Dealer</a></li>
+												</ul>
+											</li>
 										</ul>
 									</div>
 									<!-- /.nav-collapse -->
@@ -302,6 +310,10 @@ $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBd
 
 							if (isset($_GET["clientesNuevos"])) {
 								$filtro .= " AND year(cli_fecha_ingreso)=".date("Y")." AND month(cli_fecha_ingreso)=".date("m");
+							}
+
+							if (isset($_GET["categoria"]) && is_numeric($_GET["categoria"])) {
+								$filtro .= " AND cli_categoria=".$_GET["categoria"];
 							}
 							?>
 
