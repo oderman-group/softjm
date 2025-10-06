@@ -30,8 +30,11 @@ try {
     ");
 
     if ($clasificacion == 'VALIDO') {
+        $nomreEvento = $data["fuente_id"] == 4 && !empty($data["ciudad_evento"]) ? 'Evento en la ciudad de '.$data["ciudad_evento"] : null;
+        $claveDocumentos = rand(10000,99999);
+
         //Crear al cliente
-        mysqli_query($conexionBdPrincipal,"INSERT INTO clientes(cli_nombre, cli_categoria, cli_email, cli_telefono, cli_fecha_registro, cli_nivel, cli_responsable, cli_id_empresa, cli_ciudad, cli_referencia, cli_forma_creacion)VALUES('" . $data["nombre_cliente"] . "', ".CLI_CATEGORIA_PROSPECTO.",'" . $data["email"] . "','" . $data["telefono"] . "', now(), 3, '" . $_SESSION["id"] . "', '" . $idEmpresa . "', ".CIUDAD_DESCONOCIDA.", '" . $data["fuente_id"] . "', 'EJECUTIVO_PROSPECCION')");
+        mysqli_query($conexionBdPrincipal,"INSERT INTO clientes(cli_nombre, cli_categoria, cli_email, cli_telefono, cli_fecha_registro, cli_nivel, cli_responsable, cli_id_empresa, cli_ciudad, cli_referencia, cli_forma_creacion, cli_nombre_evento, cli_clave_documentos)VALUES('" . $data["nombre_cliente"] . "', ".CLI_CATEGORIA_PROSPECTO.",'" . $data["email"] . "','" . $data["telefono"] . "', now(), 3, '" . $_SESSION["id"] . "', '" . $idEmpresa . "', ".CIUDAD_DESCONOCIDA.", '" . $data["fuente_id"] . "', 'EJECUTIVO_PROSPECCION', '".$nomreEvento."', '".$claveDocumentos."')");
         $idCliente = mysqli_insert_id($conexionBdPrincipal);
 
         //Crear automáticamente la sucursal
@@ -122,6 +125,7 @@ try {
             'gestion_estado' => $prospectos['pid_estado'],
             'notas_previas'  => $prospectos['pid_notas'],
             'fuente'         => $referenciaLlegada[$prospectos['pi_fuente']],
+            'fuente_id'      => $prospectos['pi_fuente'],
             'ciudad'         => $prospectos['pi_ciudad_evento'],
         ];
     }
