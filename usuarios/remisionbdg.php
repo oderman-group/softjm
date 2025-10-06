@@ -194,7 +194,7 @@ include("includes/head.php");
 							<td><?= $no; ?></td>	
 							<td style="background-color: <?= $fondoRemision; ?>;" title="<?=$infoFac;?>"><?=$res['remi_id'];?></td>
                                 <td><?=$res['remi_fecha_propuesta'];?></td>
-                                <td><?=strtoupper($res['cli_nombre']);?></td>
+                                <td><a href="clientes-editar.php?id=<?=$res['cli_id'];?>"><?=strtoupper($res['cli_nombre']);?></a></td>
 								<td><?=strtoupper($res['usr_nombre']);?></td>
 								<td><?=strtoupper($vendedor['usr_nombre']);?></td>
 								<td><a href="pedidos.php?busqueda=<?=$res['remi_pedido'];?>" class="normalLink"><?=$res['remi_pedido'];?></a></td>
@@ -216,7 +216,7 @@ include("includes/head.php");
 
 											<?php if($generoFactura[0]=="" && Modulos::validarRol([377], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 											
-											<li><a href="bd_create/remisionbdg-generar-factura.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea generar factura de esta remisión?')){return false;}">Generar Factura</a></li>
+											<li><a href="bd_create/remisionbdg-generar-factura.php?id=<?=$res[0];?>&cliente=<?=$res['remi_cliente'];?>" onClick="if(!confirm('Desea generar factura de esta remisión?')){return false;}">Generar Factura</a></li>
 
 											<?php }?>
 											
