@@ -40,18 +40,21 @@ try {
         //Crear automáticamente la sucursal
         mysqli_query($conexionBdPrincipal,"INSERT INTO sucursales(sucu_cliente_principal, sucu_telefono, sucu_nombre)VALUES('" . $idCliente . "', '" . $data["telefono"] . "','Sede principal')");
 
+        $idSucursal = mysqli_insert_id($conexionBdPrincipal);
+
         //Crear el contacto
-        mysqli_query($conexionBdPrincipal,"INSERT INTO contactos(cont_nombre, cont_telefono, cont_email, cont_cliente_principal)VALUES('" . $data["nombre_cliente"] . "', '" . $data["telefono"] . "', '" . $data["email"] . "', '" . $idCliente . "')");
+        mysqli_query($conexionBdPrincipal,"INSERT INTO contactos(cont_nombre, cont_telefono, cont_email, cont_cliente_principal, cont_sucursal)VALUES('" . $data["nombre_cliente"] . "', '" . $data["telefono"] . "', '" . $data["email"] . "', '" . $idCliente . "', '" . $idSucursal . "')");
+
         $idContacto = mysqli_insert_id($conexionBdPrincipal);
 
         //Crear ticket
-        mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_tikets(tik_asunto_principal, tik_tipo_tiket, tik_fecha_creacion, tik_usuario_responsable, tik_estado, tik_cliente, tik_prioridad, tik_canal, tik_etapa, tik_tipo_negocio)
-        VALUES('NUEVO PROSPECTO VÁLIDO - (".$data["nombre_cliente"].")', ".TICKET_COMERCIAL.", now(), ".$_SESSION["id"].", ".TIK_ESTADO_ABIERTO.", ".$idCliente.", ".TICKET_PRIORIDAD_URGENTE.", 7, 1, 1)");
+        mysqli_query($conexionBdPrincipal,"INSERT INTO clientes_tikets(tik_asunto_principal, tik_tipo_tiket, tik_fecha_creacion, tik_usuario_responsable, tik_estado, tik_cliente, tik_prioridad, tik_canal, tik_etapa, tik_tipo_negocio, tik_origen_negocio)
+        VALUES('NUEVO PROSPECTO VÁLIDO - (".$data["nombre_cliente"].")', ".TICKET_COMERCIAL.", now(), ".$_SESSION["id"].", ".TIK_ESTADO_ABIERTO.", ".$idCliente.", ".TICKET_PRIORIDAD_URGENTE.", 7, 1, 1, 8)");
         
         $tiketID = mysqli_insert_id($conexionBdPrincipal);
         
         //Crear seguimiento
-        mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto)VALUES(".$idCliente.", now(), 'Asignado desde ejecutivo de prospección', ".$_SESSION["id"].", now(), '".$notas."', ".$agente.", now(), ".SEGUIMIENTO_COMERCIAL.", '".$idContacto."', '".$tiketID."', 7, 8)");
+        mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_forma_contacto, cseg_realizado)VALUES(".$idCliente.", now(), 'Asignado desde ejecutivo de prospección', ".$_SESSION["id"].", now(), '".$notas."', ".$agente.", now(), ".SEGUIMIENTO_COMERCIAL.", '".$idContacto."', '".$tiketID."', 7, 8, 1, 1)");
 
         $idSeguimiento = mysqli_insert_id($conexionBdPrincipal);
 
