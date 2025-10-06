@@ -240,10 +240,13 @@ include("includes/js-formularios.php");
 														</div>
 													</div>
 
+													<?php
+													$soloLecturaUsuarioAcceso = empty($resultadoD['cli_usuario_acceso']) ? '' : 'readonly'
+													?>
 													<div class="control-group">
 														<label class="control-label">Usuario de acceso</label>
 														<div class="controls">
-															<input type="text" class="span4" value="<?=$resultadoD['cli_usuario_acceso'];?>"  readonly name="usuarioAcceso" autocomplete="off">
+															<input type="text" class="span4" value="<?=$resultadoD['cli_usuario_acceso'];?>"  <?=$soloLecturaUsuarioAcceso;?> name="usuarioAcceso" autocomplete="off">
 														</div>
 													</div>
 
@@ -255,7 +258,7 @@ include("includes/js-formularios.php");
 													</div>
 													
 													<div class="control-group">
-														<label class="control-label">Clave documentos
+														<label class="control-label">Clave documentos (*)
 														       <button class="tooltipp">Solo se admiten caracteres de la a-z A-Z numeros 0-9</button>
 															<i class="fa-solid fa-circle-question"></i>
 														</label>
