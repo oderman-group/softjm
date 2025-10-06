@@ -3,6 +3,8 @@ require_once("../sesion.php");
 
 $idPagina = 29;
 
+require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
+
 if (isset($_POST["envio"])) {
     $envio = $_POST["envio"];
 } else {
@@ -17,6 +19,14 @@ if ($_POST["ticket"] == 'TICKET_AUTO') {
 
     $ticketId = mysqli_insert_id($conexionBdPrincipal);
 } else if ($_POST["ticket"] != 'NO_TICKET') {
+
+    $ticketYaAsociado = Cotizacion::ticketAsociado($_POST["ticket"], $idEmpresa);
+
+    if ($ticketYaAsociado) {
+    echo "<span style='font-family:arial; text-align:center; color:red;'>Este ticket ya fue asociado a otra cotización. Escoja otro disponible o permita que el sistema cree uno nuevo automáticamente</div>";
+    exit();
+}
+
     $ticketId = $_POST["ticket"];
 }
 
