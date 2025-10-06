@@ -15,6 +15,7 @@ class Cotizacion extends BaseDatos {
     public static $tableAs    = 'cotiz';
 
     public const COTIZACION_VENDIDA = 1;
+    public const PRECOTIZACION      = 1;
 
     /**
      * Verifica si una cotización específica ha sido marcada como vendida.
@@ -44,6 +45,30 @@ class Cotizacion extends BaseDatos {
         }
 
         return "";
+    }
+
+    public static function esPrecotizacion(int $idCotizacion, int $idEmpresa): bool {
+        $predicado = [
+            'cotiz_id'         => $idCotizacion,
+            'cotiz_id_empresa' => $idEmpresa
+        ];
+
+        $consulta = self::Select($predicado);
+        $datos = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+
+        return $datos['cotiz_es_precotizacion'] == self::PRECOTIZACION;
+    }
+
+    public static function ticketAsociado(int $idTicket, int $idEmpresa): bool {
+        $predicado = [
+            'cotiz_ticket'     => $idTicket,
+            'cotiz_id_empresa' => $idEmpresa
+        ];
+
+        $consulta = self::Select($predicado);
+        $cantidad = mysqli_num_rows($consulta);
+
+        return $cantidad > 0;
     }
 
 }
