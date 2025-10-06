@@ -248,7 +248,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 								<div class="container">
 									<div class="nav-collapse collapse navbar-responsive-collapse">
 										<ul class="nav">
-											<li><a href="productos.php"><i class="icon-group"></i> Todos los productos</a></li>
+											<li><a href="productos.php"><i class="icon-th-large"></i> Todos los productos</a></li>
 											<li><a href="javascript:history.go(-1);"><i class="icon-arrow-left"></i> Regresar</a></li>
 											<li>
 												<?php if (Modulos::validarRol([37], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
