@@ -316,7 +316,7 @@ if(!empty($_GET["idTK"])){
 														<a href="clientes-seguimiento-agregar.php?idTK=<?= $res['cseg_tiket']; ?>" data-toggle="tooltip" title="Nuevo Seguimiento"><i class="icon-plus"></i></a>
 														<?php } ?>
 														<?php if (Modulos::validarRol([14], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-														<a href="clientes-seguimiento-editar.php?id=<?= $res[0]; ?>&idTK=<?= $_GET["idTK"]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
+														<a href="clientes-seguimiento-editar.php?id=<?= $res[0]; ?>&idTK=<?= $res['cseg_tiket']; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>&nbsp;
 														<?php } ?>
 														<?php 
 														//if (Modulos::validarRol([56], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
