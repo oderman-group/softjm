@@ -26,6 +26,10 @@ if (isset($_GET["clientesNuevos"])) {
 	$filtro .= " AND year(cli_fecha_ingreso)=".date("Y")." AND month(cli_fecha_ingreso)=".date("m");
 }
 
+if (isset($_GET["categoria"]) && is_numeric($_GET["categoria"])) {
+	$filtro .= " AND cli_categoria=".$_GET["categoria"];
+}
+
 $dpto="";
 if (isset($_GET["dpto"]) and $_GET["dpto"] != "") {
 	$consulta = $conexionBdPrincipal->query("SELECT * FROM " . MAINBD . ".clientes
@@ -157,8 +161,9 @@ while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
 
 		<td style="background-color: <?= $fondoColorCat; ?>;">
-			<?php echo "<b>Tipo</b>:" . $tipoDocumento[$res['cli_tipo_documento']] . " | "; ?>
-			<?php echo "<b>Documento</b>:" . $res['cli_usuario']; ?> | <?php echo "<b>Categoría:</b> " . $categ; ?><br>
+			<?php echo "<b>Creado:</b> " .$res['cli_fecha_registro'];?><br>
+			<?php echo "<b>Tipo documento</b>:" . $tipoDocumento[$res['cli_tipo_documento']] . " | "; ?>
+			<?php echo "<b>Nro. Documento</b>:" . $res['cli_usuario']; ?> | <?php echo "<b>Categoría:</b> " . $categ; ?><br>
 			<?php echo '<span style="font-size:16px;">' . $res['cli_nombre']; ?></span>
 			<?php if ($res['cli_telefono'] != "") echo "<br><b>Tel:</b> " . $res['cli_telefono']; ?>
 			<?php if ($res['cli_celular'] != "") echo "<br><b>Cel:</b> " . $res['cli_celular']; ?>
