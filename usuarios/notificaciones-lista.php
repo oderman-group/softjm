@@ -163,7 +163,7 @@ mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE n
 								switch($_GET["estNot"]){
 									case 1: $estadoNot = 'AND not_estado=' . NOT_ESTADO_PENDIENTE; break;
 									case 2: $estadoNot = 'AND not_estado=' . NOT_ESTADO_COMPLETA; break;
-									case 3: $estadoNot = 'AND (not_estado IN (' . NOT_ESTADO_PENDIENTE . ', ' . NOT_ESTADO_COMPLETA . ')'; break;
+									case 3: $estadoNot = 'AND (not_estado IN (' . NOT_ESTADO_PENDIENTE . ', ' . NOT_ESTADO_COMPLETA . '))'; break;
 									default: $estadoNot = 'AND not_estado=' . NOT_ESTADO_PENDIENTE; break;
 								}
 							}
@@ -177,12 +177,14 @@ mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE n
 								mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_usuario_encargado='".$_SESSION["id"]."' WHERE cseg_id='".$_GET["idSeg"]."'");
 								
 							}	
-								
-							$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM notificaciones 
+							
+							$sql = "SELECT * FROM notificaciones 
 							INNER JOIN clientes ON cli_id=not_cliente 
 							WHERE not_usuario='".$_SESSION["id"]."' 
 							$estadoNot
-							ORDER BY not_id DESC");
+							ORDER BY not_id DESC";
+
+							$consulta = mysqli_query($conexionBdPrincipal,$sql);
 							$no = 1;
 							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 								switch($res['not_estado']){

@@ -802,7 +802,20 @@ include("includes/js-formularios.php");
 								<div class="widget-container">
 									<form class="form-horizontal" method="post" action="enviar_correos/cotizaciones-enviar-correo.php">
 									<input type="hidden" name="id" value="<?=$_GET["id"];?>">
-										
+										<div class="control-group">
+											<label class="control-label">Nombre del contacto</label>
+											<div class="controls">
+												<input type="text" class="span8" name="destinoNombre" readonly value="<?=$resultadoD['cont_nombre'];?>">
+											</div>
+										</div>	
+
+										<div class="control-group">
+											<label class="control-label">Email</label>
+											<div class="controls">
+												<input type="text" class="span8" name="destinoEmail" readonly value="<?=$resultadoD['cont_email'];?>">
+											</div>
+										</div>	
+
 										<div class="control-group">
 											<label class="control-label">Asunto</label>
 											<div class="controls">
@@ -819,11 +832,18 @@ include("includes/js-formularios.php");
 													<?=$configuracion['conf_emsj_cotizacion'];?>
 												</textarea>
 											</div>
-										</div>	
-										
-									<div class="form-actions">
-											<button type="submit" class="btn btn-info"><i class="icon-envelope"></i> Enviar cotización</button>
 										</div>
+
+										<?php if (!empty($resultadoD['cont_email']) && filter_var($resultadoD['cont_email'], FILTER_VALIDATE_EMAIL)) { ?>
+											<div class="form-actions">
+												<button type="submit" class="btn btn-info"><i class="icon-envelope"></i> Enviar cotización</button>
+											</div>
+										<?php } else {?>
+											<div class="alert alert-warning">
+												<button type="button" class="close" data-dismiss="alert">&times;</button>
+												<i class="icon-warning-sign"></i><strong>Email inválido!</strong> Este contacto no tiene email registrado o el que tiene está incorrecto.
+											</div>
+										<?php }?>
 									</form>	
 								</div>
 							</div>
@@ -847,10 +867,17 @@ include("includes/js-formularios.php");
 						<div class="span12">
 							<?php
 							while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
+								$rutaFoto = "files/fotos/".$res['usr_foto'];
+
+								if (!empty($res['usr_foto']) && file_exists($rutaFoto)) {
+									$foto = $rutaFoto;
+								} else {
+									$rutaFoto = "images/item-pic.png";
+								}
 							?>
 								<div class="media">
 									<a href="#" class="pull-left media-thumb">
-										<img src="images/item-pic.png" width="34" height="34" alt="user">
+										<img src="<?=$rutaFoto;?>" width="34" height="34" alt="user">
 									</a>
 									<div class="media-body ">
 										<h4 class="media-heading"><?=$res['cseg_fecha_reporte'];?> - <?=$res['usr_nombre'];?></h4>

@@ -94,7 +94,7 @@ include("includes/js-formularios.php");
 							<div class="control-group">
 								<label class="control-label" style="font-weight: bold;">Cliente</label>
 								<div class="controls">
-									<?=$infoTicket['cli_nombre'];?>
+									<a href="clientes-editar.php?id=<?=$infoTicket['cli_id'];?>"><?=$infoTicket['cli_nombre'];?></a>
 								</div>
 							</div>
 							
@@ -181,10 +181,11 @@ include("includes/js-formularios.php");
 								</div>
 							</div>
 
-							
-							<div align="center" style="padding: 5px;">
-									<a href="clientes-tikets-editar.php?id=<?=$infoTicket['tik_id'];?>" class="btn btn-primary">Editar ticket</a>
-							</div>
+							<?php if (Modulos::validarRol([90], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $estadoTicket == 1) {?>
+								<div align="center" style="padding: 5px;">
+										<a href="clientes-tikets-editar.php?id=<?=$infoTicket['tik_id'];?>" class="btn btn-primary">Editar ticket</a>
+								</div>
+							<?php }?>
 							
 						</div>
 					</div>
@@ -215,7 +216,7 @@ include("includes/js-formularios.php");
 						</div>
 						<div class="widget-container">
 							<form class="form-horizontal" method="post" action="bd_create/clientes-seguimiento-guardar.php" enctype="multipart/form-data">
-                            
+                            <?php if ($estadoTicket == 1) {?>
                             <input type="hidden" name="idTK" value="<?=$tiketID;?>">
                             <input type="hidden" name="tipoS" value="<?=$tipoSeguimiento;?>">
                             <input type="hidden" name="cliente" value="<?=$cliente;?>">
@@ -516,33 +517,32 @@ include("includes/js-formularios.php");
 							</fieldset>	
 								
 								<fieldset class="default">
-								<legend>Complementario</legend>
-								<div class="control-group">
-									<label class="control-label">Cerrar ticket</label>
-									<div class="controls">
-                                        <input type="checkbox" value="1" name="cerrarTK" id="miCheckboxControl">
-                                        <span style="color:navy;">Este se toma como el último seguimiento y el ticket quedará cerrado.</span>
+									<legend>Complementario</legend>
+									<div class="control-group">
+										<label class="control-label">Cerrar ticket</label>
+										<div class="controls">
+											<input type="checkbox" value="1" name="cerrarTK" id="miCheckboxControl">
+											<span style="color:navy;">Este se toma como el último seguimiento y el ticket quedará cerrado.</span>
+										</div>
 									</div>
-								</div>
-                               
-                               <div class="control-group">
-									<label class="control-label">Notificar de inmediato al encargado</label>
-									<div class="controls">
-                                        <input type="checkbox" value="1" name="notf">
-                                        <span style="color:#00078A;">Llegará una notificación inmediata al encargado</span>
-									</div>
-								</div>
 								
-								<div class="control-group">
-									<label class="control-label">Notificar al cliente</label>
-									<div class="controls">
-                                        <input type="checkbox" value="1" name="notfCliente">
-                                        <span style="color:#00078A;">También llegará una notificación inmediata al cliente</span>
+									<div class="control-group">
+										<label class="control-label">Notificar de inmediato al encargado</label>
+										<div class="controls">
+											<input type="checkbox" value="1" name="notf">
+											<span style="color:#00078A;">Llegará una notificación inmediata al encargado</span>
+										</div>
 									</div>
-								</div>
+									
+									<div class="control-group">
+										<label class="control-label">Notificar al cliente</label>
+										<div class="controls">
+											<input type="checkbox" value="1" name="notfCliente">
+											<span style="color:#00078A;">También llegará una notificación inmediata al cliente</span>
+										</div>
+									</div>
 								</fieldset>
                                
-								<?php if ($estadoTicket == 1) {?>
 									<div class="form-actions">
 										<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
 										<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>

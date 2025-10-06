@@ -11,7 +11,12 @@ require RUTA_PROYECTO.'/librerias/phpmailer/SMTP.php';
 $idPagina = 24;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-$consulta= $conexionBdPrincipal->query("SELECT * FROM cotizacion INNER JOIN clientes ON cli_id=cotiz_cliente INNER JOIN sucursales ON sucu_id=cotiz_sucursal INNER JOIN contactos ON cont_id=cotiz_contacto INNER JOIN usuarios ON usr_id=cotiz_vendedor WHERE cotiz_id='" . $_POST["id"] . "'");
+$consulta = $conexionBdPrincipal->query("SELECT * FROM cotizacion 
+INNER JOIN clientes ON cli_id=cotiz_cliente 
+INNER JOIN sucursales ON sucu_id=cotiz_sucursal 
+INNER JOIN contactos ON cont_id=cotiz_contacto 
+INNER JOIN usuarios ON usr_id=cotiz_vendedor 
+WHERE cotiz_id='" . $_POST["id"] . "'");
 $resultado = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
 $fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
