@@ -125,6 +125,7 @@ include("includes/js-formularios.php");
 <?php }?>
 <?php
 		require '../usuarios/class/CotizacionesEditar.php';
+
 		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaProductos') {
 			$htmlTablaProductos = CotizacionesEditar::generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
 			echo $htmlTablaProductos;
@@ -638,6 +639,8 @@ include("includes/js-formularios.php");
 										</div>
 
 										<?php
+										$envio = $resultadoD['cotiz_envio'];
+
 										if (empty($resultadoD['cotiz_ticket'])) {
 											$consultaTickets = $conexionBdPrincipal->query("SELECT * FROM clientes_tikets 
 											WHERE tik_cliente='".$resultadoD['cotiz_cliente']."'
@@ -749,7 +752,7 @@ include("includes/js-formularios.php");
 										</tr>
 										<tr style="font-weight: bold; font-size: 16px;">
 											<td style="text-align: right;" colspan="<?=$colspan;?>">ENVÍO</td>
-											<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?=!empty($envio) ? number_format($envio,0,",",".") : 0;?>
+											<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?php if(!empty($envio)) echo number_format($envio,0,",","."); else echo 0;?>
 												</td>
 										</tr>
 										<tr style="font-weight: bold; font-size: 16px;">
