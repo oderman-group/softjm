@@ -5,8 +5,14 @@ $idPagina = 88;
 $paginaActual['pag_nombre'] = "Tickets de clientes";
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='".$_GET["cte"]."' AND cli_id_empresa='".$idEmpresa."'");
-$cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
+
+if (!empty($_GET["cte"])) {
+	$consultaDatos=mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes 
+	WHERE cli_id='".$_GET["cte"]."' AND cli_id_empresa='".$idEmpresa."'");
+	$cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
+}
+
+require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
 ?>
 <!-- styles -->
 
@@ -72,14 +78,38 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 					<div class="span12">
 						<div class="primary-head">
 							<h3 class="page-header"><?=$paginaActual['pag_nombre'];?> de <b><?=$cliente['cli_nombre'];?></b></h3>
-						</div>
-						<ul class="breadcrumb">
-							<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-							<li><a href="clientes.php">Clientes</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-							<li class="active"><?=$paginaActual['pag_nombre'];?> de <b><?=$cliente['cli_nombre'];?></b></li>
-						</ul>
+						</div>	
 					</div>
 				</div>
+
+				<?php
+				$totalTicketsComerciales = Ticket::obtenerTotalTicketsComerciales($conexionBdPrincipal);
+
+				$ticketsComercialesEfectivos = Ticket::obtenerTicketsComercialesEfectivos($conexionBdPrincipal);
+				$porcentajeEfectivo = round(($ticketsComercialesEfectivos / $totalTicketsComerciales) * 100, 2);
+
+				$ticketsComercialesNoEfectivos = Ticket::obtenerTicketsComercialesNoEfectivos($conexionBdPrincipal);
+				$porcentajeNoEfectivo = round(($ticketsComercialesNoEfectivos / $totalTicketsComerciales) * 100, 2);
+				?>
+
+				<div class="row-fluid">
+					<div class="span4">
+						<h6>% Tickets comerciales efectivos</h6>
+						<div class="progress progress-success progress-striped active">
+							<div class="bar" style="width: <?=$porcentajeEfectivo;?>%">
+								<?=$porcentajeEfectivo;?>%
+							</div>
+						</div>
+
+						<h6>% Tickets comerciales NO efectivos</h6>
+						<div class="progress progress-danger progress-striped active">
+							<div class="bar" style="width: <?=$porcentajeNoEfectivo;?>%">
+								<?=$porcentajeNoEfectivo;?>%
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<?php include("includes/notificaciones.php");?>
 				<p>
 					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
@@ -150,6 +180,7 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 											<th>Resposable</th>
 											<th>Nro. Cotización</th>
 											<th>Estado</th>
+											<th>Etapa</th>
 											<th>Prioridad</th>
 											<th>Seg.</th>
 											<th></th>
@@ -243,6 +274,7 @@ $cliente = mysqli_fetch_array($consultaDatos, MYSQLI_BOTH);
 												<td><?= $res['usr_nombre'];?></td>
 												<td><a href='cotizaciones-editar.php?id=<?= $res['tik_id_cotizacion'];?>'><?= $res['tik_id_cotizacion'];?></a></td>
 												<td><span class="label label-<?= $etiquetaE; ?>"><?= $estado; ?></span></td>
+												<td><?= $opcionesEtapa[$res['tik_etapa']]; ?></td>
 												<td><span class="label label-<?= $etiquetaP; ?>"><?= $prioridad; ?></span></td>
 												<td align="center" style="background:<?= $color2; ?>;">
 												<?php if( Modulos::validarRol(['12'], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) ) {?>
