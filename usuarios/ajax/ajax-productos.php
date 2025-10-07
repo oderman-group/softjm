@@ -89,7 +89,11 @@ if ($_POST["proceso"] == 2) {
 			}
 		}
 
-		mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."', czpp_ultima_actualizacion=now(), czpp_cantidad_actualizaciones=czpp_cantidad_actualizaciones+1, czpp_usuario_ultima_actualizacion='".$_SESSION["id"]."' 
+		mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET 
+		".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."', 
+		czpp_ultima_actualizacion=now(), 
+		czpp_cantidad_actualizaciones=czpp_cantidad_actualizaciones+1, 
+		czpp_usuario_ultima_actualizacion='".$_SESSION["id"]."' 
 		WHERE czpp_id='".$_POST["producto"]."'");
 
 		$response = [
