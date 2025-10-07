@@ -231,4 +231,35 @@ class Producto extends BaseDatos {
         }
     }
 
+    /**
+     * 
+     */
+    public static function productoMasVendido($conexionBdPrincipal) {
+        $sql = "SELECT 
+            czpp_producto as id_producto, 
+            prod_nombre as nombre_producto, 
+            SUM(czpp_cantidad) AS total_unidades_vendidas, 
+            COUNT(*) AS total_documentos_diferentes 
+        FROM 
+            cotizacion_productos
+        INNER JOIN 
+            productos 
+            ON prod_id = czpp_producto
+        INNER JOIN 
+            facturas 
+            ON factura_id = czpp_cotizacion 
+            AND factura_tipo = ".FACT_TIPO_VENTA."
+            AND YEAR(factura_fecha_creacion)=".date("Y")."
+        WHERE 
+            czpp_tipo = ".CZPP_TIPO_FACT."
+        GROUP BY 
+            czpp_producto, prod_nombre
+        ORDER BY 
+            total_unidades_vendidas desc
+        LIMIT 1
+        ";
+
+        return mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, $sql));
+    }
+
 }

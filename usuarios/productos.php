@@ -238,7 +238,28 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 
 		<div class="main-wrapper">
 			<div class="container-fluid">
+				<?php
+				$productoMasVendido = Producto::productoMasVendido($conexionBdPrincipal);
+				?>
+
 				<?php include("includes/notificaciones.php"); ?>
+
+				<div class="row-fluid">
+					<div class="span3">
+						<div class="board-widgets magenta">
+							<div class="board-widgets-head clearfix">
+								<h4 class="pull-left"><i class="icon-certificate"></i> Producto más vendido este año </h4>
+							</div>
+							<div class="board-widgets-content">
+								<span class="n-counter"><?=$productoMasVendido['total_unidades_vendidas'];?></span><span class="n-sources">Unidades</span>
+							</div>
+							<div class="board-widgets-botttom">
+								<a href="productos-editar.php?id=<?=$productoMasVendido['id_producto'];?>" target="_blank"><?=$productoMasVendido['nombre_producto'];?><i class="icon-double-angle-right"></i></a>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<span id="resp"></span>
 
 				<div class="row-fluid">
