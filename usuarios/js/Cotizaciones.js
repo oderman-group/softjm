@@ -198,7 +198,7 @@ if (idEditar) {
             let subtotalRow = quantity * value;
             let discountAmount = subtotalRow * (discount / 100);
             let rowTotal = subtotalRow - discountAmount;
-            let rowIva = (rowTotal * parseFloat($(this).find("input[title='czpp_impuesto']").val())) / 100;
+            let rowIva = (rowTotal * (parseFloat($(this).find("input[title='czpp_impuesto']").val()) || 0)) / 100;
 
             subtotal += subtotalRow;
             totalDiscount += discountAmount;
@@ -214,7 +214,11 @@ if (idEditar) {
         $("#totalIva .valor-numerico").text(totalIva.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
 
         let envio = parseFloat($("input[name='envio']").val()) || 0;
+        subtotal = subtotal || 0;
+        totalDiscount = totalDiscount || 0;
+        totalIva = totalIva || 0;
         let total = subtotal - totalDiscount + totalIva + envio;
+
         $("#total .valor-numerico").text(total.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
         
         //Mostramos la utilidad total
