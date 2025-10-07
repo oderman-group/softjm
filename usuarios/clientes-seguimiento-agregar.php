@@ -45,6 +45,7 @@ if(isset($_GET["idTK"]) and is_numeric($_GET["idTK"]) && $_GET["idTK"] > 0){
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+<script src="js/bootbox.js"></script>
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
@@ -88,6 +89,8 @@ include("includes/js-formularios.php");
 							$infoTicket = mysqli_fetch_array($consultaInfoTikets, MYSQLI_BOTH);
 							
 							?>
+							<input type="hidden" id="tik_tipo_tiket" value="<?=$infoTicket['tik_tipo_tiket'];?>">
+							<input type="hidden" id="tik_tipo_negocio" value="<?=$infoTicket['tik_tipo_negocio'];?>">
 						</div>
 						<div class="widget-container" style="font-size: 10px;">
 							

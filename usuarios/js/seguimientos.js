@@ -7,6 +7,9 @@ $(document).ready(function() {
     const $checkboxControl = $('#miCheckboxControl'); // Selecciona el checkbox
     const fieldIdsToControl = ['fechaPC', 'horaPC', 'minutosRecordarAntes', 'canalPC', 'asunto']; // Los IDs de tus campos
 
+    const tipoTicket = document.getElementById("tik_tipo_tiket").value;
+    const tipoNegocio = document.getElementById("tik_tipo_negocio").value;
+
     // Define la lógica de toggle (puede ser anónima o una función nombrada)
     const applyToggleLogic = function() {
         const isChecked = $checkboxControl.is(':checked'); // Usa .is(':checked') de jQuery
@@ -18,6 +21,12 @@ $(document).ready(function() {
                 $field.prop('required', false);
             });
             $fieldsetContainer.hide();
+
+            if (tipoTicket == 1 && tipoNegocio == 1){
+                bootbox.alert("Al cerrar el ticket en este punto se entenderá que este negocio fue perdido. Para que este ticket sea efectivo se debe generar el pedido de la cotización asociada y terminar el proceso en una factura de venta.", function () {
+                    //callback
+                });
+            }
         } else {
             $fields.forEach($field => {
                 $field.prop('required', true);
