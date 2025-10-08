@@ -1,4 +1,4 @@
-<?php 
+<?php
 include("sesion.php");
 
 $idPagina = 13;
@@ -29,6 +29,7 @@ if(isset($_GET["idTK"]) and is_numeric($_GET["idTK"]) && $_GET["idTK"] > 0){
 }
 ?>
 <link href="css/chosen.css" rel="stylesheet">
+<link href="css/jquery.gritter.css" rel="stylesheet">
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -46,6 +47,7 @@ if(isset($_GET["idTK"]) and is_numeric($_GET["idTK"]) && $_GET["idTK"] > 0){
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script src="js/bootbox.js"></script>
+<script src="js/jquery.gritter.js"></script>
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
@@ -338,19 +340,6 @@ include("includes/js-formularios.php");
 									</div>
 								</div>
 								
-								<div class="control-group">
-									<label class="control-label">¿Hubo cotización?</label>
-									<div class="controls">
-                                        <input type="checkbox" value="1" name="cotizo">
-									</div>
-								</div>
-								
-								<div class="control-group">
-									<label class="control-label">¿Hubo venta?</label>
-									<div class="controls">
-                                        <input type="checkbox" value="1" name="vendio">
-									</div>
-								</div>
 
 								<div class="control-group">
 									<label class="control-label">¿Hubo demostración?</label>
@@ -439,17 +428,17 @@ include("includes/js-formularios.php");
 								<legend>Próximo contacto</legend>
 
                                 <div class="control-group">
-									<label class="control-label">Fecha próximo contacto (*)</label>
-									<div class="controls">
-										<input type="date" class="span4" name="fechaPC" required id="fechaPC">
-										<a href="calendario.php?id=<?=$_SESSION["id"];?>" target="_blank" style="color:#009; text-decoration: underline;"><i class="icon icon-calendar"></i> Ver mi calendario</a>
-									</div>
-								</div>
+         <label class="control-label">Fecha próximo contacto (*)</label>
+         <div class="controls">
+          <input type="date" class="span4" name="fechaPC" value="<?=date('Y-m-d', strtotime('+1 day'));?>" required id="fechaPC">
+          <a href="#" data-toggle="modal" data-target="#calendarModal" style="color:#009; text-decoration: underline;"><i class="icon icon-calendar"></i> Ver mi calendario</a>
+         </div>
+        </div>
 
 								<div class="control-group">
 									<label class="control-label">Hora próximo contacto (*)</label>
 									<div class="controls">
-										<input type="time" class="span2" name="horaPC" required id="horaPC">
+										<input type="time" class="span2" name="horaPC" value="<?=date('H:i');?>" required id="horaPC">
 									</div>
 								</div>
 
@@ -567,5 +556,23 @@ include("includes/js-formularios.php");
 	<?php include("includes/pie.php");?>
 </div>
 <script src="js/seguimientos.js"></script>
+
+<!-- Modal for Calendar -->
+<div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document" style="width: 95%; max-width: 1400px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="calendarModalLabel">Mi Calendario</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 0;">
+        <iframe src="calendario-modal.php?id=<?=$_SESSION["id"];?>" width="100%" height="1000" frameborder="0"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

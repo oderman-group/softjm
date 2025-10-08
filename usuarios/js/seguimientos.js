@@ -22,15 +22,17 @@ $(document).ready(function() {
             });
             $fieldsetContainer.hide();
 
-            if (tipoTicket == 1 && tipoNegocio == 1){
-                bootbox.alert("Al cerrar el ticket en este punto se entenderá que este negocio fue perdido. Para que este ticket sea efectivo se debe generar el pedido de la cotización asociada y terminar el proceso en una factura de venta.", function () {
+            if (tipoTicket == 1 && tipoNegocio == 1) {
+                bootbox.alert("Al cerrar el ticket en este punto se entenderá que este negocio fue perdido. Para que este ticket sea efectivo se debe generar el pedido a partir de la cotización asociada, y terminar el proceso en una factura de venta.", function () {
                     //callback
                 });
             }
         } else {
             $fields.forEach($field => {
+                if ($field.attr('id') !== 'fechaPC' && $field.attr('id') !== 'horaPC') {
+                    $field.val('');
+                }
                 $field.prop('required', true);
-                $field.val('');
             });
             $fieldsetContainer.show();
         }
