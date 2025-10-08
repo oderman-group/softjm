@@ -1,19 +1,20 @@
 <?php
 $paso=true;
-if(!isset($idPagina)){
+if (!isset($idPagina)) {
 	$rutaSalida= "index.php";
 	$mensaje= "Falta el ID de esta página.";
 	$paso=false;
-}else{
+} else {
 	$consultaPaginaActual = $conexionBdAdmin->query("SELECT * FROM paginas WHERE pag_id='".$idPagina."'");
 	$paginaActual = mysqli_fetch_array($consultaPaginaActual, MYSQLI_BOTH);
 
-	if(!Modulos::validarAccesoModulo($configuracion['conf_id_empresa'], $paginaActual['pag_id_modulo'], $conexionBdAdmin, $datosUsuarioActual)){
+	if (!Modulos::validarAccesoModulo($configuracion['conf_id_empresa'], $paginaActual['pag_id_modulo'], $conexionBdAdmin, $datosUsuarioActual)) {
 		$rutaSalida= "index.php";
 		$mensaje= "La empresa NO tiene permiso a este modulo: " . $paginaActual['pag_id_modulo'];
 		$paso=false;
 	}
-	if($paso && !Modulos::validarRol([$idPagina], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
+
+	if ($paso && !Modulos::validarRol([$idPagina], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 		$rutaSalida= "index.php";
 		$mensaje= "No tienes permiso para acceder a esta pagina. Serás redireccionado al inicio.";
 		$paso=false;
