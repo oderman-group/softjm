@@ -287,8 +287,9 @@ FLOT PIE CHART
 			$tikets = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
 			INNER JOIN clientes ON cli_id=cseg_cliente
 			INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
-			WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND cseg_fecha_proximo_contacto!='0000-00-00'
+			WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND cseg_fecha_proximo_contacto!='0000-00-00' AND YEAR(cseg_fecha_proximo_contacto) = YEAR(NOW())
 			ORDER BY cseg_fecha_proximo_contacto DESC
+			LIMIT 10
 			");
 			?>
 			
@@ -305,9 +306,15 @@ FLOT PIE CHART
 						<div class="widget-container">
 							<ul class="sample-noty">
 								<?php
-								$llamadas = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento 
+								$consultaNumLlamadas = $conexionBdPrincipal->query("SELECT COUNT(*) as total FROM cliente_seguimiento
 								INNER JOIN clientes ON cli_id=cseg_cliente
-								WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND (cseg_canal_proximo_contacto=2 OR cseg_canal_proximo_contacto=3) AND cseg_realizado IS NULL");
+								WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND (cseg_canal_proximo_contacto=2 OR cseg_canal_proximo_contacto=3) AND cseg_realizado IS NULL AND YEAR(cseg_fecha_proximo_contacto) = YEAR(NOW())");
+								$numLlamadas = mysqli_fetch_array($consultaNumLlamadas, MYSQLI_BOTH)['total'];
+								$llamadas = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
+								INNER JOIN clientes ON cli_id=cseg_cliente
+								WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND (cseg_canal_proximo_contacto=2 OR cseg_canal_proximo_contacto=3) AND cseg_realizado IS NULL AND YEAR(cseg_fecha_proximo_contacto) = YEAR(NOW())
+								ORDER BY cseg_fecha_proximo_contacto DESC
+								LIMIT 10");
 								
 								while($llamada = mysqli_fetch_array($llamadas)){
 								$consultaClienteSeguimiento=$conexionBdPrincipal->query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()) FROM cliente_seguimiento 
@@ -331,6 +338,8 @@ FLOT PIE CHART
 								}
 								?>
 							</ul>
+							<?php if($numReuniones > 10) { ?><div align="center">Tienes más reuniones pendientes.</div><?php } ?>
+							<?php if($numLlamadas > 10) { ?><div align="center">Tienes más llamadas pendientes.</div><?php } ?>
 						</div>
 					</div>
 					
@@ -341,9 +350,15 @@ FLOT PIE CHART
 						<div class="widget-container">
 							<ul class="sample-noty">
 								<?php
-								$llamadas = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento 
+								$consultaNumReuniones = $conexionBdPrincipal->query("SELECT COUNT(*) as total FROM cliente_seguimiento
 								INNER JOIN clientes ON cli_id=cseg_cliente
-								WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND (cseg_canal_proximo_contacto=4 OR cseg_canal_proximo_contacto=5) AND cseg_realizado IS NULL");
+								WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND (cseg_canal_proximo_contacto=4 OR cseg_canal_proximo_contacto=5) AND cseg_realizado IS NULL AND YEAR(cseg_fecha_proximo_contacto) = YEAR(NOW())");
+								$numReuniones = mysqli_fetch_array($consultaNumReuniones, MYSQLI_BOTH)['total'];
+								$llamadas = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
+								INNER JOIN clientes ON cli_id=cseg_cliente
+								WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND (cseg_canal_proximo_contacto=4 OR cseg_canal_proximo_contacto=5) AND cseg_realizado IS NULL AND YEAR(cseg_fecha_proximo_contacto) = YEAR(NOW())
+								ORDER BY cseg_fecha_proximo_contacto DESC
+								LIMIT 10");
 								
 								while($llamada = mysqli_fetch_array($llamadas)){
 								$consultaClienteSeguimiento=$conexionBdPrincipal->query("SELECT DATEDIFF(cseg_fecha_proximo_contacto,now()) FROM cliente_seguimiento 
@@ -385,22 +400,24 @@ FLOT PIE CHART
 					<?php
 					$ConsultaNumTikets=$conexionBdPrincipal->query("SELECT * FROM clientes_tikets
 					INNER JOIN clientes ON cli_id=tik_cliente
-					WHERE 
-						tik_usuario_responsable='".$_SESSION["id"]."' 
+					WHERE
+						tik_usuario_responsable='".$_SESSION["id"]."'
 					AND tik_estado='".TIK_ESTADO_ABIERTO."'
 					AND tik_prioridad = ".TICKET_PRIORIDAD_MUY_URGENTE."
+					AND YEAR(tik_fecha_creacion) = YEAR(NOW())
 					ORDER BY tik_tipo_tiket DESC
 					");
 					$NumtiketsI = $ConsultaNumTikets->num_rows;
 
 					$tiketsI = $conexionBdPrincipal->query("SELECT * FROM clientes_tikets
 					INNER JOIN clientes ON cli_id=tik_cliente
-					WHERE 
-						tik_usuario_responsable='".$_SESSION["id"]."' 
-					AND tik_estado='".TIK_ESTADO_ABIERTO."' 
+					WHERE
+						tik_usuario_responsable='".$_SESSION["id"]."'
+					AND tik_estado='".TIK_ESTADO_ABIERTO."'
 					AND tik_prioridad = ".TICKET_PRIORIDAD_MUY_URGENTE."
+					AND YEAR(tik_fecha_creacion) = YEAR(NOW())
 					ORDER BY tik_tipo_tiket DESC
-					LIMIT 0,5
+					LIMIT 0,10
 					");
 					?>
 					<div class="content-widgets gray">
@@ -416,7 +433,7 @@ FLOT PIE CHART
 							</ul>
                             <?php $i++;}?>
                             
-                            <?php if($NumtiketsI>5){?><div align="center"><a href="clientes-tikets.php?resp=<?=$_SESSION["id"];?>" class="btn btn-mini btn-danger" style="margin:10px; color:#FFF;">VER TODOS</a></div><?php }?>
+                            <?php if($NumtiketsI>10){?><div align="center"><a href="clientes-tikets.php?resp=<?=$_SESSION["id"];?>" class="btn btn-mini btn-danger" style="margin:10px; color:#FFF;">VER TODOS</a></div><?php }?>
 
 					</div>
 					
@@ -472,7 +489,7 @@ FLOT PIE CHART
 											</div>
 											<?php if ($tkRes['cseg_realizado'] != 1) {?>
 												<div class="btn-group pull-right">
-													<a href="bd_update/cliente-seguimiento-estado-update.php?id=<?=$tkRes['cseg_id'];?>&get=28" class="btn"><i class="icon-ok-circle"></i> Completar tarea</a>
+													<a href="bd_update/cliente-seguimiento-estado-update.php?id=<?=$tkRes['cseg_id'];?>&get=28" class="btn" title="Completar tarea"><i class="icon-ok-circle"></i> Completar tarea</a>
 												</div>
 											<?php } else {?>
 												<div class="btn-group pull-right" style="margin-bottom: 20px;">
@@ -495,7 +512,9 @@ FLOT PIE CHART
 									$tikets2 = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
 									INNER JOIN clientes ON cli_id=cseg_cliente
 									INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
-									WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND cseg_fecha_proximo_contacto!='0000-00-00'
+									WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND cseg_fecha_proximo_contacto!='0000-00-00' AND YEAR(cseg_fecha_proximo_contacto) = YEAR(NOW())
+									ORDER BY cseg_fecha_proximo_contacto DESC
+									LIMIT 10
 									");
 									while($tkRes2 = mysqli_fetch_array($tikets2, MYSQLI_BOTH)){
 										switch($tkRes2['cseg_tipo']){
@@ -543,7 +562,9 @@ FLOT PIE CHART
 									$tikets3 = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
 									INNER JOIN clientes ON cli_id=cseg_cliente
 									INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
-									WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND cseg_fecha_proximo_contacto!='0000-00-00'
+									WHERE cseg_usuario_encargado='".$_SESSION["id"]."' AND cseg_fecha_proximo_contacto!='0000-00-00' AND YEAR(cseg_fecha_proximo_contacto) = YEAR(NOW())
+									ORDER BY cseg_fecha_proximo_contacto DESC
+									LIMIT 10
 									");
 									while($tkRes3 = mysqli_fetch_array($tikets3, MYSQLI_BOTH)){
 										switch($tkRes3['cseg_tipo']){
@@ -575,7 +596,7 @@ FLOT PIE CHART
 												<a href="clientes-seguimiento-editar.php?id=<?=$tkRes3['cseg_id'];?>&idTK=<?=$tkRes3['cseg_tiket'];?>" class="btn btn-mini" target="new"><i class=" icon-list-alt"></i> Más detalles</a>
 											</div>
 											<div class="btn-group pull-right">
-												<a href="bd_update/cliente-seguimiento-estado-update.php?id=<?=$tkRes3['cseg_id'];?>&get=28" class="btn"><i class="icon-ok-circle"></i> Completar tarea</a>
+												<a href="bd_update/cliente-seguimiento-estado-update.php?id=<?=$tkRes3['cseg_id'];?>&get=28" class="btn" title="Completar tarea"><i class="icon-ok-circle"></i> Completar tarea</a>
 											</div>
 										</div>
 									</div>
