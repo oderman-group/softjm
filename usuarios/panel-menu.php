@@ -659,7 +659,7 @@ $(function () {
                                                             <img width="46" height="46" alt="User" src="images/user-thumb1.png">
                                                         </div>
                                                         <ul class="list_info clearfix">
-                                                            <li><span style="color: red;">TAREA VENCIDA (Hace <?= ($segHoy[0] * -1); ?> días)</span></li>
+                                                            <li><span style="color: red;">TAREA VENCIDA (Hace <?= ($segHoy3[0] * -1); ?> días)</span></li>
                                                             <li><span>Cliente: <i><a href="#"><?= $tkRes3['cli_nombre']; ?></a></i></span></li>
                                                             <li><span>Asunto: <b><?= $tkRes3['cseg_asunto']; ?></b></span></li>
                                                             <li><span>Creador del seguimiento: <b><?= $tkRes3['usr_nombre']; ?></b></span></li>
