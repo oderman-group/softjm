@@ -15,5 +15,5 @@ function notificaciones(){
 		});
 }
 //setInterval('notificaciones()',200000);
-window.onload = notificaciones();	
-</script>	
+window.onload = notificaciones();
+</script>
