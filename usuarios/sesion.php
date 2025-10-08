@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+date_default_timezone_set('America/Bogota');
+
 require_once($_SERVER['DOCUMENT_ROOT']."/softjm/constantes.php");
 
 if( $_SESSION["id"]=="" || !is_numeric($_SESSION["id"]) ){
