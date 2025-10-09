@@ -927,7 +927,8 @@ include("includes/js-formularios.php");
 
 																			<?php } //el codigo 22 no se encontro en el archivo sql?>
 																			<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-																			<li><a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir</a></li>
+																			<li><a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir (Formato 1)</a></li>
+																			<li><a href="reportes/formato-cotizacion-3_pdf.php?id=<?=$res['cotiz_id'];?>" target="_blank">Imprimir (Formato 2)</a></li>
 																			<?php } ?>
 																			
 																			<?php if (Modulos::validarRol([380], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>

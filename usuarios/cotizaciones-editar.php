@@ -173,7 +173,10 @@ include("includes/js-formularios.php");
 				<a href="cotizaciones-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
 				<?php } ?>
 				<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-				<a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
+				<div class="btn-group">
+					<a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir (Formato 1)</a>
+					<a href="reportes/formato-cotizacion-3_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-warning" target="_blank"><i class="icon-print"></i> Imprimir (Formato 2)</a>
+				</div>
 				<?php } ?>
 				
 				<?php
@@ -784,7 +787,10 @@ include("includes/js-formularios.php");
 											
 												
 											<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-											<a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir</a>
+											<div class="btn-group">
+												<a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir (Formato 1)</a>
+												<a href="reportes/formato-cotizacion-3_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-warning" target="_blank"><i class="icon-print"></i> Imprimir (Formato 2)</a>
+											</div>
 											<?php } ?>
 										</div>
 									</form>
