@@ -155,6 +155,57 @@ $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBd
 					</div>
 				</div>
 
+				<!-- Filtros de Fechas -->
+				<div class="row-fluid" style="margin-top: 20px;">
+					<div class="span12">
+						<div class="content-widgets light-gray">
+							<div class="widget-head green" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border-radius: 10px; cursor: pointer;" data-toggle="collapse" data-target="#filtersCollapse">
+								<h3 style="text-align: center; margin: 0; padding: 10px;"><i class="icon-filter"></i> Filtros de Fechas <i class="icon-chevron-down pull-right"></i></h3>
+							</div>
+							<div class="widget-container">
+								<div id="filtersCollapse" class="in collapse" style="padding: 20px; background: #f8f9fa; border: 2px solid #007bff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-top: none; border-top-left-radius: 0; border-top-right-radius: 0;">
+								<form method="GET" action="" class="form-horizontal">
+									<?php if(isset($_GET["dpto"])) { ?><input type="hidden" name="dpto" value="<?=$_GET["dpto"];?>"><?php } ?>
+									<?php if(isset($_GET["tipoDoc"])) { ?><input type="hidden" name="tipoDoc" value="<?=$_GET["tipoDoc"];?>"><?php } ?>
+									<?php if(isset($_GET["categoria"])) { ?><input type="hidden" name="categoria" value="<?=$_GET["categoria"];?>"><?php } ?>
+									<?php if(isset($_GET["grupo"])) { ?><input type="hidden" name="grupo" value="<?=$_GET["grupo"];?>"><?php } ?>
+									<div class="control-group">
+										<div class="span3">
+											<label class="control-label" style="font-weight: bold;">Fecha Creación Inicio: <?php if(isset($_GET["fecha_registro_inicio"]) && $_GET["fecha_registro_inicio"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_registro_inicio' => ''])) ?>" style="color:red; font-weight: bold;">x</a><?php } ?></label>
+											<div class="controls">
+												<input type="date" name="fecha_registro_inicio" value="<?= isset($_GET["fecha_registro_inicio"]) ? $_GET["fecha_registro_inicio"] : ""; ?>" class="form-control" style="width: 100%;">
+											</div>
+										</div>
+										<div class="span3">
+											<label class="control-label" style="font-weight: bold;">Fecha Creación Fin: <?php if(isset($_GET["fecha_registro_fin"]) && $_GET["fecha_registro_fin"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_registro_fin' => ''])) ?>" style="color:red; font-weight: bold;">x</a><?php } ?></label>
+											<div class="controls">
+												<input type="date" name="fecha_registro_fin" value="<?= isset($_GET["fecha_registro_fin"]) ? $_GET["fecha_registro_fin"] : ""; ?>" class="form-control" style="width: 100%;">
+											</div>
+										</div>
+										<div class="span3">
+											<label class="control-label" style="font-weight: bold;">Fecha Cliente Inicio: <?php if(isset($_GET["fecha_ingreso_inicio"]) && $_GET["fecha_ingreso_inicio"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_ingreso_inicio' => ''])) ?>" style="color:red; font-weight: bold;">x</a><?php } ?></label>
+											<div class="controls">
+												<input type="date" name="fecha_ingreso_inicio" value="<?= isset($_GET["fecha_ingreso_inicio"]) ? $_GET["fecha_ingreso_inicio"] : ""; ?>" class="form-control" style="width: 100%;">
+											</div>
+										</div>
+										<div class="span3">
+											<label class="control-label" style="font-weight: bold;">Fecha Cliente Fin: <?php if(isset($_GET["fecha_ingreso_fin"]) && $_GET["fecha_ingreso_fin"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_ingreso_fin' => ''])) ?>" style="color:red; font-weight: bold;">x</a><?php } ?></label>
+											<div class="controls">
+												<input type="date" name="fecha_ingreso_fin" value="<?= isset($_GET["fecha_ingreso_fin"]) ? $_GET["fecha_ingreso_fin"] : ""; ?>" class="form-control" style="width: 100%;">
+											</div>
+										</div>
+									</div>
+									<div class="form-actions" style="text-align: center; margin-top: 20px;">
+										<button type="submit" class="btn btn-success btn-large"><i class="icon-search"></i> Filtrar</button>
+										<a href="?<?= http_build_query(array_intersect_key($_GET, array_flip(['dpto','tipoDoc','categoria','grupo']))) ?>" class="btn btn-warning btn-large"><i class="icon-refresh"></i> Limpiar Todos</a>
+									</div>
+								</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="navbar">
@@ -314,6 +365,18 @@ $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBd
 
 							if (isset($_GET["categoria"]) && is_numeric($_GET["categoria"])) {
 								$filtro .= " AND cli_categoria=".$_GET["categoria"];
+							}
+							if (isset($_GET["fecha_registro_inicio"]) and $_GET["fecha_registro_inicio"] != "") {
+								$filtro .= " AND cli_fecha_registro >= '" . $_GET["fecha_registro_inicio"] . " 00:00:00'";
+							}
+							if (isset($_GET["fecha_registro_fin"]) and $_GET["fecha_registro_fin"] != "") {
+								$filtro .= " AND cli_fecha_registro <= '" . $_GET["fecha_registro_fin"] . " 23:59:59'";
+							}
+							if (isset($_GET["fecha_ingreso_inicio"]) and $_GET["fecha_ingreso_inicio"] != "") {
+								$filtro .= " AND cli_fecha_ingreso >= '" . $_GET["fecha_ingreso_inicio"] . " 00:00:00' AND cli_categoria = 2";
+							}
+							if (isset($_GET["fecha_ingreso_fin"]) and $_GET["fecha_ingreso_fin"] != "") {
+								$filtro .= " AND cli_fecha_ingreso <= '" . $_GET["fecha_ingreso_fin"] . " 23:59:59' AND cli_categoria = 2";
 							}
 							?>
 
