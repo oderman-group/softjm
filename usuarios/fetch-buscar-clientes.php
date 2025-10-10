@@ -29,6 +29,18 @@ if (isset($_GET["clientesNuevos"])) {
 if (isset($_GET["categoria"]) && is_numeric($_GET["categoria"])) {
 	$filtro .= " AND cli_categoria=".$_GET["categoria"];
 }
+if (isset($_GET["fecha_registro_inicio"]) and $_GET["fecha_registro_inicio"] != "") {
+	$filtro .= " AND cli_fecha_registro >= '" . $_GET["fecha_registro_inicio"] . " 00:00:00'";
+}
+if (isset($_GET["fecha_registro_fin"]) and $_GET["fecha_registro_fin"] != "") {
+	$filtro .= " AND cli_fecha_registro <= '" . $_GET["fecha_registro_fin"] . " 23:59:59'";
+}
+if (isset($_GET["fecha_ingreso_inicio"]) and $_GET["fecha_ingreso_inicio"] != "") {
+	$filtro .= " AND cli_fecha_ingreso >= '" . $_GET["fecha_ingreso_inicio"] . " 00:00:00' AND cli_categoria = 2";
+}
+if (isset($_GET["fecha_ingreso_fin"]) and $_GET["fecha_ingreso_fin"] != "") {
+	$filtro .= " AND cli_fecha_ingreso <= '" . $_GET["fecha_ingreso_fin"] . " 23:59:59' AND cli_categoria = 2";
+}
 
 $dpto="";
 if (isset($_GET["dpto"]) and $_GET["dpto"] != "") {

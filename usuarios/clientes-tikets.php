@@ -139,10 +139,78 @@ require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
 							if (isset($_GET["tipo"]) and $_GET["tipo"] != "") {
 								$filtro .= " AND tik_tipo_tiket='" . $_GET["tipo"] . "'";
 							}
+							if (isset($_GET["estado"]) and $_GET["estado"] != "") {
+								$filtro .= " AND tik_estado='" . $_GET["estado"] . "'";
+							}
+							if (isset($_GET["prioridad"]) and $_GET["prioridad"] != "") {
+								$filtro .= " AND tik_prioridad='" . $_GET["prioridad"] . "'";
+							}
+							if (isset($_GET["etapa"]) and $_GET["etapa"] != "") {
+								$filtro .= " AND tik_etapa='" . $_GET["etapa"] . "'";
+							}
+							if (isset($_GET["fecha_inicio"]) and $_GET["fecha_inicio"] != "") {
+								$filtro .= " AND tik_fecha_creacion >= '" . $_GET["fecha_inicio"] . " 00:00:00'";
+							}
+							if (isset($_GET["fecha_fin"]) and $_GET["fecha_fin"] != "") {
+								$filtro .= " AND tik_fecha_creacion <= '" . $_GET["fecha_fin"] . " 23:59:59'";
+							}
 							if(Modulos::validarRol([385], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
 								$filtro.=' AND cli_ciudad!="1122"';
 							}
 							?>
+
+							<!-- Filtros -->
+							<div class="row-fluid" style="margin-bottom: 20px;">
+								<form method="GET" action="">
+									<?php if(isset($_GET["cte"])) { ?><input type="hidden" name="cte" value="<?=$_GET["cte"];?>"><?php } ?>
+									<div class="span2">
+										<label>Estado: <?php if(isset($_GET["estado"]) && $_GET["estado"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['estado' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<select name="estado" class="form-control">
+											<option value="">Todos</option>
+											<option value="1" <?= (isset($_GET["estado"]) && $_GET["estado"]=="1") ? "selected" : ""; ?>>Abierto</option>
+											<option value="2" <?= (isset($_GET["estado"]) && $_GET["estado"]=="2") ? "selected" : ""; ?>>Cerrado</option>
+										</select>
+									</div>
+									<div class="span2">
+										<label>Prioridad: <?php if(isset($_GET["prioridad"]) && $_GET["prioridad"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['prioridad' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<select name="prioridad" class="form-control">
+											<option value="">Todas</option>
+											<option value="1" <?= (isset($_GET["prioridad"]) && $_GET["prioridad"]=="1") ? "selected" : ""; ?>>Normal</option>
+											<option value="2" <?= (isset($_GET["prioridad"]) && $_GET["prioridad"]=="2") ? "selected" : ""; ?>>Urgente</option>
+											<option value="3" <?= (isset($_GET["prioridad"]) && $_GET["prioridad"]=="3") ? "selected" : ""; ?>>Muy Urgente</option>
+										</select>
+									</div>
+									<div class="span2">
+										<label>Tipo: <?php if(isset($_GET["tipo"]) && $_GET["tipo"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['tipo' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<select name="tipo" class="form-control">
+											<option value="">Todos</option>
+											<option value="1" <?= (isset($_GET["tipo"]) && $_GET["tipo"]=="1") ? "selected" : ""; ?>>Comercial</option>
+											<option value="3" <?= (isset($_GET["tipo"]) && $_GET["tipo"]=="3") ? "selected" : ""; ?>>Soporte operativo</option>
+										</select>
+									</div>
+									<div class="span2">
+										<label>Etapa: <?php if(isset($_GET["etapa"]) && $_GET["etapa"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['etapa' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<select name="etapa" class="form-control">
+											<option value="">Todas</option>
+											<?php for($i=1; $i<=6; $i++){ ?>
+												<option value="<?=$i;?>" <?= (isset($_GET["etapa"]) && $_GET["etapa"]==$i) ? "selected" : ""; ?>><?=$opcionesEtapa[$i];?></option>
+											<?php } ?>
+										</select>
+									</div>
+									<div class="span2">
+										<label>Fecha Inicio: <?php if(isset($_GET["fecha_inicio"]) && $_GET["fecha_inicio"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_inicio' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<input type="date" name="fecha_inicio" value="<?= isset($_GET["fecha_inicio"]) ? $_GET["fecha_inicio"] : ""; ?>" class="form-control">
+									</div>
+									<div class="span2">
+										<label>Fecha Fin: <?php if(isset($_GET["fecha_fin"]) && $_GET["fecha_fin"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_fin' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<input type="date" name="fecha_fin" value="<?= isset($_GET["fecha_fin"]) ? $_GET["fecha_fin"] : ""; ?>" class="form-control">
+									</div>
+									<div class="span12" style="margin-top: 10px;">
+										<button type="submit" class="btn btn-primary">Filtrar</button>
+										<a href="?<?= isset($_GET["cte"]) ? "cte=".$_GET["cte"] : ""; ?>" class="btn btn-default">Limpiar Todos</a>
+									</div>
+								</form>
+							</div>
 
 							<?php
 							if (Modulos::validarRol([384], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {

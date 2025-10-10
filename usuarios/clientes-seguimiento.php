@@ -97,7 +97,7 @@ if(!empty($_GET["idTK"])){
 				<?php include("includes/notificaciones.php");?>
 				<p>
 					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-					<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+					<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && (isset($_GET["cte"]) || isset($_GET["idTK"])) && (!isset($tiket['tik_estado']) || $tiket['tik_estado'] != 2)) {?>
 					<a href="clientes-seguimiento-agregar.php?idTK=<?= $_GET["idTK"]; ?>&cte=<?= $_GET["cte"]; ?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
 					<?php } ?>
 				</p>
@@ -170,6 +170,22 @@ if(!empty($_GET["idTK"])){
 					$filtro .= " AND MONTH(cseg_fecha_reporte)='" . $_GET["m"] . "'";
 					$filtroUsuario = '';
 				}
+				if (isset($_GET["usuario_resp"]) and $_GET["usuario_resp"] != "") {
+					$filtro .= " AND cseg_usuario_responsable='" . $_GET["usuario_resp"] . "'";
+				}
+				if (isset($_GET["estado_seg"]) and $_GET["estado_seg"] != "") {
+					if($_GET["estado_seg"] == "1"){
+						$filtro .= " AND cseg_realizado=1";
+					}else{
+						$filtro .= " AND (cseg_realizado IS NULL OR cseg_realizado=0)";
+					}
+				}
+				if (isset($_GET["fecha_inicio"]) and $_GET["fecha_inicio"] != "") {
+					$filtro .= " AND cseg_fecha_contacto >= '" . $_GET["fecha_inicio"] . " 00:00:00'";
+				}
+				if (isset($_GET["fecha_fin"]) and $_GET["fecha_fin"] != "") {
+					$filtro .= " AND cseg_fecha_contacto <= '" . $_GET["fecha_fin"] . " 23:59:59'";
+				}
 
 				if ($_GET["inf"] == 1) {
 					$SQL = "SELECT * FROM cliente_seguimiento
@@ -207,6 +223,50 @@ if(!empty($_GET["idTK"])){
 							<div class="widget-head green">
 								<h3><?= $paginaActual['pag_nombre']; ?> : <b><?= $tiket['tik_asunto_principal']; ?></b></h3>
 							</div>
+
+							<!-- Filtros -->
+							<div class="row-fluid" style="margin-bottom: 20px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd;">
+								<form method="GET" action="">
+									<?php if(isset($_GET["cte"])) { ?><input type="hidden" name="cte" value="<?=$_GET["cte"];?>"><?php } ?>
+									<?php if(isset($_GET["idTK"])) { ?><input type="hidden" name="idTK" value="<?=$_GET["idTK"];?>"><?php } ?>
+									<?php if(isset($_GET["a"])) { ?><input type="hidden" name="a" value="<?=$_GET["a"];?>"><?php } ?>
+									<?php if(isset($_GET["m"])) { ?><input type="hidden" name="m" value="<?=$_GET["m"];?>"><?php } ?>
+									<div class="span3">
+										<label>Usuario Responsable: <?php if(isset($_GET["usuario_resp"]) && $_GET["usuario_resp"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['usuario_resp' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<select name="usuario_resp" class="form-control">
+											<option value="">Todos</option>
+											<?php
+											$consultaUsuarios = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
+											while($usuario = mysqli_fetch_array($consultaUsuarios, MYSQLI_BOTH)){
+												$selected = (isset($_GET["usuario_resp"]) && $_GET["usuario_resp"]==$usuario['usr_id']) ? "selected" : "";
+												echo '<option value="'.$usuario['usr_id'].'" '.$selected.'>'.$usuario['usr_nombre'].'</option>';
+											}
+											?>
+										</select>
+									</div>
+									<div class="span3">
+										<label>Estado Seguimiento: <?php if(isset($_GET["estado_seg"]) && $_GET["estado_seg"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['estado_seg' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<select name="estado_seg" class="form-control">
+											<option value="">Todos</option>
+											<option value="1" <?= (isset($_GET["estado_seg"]) && $_GET["estado_seg"]=="1") ? "selected" : ""; ?>>Completado</option>
+											<option value="0" <?= (isset($_GET["estado_seg"]) && $_GET["estado_seg"]=="0") ? "selected" : ""; ?>>Pendiente</option>
+										</select>
+									</div>
+									<div class="span3">
+										<label>Fecha Inicio: <?php if(isset($_GET["fecha_inicio"]) && $_GET["fecha_inicio"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_inicio' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<input type="date" name="fecha_inicio" value="<?= isset($_GET["fecha_inicio"]) ? $_GET["fecha_inicio"] : ""; ?>" class="form-control">
+									</div>
+									<div class="span3">
+										<label>Fecha Fin: <?php if(isset($_GET["fecha_fin"]) && $_GET["fecha_fin"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_fin' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<input type="date" name="fecha_fin" value="<?= isset($_GET["fecha_fin"]) ? $_GET["fecha_fin"] : ""; ?>" class="form-control">
+									</div>
+									<div class="span12" style="margin-top: 10px;">
+										<button type="submit" class="btn btn-primary">Filtrar</button>
+										<a href="?<?= http_build_query(array_intersect_key($_GET, array_flip(['cte','idTK','a','m']))) ?>" class="btn btn-default">Limpiar Todos</a>
+									</div>
+								</form>
+							</div>
+
 							<div class="widget-container">
 								<?php include("includes/notificaciones.php"); ?>
 								<div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
@@ -312,7 +372,7 @@ if(!empty($_GET["idTK"])){
 													<?php echo "<br><b>Ciudad:</b> " . $res['ciu_nombre']; ?>
 
 													<h4 style="margin-top:10px;">
-														<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+														<?php if (Modulos::validarRol([13], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $ticketR['tik_estado'] != 2) {?>
 														<a href="clientes-seguimiento-agregar.php?idTK=<?= $res['cseg_tiket']; ?>" data-toggle="tooltip" title="Nuevo Seguimiento"><i class="icon-plus"></i></a>
 														<?php } ?>
 														<?php if (Modulos::validarRol([14], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
