@@ -149,6 +149,173 @@ if($_POST["proceso"] == 3) {
 	}
 	
 }
+
+$resultado = array(
+    "estado" => 0,
+    "mensaje" => 0,
+    "datos" => array()
+);
+
+if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_usuarios_metas_id_empresa" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+		SELECT 
+		um.um_id id,
+		um.um_fecha_creacion fecha,
+		um.um_tipo_meta tipo,
+		um.um_id_empresa id_empresa,
+		um.um_usuario id_usuario,
+		u.usr_login usuario,
+		u.usr_nombre nombre,
+		um.um_year anno,
+		if(um.um_mes < 10, CONCAT('0',um.um_mes),um.um_mes) mes,
+		CONCAT(um.um_year,'-',if(um.um_mes < 10, CONCAT('0',um.um_mes),um.um_mes)) periodo,
+		um.um_meta meta
+		FROM usuarios_metas um
+		JOIN usuarios u ON u.usr_id = um.um_usuario 
+		WHERE um.um_id_empresa = ".$e_dato[0]->id_empresa."
+		ORDER BY um.um_tipo_meta,u.usr_nombre,um.um_year,um.um_mes
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Listado de metas de usuarios"; ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+	exit();
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_usuarios_id_empresa" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+		SELECT
+		usr_id id,
+		usr_login usuario,
+		usr_nombre nombre,
+		usr_email email
+		FROM usuarios
+		WHERE usr_id_empresa = ".$e_dato[0]->id_empresa."
+		ORDER BY usr_nombre;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Listado de metas de usuarios"; ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+	exit();
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "crear_usuarios_metas" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+
+	$query = '
+		SELECT
+		um.um_id
+		FROM usuarios_metas um
+		WHERE um.um_usuario = "'.$e_dato[0]->id_usuario.'"
+			AND um.um_tipo_meta = "'.$e_dato[0]->tipo_meta.'"
+			AND um.um_id_empresa = "'.$e_dato[0]->id_empresa.'"
+			AND um.um_year = "'.$e_dato[0]->anno.'"
+			AND um.um_mes = "'.$e_dato[0]->mes.'"
+			AND um.um_id <> 0 ;
+	';
+
+	$result = mysqli_query($conexionBdPrincipal, $query);
+
+	if($result->num_rows == 0){                                   
+
+		$query = '
+			INSERT INTO usuarios_metas (
+				um_tipo_meta,
+				um_usuario,
+				um_id_empresa,
+				um_year,
+				um_mes,
+				um_meta
+			) VALUES (
+				"'.$e_dato[0]->tipo_meta.'",
+				"'.$e_dato[0]->id_usuario.'",
+				"'.$e_dato[0]->id_empresa.'",
+				"'.$e_dato[0]->anno.'",
+				"'.$e_dato[0]->mes.'",
+				"'.$e_dato[0]->valor_meta.'"
+			)
+		';
+
+		$result = $conexionBdPrincipal->prepare($query);
+		$result->execute();
+
+		$resultado["estado"] = "ok";
+		$resultado["mensaje"] = "Meta agregada correctamente"; ;
+		$resultado["datos"] = $e_dato;  
+	}else{
+
+		$resultado["estado"]= "ko";
+        $resultado["mensaje"]= "La meta para el usuario y el periodo seleccionado ya existe.";
+		$resultado["datos"] = $e_dato; 
+	}    
+
+    echo json_encode($resultado,512);
+	exit();
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "eliminar_usuarios_metas" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+                                 
+
+	$query = '
+		DELETE FROM usuarios_metas 
+		WHERE um_id = "'.$e_dato[0]->id_meta.'";
+	';
+
+	$result = $conexionBdPrincipal->prepare($query);
+	$result->execute();
+
+	$resultado["estado"] = "ok";
+	$resultado["mensaje"] = "Meta eliminada correctamente"; ;
+	$resultado["datos"] = $e_dato;  
+  
+
+    echo json_encode($resultado,512);
+	exit();
+}
+
 ?>
 
 <div class="alert alert-<?=$tipo;?>">

@@ -98,7 +98,10 @@ require_once RUTA_PROYECTO.'/usuarios/class/UsuarioMeta.php';
 								echo '<a href="usuarios-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a> ';
 							}
 							if (Modulos::validarRol([2], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
-								echo '<a href="usuarios.php?bloq=1" class="btn btn-warning"><i class="icon-lock"></i> Usuarios bloqueados</a>';
+								echo '<a href="usuarios.php?bloq=1" class="btn btn-warning"><i class="icon-lock"></i> Usuarios bloqueados</a> ';								
+							}
+							if (Modulos::validarRol([3], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+								echo '<a href="usuarios-metas.php" class="btn btn-success"><i class="icon-dashboard"></i> Metas</a>';
 							}
 						?>	 					
 					</p>
@@ -117,12 +120,11 @@ require_once RUTA_PROYECTO.'/usuarios/class/UsuarioMeta.php';
 												<th>Imagen</th>
 												<th>Datos</th>
 												<th>Tipo usuario</th>
+												<th>Área</th>
 												<th>Usuario de acceso</th>
 												<th>Bloq.</th>
+												<th>Sesión</th>
 												<th>Último ingreso</th>
-												<th>Meta <br>(Valor ventas)</th>
-												<th>Meta <br>(Número de ventas)</th>
-												<th>Meta <br>(Número de demostraciones)</th>
 												<th></th>
 											</tr>
 										</thead>
@@ -132,7 +134,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/UsuarioMeta.php';
 												if(isset($_GET['bloq']) AND $_GET['bloq']==1){$filtro =" AND usr_bloqueado='1'";}
 
 												$consulta = $conexionBdPrincipal->query("SELECT u.*, GROUP_CONCAT(r.utipo_id) AS roles_id,
-												GROUP_CONCAT(r.utipo_nombre) AS roles_nombre
+												GROUP_CONCAT(r.utipo_nombre) AS roles_nombre,ar_nombre
 												FROM usuarios AS u
 												LEFT JOIN ".BDADMIN.".usuarios_roles AS ru ON u.usr_id = ru.upr_id_usuario
 												LEFT JOIN usuarios_tipos AS r ON ru.upr_id_rol = r.utipo_id
@@ -190,27 +192,11 @@ require_once RUTA_PROYECTO.'/usuarios/class/UsuarioMeta.php';
 															}
 															?>
 												</td>
+												<td><a href="areas-editar.php?id=<?=$res['usr_area'];?>"><?=$res['ar_nombre'];?></a></td>
 												<td><?=$res['usr_login'];?></td>
 												<td><?=$opcionesSINO[$res['usr_bloqueado']];?></td>
+												<td><img src="files/<?=$estadoSesion;?>" width="20"></td>
 												<td><?=$res['usr_ultimo_ingreso'];?></td>
-
-												<td>
-													<input id="<?= $res['usr_id']; ?>" type="text"  value="<?= $res['usr_meta_ventas']; ?>" style="width: 80px; text-align: center" onChange="usuarios(this)" data-proceso="1">
-													<span style="display: none;"><?php if(!empty($res['usr_meta_ventas']) && is_numeric($res['usr_meta_ventas'])) echo number_format($res['usr_meta_ventas'],0,".",".");?></span>
-													
-												</td>
-
-												<td>
-													<input id="<?= $res['usr_id']; ?>" type="text"  value="<?= $usuarioMetaVenta['um_meta']; ?>" style="width: 80px; text-align: center" onChange="usuarios(this)" data-proceso="2">
-													<span style="display: none;"><?php if(!empty($usuarioMetaVenta['um_meta']) && is_numeric($usuarioMetaVenta['um_meta'])) echo $usuarioMetaVenta['um_meta'];?></span>
-													
-												</td>
-
-												<td>
-													<input id="<?= $res['usr_id']; ?>" type="text"  value="<?= $usuarioMetaDemo['um_meta']; ?>" style="width: 80px; text-align: center" onChange="usuarios(this)" data-proceso="3">
-													<span style="display: none;"><?php if(!empty($usuarioMetaDemo['um_meta']) && is_numeric($usuarioMetaDemo['um_meta'])) echo $usuarioMetaDemo['um_meta'];?></span>
-													
-												</td>
 
 												<td>
 													<h4>
