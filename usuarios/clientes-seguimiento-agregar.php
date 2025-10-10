@@ -210,6 +210,27 @@ include("includes/js-formularios.php");
 						</div>
 					<?php }?>
 				</div>
+<?php
+// Análisis de canales de contacto más usados para el cliente y usuario actual
+$consultaCanal = mysqli_query($conexionBdPrincipal, "SELECT cseg_canal, COUNT(*) as count FROM cliente_seguimiento WHERE cseg_cliente = '$cliente' AND cseg_usuario_responsable = '" . $_SESSION["id"] . "' GROUP BY cseg_canal ORDER BY count DESC LIMIT 1");
+$canalMasUsado = mysqli_fetch_array($consultaCanal, MYSQLI_BOTH);
+$canalSeleccionado = $canalMasUsado['cseg_canal'] ?? 4; // Default a Celular si no hay datos
+
+$consultaCanalPC = mysqli_query($conexionBdPrincipal, "SELECT cseg_canal_proximo_contacto, COUNT(*) as count FROM cliente_seguimiento WHERE cseg_cliente = '$cliente' AND cseg_usuario_responsable = '" . $_SESSION["id"] . "' GROUP BY cseg_canal_proximo_contacto ORDER BY count DESC LIMIT 1");
+$canalPCMasUsado = mysqli_fetch_array($consultaCanalPC, MYSQLI_BOTH);
+$canalPCSeleccionado = $canalPCMasUsado['cseg_canal_proximo_contacto'] ?? 3; // Default a Celular si no hay datos
+if(!empty($tiketID) && $estadoTicket == 1){
+    $consultaNumSeguimientos = mysqli_query($conexionBdPrincipal, "SELECT COUNT(*) as total FROM cliente_seguimiento WHERE cseg_tiket = '$tiketID'");
+    $numSeguimientos = mysqli_fetch_array($consultaNumSeguimientos, MYSQLI_BOTH)['total'];
+    if($numSeguimientos > 0){
+        $consultaUltimoSeguimiento = mysqli_query($conexionBdPrincipal, "SELECT * FROM cliente_seguimiento WHERE cseg_tiket = '$tiketID' ORDER BY cseg_id DESC LIMIT 1");
+        $ultimoSeguimiento = mysqli_fetch_array($consultaUltimoSeguimiento, MYSQLI_BOTH);
+        $mostrarModalUltimo = true;
+        // Usar el canal del próximo contacto del último seguimiento como seleccionado para el canal actual
+        $canalSeleccionado = $ultimoSeguimiento['cseg_canal_proximo_contacto'] ?? $canalSeleccionado;
+    }
+}
+?>
 
 				
 				
@@ -308,20 +329,20 @@ include("includes/js-formularios.php");
                                </div>
 								
                                 <div class="control-group">
-									<label class="control-label">Canal de contacto (*)</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal" required>
-											<option value="4"></option>
-                                            <?php
-											$opciones = array("","Facebook","WhatsApp","Fijo","Celular","Personal","Skype","Otro","Correo", "Sitio Web");
-											for($i=1; $i<=9; $i++){
-												if($resultadoD['tik_canal']==$i)echo '<option value="'.$i.'" selected>'.$opciones[$i].'</option>';
-												else echo '<option value="'.$i.'">'.$opciones[$i].'</option>';	
-											}
-											?>
-                                    	</select>
-                                    </div>
-                               </div>
+         <label class="control-label">Canal de contacto (*)</label>
+         <div class="controls">
+          <select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal" required>
+           <option value=""></option>
+                                             <?php
+           $opciones = array("","Facebook","WhatsApp","Fijo","Celular","Personal","Skype","Otro","Correo", "Sitio Web");
+           for($i=1; $i<=9; $i++){
+            $selected = ($i == $canalSeleccionado) ? 'selected' : '';
+            echo '<option value="'.$i.'" '.$selected.'>'.$opciones[$i].'</option>';
+           }
+           ?>
+                                     	</select>
+                                     </div>
+                                </div>
                                 
                                
                                 <div class="control-group">
@@ -386,12 +407,16 @@ include("includes/js-formularios.php");
 											</select>
 										</div>
 									</div>
-								<?php } else { ?>
+								<?php } else {
+									// Solo mostrar el mensaje si el ticket es comercial y el tipo de negocio es venta
+									if($infoTicket['tik_tipo_tiket'] == 1 && $infoTicket['tik_tipo_negocio'] == 1){
+								?>
 									<div class="alert alert-info">
 										<button type="button" class="close" data-dismiss="alert">&times;</button>
 										<i class="icon-exclamation-sign"></i><strong>Sin cotización!</strong> No hay cotizaciones para este cliente que podamos asociar a este proceso. Pero no se preocupe, puede crear una y asociarla más tarde. <a href="cotizaciones-agregar.php?cte=<?=$tiket['tik_cliente'];?>&ticket=<?=$tiket['tik_id'];?>" target="_blank" class="btn btn-danger">Crear cotización</a>
 									</div>
-								<?php }?>
+								<?php }
+								}?>
 								<?php } else {?>
 									<input type="hidden" class="span4" name="cotizacion" value="<?=$tiket['tik_id_cotizacion'];?>">
 								<?php }?>
@@ -459,17 +484,17 @@ include("includes/js-formularios.php");
 									<label class="control-label">Medio de contacto (*)</label>
 									<div class="controls">
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="canalPC" required id="canalPC">
-											<option value="3"></option>
-                                            <?php
+											<option value=""></option>
+								                                     <?php
 											$opciones = array("","WhatsApp","Fijo","Celular","Visitar al cliente","El cliente me visita","Skype", "Otro","Correo","Sitio Web");
 											for($i=1; $i<=9; $i++){
-												if($resultadoD['cseg_canal_proximo_contacto']==$i)echo '<option value="'.$i.'" selected>'.$opciones[$i].'</option>';
-												else echo '<option value="'.$i.'">'.$opciones[$i].'</option>';	
+												$selected = ($i == $canalPCSeleccionado) ? 'selected' : '';
+												echo '<option value="'.$i.'" '.$selected.'>'.$opciones[$i].'</option>';
 											}
 											?>
-                                    	</select>
-                                    </div>
-                               </div>
+								                             	</select>
+								                             </div>
+								                        </div>
                                 
                                 <div class="control-group">
 									<label class="control-label">Asunto a tratar (*)</label>
@@ -555,6 +580,13 @@ include("includes/js-formularios.php");
 	</div>
 	<?php include("includes/pie.php");?>
 </div>
+<?php if(isset($mostrarModalUltimo) && $mostrarModalUltimo){ ?>
+<script>
+$(document).ready(function(){
+    $('#ultimoSeguimientoModal').modal('show');
+});
+</script>
+<?php } ?>
 <script src="js/seguimientos.js"></script>
 
 <!-- Modal for Calendar -->
@@ -576,3 +608,49 @@ include("includes/js-formularios.php");
 
 </body>
 </html>
+<?php if(isset($mostrarModalUltimo) && $mostrarModalUltimo){ ?>
+<!-- Modal for Last Follow-up -->
+<div class="modal fade" id="ultimoSeguimientoModal" tabindex="-1" role="dialog" aria-labelledby="ultimoSeguimientoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ultimoSeguimientoModalLabel">Recordatorio del Último Seguimiento</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <?php
+        $dias = array('Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado');
+        $meses = array('','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
+        $fechaContacto = strtotime($ultimoSeguimiento['cseg_fecha_contacto']);
+        $diaSemana = $dias[date('w', $fechaContacto)];
+        $dia = date('d', $fechaContacto);
+        $mes = $meses[date('n', $fechaContacto)];
+        $anio = date('Y', $fechaContacto);
+        $fechaFormateada = $diaSemana . ', ' . $dia . ' de ' . $mes . ' de ' . $anio;
+
+        $fechaProximo = strtotime($ultimoSeguimiento['cseg_fecha_proximo_contacto'] . ' ' . $ultimoSeguimiento['cseg_hora_proximo_contacto']);
+        $diaSemanaP = $dias[date('w', $fechaProximo)];
+        $diaP = date('d', $fechaProximo);
+        $mesP = $meses[date('n', $fechaProximo)];
+        $anioP = date('Y', $fechaProximo);
+        $horaP = date('H:i', $fechaProximo);
+        $fechaProximaFormateada = $diaSemanaP . ', ' . $diaP . ' de ' . $mesP . ' de ' . $anioP . ' a las ' . $horaP;
+        ?>
+        <p><strong>Fecha del contacto:</strong> <?=$fechaFormateada;?></p>
+        <p><strong>Canal de contacto:</strong> <?php $opcionesCanal = array("","Facebook","WhatsApp","Fijo","Celular","Personal","Skype","Otro","Correo", "Sitio Web"); echo $opcionesCanal[$ultimoSeguimiento['cseg_canal']];?></p>
+        <p><strong>Observaciones:</strong> <?=$ultimoSeguimiento['cseg_observacion'];?></p>
+        <p><strong>Próximo contacto:</strong> <?=$fechaProximaFormateada;?></p>
+        <p><strong>Medio de próximo contacto:</strong> <?php $opcionesCanalPC = array("","WhatsApp","Fijo","Celular","Visitar al cliente","El cliente me visita","Skype", "Otro","Correo","Sitio Web"); echo $opcionesCanalPC[$ultimoSeguimiento['cseg_canal_proximo_contacto']];?></p>
+        <p><strong>Asunto a tratar:</strong> <?=$ultimoSeguimiento['cseg_asunto'];?></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<?php } ?>
+
+<!-- Modal for Calendar -->
