@@ -88,6 +88,53 @@ include("includes/head.php");
 							<div class="widget-head green">
 								<h3><?= $paginaActual['pag_nombre']; ?></h3>
 							</div>
+
+							<!-- Filtros -->
+							<div class="row-fluid" style="margin-bottom: 20px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd;">
+								<form method="GET" action="">
+									<?php if(isset($_GET["cte"])) { ?><input type="hidden" name="cte" value="<?=$_GET["cte"];?>"><?php } ?>
+									<div class="span3">
+										<label>Usuario Responsable: <?php if(isset($_GET["usuario_resp"]) && $_GET["usuario_resp"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['usuario_resp' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<select name="usuario_resp" class="form-control">
+											<option value="">Todos</option>
+											<?php
+											$consultaUsuarios = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
+											while($usuario = mysqli_fetch_array($consultaUsuarios, MYSQLI_BOTH)){
+												$selected = (isset($_GET["usuario_resp"]) && $_GET["usuario_resp"]==$usuario['usr_id']) ? "selected" : "";
+												echo '<option value="'.$usuario['usr_id'].'" '.$selected.'>'.$usuario['usr_nombre'].'</option>';
+											}
+											?>
+										</select>
+									</div>
+									<div class="span3">
+										<label>Tipo: <?php if(isset($_GET["tipo_cot"]) && $_GET["tipo_cot"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['tipo_cot' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<select name="tipo_cot" class="form-control">
+											<option value="">Todos</option>
+											<option value="0" <?= (isset($_GET["tipo_cot"]) && $_GET["tipo_cot"]=="0") ? "selected" : ""; ?>>Cotización</option>
+											<option value="1" <?= (isset($_GET["tipo_cot"]) && $_GET["tipo_cot"]=="1") ? "selected" : ""; ?>>Pre-cotización</option>
+										</select>
+									</div>
+									<div class="span3">
+										<label>Generó Pedido: <?php if(isset($_GET["genero_pedido"]) && $_GET["genero_pedido"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['genero_pedido' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<select name="genero_pedido" class="form-control">
+											<option value="">Todos</option>
+											<option value="1" <?= (isset($_GET["genero_pedido"]) && $_GET["genero_pedido"]=="1") ? "selected" : ""; ?>>Sí</option>
+											<option value="0" <?= (isset($_GET["genero_pedido"]) && $_GET["genero_pedido"]=="0") ? "selected" : ""; ?>>No</option>
+										</select>
+									</div>
+									<div class="span3">
+										<label>Fecha Inicio: <?php if(isset($_GET["fecha_inicio"]) && $_GET["fecha_inicio"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_inicio' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<input type="date" name="fecha_inicio" value="<?= isset($_GET["fecha_inicio"]) ? $_GET["fecha_inicio"] : ""; ?>" class="form-control">
+										<label>Fecha Fin: <?php if(isset($_GET["fecha_fin"]) && $_GET["fecha_fin"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_fin' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
+										<input type="date" name="fecha_fin" value="<?= isset($_GET["fecha_fin"]) ? $_GET["fecha_fin"] : ""; ?>" class="form-control">
+									</div>
+									<div class="span12" style="margin-top: 10px;">
+										<button type="submit" class="btn btn-primary">Filtrar</button>
+										<a href="?<?= isset($_GET["cte"]) ? "cte=".$_GET["cte"] : ""; ?>" class="btn btn-default">Limpiar Todos</a>
+									</div>
+								</form>
+							</div>
+
 							<div class="widget-container">
 								<p></p>
 
@@ -106,6 +153,25 @@ include("includes/head.php");
 								}
 								if($datosUsuarioActual['usr_tipo'] != ADMIN){
 									$filtro.='AND cli_ciudad!="1122"';
+								}
+								if (isset($_GET["usuario_resp"]) and $_GET["usuario_resp"] != "") {
+									$filtro .= " AND cotiz_creador='" . $_GET["usuario_resp"] . "'";
+								}
+								if (isset($_GET["tipo_cot"]) and $_GET["tipo_cot"] != "") {
+									$filtro .= " AND cotiz_es_precotizacion='" . $_GET["tipo_cot"] . "'";
+								}
+								if (isset($_GET["genero_pedido"]) and $_GET["genero_pedido"] != "") {
+									if($_GET["genero_pedido"] == "1"){
+										$filtro .= " AND EXISTS (SELECT 1 FROM pedidos WHERE pedid_cotizacion=cotiz_id AND pedid_id_empresa='".$idEmpresa."')";
+									}else{
+										$filtro .= " AND NOT EXISTS (SELECT 1 FROM pedidos WHERE pedid_cotizacion=cotiz_id AND pedid_id_empresa='".$idEmpresa."')";
+									}
+								}
+								if (isset($_GET["fecha_inicio"]) and $_GET["fecha_inicio"] != "") {
+									$filtro .= " AND cotiz_fecha_propuesta >= '" . $_GET["fecha_inicio"] . " 00:00:00'";
+								}
+								if (isset($_GET["fecha_fin"]) and $_GET["fecha_fin"] != "") {
+									$filtro .= " AND cotiz_fecha_propuesta <= '" . $_GET["fecha_fin"] . " 23:59:59'";
 								}
 
 								//Consulta de contar registros Solo para paginación
@@ -282,7 +348,8 @@ include("includes/head.php");
 																<li><a href="bd_delete/cotizaciones-eliminar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 																<?php } ?>
 																<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-																<li><a href="reportes/formato-cotizacion-1_pdf.php?id=<?= $res['cotiz_id']; ?>" target="_blank">Generar PDF</a></li>
+																<li><a href="reportes/formato-cotizacion-1_pdf.php?id=<?= $res['cotiz_id']; ?>" target="_blank">Generar PDF (Formato 1)</a></li>
+																<li><a href="reportes/formato-cotizacion-3_pdf.php?id=<?= $res['cotiz_id']; ?>" target="_blank">Generar PDF (Formato 2)</a></li>
 																<?php } ?>
 																<?php if (Modulos::validarRol([253], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 																<li><a href="bd_create/cotizaciones-replicar.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
