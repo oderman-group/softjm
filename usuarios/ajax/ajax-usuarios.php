@@ -253,37 +253,59 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_usuarios_metas_id
 			AND um.um_id_empresa = "'.$e_dato[0]->id_empresa.'"
 			AND um.um_year = "'.$e_dato[0]->anno.'"
 			AND um.um_mes = "'.$e_dato[0]->mes.'"
-			AND um.um_id <> 0 ;
+			AND um.um_id <> "'.$e_dato[0]->id_meta.'" ;
 	';
 
 	$result = mysqli_query($conexionBdPrincipal, $query);
 
-	if($result->num_rows == 0){                                   
+	if($result->num_rows == 0){    
+		
+		if($e_dato[0]->id_meta > 0){
+			$query = '
+				UPDATE usuarios_metas SET 
+					um_tipo_meta = "'.$e_dato[0]->tipo_meta.'",
+					um_usuario = "'.$e_dato[0]->id_usuario.'",
+					um_id_empresa = "'.$e_dato[0]->id_empresa.'",
+					um_year = "'.$e_dato[0]->anno.'",
+					um_mes = "'.$e_dato[0]->mes.'",
+					um_meta = "'.$e_dato[0]->valor_meta.'"
+				WHERE um_id = "'.$e_dato[0]->id_meta.'"
+			';
 
-		$query = '
-			INSERT INTO usuarios_metas (
-				um_tipo_meta,
-				um_usuario,
-				um_id_empresa,
-				um_year,
-				um_mes,
-				um_meta
-			) VALUES (
-				"'.$e_dato[0]->tipo_meta.'",
-				"'.$e_dato[0]->id_usuario.'",
-				"'.$e_dato[0]->id_empresa.'",
-				"'.$e_dato[0]->anno.'",
-				"'.$e_dato[0]->mes.'",
-				"'.$e_dato[0]->valor_meta.'"
-			)
-		';
+			$result = $conexionBdPrincipal->prepare($query);
+			$result->execute();
 
-		$result = $conexionBdPrincipal->prepare($query);
-		$result->execute();
+			$resultado["estado"] = "ok";
+			$resultado["mensaje"] = "Meta modificada correctamente"; ;
+			$resultado["datos"] = $e_dato;  
 
-		$resultado["estado"] = "ok";
-		$resultado["mensaje"] = "Meta agregada correctamente"; ;
-		$resultado["datos"] = $e_dato;  
+		}else{
+
+			$query = '
+				INSERT INTO usuarios_metas (
+					um_tipo_meta,
+					um_usuario,
+					um_id_empresa,
+					um_year,
+					um_mes,
+					um_meta
+				) VALUES (
+					"'.$e_dato[0]->tipo_meta.'",
+					"'.$e_dato[0]->id_usuario.'",
+					"'.$e_dato[0]->id_empresa.'",
+					"'.$e_dato[0]->anno.'",
+					"'.$e_dato[0]->mes.'",
+					"'.$e_dato[0]->valor_meta.'"
+				)
+			';
+
+			$result = $conexionBdPrincipal->prepare($query);
+			$result->execute();
+
+			$resultado["estado"] = "ok";
+			$resultado["mensaje"] = "Meta agregada correctamente"; ;
+			$resultado["datos"] = $e_dato;  
+		}
 	}else{
 
 		$resultado["estado"]= "ko";
