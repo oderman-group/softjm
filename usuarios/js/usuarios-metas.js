@@ -9,8 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     var selectId = 0;
     
     const txtValorMeta = clsGenerales_.fnNumber(document.getElementById('txtValorMeta'));
-    const btnAgregar = document.getElementById('btnAgregar');
+    const btnLimpiar = document.getElementById('btnLimpiar');
+    const btnGuardar = document.getElementById('btnGuardar');
     const btnEliminar = document.getElementById('btnEliminar');
+    const txtInfoRegistro = document.getElementById('txtInfoRegistro');
+
+    btnLimpiar.classList.add('hide');
 
     const cmbUsuarios = $('#cmbUsuarios').dxSelectBox({
         placeholder: 'Seleccione una opcion',
@@ -83,6 +87,14 @@ document.addEventListener('DOMContentLoaded', () => {
         onSelectionChanged: function(selectedItems) {
             if (selectedItems.selectedRowsData.length > 0) {
                 selectId = selectedItems.selectedRowsData[0].id;
+                clsGenerales_.fnComponetInstanceSetValue(cmbUsuarios, selectedItems.selectedRowsData[0].id_usuario);
+                clsGenerales_.fnComponetInstanceSetValue(cmbMetas, selectedItems.selectedRowsData[0].tipo);
+                var dtFecha = new Date(selectedItems.selectedRowsData[0].anno, selectedItems.selectedRowsData[0].mes - 1, 1);
+                clsGenerales_.fnComponetInstanceSetValue(dtPeriodo, dtFecha);
+                clsGenerales_.fnComponetInstanceSetValue(txtValorMeta, selectedItems.selectedRowsData[0].meta);
+                btnLimpiar.classList.remove('hide');
+                btnGuardar.innerText = "Modificar";
+                txtInfoRegistro.innerText = "Para agregar un nuevo registro debe limpiar el formulario.";
             }
         }
     }).dxDataGrid("instance");
@@ -109,6 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 grdDatos.option({ dataSource: respuesta["datos"] });
                 grdDatos.refresh();          
             }
+
+            if(selectId > 0){
+                btnLimpiarClick();
+            }           
 
         }); 
     }
@@ -137,9 +153,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });   
 
+    btnLimpiar.addEventListener('click', btnLimpiarClick);
+    function btnLimpiarClick() {
 
-    btnAgregar.addEventListener('click', btnAgregarClick);
-    function btnAgregarClick(e) {
+        selectId = 0;
+        clsGenerales_.fnComponetInstanceSetValue(cmbUsuarios, null);
+        clsGenerales_.fnComponetInstanceSetValue(cmbMetas, null);
+        clsGenerales_.fnComponetInstanceSetValue(dtPeriodo, new Date());
+        clsGenerales_.fnComponetInstanceSetValue(txtValorMeta, 0); 
+        
+        btnLimpiar.classList.add('hide');
+        btnGuardar.innerText = "Guardar";
+
+        txtInfoRegistro.innerText = "Para modificar un registro es necesario seleccionarlo de la tabla.";
+        
+    }
+
+
+    btnGuardar.addEventListener('click', btnGuardarClick);
+    function btnGuardarClick(e) {
         e.preventDefault();
 
         if (!clsGenerales_.fnComponetInstanceGetValue(cmbUsuarios)) {
@@ -173,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         var mes = dtFecha.getMonth() + 1;
 
         var e_datos = [{
+            id_meta: selectId,
             id_empresa: idEmpresa,
             id_usuario: clsGenerales_.fnComponetInstanceGetValue(cmbUsuarios),
             tipo_meta: clsGenerales_.fnComponetInstanceGetValue(cmbMetas),

@@ -90,12 +90,15 @@ include("includes/head.php");
 								</div>								
 								<div class="control-group">
 									<div class="controls">
-										<button class="btn btn-success" id="btnAgregar">Agregar</button>
-										<button class="btn btn-danger" id="btnEliminar">Eliminar</button>
-										<a href="usuarios.php" class="btn btn-gray">Regresar a usuarios</a>
+										<button class="btn btn-info" id="btnLimpiar">Limpiar formulario</button>
+										<button class="btn btn-success" id="btnGuardar">Guardar</button>
+										<br>
+										<b><small id="txtInfoRegistro">Para modificar un registro es necesario seleccionarlo de la tabla.</small></b>
 									</div>
 								</div>
 								<br>
+								<a href="usuarios.php" class="btn btn-gray">Regresar a usuarios</a>
+								<button class="btn btn-danger" id="btnEliminar">Eliminar registro</button>								
 								<hr>
 								<div class="control-group">    
 									<div id="grdDatos"></div>
