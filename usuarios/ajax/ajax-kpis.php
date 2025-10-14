@@ -441,7 +441,7 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
             cli_id id,
             usr_id,
             usr_sucursal,
-            usr_nombre vendedor,
+            usr_nombre asesor,
             sucp_nombre sucursal,
             cli_fecha_registro AS fecha,
             DATE_FORMAT(cli_fecha_registro, '%Y%m') AS periodo,
@@ -504,7 +504,7 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
             cli_id id,
             usr_id,
             usr_sucursal,
-            usr_nombre vendedor,
+            usr_nombre asesor,
             sucp_nombre sucursal,
             cli_fecha_registro AS fecha,
             DATE_FORMAT(cli_fecha_registro, '%Y%m') AS periodo,
@@ -1029,6 +1029,94 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
         join usuarios u on usr_id=cli_responsable
         join sucursales_propias s on sucp_id=usr_sucursal
         WHERE cli_categoria IN (1,2,3) AND cli_fecha_ingreso is not null AND  cli_fecha_ingreso <> '0000-00-00' AND cli_referencia = 4 AND ".$_POST["condicion"]." ;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 8 clientes efectivos por evento ganados" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_9_nuevos_subdistribuidores" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT
+            cli_id id,
+            cli_fecha_registro fecha,
+            cli_usuario identificacion,
+            cli_nombre cliente,
+            usr_id,
+            usr_sucursal,
+            cli_responsable id_asesor,
+            usr_nombre asesor,
+            usr_sucursal id_sucursal,
+            sucp_nombre sucursal,
+            DATE_FORMAT(cli_fecha_registro, '%Y%m') AS periodo
+        FROM clientes
+        JOIN usuarios ON usr_id = cli_responsable
+        JOIN sucursales_propias ON sucp_id = usr_sucursal
+        WHERE cli_categoria = 3  AND ".$_POST["condicion"]." ;
+    ";
+    $result = mysqli_query($conexionBdPrincipal, $sql);
+
+    $results = [];
+    if($result->num_rows > 0){
+        
+        $i=0;
+        while($fila = mysqli_fetch_assoc($result)) {                    
+            $datos[$i] = $fila;
+            $i ++;
+        }              
+        
+        $resultado["estado"] = "ok";
+        $resultado["mensaje"] = "Detalle del kpi 8 clientes efectivos por evento ganados" ;
+        $resultado["datos"] = $datos; 
+        
+    }else {
+        $resultado["estado"]= "ko";
+        $resultado["mensaje"]= "No hay datos para mostrar" ;
+    }
+
+    echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_10_captacion_clientes_instituciones" ) {
+
+
+    $e_dato = json_decode($_POST["e_datos"]);
+
+    $sql = "
+        SELECT
+            cli_id id,
+            cli_fecha_registro fecha,
+            cli_usuario identificacion,
+            cli_nombre cliente,
+            usr_id,
+            usr_sucursal,
+            cli_responsable id_asesor,
+            usr_nombre asesor,
+            usr_sucursal id_sucursal,
+            sucp_nombre sucursal,
+            DATE_FORMAT(cli_fecha_registro, '%Y%m') AS periodo
+        FROM clientes
+        JOIN usuarios ON usr_id = cli_responsable
+        JOIN sucursales_propias ON sucp_id = usr_sucursal
+        WHERE cli_institucional = 1  AND ".$_POST["condicion"]." ;
     ";
     $result = mysqli_query($conexionBdPrincipal, $sql);
 
