@@ -1245,19 +1245,29 @@ document.addEventListener('DOMContentLoaded', () => {
                             caption: 'Sucursal',
                             dataField: 'sucursal',
                             area: 'row',
-                            sortOrder: 'asc'
+                            sortOrder: 'asc',
+                            expanded: true
                         },{
                             width: 150,
-                            caption: 'Vendedor',
-                            dataField: 'vendedor',
+                            caption: 'Asesor',
+                            dataField: 'asesor',
                             area: 'row',
-                            sortOrder: 'asc'
+                            sortOrder: 'asc',
+                            expanded: true
                         },{
                             caption: 'Fecha',
                             dataField: 'fecha',
                             dataType: 'date',
                             area: 'column',
-                            sortOrder: 'desc'
+                            sortOrder: 'desc',
+                            expanded: true
+                        },{
+                            groupName: 'date',
+                            groupInterval: 'quarter',
+                            expanded: true
+                        },{
+                            groupName: 'date',
+                            groupInterval: 'month'
                         },{
                             summaryType: 'sum',
                             dataField: "nuevos",
@@ -1289,6 +1299,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         store: datosKpi
                     }
                 });
+
+               
 
             }
             if (idbtn == "kpi10") {
@@ -1382,19 +1394,29 @@ document.addEventListener('DOMContentLoaded', () => {
                             caption: 'Sucursal',
                             dataField: 'sucursal',
                             area: 'row',
-                            sortOrder: 'asc'
+                            sortOrder: 'asc',
+                            expanded: true
                         },{
                             width: 150,
-                            caption: 'Vendedor',
-                            dataField: 'vendedor',
+                            caption: 'Asesor',
+                            dataField: 'asesor',
                             area: 'row',
-                            sortOrder: 'asc'
+                            sortOrder: 'asc',
+                            expanded: true
                         },{
                             caption: 'Fecha',
                             dataField: 'fecha',
                             dataType: 'date',
                             area: 'column',
-                            sortOrder: 'desc'
+                            sortOrder: 'desc',
+                            expanded: true
+                        },{
+                            groupName: 'date',
+                            groupInterval: 'quarter',
+                            expanded: true
+                        },{
+                            groupName: 'date',
+                            groupInterval: 'month'
                         },{
                             summaryType: 'sum',
                             dataField: "nuevos",
@@ -1424,6 +1446,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }],
                         store: datosKpi
+                    },onOptionChanged: function(e) {
+                        if(e.name === "fecha") {
+                            // handle the property change here
+                        }
                     }
                 });
 
@@ -1976,7 +2002,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                                     cellTemplate: function (container, options) {
                                                         $("<a>")
                                                             .text(options.data.id)
-                                                            .attr("href", "clientes-seguimiento.php?busqueda=" + options.data.id) // 🔑 URL dinámica
+                                                            .attr("href", "clientes-editar.php?id" + options.data.id) // 🔑 URL dinámica
                                                             .attr("target", "_blank") // abrir en nueva pestaña
                                                             .appendTo(container);
                                                     }   
@@ -2330,6 +2356,271 @@ document.addEventListener('DOMContentLoaded', () => {
                                 })
                             }); 
                         }
+
+                        if(idbtn == "kpi9") {
+
+                            clsGenerales_.mtdActivarLoadPagina();
+
+                            let opcionKpi = "consultar_detalleKpi_9_nuevos_subdistribuidores";
+                            let fieldOpcion = "Actuales";
+                            let condicionSucusalAsesor = " sucp_nombre =  '" + e.cell.rowPath[0] + "' ";
+
+                            if(e.cell.rowPath.length == 2) {
+                                condicionSucusalAsesor += " AND usr_nombre =  '" + e.cell.rowPath[1] + "' ";
+                            }
+
+                            let anno = e.cell.columnPath[0];
+                            let condicionFecha = " AND YEAR(cli_fecha_registro) > '" + anno + "' ";
+                            if(e.cell.columnPath.length == 2) {
+                                const quarter = e.cell.columnPath[1];
+
+                                let month = "";
+                                if(quarter == "1") { month = anno+"-01','"+anno+"-02','"+anno+"-03'"; }
+                                if(quarter == "2") { month = anno+"-04','"+anno+"-05','"+anno+"-06'"; }
+                                if(quarter == "3") { month = anno+"-07','"+anno+"-08','"+anno+"-09'"; }
+                                if(quarter == "4") { month = anno+"-10','"+anno+"-11','"+anno+"-12'"; }
+
+                                condicionFecha = "  AND DATE_FORMAT(cli_fecha_registro, '%Y-%m') IN ('" + month + ") ";
+                            }
+                            if(e.cell.columnPath.length == 3) {
+                                let month = String(e.cell.columnPath[2]).padStart(2, '0');
+                                condicionFecha = " AND DATE_FORMAT(cli_fecha_registro, '%Y%m') < " + e.cell.columnPath[0] + "" + month + " ";
+                            }
+
+                            
+                            if(e.cell.dataIndex == 0) { 
+                                fieldOpcion = "Nuevos";
+
+                                condicionSucusalAsesor = " sucp_nombre =  '" + e.cell.rowPath[0] + "' ";
+
+                                if(e.cell.rowPath.length == 2) {
+                                    condicionSucusalAsesor += " AND usr_nombre =  '" + e.cell.rowPath[1] + "' ";
+                                }
+
+                                anno = e.cell.columnPath[0];
+                                condicionFecha = " AND YEAR(cli_fecha_registro) = '" + anno + "' ";
+                                if(e.cell.columnPath.length == 2) {
+                                    const quarter = e.cell.columnPath[1];
+
+                                    let month = "";
+                                    if(quarter == "1") { month = anno+"-01','"+anno+"-02','"+anno+"-03'"; }
+                                    if(quarter == "2") { month = anno+"-04','"+anno+"-05','"+anno+"-06'"; }
+                                    if(quarter == "3") { month = anno+"-07','"+anno+"-08','"+anno+"-09'"; }
+                                    if(quarter == "4") { month = anno+"-10','"+anno+"-11','"+anno+"-12'"; }
+
+                                    condicionFecha = "  AND DATE_FORMAT(cli_fecha_registro, '%Y-%m') IN ('" + month + ") ";
+                                }
+                                if(e.cell.columnPath.length == 3) {
+                                    let month = String(e.cell.columnPath[2]).padStart(2, '0');
+                                    condicionFecha = " AND DATE_FORMAT(cli_fecha_registro, '%Y-%m') = '" + e.cell.columnPath[0] + "-" + month + "' ";
+                                }                            
+                            }
+
+                            $.ajax({
+                                url: "ajax/ajax-kpis.php",
+                                type: "POST",
+                                crossDomain: true,
+                                dataType: 'json',
+                                data: {
+                                    e_datos: JSON.stringify([{}]),
+                                    opcion: opcionKpi,
+                                    condicion: condicionSucusalAsesor + condicionFecha
+                                },
+                                error: function() {
+                                    clsGenerales_.mtdDesactivarLoadPagina();
+                                    clsGenerales_.mtdMostrarMensaje("No se pudo completar la solicitud", "error");
+                                }
+                            }).done((respuesta) => {
+                                clsGenerales_.mtdDesactivarLoadPagina();
+
+                                if (respuesta["estado"] === 'ok') {  
+                                    datosDetalleKpi = respuesta["datos"]; 
+                                }
+                                if (respuesta["estado"] === 'ko') {
+                                    clsGenerales_.mtdMostrarMensaje(respuesta["mensaje"], "error");
+                                }
+                                modalDetalle.option({
+                                    contentTemplate: function(container) {
+                                        $("<div id='gridPopup'>")
+                                        .appendTo(container)
+                                        .dxDataGrid({
+                                            dataSource: datosDetalleKpi,
+                                            keyExpr: "id",
+                                            showBorders: true,
+                                            showColumnLines: true,
+                                            columnAutoWidth: true,
+                                            showRowLines: true,
+                                            noDataText: "No hay datos para mostrar",
+                                            paging: { pageSize: 10 },
+                                            pager: {
+                                                showPageSizeSelector: true,
+                                                allowedPageSizes: [10, 30, 50],
+                                                showInfo: true
+                                            },
+                                            columns: [
+                                               "fecha","sucursal", "asesor",{ dataField: "id",
+                                                    cellTemplate: function (container, options) {
+                                                        $("<a>")
+                                                            .text(options.data.id)
+                                                            .attr("href", "clientes-editar.php?id=" + options.data.id) // 🔑 URL dinámica
+                                                            .attr("target", "_blank") // abrir en nueva pestaña
+                                                            .appendTo(container);
+                                                    }   
+                                                },"identificacion", {
+                                                    caption: fieldOpcion,
+                                                    dataField: 'cliente'
+                                                }
+                                            ],
+                                            summary: {
+                                                totalItems: [{
+                                                    column: "fecha",
+                                                    summaryType: "count",
+                                                    displayFormat: "{0}"
+                                                }],
+                                                groupItems: [{
+                                                    column: "fecha",
+                                                    summaryType: "count",
+                                                    displayFormat: "{0}",
+                                                }]
+                                            },
+                                        });
+                                    }
+                                })
+                            }); 
+                        }
+
+                        if(idbtn == "kpi10") {
+
+                            clsGenerales_.mtdActivarLoadPagina();
+
+                            let opcionKpi = "consultar_detalleKpi_10_captacion_clientes_instituciones";
+                            let fieldOpcion = "Actuales";
+                            let condicionSucusalAsesor = " sucp_nombre =  '" + e.cell.rowPath[0] + "' ";
+
+                            if(e.cell.rowPath.length == 2) {
+                                condicionSucusalAsesor += " AND usr_nombre =  '" + e.cell.rowPath[1] + "' ";
+                            }
+
+                            let anno = e.cell.columnPath[0];
+                            let condicionFecha = " AND YEAR(cli_fecha_registro) > '" + anno + "' ";
+                            if(e.cell.columnPath.length == 2) {
+                                const quarter = e.cell.columnPath[1];
+
+                                let month = "";
+                                if(quarter == "1") { month = anno+"-01','"+anno+"-02','"+anno+"-03'"; }
+                                if(quarter == "2") { month = anno+"-04','"+anno+"-05','"+anno+"-06'"; }
+                                if(quarter == "3") { month = anno+"-07','"+anno+"-08','"+anno+"-09'"; }
+                                if(quarter == "4") { month = anno+"-10','"+anno+"-11','"+anno+"-12'"; }
+
+                                condicionFecha = "  AND DATE_FORMAT(cli_fecha_registro, '%Y-%m') IN ('" + month + ") ";
+                            }
+                            if(e.cell.columnPath.length == 3) {
+                                let month = String(e.cell.columnPath[2]).padStart(2, '0');
+                                condicionFecha = " AND DATE_FORMAT(cli_fecha_registro, '%Y%m') < " + e.cell.columnPath[0] + "" + month + " ";
+                            }
+
+                            
+                            if(e.cell.dataIndex == 0) { 
+                                fieldOpcion = "Nuevos";
+
+                                condicionSucusalAsesor = " sucp_nombre =  '" + e.cell.rowPath[0] + "' ";
+
+                                if(e.cell.rowPath.length == 2) {
+                                    condicionSucusalAsesor += " AND usr_nombre =  '" + e.cell.rowPath[1] + "' ";
+                                }
+
+                                anno = e.cell.columnPath[0];
+                                condicionFecha = " AND YEAR(cli_fecha_registro) = '" + anno + "' ";
+                                if(e.cell.columnPath.length == 2) {
+                                    const quarter = e.cell.columnPath[1];
+
+                                    let month = "";
+                                    if(quarter == "1") { month = anno+"-01','"+anno+"-02','"+anno+"-03'"; }
+                                    if(quarter == "2") { month = anno+"-04','"+anno+"-05','"+anno+"-06'"; }
+                                    if(quarter == "3") { month = anno+"-07','"+anno+"-08','"+anno+"-09'"; }
+                                    if(quarter == "4") { month = anno+"-10','"+anno+"-11','"+anno+"-12'"; }
+
+                                    condicionFecha = "  AND DATE_FORMAT(cli_fecha_registro, '%Y-%m') IN ('" + month + ") ";
+                                }
+                                if(e.cell.columnPath.length == 3) {
+                                    let month = String(e.cell.columnPath[2]).padStart(2, '0');
+                                    condicionFecha = " AND DATE_FORMAT(cli_fecha_registro, '%Y-%m') = '" + e.cell.columnPath[0] + "-" + month + "' ";
+                                }                            
+                            }
+
+                            $.ajax({
+                                url: "ajax/ajax-kpis.php",
+                                type: "POST",
+                                crossDomain: true,
+                                dataType: 'json',
+                                data: {
+                                    e_datos: JSON.stringify([{}]),
+                                    opcion: opcionKpi,
+                                    condicion: condicionSucusalAsesor + condicionFecha
+                                },
+                                error: function() {
+                                    clsGenerales_.mtdDesactivarLoadPagina();
+                                    clsGenerales_.mtdMostrarMensaje("No se pudo completar la solicitud", "error");
+                                }
+                            }).done((respuesta) => {
+                                clsGenerales_.mtdDesactivarLoadPagina();
+
+                                if (respuesta["estado"] === 'ok') {  
+                                    datosDetalleKpi = respuesta["datos"]; 
+                                }
+                                if (respuesta["estado"] === 'ko') {
+                                    clsGenerales_.mtdMostrarMensaje(respuesta["mensaje"], "error");
+                                }
+                                modalDetalle.option({
+                                    contentTemplate: function(container) {
+                                        $("<div id='gridPopup'>")
+                                        .appendTo(container)
+                                        .dxDataGrid({
+                                            dataSource: datosDetalleKpi,
+                                            keyExpr: "id",
+                                            showBorders: true,
+                                            showColumnLines: true,
+                                            columnAutoWidth: true,
+                                            showRowLines: true,
+                                            noDataText: "No hay datos para mostrar",
+                                            paging: { pageSize: 10 },
+                                            pager: {
+                                                showPageSizeSelector: true,
+                                                allowedPageSizes: [10, 30, 50],
+                                                showInfo: true
+                                            },
+                                            columns: [
+                                               "fecha","sucursal", "asesor",{ dataField: "id",
+                                                    cellTemplate: function (container, options) {
+                                                        $("<a>")
+                                                            .text(options.data.id)
+                                                            .attr("href", "clientes-editar.php?id=" + options.data.id) // 🔑 URL dinámica
+                                                            .attr("target", "_blank") // abrir en nueva pestaña
+                                                            .appendTo(container);
+                                                    }   
+                                                },"identificacion", {
+                                                    caption: fieldOpcion,
+                                                    dataField: 'cliente'
+                                                }
+                                            ],
+                                            summary: {
+                                                totalItems: [{
+                                                    column: "fecha",
+                                                    summaryType: "count",
+                                                    displayFormat: "{0}"
+                                                }],
+                                                groupItems: [{
+                                                    column: "fecha",
+                                                    summaryType: "count",
+                                                    displayFormat: "{0}",
+                                                }]
+                                            },
+                                        });
+                                    }
+                                })
+                            }); 
+                        }
+                        
                         modalDetalle.show();
                     }
                 }
