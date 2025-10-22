@@ -621,13 +621,19 @@ if(!empty($_GET["idTK"])){
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
-    margin: 30px 0;
+    gap: 8px;
+    margin: 30px 0 15px 0;
+    flex-wrap: wrap;
 }
 
 .pagination-modern a,
 .pagination-modern span {
-    padding: 10px 15px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 8px;
     background: white;
     color: #667eea;
@@ -635,6 +641,7 @@ if(!empty($_GET["idTK"])){
     font-weight: 600;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 2px solid transparent;
 }
 
 .pagination-modern a:hover {
@@ -647,6 +654,60 @@ if(!empty($_GET["idTK"])){
 .pagination-modern span.current {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    border: 2px solid #667eea;
+}
+
+/* Botones Anterior/Siguiente */
+.pagination-modern .pagination-prev,
+.pagination-modern .pagination-next {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 15px;
+}
+
+.pagination-modern .pagination-prev:hover,
+.pagination-modern .pagination-next:hover {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+}
+
+.pagination-modern .pagination-prev.disabled,
+.pagination-modern .pagination-next.disabled {
+    background: #f5f5f5;
+    color: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Puntos suspensivos */
+.pagination-modern .pagination-dots {
+    background: transparent;
+    color: #999;
+    font-weight: 700;
+    box-shadow: none;
+    cursor: default;
+    min-width: 30px;
+    letter-spacing: 2px;
+}
+
+/* Información de paginación */
+.pagination-info {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 30px;
+    padding: 12px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: inline-block;
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+
+.pagination-info strong {
+    color: #667eea;
+    font-weight: 700;
 }
 
 /* ========== INFO CARDS ========== */
@@ -803,6 +864,28 @@ if(!empty($_GET["idTK"])){
         width: 50px;
         height: 50px;
         font-size: 20px;
+    }
+    
+    /* Paginación responsive */
+    .pagination-modern {
+        gap: 5px;
+    }
+    
+    .pagination-modern a,
+    .pagination-modern span {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 8px;
+        font-size: 14px;
+    }
+    
+    .pagination-info {
+        font-size: 13px;
+        padding: 10px 15px;
+        margin-left: 0;
+        transform: none;
+        width: 100%;
+        box-sizing: border-box;
     }
 }
 
@@ -1403,18 +1486,39 @@ if(!empty($_GET["idTK"])){
                 </div>
 
                 <!-- Paginación -->
-                <?php if($hayResultados){ ?>
+                <?php if($hayResultados && $numPaginas > 1){ ?>
                 <div class="pagination-modern">
                     <?php 
-                    // Generar links de paginación modernos
+                    // Generar links de paginación modernos con lógica inteligente
                     $queryParams = $_GET;
+                    $rango = 2; // Número de páginas a mostrar antes y después de la actual
                     
+                    // Botón Anterior
                     if($paginaAnterior > 0){
                         $queryParams['pagina'] = $paginaAnterior;
-                        echo '<a href="?'.http_build_query($queryParams).'"><i class="fa-solid fa-chevron-left"></i> Anterior</a>';
+                        echo '<a href="?'.http_build_query($queryParams).'" class="pagination-prev" title="Página anterior"><i class="fa-solid fa-chevron-left"></i></a>';
+                    } else {
+                        echo '<span class="pagination-prev disabled"><i class="fa-solid fa-chevron-left"></i></span>';
                     }
                     
-                    for($i=1; $i<=$numPaginas; $i++){
+                    // Primera página siempre visible
+                    $queryParams['pagina'] = 1;
+                    if($pagina == 1){
+                        echo '<span class="current">1</span>';
+                    } else {
+                        echo '<a href="?'.http_build_query($queryParams).'">1</a>';
+                    }
+                    
+                    // Puntos suspensivos si hay un salto
+                    if($pagina > ($rango + 2)){
+                        echo '<span class="pagination-dots">...</span>';
+                    }
+                    
+                    // Páginas alrededor de la actual
+                    $inicio = max(2, $pagina - $rango);
+                    $fin = min($numPaginas - 1, $pagina + $rango);
+                    
+                    for($i = $inicio; $i <= $fin; $i++){
                         $queryParams['pagina'] = $i;
                         if($i == $pagina){
                             echo '<span class="current">'.$i.'</span>';
@@ -1423,11 +1527,35 @@ if(!empty($_GET["idTK"])){
                         }
                     }
                     
+                    // Puntos suspensivos si hay un salto
+                    if($pagina < ($numPaginas - $rango - 1)){
+                        echo '<span class="pagination-dots">...</span>';
+                    }
+                    
+                    // Última página siempre visible (si hay más de 1 página)
+                    if($numPaginas > 1){
+                        $queryParams['pagina'] = $numPaginas;
+                        if($pagina == $numPaginas){
+                            echo '<span class="current">'.$numPaginas.'</span>';
+                        } else {
+                            echo '<a href="?'.http_build_query($queryParams).'">'.$numPaginas.'</a>';
+                        }
+                    }
+                    
+                    // Botón Siguiente
                     if($paginaSiguiente <= $numPaginas){
                         $queryParams['pagina'] = $paginaSiguiente;
-                        echo '<a href="?'.http_build_query($queryParams).'">Siguiente <i class="fa-solid fa-chevron-right"></i></a>';
+                        echo '<a href="?'.http_build_query($queryParams).'" class="pagination-next" title="Página siguiente"><i class="fa-solid fa-chevron-right"></i></a>';
+                    } else {
+                        echo '<span class="pagination-next disabled"><i class="fa-solid fa-chevron-right"></i></span>';
                     }
                     ?>
+                </div>
+                
+                <!-- Información de paginación -->
+                <div class="pagination-info">
+                    Mostrando página <strong><?= $pagina; ?></strong> de <strong><?= $numPaginas; ?></strong> 
+                    (<?= $totalRegistros; ?> <?= $totalRegistros == 1 ? 'registro' : 'registros'; ?> en total)
                 </div>
                 <?php } ?>
 
