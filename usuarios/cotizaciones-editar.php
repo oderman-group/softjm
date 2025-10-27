@@ -5,20 +5,50 @@ $idPagina = 79;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$consultaCliente=$conexionBdPrincipal->query("SELECT * FROM cotizacion 
-INNER JOIN clientes ON cli_id=cotiz_cliente
-INNER JOIN contactos ON cont_id=cotiz_contacto
-WHERE cotiz_id='".$_GET["id"]."' AND cotiz_id_empresa='".$idEmpresa."'");
+
+// ========================================
+// CONSULTA PRINCIPAL OPTIMIZADA
+// ========================================
+// Solo traer campos necesarios en lugar de SELECT *
+$consultaCliente = $conexionBdPrincipal->query("
+	SELECT 
+		c.cotiz_id, c.cotiz_cliente, c.cotiz_contacto, c.cotiz_vendedor, c.cotiz_proveedor,
+		c.cotiz_sucursal, c.cotiz_fecha_propuesta, c.cotiz_fecha_vencimiento, c.cotiz_forma_pago,
+		c.cotiz_moneda, c.cotiz_observaciones, c.cotiz_envio, c.cotiz_ticket, c.cotiz_vendida,
+		c.cotiz_fecha_vendida, c.cotiz_ocultar_descuento_combo, c.cotiz_descuentos_especiales,
+		c.cotiz_es_precotizacion, c.cotiz_version, c.cotiz_ultima_modificacion, c.cotiz_creador,
+		cli.cli_id, cli.cli_nombre, cli.cli_categoria, cli.cli_ciudad, cli.cli_direccion,
+		cli.cli_telefono, cli.cli_celular, cli.cli_credito,
+		cont.cont_id, cont.cont_nombre, cont.cont_email
+	FROM cotizacion c
+	INNER JOIN clientes cli ON cli.cli_id = c.cotiz_cliente
+	INNER JOIN contactos cont ON cont.cont_id = c.cotiz_contacto
+	WHERE c.cotiz_id = '".$_GET["id"]."' AND c.cotiz_id_empresa = '".$idEmpresa."'
+	LIMIT 1
+");
 $resultadoD = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 
-if(isset($_GET["cte"])){
-	if(is_numeric($_GET["cte"])){
-		$cliente = $_GET["cte"]; 
-	}
+if (!$resultadoD) {
+	echo '<script>alert("Cotización no encontrada"); window.location.href="cotizaciones.php";</script>';
+	exit;
+}
+
+if(isset($_GET["cte"]) && is_numeric($_GET["cte"])){
+	$cliente = $_GET["cte"]; 
 }else{
 	$cliente = $resultadoD['cotiz_cliente'];
 }
 
+// Guardar info del cliente para uso posterior
+$clienteInfo = [
+	'cli_credito' => $resultadoD['cli_credito'],
+	'cli_ciudad' => $resultadoD['cli_ciudad'],
+	'cli_direccion' => $resultadoD['cli_direccion'],
+	'cli_telefono' => $resultadoD['cli_telefono'],
+	'cli_celular' => $resultadoD['cli_celular'],
+	'cli_nombre' => $resultadoD['cli_nombre'],
+	'cli_categoria' => $resultadoD['cli_categoria']
+];
 
 require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
@@ -28,6 +58,79 @@ require_once RUTA_PROYECTO.'/usuarios/class/Combo.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
 
 $ticketAsociado = Ticket::obtenerDatosTikcetPorIdCotizacion($resultadoD['cotiz_id'], $conexionBdPrincipal);
+
+// ========================================
+// CACHE DE CONSULTAS COMUNES
+// ========================================
+// Usuarios activos (usado 2 veces en la página)
+$usuariosActivos = [];
+$consultaUsuarios = $conexionBdPrincipal->query("
+	SELECT usr_id, usr_nombre, usr_email 
+	FROM usuarios 
+	WHERE usr_bloqueado != 1 AND usr_id_empresa = '".$idEmpresa."' 
+	ORDER BY usr_nombre
+");
+while($usr = mysqli_fetch_array($consultaUsuarios, MYSQLI_BOTH)){
+	$usuariosActivos[] = $usr;
+}
+
+// Sucursales del cliente
+$sucursales = [];
+$consultaSucursales = $conexionBdPrincipal->query("
+	SELECT sucu_id, sucu_nombre 
+	FROM sucursales 
+	WHERE sucu_cliente_principal = '".$cliente."'
+	ORDER BY sucu_nombre
+");
+while($sucu = mysqli_fetch_array($consultaSucursales, MYSQLI_BOTH)){
+	$sucursales[] = $sucu;
+}
+
+// Si no hay sucursales, crear automáticamente
+if(count($sucursales) == 0){
+	$conexionBdPrincipal->query("
+		INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)
+		VALUES('".$cliente."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')
+	");
+	// Recargar sucursales
+	$consultaSucursales = $conexionBdPrincipal->query("
+		SELECT sucu_id, sucu_nombre 
+		FROM sucursales 
+		WHERE sucu_cliente_principal = '".$cliente."'
+	");
+	while($sucu = mysqli_fetch_array($consultaSucursales, MYSQLI_BOTH)){
+		$sucursales[] = $sucu;
+	}
+}
+
+// Contactos del cliente
+$contactos = [];
+$consultaContactos = $conexionBdPrincipal->query("
+	SELECT cont_id, cont_nombre, cont_email 
+	FROM contactos 
+	WHERE cont_cliente_principal = '".$cliente."'
+	ORDER BY cont_nombre
+");
+while($cont = mysqli_fetch_array($consultaContactos, MYSQLI_BOTH)){
+	$contactos[] = $cont;
+}
+
+// Si no hay contactos, crear automáticamente
+if(count($contactos) == 0){
+	$conexionBdPrincipal->query("
+		INSERT INTO contactos(cont_nombre, cont_cliente_principal)
+		VALUES('Contacto principal (Automático)', '".$cliente."')
+	");
+	// Recargar contactos
+	$consultaContactos = $conexionBdPrincipal->query("
+		SELECT cont_id, cont_nombre, cont_email 
+		FROM contactos 
+		WHERE cont_cliente_principal = '".$cliente."'
+	");
+	while($cont = mysqli_fetch_array($consultaContactos, MYSQLI_BOTH)){
+		$contactos[] = $cont;
+	}
+}
 ?>
 
 <link href="css/chosen.css" rel="stylesheet">
@@ -589,82 +692,63 @@ include("includes/js-formularios.php");
 									</div>
 									
 									<div class="control-group">
-											<label class="control-label">Sucursal</label>
-											<div class="controls">
-												<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="sucursal" required <?=$camposCotizacionDisabled;?>>
-													<option value=""></option>
-													<?php
-													$conOp = $conexionBdPrincipal->query("SELECT sucu_id, sucu_nombre FROM sucursales WHERE sucu_cliente_principal='".$cliente."'");
-													$numOp = $conOp->num_rows;
-													if($numOp==0){
-														//Crear automáticamente la sucursal
-														$conexionBdPrincipal->query("INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$cliente."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')");
-														
-														echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
-														exit();
-													}
-
-													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-														
-													?>
-														<option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_sucursal']==$resOp[0] || $numOp == 1){echo "selected";} echo $disabled; ?>><?=$resOp['sucu_nombre'];?></option>
-													<?php 
-													}
-													?>
-												</select>
-											</div>
-											<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-										<a href="clientes-sucursales.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver sucursales</a>
-											<?php } ?>
-									</div>
+										<label class="control-label">Sucursal</label>
+										<div class="controls">
+											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="sucursal" required <?=$camposCotizacionDisabled;?>>
+												<option value=""></option>
+												<?php
+												// Usar sucursales del cache
+												foreach($sucursales as $sucursal){
+												?>
+													<option value="<?=$sucursal['sucu_id'];?>" <?php if($resultadoD['cotiz_sucursal']==$sucursal['sucu_id'] || count($sucursales) == 1){echo "selected";} ?>><?=$sucursal['sucu_nombre'];?></option>
+												<?php 
+												}
+												?>
+											</select>
+										</div>
+										<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<a href="clientes-sucursales.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver sucursales</a>
+										<?php } ?>
+								</div>
 										
-										<div class="control-group">
-											<label class="control-label">Contacto</label>
-											<div class="controls">
-												<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required <?=$camposCotizacionDisabled;?>>
-													<option value=""></option>
-													<?php
-													$conOp = $conexionBdPrincipal->query("SELECT cont_id, cont_nombre, cont_email FROM contactos 
-													WHERE cont_cliente_principal='".$cliente."'");
-													$numOp = $conOp->num_rows;
-													if($numOp==0){
-														//Crear automáticamente el contacto
-														$conexionBdPrincipal->query("INSERT INTO contactos(cont_nombre, cont_cliente_principal)VALUES('Contacto principal (Automático)', '".$cliente."')");
-														
-														echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
-														exit();
-													}
-													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-													?>
-														<option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_contacto']==$resOp[0] || $numOp == 1){echo "selected";}?>><?=strtoupper($resOp['cont_nombre'])." (".$resOp['cont_email'].")";?></option>
-													<?php
-													}
-													?>
-												</select>
-											</div>
-											<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-											<a href="clientes-contactos.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver contactos</a>
-											<?php } ?>
-									</div>	
+									<div class="control-group">
+										<label class="control-label">Contacto</label>
+										<div class="controls">
+											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required <?=$camposCotizacionDisabled;?>>
+												<option value=""></option>
+												<?php
+												// Usar contactos del cache
+												foreach($contactos as $contacto){
+												?>
+													<option value="<?=$contacto['cont_id'];?>" <?php if($resultadoD['cotiz_contacto']==$contacto['cont_id'] || count($contactos) == 1){echo "selected";}?>><?=strtoupper($contacto['cont_nombre'])." (".$contacto['cont_email'].")";?></option>
+												<?php
+												}
+												?>
+											</select>
+										</div>
+										<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+										<a href="clientes-contactos.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver contactos</a>
+										<?php } ?>
+								</div>
 									
 									</fieldset>
 										
-										<div class="control-group">
-											<label class="control-label">Usuario Influyente</label>
-											<div class="controls">
-												<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente" <?=$camposCotizacionDisabled;?>>
-													<option value=""></option>
-													<?php
-													$conOp = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
-													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-													?>
-														<option value="<?=$resOp['usr_id'];?>" <?php if($resultadoD['cotiz_vendedor']==$resOp['usr_id']){echo "selected";}?>><?=strtoupper($resOp['usr_nombre'])." (".$resOp['usr_email'].")";?></option>
-													<?php
-													}
-													?>
-												</select>
-											</div>
-									</div>
+									<div class="control-group">
+										<label class="control-label">Usuario Influyente</label>
+										<div class="controls">
+											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente" <?=$camposCotizacionDisabled;?>>
+												<option value=""></option>
+												<?php
+												// Usar usuarios del cache
+												foreach($usuariosActivos as $usuario){
+												?>
+													<option value="<?=$usuario['usr_id'];?>" <?php if($resultadoD['cotiz_vendedor']==$usuario['usr_id']){echo "selected";}?>><?=strtoupper($usuario['usr_nombre'])." (".$usuario['usr_email'].")";?></option>
+												<?php
+												}
+												?>
+											</select>
+										</div>
+								</div>
 									
 									<div class="control-group">
 											<label class="control-label">Fecha de la propuesta</label>
@@ -732,45 +816,53 @@ include("includes/js-formularios.php");
 											</div>
 									</div>	
 										
-										<div class="control-group">
-												<label class="control-label">Combos</label>
-												<div class="controls">
-													<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="combo[]" multiple id="combos-select" <?=$camposCotizacionDisabled;?>>
-														<option value=""></option>
-														<?php
-														$conOp = $conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo, combo_id, combo_nombre FROM cotizacion_productos
-														INNER JOIN combos ON combo_id=czpp_combo AND combo_id_empresa='".$idEmpresa."'
-														WHERE czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo='".CZPP_TIPO_COTZ."'
-														ORDER BY combo_nombre");
-														while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-														?>
-															<option selected value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>
-														<?php
-														}
-														?>
-													</select>
-												</div>
-										</div>
-										
-										<div class="control-group">
-												<label class="control-label">Productos</label>
-												<div class="controls">
-													<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="producto[]" multiple id="product-select" <?=$camposCotizacionDisabled;?>>
+									<div class="control-group">
+											<label class="control-label">Combos</label>
+											<div class="controls">
+												<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="combo[]" multiple id="combos-select" <?=$camposCotizacionDisabled;?>>
+													<option value=""></option>
 													<?php
-														$consultaProductos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad, czpp_tipo FROM cotizacion_productos
-														INNER JOIN productos ON prod_id=czpp_producto AND prod_id_empresa='".$idEmpresa."'
-														WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=".CZPP_TIPO_COTZ."
-														ORDER BY prod_nombre");
-
-														while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
-														?>
-															<option selected value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
-														<?php
-															}
-														?>
-													</select>
-												</div>
+													// Consulta optimizada: solo campos necesarios, índice en czpp_cotizacion y czpp_tipo
+													$conOp = $conexionBdPrincipal->query("
+														SELECT cb.combo_id, cb.combo_nombre 
+														FROM cotizacion_productos cp
+														INNER JOIN combos cb ON cb.combo_id = cp.czpp_combo AND cb.combo_id_empresa = '".$idEmpresa."'
+														WHERE cp.czpp_cotizacion = '".$resultadoD['cotiz_id']."' AND cp.czpp_tipo = '".CZPP_TIPO_COTZ."'
+														ORDER BY cb.combo_nombre
+													");
+													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+													?>
+														<option selected value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>
+													<?php
+													}
+													?>
+												</select>
 											</div>
+									</div>
+										
+									<div class="control-group">
+											<label class="control-label">Productos</label>
+											<div class="controls">
+												<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="producto[]" multiple id="product-select" <?=$camposCotizacionDisabled;?>>
+												<?php
+													// Consulta optimizada: solo campos necesarios para el select
+													$consultaProductos = $conexionBdPrincipal->query("
+														SELECT p.prod_id, p.prod_nombre, cp.czpp_cantidad
+														FROM cotizacion_productos cp
+														INNER JOIN productos p ON p.prod_id = cp.czpp_producto AND p.prod_id_empresa = '".$idEmpresa."'
+														WHERE cp.czpp_cotizacion = '".$_GET["id"]."' AND cp.czpp_tipo = ".CZPP_TIPO_COTZ."
+														ORDER BY p.prod_nombre
+													");
+
+													while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
+													?>
+														<option selected value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
+													<?php
+														}
+													?>
+												</select>
+											</div>
+										</div>
 
 
 										<div class="control-group">
@@ -815,19 +907,23 @@ include("includes/js-formularios.php");
 											</div>
 										</div>
 
-										<?php
-										$envio = $resultadoD['cotiz_envio'];
+									<?php
+									$envio = $resultadoD['cotiz_envio'];
 
-										if (empty($resultadoD['cotiz_ticket'])) {
-											$consultaTickets = $conexionBdPrincipal->query("SELECT * FROM clientes_tikets 
-											WHERE tik_cliente='".$resultadoD['cotiz_cliente']."'
+									if (empty($resultadoD['cotiz_ticket'])) {
+										// Consulta optimizada: solo campos necesarios para mostrar
+										$consultaTickets = $conexionBdPrincipal->query("
+											SELECT tik_id, tik_asunto, tik_fecha_creacion
+											FROM clientes_tikets 
+											WHERE tik_cliente = '".$resultadoD['cotiz_cliente']."'
 											AND tik_id_cotizacion IS NULL
 											AND tik_tipo_tiket = 1
 											AND tik_estado = 1
 											AND tik_tipo_negocio = 1
-											");
-											$numTickets = $consultaTickets->num_rows;
-										?>
+											ORDER BY tik_id DESC
+										");
+										$numTickets = $consultaTickets->num_rows;
+									?>
 
 											<div class="control-group">
 												<label class="control-label">Asociar a un ticket</label>
@@ -835,17 +931,17 @@ include("includes/js-formularios.php");
 													<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="ticket" <?=$camposCotizacionDisabled;?>>
 														<option value="TICKET_AUTO">Deseo que el ticket se cree automáticamente</option>
 														<option value="NO_TICKET" selected>NO deseo asociar ningun ticket a esta cotización por el momento</option>
-														<?php
-														if ($numTickets > 0) {
-															echo '<optgroup label="Tickets disponibles">';
-															while ($resOp = mysqli_fetch_array($consultaTickets, MYSQLI_BOTH)) {
-														?>
-																<option value="<?=$resOp[0];?>"><?="Ticket # ".$resOp[0]." - ".strtoupper($resOp[1])." (".$resOp[3].")";?></option>
-														<?php
+													<?php
+													if ($numTickets > 0) {
+														echo '<optgroup label="Tickets disponibles">';
+														while ($resOp = mysqli_fetch_array($consultaTickets, MYSQLI_BOTH)) {
+													?>
+															<option value="<?=$resOp['tik_id'];?>"><?="Ticket # ".$resOp['tik_id']." - ".strtoupper($resOp['tik_asunto'])." (".$resOp['tik_fecha_creacion'].")";?></option>
+													<?php
+													}
+														echo '</optgroup>';
 														}
-															echo '</optgroup>';
-															}
-														?>
+													?>
 													</select>
 												</div>
 											</div>
