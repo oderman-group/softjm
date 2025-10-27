@@ -573,43 +573,48 @@ include("includes/js-formularios.php");
 								<div class="widget-head bondi-blue">
 									<h3> <?=$paginaActual['pag_nombre'];?> #<?=$resultadoD['cotiz_id'];?> <?=$versionActualCotizacion;?> <?php if (!empty($resultadoD['cotiz_ultima_modificacion'])) echo " - Ultima modificación: " . $resultadoD['cotiz_ultima_modificacion'];?></h3>
 								</div>
-								<div class="widget-container">
-									<form class="form-horizontal" method="post" action="bd_update/cotizaciones-actualizar.php">
-									<input type="hidden" name="id" id="id" value="<?=$_GET["id"];?>">
-									<input type="hidden" name="monedaActual" value="<?=$resultadoD['cotiz_moneda'];?>">
-										
-									<script type="application/javascript">
-											function clientes(datos){
-												id = datos.value;
-												idCotizacion = <?=$_GET["id"];?>;
-												datos = "idCotizacion="+(idCotizacion)+"&idCliente="+(id);
+							<div class="widget-container">
+								<!-- Mensaje de respuesta para guardado asíncrono -->
+								<div id="mensaje-guardado" style="display: none; margin-bottom: 15px;"></div>
+								
+								<form class="form-horizontal" method="post" action="bd_update/cotizaciones-actualizar.php" id="form-cotizacion-info">
+								<input type="hidden" name="id" id="id" value="<?=$_GET["id"];?>">
+								<input type="hidden" name="monedaActual" value="<?=$resultadoD['cotiz_moneda'];?>">
+									
+								<script type="application/javascript">
+										function clientes(datos){
+											id = datos.value;
+											idCotizacion = <?=$_GET["id"];?>;
+											datos = "idCotizacion="+(idCotizacion)+"&idCliente="+(id);
 
-												$.ajax({
-													type: "POST",
-													url: "ajax/ajax-cotizaciones-actualizar.php",
-													data: datos,
-													success: function(data) {
-														var response = JSON.parse(data);
-														if(response.success) {
-															location.href = "cotizaciones-editar.php?id="+idCotizacion+"&cte="+id+"#productos";
-														} else {
-															alert(response.message);
-														}
-
+											$.ajax({
+												type: "POST",
+												url: "ajax/ajax-cotizaciones-actualizar.php",
+												data: datos,
+												success: function(data) {
+													var response = JSON.parse(data);
+													if(response.success) {
+														location.href = "cotizaciones-editar.php?id="+idCotizacion+"&cte="+id+"#productos";
+													} else {
+														alert(response.message);
 													}
-												});
-												
-											}
-										</script>
-										
-										<div class="form-actions">
-											<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-											<?php
-											if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
-											?>
-											<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-											<?php }?>
-										</div>
+
+												}
+											});
+											
+										}
+									</script>
+									
+									<div class="form-actions">
+										<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+										<?php
+										if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
+										?>
+										<button type="button" id="btn-guardar-cambios" class="btn btn-info">
+											<i class="icon-save"></i> <span id="btn-text">Guardar cambios</span>
+										</button>
+										<?php }?>
+									</div>
 										
 
 										<?php if($configuracion['conf_proveedor_cotizacion'] == 1){?>
@@ -949,20 +954,23 @@ include("includes/js-formularios.php");
 											<input type="hidden" name="ticket" value="<?=$resultadoD['cotiz_ticket'];?>">
 										<?php }?>
 										
-									<div class="form-actions">
-											<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-											<?php
-											if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
-											?>
-											<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-											<?php }?>
-										</div>
-										
-								</div>
+								<div class="form-actions">
+										<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+										<?php
+										if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
+										?>
+										<button type="button" id="btn-guardar-cambios-2" class="btn btn-info">
+											<i class="icon-save"></i> <span id="btn-text-2">Guardar cambios</span>
+										</button>
+										<?php }?>
+									</div>
+									</form>
+									
 							</div>
 						</div>
 					</div>
 				</div>
+			</div>
 
 		<!-- LISTADO DE LO QUE SE ESTÁ COTIZANDO -->	
 		<div class="tab-pane" id="itemsCotizados">
@@ -1332,8 +1340,241 @@ $(document).ready(function() {
 	}
 	
 	console.log('Sistema de carga lazy para tabs inicializado');
+	
+	// ========================================
+	// GUARDADO ASÍNCRONO DEL FORMULARIO
+	// ========================================
+	
+	/**
+	 * Función para mostrar mensajes de respuesta
+	 */
+	function mostrarMensaje(tipo, mensaje) {
+		const $mensajeDiv = $('#mensaje-guardado');
+		let icono = '';
+		let alertClass = '';
+		
+		switch(tipo) {
+			case 'success':
+				alertClass = 'alert-success';
+				icono = '<i class="icon-ok-sign"></i>';
+				break;
+			case 'error':
+				alertClass = 'alert-danger';
+				icono = '<i class="icon-exclamation-sign"></i>';
+				break;
+			case 'warning':
+				alertClass = 'alert-warning';
+				icono = '<i class="icon-warning-sign"></i>';
+				break;
+			case 'info':
+				alertClass = 'alert-info';
+				icono = '<i class="icon-info-sign"></i>';
+				break;
+		}
+		
+		$mensajeDiv.html(`
+			<div class="alert ${alertClass}">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				${icono} <strong>${mensaje}</strong>
+			</div>
+		`).fadeIn();
+		
+		// Scroll suave hacia el mensaje
+		$('html, body').animate({
+			scrollTop: $mensajeDiv.offset().top - 100
+		}, 500);
+		
+		// Auto-ocultar después de 5 segundos
+		setTimeout(function() {
+			$mensajeDiv.fadeOut();
+		}, 5000);
+	}
+	
+	/**
+	 * Función para deshabilitar/habilitar botones
+	 */
+	function toggleBotones(disabled) {
+		$('#btn-guardar-cambios, #btn-guardar-cambios-2').prop('disabled', disabled);
+		
+		if(disabled) {
+			$('#btn-text, #btn-text-2').html('Guardando... <i class="icon-spinner icon-spin"></i>');
+		} else {
+			$('#btn-text, #btn-text-2').html('Guardar cambios');
+		}
+	}
+	
+	/**
+	 * Función para actualizar la fecha de última modificación en el header
+	 */
+	function actualizarFechaModificacion(fecha) {
+		const $header = $('.widget-head.bondi-blue h3');
+		const textoActual = $header.text();
+		
+		// Buscar si ya existe "Ultima modificación"
+		if(textoActual.indexOf('Ultima modificación') !== -1) {
+			// Reemplazar la fecha existente
+			const partes = textoActual.split(' - Ultima modificación:');
+			$header.text(partes[0] + ' - Ultima modificación: ' + fecha);
+		} else {
+			// Agregar la fecha por primera vez
+			$header.text(textoActual + ' - Ultima modificación: ' + fecha);
+		}
+		
+		// Efecto visual para indicar actualización
+		$header.fadeOut(200).fadeIn(200);
+	}
+	
+	/**
+	 * Manejador del click en los botones de guardar
+	 */
+	$('#btn-guardar-cambios, #btn-guardar-cambios-2').on('click', function(e) {
+		e.preventDefault();
+		
+		console.log('Iniciando guardado asíncrono...');
+		
+		// Obtener todos los datos del formulario
+		const formData = $('#form-cotizacion-info').serialize();
+		
+		// Deshabilitar botones durante el guardado
+		toggleBotones(true);
+		
+		// Ocultar mensaje anterior si existe
+		$('#mensaje-guardado').fadeOut();
+		
+		// Realizar petición AJAX
+		$.ajax({
+			url: 'ajax/cotizaciones-guardar-asincrono.php',
+			type: 'POST',
+			data: formData,
+			dataType: 'json',
+			success: function(response) {
+				console.log('Respuesta del servidor:', response);
+				
+				if(response.success) {
+					// Mostrar mensaje de éxito
+					mostrarMensaje('success', response.message);
+					
+					// Actualizar fecha de última modificación si viene en la respuesta
+					if(response.ultima_modificacion) {
+						actualizarFechaModificacion(response.ultima_modificacion);
+					}
+					
+					// Si es el cambio de cliente, recargar página (como antes)
+					if($('#form-cotizacion-info').data('cliente-cambiado')) {
+						setTimeout(function() {
+							location.reload();
+						}, 1500);
+					}
+				} else {
+					// Mostrar mensaje de error
+					mostrarMensaje('error', response.message || 'Error al guardar los cambios');
+				}
+			},
+			error: function(xhr, status, error) {
+				console.error('Error AJAX:', {xhr, status, error});
+				
+				let mensaje = 'Error al guardar los cambios';
+				
+				// Intentar obtener mensaje del servidor
+				try {
+					const response = JSON.parse(xhr.responseText);
+					if(response.message) {
+						mensaje = response.message;
+					}
+				} catch(e) {
+					console.error('Error parseando respuesta:', e);
+				}
+				
+				mostrarMensaje('error', mensaje);
+			},
+			complete: function() {
+				// Rehabilitar botones
+				toggleBotones(false);
+				console.log('Guardado completado');
+			}
+		});
+	});
+	
+	// Prevenir submit tradicional del formulario
+	$('#form-cotizacion-info').on('submit', function(e) {
+		e.preventDefault();
+		// Simular click en el botón para usar la misma lógica
+		$('#btn-guardar-cambios').trigger('click');
+		return false;
+	});
+	
+	console.log('Sistema de guardado asíncrono inicializado');
 });
 </script>
+
+<!-- Estilos adicionales para el spinner -->
+<style>
+.icon-spin {
+	animation: icon-spin 1s infinite linear;
+}
+
+@keyframes icon-spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+#btn-guardar-cambios:disabled,
+#btn-guardar-cambios-2:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.alert {
+	position: relative;
+	padding: 15px;
+	margin-bottom: 20px;
+	border: 1px solid transparent;
+	border-radius: 4px;
+}
+
+.alert-success {
+	color: #3c763d;
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
+}
+
+.alert-danger {
+	color: #a94442;
+	background-color: #f2dede;
+	border-color: #ebccd1;
+}
+
+.alert-warning {
+	color: #8a6d3b;
+	background-color: #fcf8e3;
+	border-color: #faebcc;
+}
+
+.alert-info {
+	color: #31708f;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
+}
+
+.alert .close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	padding: 0;
+	cursor: pointer;
+	background: transparent;
+	border: 0;
+	font-size: 21px;
+	font-weight: bold;
+	line-height: 1;
+	color: #000;
+	opacity: 0.2;
+}
+
+.alert .close:hover {
+	opacity: 0.5;
+}
+</style>
 
 </body>
 </html>
