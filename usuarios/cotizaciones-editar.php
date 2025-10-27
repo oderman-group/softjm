@@ -146,6 +146,180 @@ include("includes/js-formularios.php");
 ?>
 </head>
 <body>
+
+<!-- Overlay de carga -->
+<div id="loading-overlay" class="loading-overlay-modern">
+	<div class="loading-content-modern">
+		<div class="spinner-modern"></div>
+		<h3 class="loading-text-modern">Cargando contenido...</h3>
+		<p class="loading-subtext-modern">Por favor espere un momento</p>
+	</div>
+</div>
+
+<style>
+/* Overlay de carga moderno */
+.loading-overlay-modern {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 9999;
+	transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loading-overlay-modern.hidden {
+	opacity: 0;
+	visibility: hidden;
+}
+
+.loading-content-modern {
+	text-align: center;
+	background: white;
+	padding: 40px 60px;
+	border-radius: 20px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+	animation: slideInUp 0.5s ease;
+}
+
+@keyframes slideInUp {
+	from {
+		transform: translateY(30px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+/* Spinner moderno */
+.spinner-modern {
+	width: 60px;
+	height: 60px;
+	margin: 0 auto 20px;
+	border: 4px solid #f3f3f3;
+	border-top: 4px solid #667eea;
+	border-right: 4px solid #764ba2;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+.loading-text-modern {
+	color: #333;
+	font-size: 24px;
+	font-weight: 600;
+	margin: 0 0 10px 0;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.loading-subtext-modern {
+	color: #666;
+	font-size: 14px;
+	margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.loading-content-modern {
+		padding: 30px 40px;
+		margin: 0 20px;
+	}
+	
+	.spinner-modern {
+		width: 50px;
+		height: 50px;
+	}
+	
+	.loading-text-modern {
+		font-size: 20px;
+	}
+	
+	.loading-subtext-modern {
+		font-size: 13px;
+	}
+}
+
+/* Estilos para carga lazy de tabs */
+.lazy-loading-tab {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 300px;
+	padding: 40px 20px;
+}
+
+.lazy-loading-spinner {
+	text-align: center;
+}
+
+.spinner-border {
+	width: 50px;
+	height: 50px;
+	margin: 0 auto 20px;
+	border: 4px solid #f3f3f3;
+	border-top: 4px solid #667eea;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+
+.lazy-loading-spinner p {
+	color: #666;
+	font-size: 16px;
+	margin: 0;
+	font-weight: 500;
+}
+
+.tab-loaded {
+	animation: fadeInTab 0.5s ease;
+}
+
+@keyframes fadeInTab {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Error state */
+.lazy-loading-error {
+	text-align: center;
+	padding: 40px 20px;
+}
+
+.lazy-loading-error i {
+	font-size: 48px;
+	color: #dc3545;
+	margin-bottom: 15px;
+}
+
+.lazy-loading-error p {
+	color: #666;
+	font-size: 16px;
+	margin: 10px 0;
+}
+
+.lazy-loading-error .btn {
+	margin-top: 15px;
+}
+</style>
+
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
     
@@ -281,11 +455,11 @@ include("includes/js-formularios.php");
 			?>
 
 			<ul class="nav nav-tabs" id="myTab1">
-				<li class="active"><a href="#cotizacion"><i class="icon-file-alt"></i> Información de la cotización</a></li>
-				<li><a href="#itemsCotizados"><i class="icon-list"></i> Items cotizados</a></li>
-				<li><a href="#enviarCotizacion"><i class="icon-envelope"></i> Enviar cotización por correo</a></li>
-				<li><a href="#cotizacionesAsociadas"><i class="icon-retweet"></i> Cotizaciones asociadas</a></li>
-				<li><a href="#seguimientos"><i class="icon-list-ol"></i> Seguimientos</a></li>
+				<li class="active"><a href="#cotizacion" data-toggle="tab"><i class="icon-file-alt"></i> Información de la cotización</a></li>
+				<li><a href="#itemsCotizados" data-toggle="tab" data-lazy-load="items"><i class="icon-list"></i> Items cotizados</a></li>
+				<li><a href="#enviarCotizacion" data-toggle="tab"><i class="icon-envelope"></i> Enviar cotización por correo</a></li>
+				<li><a href="#cotizacionesAsociadas" data-toggle="tab" data-lazy-load="asociadas"><i class="icon-retweet"></i> Cotizaciones asociadas</a></li>
+				<li><a href="#seguimientos" data-toggle="tab" data-lazy-load="seguimientos"><i class="icon-list-ol"></i> Seguimientos</a></li>
 			</ul>
 
 			<div class="tab-content">
@@ -694,112 +868,15 @@ include("includes/js-formularios.php");
 					</div>
 				</div>
 
-				<!-- LISTADO DE LO QUE SE ESTÁ COTIZANDO -->	
-				<div class="tab-pane" id="itemsCotizados">
-					<div class="row-fluid">
-						<div class="span12">
-							
-							<span id="resp"></span>
-							
-							<div class="content-widgets light-gray" id="productos">
-								<div class="widget-head green">
-									<h3>PRODUCTOS</h3>
-								</div>
-								<div class="widget-container">
-									<p></p>
-									<table class="table table-striped table-bordered" id="data-table">
-									<thead>
-									<tr>
-										<th>No</th>
-										<th>Orden</th>
-										<th>Producto/Servicio</th>
-										<th>Cant.</th> 
-										<th>Valor Base</th>
-										<th>IVA</th>
-										<th>Dcto.</th>
-										<?php 
-										$colspan = 7;
-										if($resultadoD['cotiz_descuentos_especiales'] == 1){
-											$colspan = 8;
-										?>
-										<th>Dcto. Especial</th>
-										<?php }?>
-
-										<th>SUBTOTAL</th>
-									</tr>
-									</thead>
-									<tbody id="tableBody"></tbody>
-									<tfoot>
-										<tr style="font-weight: bold; font-size: 16px;">
-											<td style="text-align: right;" colspan="<?=$colspan;?>">SUBTOTAL</td>
-											<td id="subtotal">
-											<span class="moneda-simbolo">
-												<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-												<span class="valor-numerico"><?=!empty($subtotal) ? number_format($subtotal,0,",",".") : 0;?>
-												</span>
-											</td>
-										</tr>
-										<tr style="font-weight: bold; font-size: 16px;">
-											<td style="text-align: right;" colspan="<?=$colspan;?>">DESCUENTO</td>
-											<td id="totalDiscount"><span class="moneda-simbolo">
-												<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-												<span class="valor-numerico"><?=!empty($totalDescuento) ? number_format($envio,0,",",".") : 0;?>
-												</span></td>
-										</tr>
-										<tr style="font-weight: bold; font-size: 16px;">
-											<td style="text-align: right;" colspan="<?=$colspan;?>">IVA</td>
-											<td id="totalIva"><span class="moneda-simbolo">
-												<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-												<span class="valor-numerico"><?=!empty($totalIva) ? number_format($totalIva,0,",",".") : 0;?>
-												</span></td>
-										</tr>
-										<tr style="font-weight: bold; font-size: 16px;">
-											<td style="text-align: right;" colspan="<?=$colspan;?>">ENVÍO</td>
-											<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?php if(!empty($envio)) echo number_format($envio,0,",","."); else echo 0;?>
-												</td>
-										</tr>
-										<tr style="font-weight: bold; font-size: 16px;">
-											<td style="text-align: right;" colspan="<?=$colspan;?>">TOTAL NETO</td>
-											<td id="total"><span class="moneda-simbolo">
-												<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-												<span class="valor-numerico"><?=!empty($subtotal) ? number_format($subtotal,0,",",".") : 0;?>
-												</span></td>
-										</tr>
-									</tfoot>	
-										
-									</table>
-
-									<?php
-									if(Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
-
-										<p style="color: black; background-color: #d8ff0038; padding: 15px; font-weight: bold; font-size: 16px;">Esta cotización deja una utilidad aproximada de $<span id="utilidadTotal">0</span>
-									<?php }?>
-									
-									
-										<div class="form-actions">
-											
-											<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-											<?php
-											if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
-											?>
-											<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-											<?php }?>
-											
-												
-											<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-											<div class="btn-group">
-												<a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir (Formato 1)</a>
-												<a href="reportes/formato-cotizacion-3_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-warning" target="_blank"><i class="icon-print"></i> Imprimir (Formato 2)</a>
-											</div>
-											<?php } ?>
-										</div>
-									</form>
-									
-								</div>
-							</div>
-						</div>
+			<!-- LISTADO DE LO QUE SE ESTÁ COTIZANDO -->	
+			<div class="tab-pane" id="itemsCotizados">
+				<div class="lazy-loading-tab">
+					<div class="lazy-loading-spinner">
+						<div class="spinner-border"></div>
+						<p>Cargando items cotizados...</p>
 					</div>
 				</div>
+			</div>
 
 				<div class="tab-pane" id="enviarCotizacion">
 					<div class="row-fluid">
@@ -860,43 +937,23 @@ include("includes/js-formularios.php");
 					</div>
 				</div>
 
-				<div class="tab-pane" id="cotizacionesAsociadas">
-					<?php include("cotizaciones-relacionadas.php");?>
-				</div>
-
-				<div class="tab-pane" id="seguimientos">
-					<?php
-					$consulta = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
-					INNER JOIN clientes ON cli_id=cseg_cliente
-					INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
-					INNER JOIN clientes_tikets ON tik_id=cseg_tiket AND tik_id_cotizacion = ".$resultadoD['cotiz_id']);
-					$no = 1;
-					?>
-					<div class="row-fluid">
-						<div class="span12">
-							<?php
-							while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
-								$rutaFoto = "files/fotos/".$res['usr_foto'];
-
-								if (!empty($res['usr_foto']) && file_exists($rutaFoto)) {
-									$foto = $rutaFoto;
-								} else {
-									$rutaFoto = "images/item-pic.png";
-								}
-							?>
-								<div class="media">
-									<a href="#" class="pull-left media-thumb">
-										<img src="<?=$rutaFoto;?>" width="34" height="34" alt="user">
-									</a>
-									<div class="media-body ">
-										<h4 class="media-heading"><?=$res['cseg_fecha_reporte'];?> - <?=$res['usr_nombre'];?></h4>
-										<p><?=$res['cseg_observacion'];?></p>
-									</div>
-								</div>
-							<?php }?>
-						</div>
+			<div class="tab-pane" id="cotizacionesAsociadas">
+				<div class="lazy-loading-tab">
+					<div class="lazy-loading-spinner">
+						<div class="spinner-border"></div>
+						<p>Cargando cotizaciones asociadas...</p>
 					</div>
 				</div>
+			</div>
+
+			<div class="tab-pane" id="seguimientos">
+				<div class="lazy-loading-tab">
+					<div class="lazy-loading-spinner">
+						<div class="spinner-border"></div>
+						<p>Cargando seguimientos...</p>
+					</div>
+				</div>
+			</div>
 
 			</div>
 
@@ -906,5 +963,197 @@ include("includes/js-formularios.php");
 	<?php include("includes/pie.php");?>
 	<script src="js/Cotizaciones.js"></script>
 </div>
+
+<script>
+// Ocultar overlay cuando la página esté completamente cargada
+window.addEventListener('load', function() {
+	// Esperar un pequeño delay para que se vea el overlay
+	setTimeout(function() {
+		const overlay = document.getElementById('loading-overlay');
+		if (overlay) {
+			overlay.classList.add('hidden');
+			
+			// Remover el overlay del DOM después de la transición
+			setTimeout(function() {
+				overlay.style.display = 'none';
+			}, 500);
+		}
+	}, 300); // 300ms de delay para que el usuario vea el overlay brevemente
+});
+
+// También ocultar si jQuery está listo (para páginas con muchos AJAX)
+$(document).ready(function() {
+	// Este es un respaldo adicional
+	setTimeout(function() {
+		const overlay = document.getElementById('loading-overlay');
+		if (overlay && !overlay.classList.contains('hidden')) {
+			overlay.classList.add('hidden');
+			setTimeout(function() {
+				overlay.style.display = 'none';
+			}, 500);
+		}
+	}, 2000); // Timeout máximo de 2 segundos
+	
+	// ========================================
+	// SISTEMA DE CARGA LAZY PARA TABS
+	// ========================================
+	
+	// Objeto para controlar qué tabs ya se han cargado
+	const loadedTabs = {
+		items: false,
+		asociadas: false,
+		seguimientos: false
+	};
+	
+	// ID de la cotización actual
+	const cotizacionId = <?=$_GET["id"];?>;
+	
+	/**
+	 * Función para cargar el contenido de un tab via AJAX
+	 */
+	function loadTabContent(tabType, tabId) {
+		// Si ya está cargado, no hacer nada
+		if (loadedTabs[tabType]) {
+			return;
+		}
+		
+		// Mapeo de tipos a URLs
+		const urls = {
+			'items': 'ajax/cotizaciones-editar-items.php',
+			'asociadas': 'ajax/cotizaciones-editar-asociadas.php',
+			'seguimientos': 'ajax/cotizaciones-editar-seguimientos.php'
+		};
+		
+		const url = urls[tabType];
+		
+		if (!url) {
+			console.error('Tipo de tab no reconocido:', tabType);
+			return;
+		}
+		
+		// Obtener el contenedor del tab
+		const $tabPane = $('#' + tabId);
+		
+		// Realizar la petición AJAX
+		$.ajax({
+			url: url,
+			type: 'GET',
+			data: { id: cotizacionId },
+			dataType: 'json',
+			beforeSend: function() {
+				console.log('Cargando contenido de tab:', tabType);
+			},
+			success: function(response) {
+				if (response.success) {
+					// Reemplazar el contenido del tab con el HTML recibido
+					$tabPane.html(response.html);
+					
+					// Agregar clase de animación
+					$tabPane.addClass('tab-loaded');
+					
+					// Marcar como cargado
+					loadedTabs[tabType] = true;
+					
+					console.log('Tab cargado exitosamente:', tabType);
+					
+					// Si es el tab de items, inicializar la funcionalidad de Cotizaciones.js
+					if (tabType === 'items') {
+						// Esperar un momento para que el DOM se actualice
+						setTimeout(function() {
+							// Verificar si existe la función de inicialización
+							if (typeof window.initCotizacionesTable === 'function') {
+								window.initCotizacionesTable();
+							}
+						}, 100);
+					}
+				} else {
+					// Mostrar error
+					showTabError($tabPane, response.message || 'Error al cargar el contenido', tabType, tabId);
+				}
+			},
+			error: function(xhr, status, error) {
+				console.error('Error al cargar tab:', tabType, error);
+				showTabError($tabPane, 'Error al cargar el contenido. Por favor, intente nuevamente.', tabType, tabId);
+			}
+		});
+	}
+	
+	/**
+	 * Función para mostrar un error en el tab
+	 */
+	function showTabError($tabPane, message, tabType, tabId) {
+		const errorHtml = `
+			<div class="lazy-loading-error">
+				<i class="icon-exclamation-sign"></i>
+				<p>${message}</p>
+				<button class="btn btn-primary" onclick="retryLoadTab('${tabType}', '${tabId}')">
+					<i class="icon-refresh"></i> Reintentar
+				</button>
+			</div>
+		`;
+		$tabPane.html(errorHtml);
+	}
+	
+	/**
+	 * Función global para reintentar la carga (llamada desde el HTML)
+	 */
+	window.retryLoadTab = function(tabType, tabId) {
+		// Resetear el estado de carga
+		loadedTabs[tabType] = false;
+		
+		// Mostrar el spinner nuevamente
+		const $tabPane = $('#' + tabId);
+		$tabPane.html(`
+			<div class="lazy-loading-tab">
+				<div class="lazy-loading-spinner">
+					<div class="spinner-border"></div>
+					<p>Cargando contenido...</p>
+				</div>
+			</div>
+		`);
+		
+		// Intentar cargar de nuevo
+		loadTabContent(tabType, tabId);
+	};
+	
+	/**
+	 * Evento cuando se cambia de tab
+	 */
+	$('a[data-toggle="tab"]').on('shown', function(e) {
+		const $target = $(e.target);
+		const lazyLoad = $target.data('lazy-load');
+		const tabId = $target.attr('href').substring(1); // Remover el #
+		
+		// Si tiene atributo data-lazy-load, cargar el contenido
+		if (lazyLoad && !loadedTabs[lazyLoad]) {
+			loadTabContent(lazyLoad, tabId);
+		}
+	});
+	
+	// Detectar si hay un hash en la URL para cargar ese tab directamente
+	const hash = window.location.hash;
+	if (hash) {
+		const tabId = hash.substring(1);
+		const $tabLink = $('a[href="' + hash + '"]');
+		
+		if ($tabLink.length > 0) {
+			const lazyLoad = $tabLink.data('lazy-load');
+			
+			// Activar el tab
+			$tabLink.tab('show');
+			
+			// Si necesita carga lazy, cargar el contenido
+			if (lazyLoad && !loadedTabs[lazyLoad]) {
+				setTimeout(function() {
+					loadTabContent(lazyLoad, tabId);
+				}, 100);
+			}
+		}
+	}
+	
+	console.log('Sistema de carga lazy para tabs inicializado');
+});
+</script>
+
 </body>
 </html>
