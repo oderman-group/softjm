@@ -5,20 +5,50 @@ $idPagina = 79;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
-$consultaCliente=$conexionBdPrincipal->query("SELECT * FROM cotizacion 
-INNER JOIN clientes ON cli_id=cotiz_cliente
-INNER JOIN contactos ON cont_id=cotiz_contacto
-WHERE cotiz_id='".$_GET["id"]."' AND cotiz_id_empresa='".$idEmpresa."'");
+
+// ========================================
+// CONSULTA PRINCIPAL OPTIMIZADA
+// ========================================
+// Solo traer campos necesarios en lugar de SELECT *
+$consultaCliente = $conexionBdPrincipal->query("
+	SELECT 
+		c.cotiz_id, c.cotiz_cliente, c.cotiz_contacto, c.cotiz_vendedor, c.cotiz_proveedor,
+		c.cotiz_sucursal, c.cotiz_fecha_propuesta, c.cotiz_fecha_vencimiento, c.cotiz_forma_pago,
+		c.cotiz_moneda, c.cotiz_observaciones, c.cotiz_envio, c.cotiz_ticket, c.cotiz_vendida,
+		c.cotiz_fecha_vendida, c.cotiz_ocultar_descuento_combo, c.cotiz_descuentos_especiales,
+		c.cotiz_es_precotizacion, c.cotiz_version, c.cotiz_ultima_modificacion, c.cotiz_creador,
+		cli.cli_id, cli.cli_nombre, cli.cli_categoria, cli.cli_ciudad, cli.cli_direccion,
+		cli.cli_telefono, cli.cli_celular, cli.cli_credito,
+		cont.cont_id, cont.cont_nombre, cont.cont_email
+	FROM cotizacion c
+	INNER JOIN clientes cli ON cli.cli_id = c.cotiz_cliente
+	INNER JOIN contactos cont ON cont.cont_id = c.cotiz_contacto
+	WHERE c.cotiz_id = '".$_GET["id"]."' AND c.cotiz_id_empresa = '".$idEmpresa."'
+	LIMIT 1
+");
 $resultadoD = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 
-if(isset($_GET["cte"])){
-	if(is_numeric($_GET["cte"])){
-		$cliente = $_GET["cte"]; 
-	}
+if (!$resultadoD) {
+	echo '<script>alert("Cotización no encontrada"); window.location.href="cotizaciones.php";</script>';
+	exit;
+}
+
+if(isset($_GET["cte"]) && is_numeric($_GET["cte"])){
+	$cliente = $_GET["cte"]; 
 }else{
 	$cliente = $resultadoD['cotiz_cliente'];
 }
 
+// Guardar info del cliente para uso posterior
+$clienteInfo = [
+	'cli_credito' => $resultadoD['cli_credito'],
+	'cli_ciudad' => $resultadoD['cli_ciudad'],
+	'cli_direccion' => $resultadoD['cli_direccion'],
+	'cli_telefono' => $resultadoD['cli_telefono'],
+	'cli_celular' => $resultadoD['cli_celular'],
+	'cli_nombre' => $resultadoD['cli_nombre'],
+	'cli_categoria' => $resultadoD['cli_categoria']
+];
 
 require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
@@ -28,6 +58,79 @@ require_once RUTA_PROYECTO.'/usuarios/class/Combo.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
 
 $ticketAsociado = Ticket::obtenerDatosTikcetPorIdCotizacion($resultadoD['cotiz_id'], $conexionBdPrincipal);
+
+// ========================================
+// CACHE DE CONSULTAS COMUNES
+// ========================================
+// Usuarios activos (usado 2 veces en la página)
+$usuariosActivos = [];
+$consultaUsuarios = $conexionBdPrincipal->query("
+	SELECT usr_id, usr_nombre, usr_email 
+	FROM usuarios 
+	WHERE usr_bloqueado != 1 AND usr_id_empresa = '".$idEmpresa."' 
+	ORDER BY usr_nombre
+");
+while($usr = mysqli_fetch_array($consultaUsuarios, MYSQLI_BOTH)){
+	$usuariosActivos[] = $usr;
+}
+
+// Sucursales del cliente
+$sucursales = [];
+$consultaSucursales = $conexionBdPrincipal->query("
+	SELECT sucu_id, sucu_nombre 
+	FROM sucursales 
+	WHERE sucu_cliente_principal = '".$cliente."'
+	ORDER BY sucu_nombre
+");
+while($sucu = mysqli_fetch_array($consultaSucursales, MYSQLI_BOTH)){
+	$sucursales[] = $sucu;
+}
+
+// Si no hay sucursales, crear automáticamente
+if(count($sucursales) == 0){
+	$conexionBdPrincipal->query("
+		INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)
+		VALUES('".$cliente."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')
+	");
+	// Recargar sucursales
+	$consultaSucursales = $conexionBdPrincipal->query("
+		SELECT sucu_id, sucu_nombre 
+		FROM sucursales 
+		WHERE sucu_cliente_principal = '".$cliente."'
+	");
+	while($sucu = mysqli_fetch_array($consultaSucursales, MYSQLI_BOTH)){
+		$sucursales[] = $sucu;
+	}
+}
+
+// Contactos del cliente
+$contactos = [];
+$consultaContactos = $conexionBdPrincipal->query("
+	SELECT cont_id, cont_nombre, cont_email 
+	FROM contactos 
+	WHERE cont_cliente_principal = '".$cliente."'
+	ORDER BY cont_nombre
+");
+while($cont = mysqli_fetch_array($consultaContactos, MYSQLI_BOTH)){
+	$contactos[] = $cont;
+}
+
+// Si no hay contactos, crear automáticamente
+if(count($contactos) == 0){
+	$conexionBdPrincipal->query("
+		INSERT INTO contactos(cont_nombre, cont_cliente_principal)
+		VALUES('Contacto principal (Automático)', '".$cliente."')
+	");
+	// Recargar contactos
+	$consultaContactos = $conexionBdPrincipal->query("
+		SELECT cont_id, cont_nombre, cont_email 
+		FROM contactos 
+		WHERE cont_cliente_principal = '".$cliente."'
+	");
+	while($cont = mysqli_fetch_array($consultaContactos, MYSQLI_BOTH)){
+		$contactos[] = $cont;
+	}
+}
 ?>
 
 <link href="css/chosen.css" rel="stylesheet">
@@ -66,6 +169,8 @@ include("includes/js-formularios.php");
 			var valor         = enviada.value;
 			var valorAnterior = enviada.getAttribute('data-valor-actual');
 			
+			// Mostrar overlay con mensaje específico
+			showAjaxOverlay('Actualizando producto...');
 			
 			$('#resp').empty().hide().html("Esperando...").show(1);
 			datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&tipoCliente="+(tipoCliente);
@@ -77,12 +182,20 @@ include("includes/js-formularios.php");
 					var response = JSON.parse(data);
 					if(response.success) {
 						$('#resp').empty().hide().html(response.message).show(1);
+						// Ocultar overlay con éxito
+						hideAjaxOverlay();
 					} else {
 						$('#resp').empty().hide().html('').show(1);
+						// Ocultar overlay y mostrar error
+						hideAjaxOverlay();
 						alert(response.message);
 						enviada.value = valorAnterior;
 					}
-
+				},
+				error: function() {
+					hideAjaxOverlay();
+					alert('Error al actualizar el producto');
+					enviada.value = valorAnterior;
 				}
 			});
 		}
@@ -93,6 +206,10 @@ include("includes/js-formularios.php");
 			var producto = enviada.name;
 			var proceso = 11;
 			var valor = enviada.value;
+			
+			// Mostrar overlay
+			showAjaxOverlay('Actualizando combo...');
+			
 			$('#resp').empty().hide().html("Esperando...").show(1);
 				datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo);
 					$.ajax({
@@ -101,6 +218,11 @@ include("includes/js-formularios.php");
 						data: datos,
 						success: function(data){
 						$('#resp').empty().hide().html(data).show(1);
+						hideAjaxOverlay();
+						},
+						error: function() {
+							hideAjaxOverlay();
+							alert('Error al actualizar el combo');
 						}
 					});
 		}	
@@ -110,6 +232,10 @@ include("includes/js-formularios.php");
 			var producto = enviada.name;
 			var proceso = 12;
 			var valor = enviada.value;
+			
+			// Mostrar overlay
+			showAjaxOverlay('Actualizando servicio...');
+			
 			$('#resp').empty().hide().html("Esperando...").show(1);
 				datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo);
 					$.ajax({
@@ -118,6 +244,11 @@ include("includes/js-formularios.php");
 						data: datos,
 						success: function(data){
 						$('#resp').empty().hide().html(data).show(1);
+						hideAjaxOverlay();
+						},
+						error: function() {
+							hideAjaxOverlay();
+							alert('Error al actualizar el servicio');
 						}
 					});
 		}
@@ -146,6 +277,310 @@ include("includes/js-formularios.php");
 ?>
 </head>
 <body>
+
+<!-- Overlay de carga inicial -->
+<div id="loading-overlay" class="loading-overlay-modern">
+	<div class="loading-content-modern">
+		<div class="spinner-modern"></div>
+		<h3 class="loading-text-modern">Cargando contenido...</h3>
+		<p class="loading-subtext-modern">Por favor espere un momento</p>
+	</div>
+</div>
+
+<!-- Overlay de operaciones AJAX -->
+<div id="ajax-overlay" class="ajax-overlay-modern" style="display: none;">
+	<div class="ajax-content-modern">
+		<div class="ajax-spinner-modern"></div>
+		<h4 class="ajax-text-modern" id="ajax-message">Procesando...</h4>
+		<p class="ajax-subtext-modern">Por favor no cierre esta ventana</p>
+	</div>
+</div>
+
+<style>
+/* Overlay de carga moderno */
+.loading-overlay-modern {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 9999;
+	transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loading-overlay-modern.hidden {
+	opacity: 0;
+	visibility: hidden;
+}
+
+.loading-content-modern {
+	text-align: center;
+	background: white;
+	padding: 40px 60px;
+	border-radius: 20px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+	animation: slideInUp 0.5s ease;
+}
+
+@keyframes slideInUp {
+	from {
+		transform: translateY(30px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+/* Spinner moderno */
+.spinner-modern {
+	width: 60px;
+	height: 60px;
+	margin: 0 auto 20px;
+	border: 4px solid #f3f3f3;
+	border-top: 4px solid #667eea;
+	border-right: 4px solid #764ba2;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+.loading-text-modern {
+	color: #333;
+	font-size: 24px;
+	font-weight: 600;
+	margin: 0 0 10px 0;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.loading-subtext-modern {
+	color: #666;
+	font-size: 14px;
+	margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.loading-content-modern {
+		padding: 30px 40px;
+		margin: 0 20px;
+	}
+	
+	.spinner-modern {
+		width: 50px;
+		height: 50px;
+	}
+	
+	.loading-text-modern {
+		font-size: 20px;
+	}
+	
+	.loading-subtext-modern {
+		font-size: 13px;
+	}
+}
+
+/* Estilos para carga lazy de tabs */
+.lazy-loading-tab {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 300px;
+	padding: 40px 20px;
+}
+
+.lazy-loading-spinner {
+	text-align: center;
+}
+
+.spinner-border {
+	width: 50px;
+	height: 50px;
+	margin: 0 auto 20px;
+	border: 4px solid #f3f3f3;
+	border-top: 4px solid #667eea;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+
+.lazy-loading-spinner p {
+	color: #666;
+	font-size: 16px;
+	margin: 0;
+	font-weight: 500;
+}
+
+.tab-loaded {
+	animation: fadeInTab 0.5s ease;
+}
+
+@keyframes fadeInTab {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Error state */
+.lazy-loading-error {
+	text-align: center;
+	padding: 40px 20px;
+}
+
+.lazy-loading-error i {
+	font-size: 48px;
+	color: #dc3545;
+	margin-bottom: 15px;
+}
+
+.lazy-loading-error p {
+	color: #666;
+	font-size: 16px;
+	margin: 10px 0;
+}
+
+.lazy-loading-error .btn {
+	margin-top: 15px;
+}
+
+/* ========================================
+   OVERLAY AJAX PARA OPERACIONES
+   ======================================== */
+.ajax-overlay-modern {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.7);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 10000; /* Mayor que el overlay de carga inicial */
+	transition: opacity 0.3s ease;
+}
+
+.ajax-overlay-modern.show {
+	display: flex;
+	animation: fadeIn 0.3s ease;
+}
+
+.ajax-overlay-modern.hide {
+	animation: fadeOut 0.3s ease;
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+	from { opacity: 1; }
+	to { opacity: 0; }
+}
+
+.ajax-content-modern {
+	text-align: center;
+	background: white;
+	padding: 35px 50px;
+	border-radius: 15px;
+	box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+	animation: slideInScale 0.4s ease;
+	min-width: 300px;
+}
+
+@keyframes slideInScale {
+	from {
+		transform: scale(0.8) translateY(20px);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1) translateY(0);
+		opacity: 1;
+	}
+}
+
+/* Spinner para AJAX */
+.ajax-spinner-modern {
+	width: 50px;
+	height: 50px;
+	margin: 0 auto 20px;
+	border: 4px solid #f3f3f3;
+	border-top: 4px solid #667eea;
+	border-right: 4px solid #764ba2;
+	border-radius: 50%;
+	animation: spin 0.8s linear infinite;
+}
+
+.ajax-text-modern {
+	color: #333;
+	font-size: 20px;
+	font-weight: 600;
+	margin: 0 0 8px 0;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.ajax-subtext-modern {
+	color: #666;
+	font-size: 13px;
+	margin: 0;
+}
+
+/* Variantes de mensajes */
+.ajax-content-modern.success {
+	border-top: 4px solid #28a745;
+}
+
+.ajax-content-modern.error {
+	border-top: 4px solid #dc3545;
+}
+
+.ajax-content-modern.warning {
+	border-top: 4px solid #ffc107;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.ajax-content-modern {
+		padding: 25px 35px;
+		margin: 0 20px;
+		min-width: 250px;
+	}
+	
+	.ajax-spinner-modern {
+		width: 40px;
+		height: 40px;
+	}
+	
+	.ajax-text-modern {
+		font-size: 18px;
+	}
+	
+	.ajax-subtext-modern {
+		font-size: 12px;
+	}
+}
+</style>
+
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
     
@@ -280,13 +715,13 @@ include("includes/js-formularios.php");
 			$versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultadoD['cotiz_version']);
 			?>
 
-			<ul class="nav nav-tabs" id="myTab1">
-				<li class="active"><a href="#cotizacion"><i class="icon-file-alt"></i> Información de la cotización</a></li>
-				<li><a href="#itemsCotizados"><i class="icon-list"></i> Items cotizados</a></li>
-				<li><a href="#enviarCotizacion"><i class="icon-envelope"></i> Enviar cotización por correo</a></li>
-				<li><a href="#cotizacionesAsociadas"><i class="icon-retweet"></i> Cotizaciones asociadas</a></li>
-				<li><a href="#seguimientos"><i class="icon-list-ol"></i> Seguimientos</a></li>
-			</ul>
+		<ul class="nav nav-tabs" id="myTab1">
+			<li class="active"><a href="#cotizacion" data-toggle="tab"><i class="icon-file-alt"></i> Información de la cotización</a></li>
+			<li><a href="#itemsCotizados" data-toggle="tab"><i class="icon-list"></i> Items cotizados</a></li>
+			<li><a href="#enviarCotizacion" data-toggle="tab"><i class="icon-envelope"></i> Enviar cotización por correo</a></li>
+			<li><a href="#cotizacionesAsociadas" data-toggle="tab" data-lazy-load="asociadas"><i class="icon-retweet"></i> Cotizaciones asociadas</a></li>
+			<li><a href="#seguimientos" data-toggle="tab" data-lazy-load="seguimientos"><i class="icon-list-ol"></i> Seguimientos</a></li>
+		</ul>
 
 			<div class="tab-content">
 				<div class="tab-pane active" id="cotizacion">
@@ -296,43 +731,48 @@ include("includes/js-formularios.php");
 								<div class="widget-head bondi-blue">
 									<h3> <?=$paginaActual['pag_nombre'];?> #<?=$resultadoD['cotiz_id'];?> <?=$versionActualCotizacion;?> <?php if (!empty($resultadoD['cotiz_ultima_modificacion'])) echo " - Ultima modificación: " . $resultadoD['cotiz_ultima_modificacion'];?></h3>
 								</div>
-								<div class="widget-container">
-									<form class="form-horizontal" method="post" action="bd_update/cotizaciones-actualizar.php">
-									<input type="hidden" name="id" id="id" value="<?=$_GET["id"];?>">
-									<input type="hidden" name="monedaActual" value="<?=$resultadoD['cotiz_moneda'];?>">
-										
-									<script type="application/javascript">
-											function clientes(datos){
-												id = datos.value;
-												idCotizacion = <?=$_GET["id"];?>;
-												datos = "idCotizacion="+(idCotizacion)+"&idCliente="+(id);
+							<div class="widget-container">
+								<!-- Mensaje de respuesta para guardado asíncrono -->
+								<div id="mensaje-guardado" style="display: none; margin-bottom: 15px;"></div>
+								
+								<form class="form-horizontal" method="post" action="bd_update/cotizaciones-actualizar.php" id="form-cotizacion-info">
+								<input type="hidden" name="id" id="id" value="<?=$_GET["id"];?>">
+								<input type="hidden" name="monedaActual" value="<?=$resultadoD['cotiz_moneda'];?>">
+									
+								<script type="application/javascript">
+										function clientes(datos){
+											id = datos.value;
+											idCotizacion = <?=$_GET["id"];?>;
+											datos = "idCotizacion="+(idCotizacion)+"&idCliente="+(id);
 
-												$.ajax({
-													type: "POST",
-													url: "ajax/ajax-cotizaciones-actualizar.php",
-													data: datos,
-													success: function(data) {
-														var response = JSON.parse(data);
-														if(response.success) {
-															location.href = "cotizaciones-editar.php?id="+idCotizacion+"&cte="+id+"#productos";
-														} else {
-															alert(response.message);
-														}
-
+											$.ajax({
+												type: "POST",
+												url: "ajax/ajax-cotizaciones-actualizar.php",
+												data: datos,
+												success: function(data) {
+													var response = JSON.parse(data);
+													if(response.success) {
+														location.href = "cotizaciones-editar.php?id="+idCotizacion+"&cte="+id+"#productos";
+													} else {
+														alert(response.message);
 													}
-												});
-												
-											}
-										</script>
-										
-										<div class="form-actions">
-											<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-											<?php
-											if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
-											?>
-											<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-											<?php }?>
-										</div>
+
+												}
+											});
+											
+										}
+									</script>
+									
+									<div class="form-actions">
+										<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+										<?php
+										if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
+										?>
+										<button type="button" id="btn-guardar-cambios" class="btn btn-info">
+											<i class="icon-save"></i> <span id="btn-text">Guardar cambios</span>
+										</button>
+										<?php }?>
+									</div>
 										
 
 										<?php if($configuracion['conf_proveedor_cotizacion'] == 1){?>
@@ -415,82 +855,63 @@ include("includes/js-formularios.php");
 									</div>
 									
 									<div class="control-group">
-											<label class="control-label">Sucursal</label>
-											<div class="controls">
-												<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="sucursal" required <?=$camposCotizacionDisabled;?>>
-													<option value=""></option>
-													<?php
-													$conOp = $conexionBdPrincipal->query("SELECT sucu_id, sucu_nombre FROM sucursales WHERE sucu_cliente_principal='".$cliente."'");
-													$numOp = $conOp->num_rows;
-													if($numOp==0){
-														//Crear automáticamente la sucursal
-														$conexionBdPrincipal->query("INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$cliente."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')");
-														
-														echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
-														exit();
-													}
-
-													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-														
-													?>
-														<option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_sucursal']==$resOp[0] || $numOp == 1){echo "selected";} echo $disabled; ?>><?=$resOp['sucu_nombre'];?></option>
-													<?php 
-													}
-													?>
-												</select>
-											</div>
-											<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-										<a href="clientes-sucursales.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver sucursales</a>
-											<?php } ?>
-									</div>
+										<label class="control-label">Sucursal</label>
+										<div class="controls">
+											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="sucursal" required <?=$camposCotizacionDisabled;?>>
+												<option value=""></option>
+												<?php
+												// Usar sucursales del cache
+												foreach($sucursales as $sucursal){
+												?>
+													<option value="<?=$sucursal['sucu_id'];?>" <?php if($resultadoD['cotiz_sucursal']==$sucursal['sucu_id'] || count($sucursales) == 1){echo "selected";} ?>><?=$sucursal['sucu_nombre'];?></option>
+												<?php 
+												}
+												?>
+											</select>
+										</div>
+										<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<a href="clientes-sucursales.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver sucursales</a>
+										<?php } ?>
+								</div>
 										
-										<div class="control-group">
-											<label class="control-label">Contacto</label>
-											<div class="controls">
-												<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required <?=$camposCotizacionDisabled;?>>
-													<option value=""></option>
-													<?php
-													$conOp = $conexionBdPrincipal->query("SELECT cont_id, cont_nombre, cont_email FROM contactos 
-													WHERE cont_cliente_principal='".$cliente."'");
-													$numOp = $conOp->num_rows;
-													if($numOp==0){
-														//Crear automáticamente el contacto
-														$conexionBdPrincipal->query("INSERT INTO contactos(cont_nombre, cont_cliente_principal)VALUES('Contacto principal (Automático)', '".$cliente."')");
-														
-														echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
-														exit();
-													}
-													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-													?>
-														<option value="<?=$resOp[0];?>" <?php if($resultadoD['cotiz_contacto']==$resOp[0] || $numOp == 1){echo "selected";}?>><?=strtoupper($resOp['cont_nombre'])." (".$resOp['cont_email'].")";?></option>
-													<?php
-													}
-													?>
-												</select>
-											</div>
-											<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-											<a href="clientes-contactos.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver contactos</a>
-											<?php } ?>
-									</div>	
+									<div class="control-group">
+										<label class="control-label">Contacto</label>
+										<div class="controls">
+											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required <?=$camposCotizacionDisabled;?>>
+												<option value=""></option>
+												<?php
+												// Usar contactos del cache
+												foreach($contactos as $contacto){
+												?>
+													<option value="<?=$contacto['cont_id'];?>" <?php if($resultadoD['cotiz_contacto']==$contacto['cont_id'] || count($contactos) == 1){echo "selected";}?>><?=strtoupper($contacto['cont_nombre'])." (".$contacto['cont_email'].")";?></option>
+												<?php
+												}
+												?>
+											</select>
+										</div>
+										<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+										<a href="clientes-contactos.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver contactos</a>
+										<?php } ?>
+								</div>
 									
 									</fieldset>
 										
-										<div class="control-group">
-											<label class="control-label">Usuario Influyente</label>
-											<div class="controls">
-												<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente" <?=$camposCotizacionDisabled;?>>
-													<option value=""></option>
-													<?php
-													$conOp = $conexionBdPrincipal->query("SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_bloqueado!=1 AND usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
-													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-													?>
-														<option value="<?=$resOp['usr_id'];?>" <?php if($resultadoD['cotiz_vendedor']==$resOp['usr_id']){echo "selected";}?>><?=strtoupper($resOp['usr_nombre'])." (".$resOp['usr_email'].")";?></option>
-													<?php
-													}
-													?>
-												</select>
-											</div>
-									</div>
+									<div class="control-group">
+										<label class="control-label">Usuario Influyente</label>
+										<div class="controls">
+											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="influyente" <?=$camposCotizacionDisabled;?>>
+												<option value=""></option>
+												<?php
+												// Usar usuarios del cache
+												foreach($usuariosActivos as $usuario){
+												?>
+													<option value="<?=$usuario['usr_id'];?>" <?php if($resultadoD['cotiz_vendedor']==$usuario['usr_id']){echo "selected";}?>><?=strtoupper($usuario['usr_nombre'])." (".$usuario['usr_email'].")";?></option>
+												<?php
+												}
+												?>
+											</select>
+										</div>
+								</div>
 									
 									<div class="control-group">
 											<label class="control-label">Fecha de la propuesta</label>
@@ -558,45 +979,53 @@ include("includes/js-formularios.php");
 											</div>
 									</div>	
 										
-										<div class="control-group">
-												<label class="control-label">Combos</label>
-												<div class="controls">
-													<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="combo[]" multiple id="combos-select" <?=$camposCotizacionDisabled;?>>
-														<option value=""></option>
-														<?php
-														$conOp = $conexionBdPrincipal->query("SELECT czpp_cotizacion, czpp_tipo, czpp_combo, combo_id, combo_nombre FROM cotizacion_productos
-														INNER JOIN combos ON combo_id=czpp_combo AND combo_id_empresa='".$idEmpresa."'
-														WHERE czpp_cotizacion='".$resultadoD['cotiz_id']."' AND czpp_tipo='".CZPP_TIPO_COTZ."'
-														ORDER BY combo_nombre");
-														while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-														?>
-															<option selected value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>
-														<?php
-														}
-														?>
-													</select>
-												</div>
-										</div>
-										
-										<div class="control-group">
-												<label class="control-label">Productos</label>
-												<div class="controls">
-													<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="producto[]" multiple id="product-select" <?=$camposCotizacionDisabled;?>>
+									<div class="control-group">
+											<label class="control-label">Combos</label>
+											<div class="controls">
+												<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="combo[]" multiple id="combos-select" <?=$camposCotizacionDisabled;?>>
+													<option value=""></option>
 													<?php
-														$consultaProductos = $conexionBdPrincipal->query("SELECT czpp_id, czpp_valor, czpp_cantidad, czpp_descuento, czpp_impuesto, czpp_orden, czpp_observacion, czpp_descuento_especial, czpp_aprobado_usuario, czpp_aprobado_fecha,prod_descuento2, prod_costo, prod_id, prod_nombre, prod_descripcion_corta, prod_utilidad, czpp_tipo FROM cotizacion_productos
-														INNER JOIN productos ON prod_id=czpp_producto AND prod_id_empresa='".$idEmpresa."'
-														WHERE czpp_cotizacion='" . $_GET["id"] . "' AND czpp_tipo=".CZPP_TIPO_COTZ."
-														ORDER BY prod_nombre");
-
-														while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
-														?>
-															<option selected value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
-														<?php
-															}
-														?>
-													</select>
-												</div>
+													// Consulta optimizada: solo campos necesarios, índice en czpp_cotizacion y czpp_tipo
+													$conOp = $conexionBdPrincipal->query("
+														SELECT cb.combo_id, cb.combo_nombre 
+														FROM cotizacion_productos cp
+														INNER JOIN combos cb ON cb.combo_id = cp.czpp_combo AND cb.combo_id_empresa = '".$idEmpresa."'
+														WHERE cp.czpp_cotizacion = '".$resultadoD['cotiz_id']."' AND cp.czpp_tipo = '".CZPP_TIPO_COTZ."'
+														ORDER BY cb.combo_nombre
+													");
+													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+													?>
+														<option selected value="<?=$resOp['combo_id'];?>"><?=$resOp['combo_nombre'];?></option>
+													<?php
+													}
+													?>
+												</select>
 											</div>
+									</div>
+										
+									<div class="control-group">
+											<label class="control-label">Productos</label>
+											<div class="controls">
+												<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="producto[]" multiple id="product-select" <?=$camposCotizacionDisabled;?>>
+												<?php
+													// Consulta optimizada: solo campos necesarios para el select
+													$consultaProductos = $conexionBdPrincipal->query("
+														SELECT p.prod_id, p.prod_nombre, cp.czpp_cantidad
+														FROM cotizacion_productos cp
+														INNER JOIN productos p ON p.prod_id = cp.czpp_producto AND p.prod_id_empresa = '".$idEmpresa."'
+														WHERE cp.czpp_cotizacion = '".$_GET["id"]."' AND cp.czpp_tipo = ".CZPP_TIPO_COTZ."
+														ORDER BY p.prod_nombre
+													");
+
+													while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
+													?>
+														<option selected value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
+													<?php
+														}
+													?>
+												</select>
+											</div>
+										</div>
 
 
 										<div class="control-group">
@@ -641,19 +1070,23 @@ include("includes/js-formularios.php");
 											</div>
 										</div>
 
-										<?php
-										$envio = $resultadoD['cotiz_envio'];
+									<?php
+									$envio = $resultadoD['cotiz_envio'];
 
-										if (empty($resultadoD['cotiz_ticket'])) {
-											$consultaTickets = $conexionBdPrincipal->query("SELECT * FROM clientes_tikets 
-											WHERE tik_cliente='".$resultadoD['cotiz_cliente']."'
+									if (empty($resultadoD['cotiz_ticket'])) {
+										// Consulta optimizada: solo campos necesarios para mostrar
+										$consultaTickets = $conexionBdPrincipal->query("
+											SELECT tik_id, tik_asunto, tik_fecha_creacion
+											FROM clientes_tikets 
+											WHERE tik_cliente = '".$resultadoD['cotiz_cliente']."'
 											AND tik_id_cotizacion IS NULL
 											AND tik_tipo_tiket = 1
 											AND tik_estado = 1
 											AND tik_tipo_negocio = 1
-											");
-											$numTickets = $consultaTickets->num_rows;
-										?>
+											ORDER BY tik_id DESC
+										");
+										$numTickets = $consultaTickets->num_rows;
+									?>
 
 											<div class="control-group">
 												<label class="control-label">Asociar a un ticket</label>
@@ -661,17 +1094,17 @@ include("includes/js-formularios.php");
 													<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="ticket" <?=$camposCotizacionDisabled;?>>
 														<option value="TICKET_AUTO">Deseo que el ticket se cree automáticamente</option>
 														<option value="NO_TICKET" selected>NO deseo asociar ningun ticket a esta cotización por el momento</option>
-														<?php
-														if ($numTickets > 0) {
-															echo '<optgroup label="Tickets disponibles">';
-															while ($resOp = mysqli_fetch_array($consultaTickets, MYSQLI_BOTH)) {
-														?>
-																<option value="<?=$resOp[0];?>"><?="Ticket # ".$resOp[0]." - ".strtoupper($resOp[1])." (".$resOp[3].")";?></option>
-														<?php
+													<?php
+													if ($numTickets > 0) {
+														echo '<optgroup label="Tickets disponibles">';
+														while ($resOp = mysqli_fetch_array($consultaTickets, MYSQLI_BOTH)) {
+													?>
+															<option value="<?=$resOp['tik_id'];?>"><?="Ticket # ".$resOp['tik_id']." - ".strtoupper($resOp['tik_asunto'])." (".$resOp['tik_fecha_creacion'].")";?></option>
+													<?php
+													}
+														echo '</optgroup>';
 														}
-															echo '</optgroup>';
-															}
-														?>
+													?>
 													</select>
 												</div>
 											</div>
@@ -679,127 +1112,130 @@ include("includes/js-formularios.php");
 											<input type="hidden" name="ticket" value="<?=$resultadoD['cotiz_ticket'];?>">
 										<?php }?>
 										
-									<div class="form-actions">
-											<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-											<?php
-											if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
-											?>
-											<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-											<?php }?>
-										</div>
-										
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- LISTADO DE LO QUE SE ESTÁ COTIZANDO -->	
-				<div class="tab-pane" id="itemsCotizados">
-					<div class="row-fluid">
-						<div class="span12">
-							
-							<span id="resp"></span>
-							
-							<div class="content-widgets light-gray" id="productos">
-								<div class="widget-head green">
-									<h3>PRODUCTOS</h3>
-								</div>
-								<div class="widget-container">
-									<p></p>
-									<table class="table table-striped table-bordered" id="data-table">
-									<thead>
-									<tr>
-										<th>No</th>
-										<th>Orden</th>
-										<th>Producto/Servicio</th>
-										<th>Cant.</th> 
-										<th>Valor Base</th>
-										<th>IVA</th>
-										<th>Dcto.</th>
-										<?php 
-										$colspan = 7;
-										if($resultadoD['cotiz_descuentos_especiales'] == 1){
-											$colspan = 8;
+								<div class="form-actions">
+										<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+										<?php
+										if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
 										?>
-										<th>Dcto. Especial</th>
+										<button type="button" id="btn-guardar-cambios-2" class="btn btn-info">
+											<i class="icon-save"></i> <span id="btn-text-2">Guardar cambios</span>
+										</button>
 										<?php }?>
-
-										<th>SUBTOTAL</th>
-									</tr>
-									</thead>
-									<tbody id="tableBody"></tbody>
-									<tfoot>
-										<tr style="font-weight: bold; font-size: 16px;">
-											<td style="text-align: right;" colspan="<?=$colspan;?>">SUBTOTAL</td>
-											<td id="subtotal">
-											<span class="moneda-simbolo">
-												<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-												<span class="valor-numerico"><?=!empty($subtotal) ? number_format($subtotal,0,",",".") : 0;?>
-												</span>
-											</td>
-										</tr>
-										<tr style="font-weight: bold; font-size: 16px;">
-											<td style="text-align: right;" colspan="<?=$colspan;?>">DESCUENTO</td>
-											<td id="totalDiscount"><span class="moneda-simbolo">
-												<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-												<span class="valor-numerico"><?=!empty($totalDescuento) ? number_format($envio,0,",",".") : 0;?>
-												</span></td>
-										</tr>
-										<tr style="font-weight: bold; font-size: 16px;">
-											<td style="text-align: right;" colspan="<?=$colspan;?>">IVA</td>
-											<td id="totalIva"><span class="moneda-simbolo">
-												<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-												<span class="valor-numerico"><?=!empty($totalIva) ? number_format($totalIva,0,",",".") : 0;?>
-												</span></td>
-										</tr>
-										<tr style="font-weight: bold; font-size: 16px;">
-											<td style="text-align: right;" colspan="<?=$colspan;?>">ENVÍO</td>
-											<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?php if(!empty($envio)) echo number_format($envio,0,",","."); else echo 0;?>
-												</td>
-										</tr>
-										<tr style="font-weight: bold; font-size: 16px;">
-											<td style="text-align: right;" colspan="<?=$colspan;?>">TOTAL NETO</td>
-											<td id="total"><span class="moneda-simbolo">
-												<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-												<span class="valor-numerico"><?=!empty($subtotal) ? number_format($subtotal,0,",",".") : 0;?>
-												</span></td>
-										</tr>
-									</tfoot>	
-										
-									</table>
-
-									<?php
-									if(Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
-
-										<p style="color: black; background-color: #d8ff0038; padding: 15px; font-weight: bold; font-size: 16px;">Esta cotización deja una utilidad aproximada de $<span id="utilidadTotal">0</span>
-									<?php }?>
-									
-									
-										<div class="form-actions">
-											
-											<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-											<?php
-											if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
-											?>
-											<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
-											<?php }?>
-											
-												
-											<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-											<div class="btn-group">
-												<a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir (Formato 1)</a>
-												<a href="reportes/formato-cotizacion-3_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-warning" target="_blank"><i class="icon-print"></i> Imprimir (Formato 2)</a>
-											</div>
-											<?php } ?>
-										</div>
+									</div>
 									</form>
 									
-								</div>
 							</div>
 						</div>
 					</div>
 				</div>
+			</div>
+
+		<!-- LISTADO DE LO QUE SE ESTÁ COTIZANDO -->	
+		<div class="tab-pane" id="itemsCotizados">
+			<div class="row-fluid">
+				<div class="span12">
+					
+					<span id="resp"></span>
+					
+					<div class="content-widgets light-gray" id="productos">
+						<div class="widget-head green">
+							<h3>PRODUCTOS</h3>
+						</div>
+						<div class="widget-container">
+							<p></p>
+							<table class="table table-striped table-bordered" id="data-table">
+							<thead>
+							<tr>
+								<th>No</th>
+								<th>Orden</th>
+								<th>Producto/Servicio</th>
+								<th>Cant.</th> 
+								<th>Valor Base</th>
+								<th>IVA</th>
+								<th>Dcto.</th>
+								<?php 
+								$colspan = 7;
+								if($resultadoD['cotiz_descuentos_especiales'] == 1){
+									$colspan = 8;
+								?>
+								<th>Dcto. Especial</th>
+								<?php }?>
+
+								<th>SUBTOTAL</th>
+							</tr>
+							</thead>
+							<tbody id="tableBody"></tbody>
+							<tfoot>
+								<tr style="font-weight: bold; font-size: 16px;">
+									<td style="text-align: right;" colspan="<?=$colspan;?>">SUBTOTAL</td>
+									<td id="subtotal">
+									<span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=!empty($subtotal) ? number_format($subtotal,0,",",".") : 0;?>
+										</span>
+									</td>
+								</tr>
+								<tr style="font-weight: bold; font-size: 16px;">
+									<td style="text-align: right;" colspan="<?=$colspan;?>">DESCUENTO</td>
+									<td id="totalDiscount"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=!empty($totalDescuento) ? number_format($envio,0,",",".") : 0;?>
+										</span></td>
+								</tr>
+								<tr style="font-weight: bold; font-size: 16px;">
+									<td style="text-align: right;" colspan="<?=$colspan;?>">IVA</td>
+									<td id="totalIva"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=!empty($totalIva) ? number_format($totalIva,0,",",".") : 0;?>
+										</span></td>
+								</tr>
+								<tr style="font-weight: bold; font-size: 16px;">
+									<td style="text-align: right;" colspan="<?=$colspan;?>">ENVÍO</td>
+									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?php if(!empty($envio)) echo number_format($envio,0,",","."); else echo 0;?>
+										</td>
+								</tr>
+								<tr style="font-weight: bold; font-size: 16px;">
+									<td style="text-align: right;" colspan="<?=$colspan;?>">TOTAL NETO</td>
+									<td id="total"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=!empty($subtotal) ? number_format($subtotal,0,",",".") : 0;?>
+										</span></td>
+								</tr>
+							</tfoot>	
+								
+							</table>
+
+							<?php
+							if(Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
+
+								<p style="color: black; background-color: #d8ff0038; padding: 15px; font-weight: bold; font-size: 16px;">Esta cotización deja una utilidad aproximada de $<span id="utilidadTotal">0</span>
+							<?php }?>
+							
+							
+								<div class="form-actions">
+									
+									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+									<?php
+									if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
+									?>
+									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+									<?php }?>
+									
+										
+									<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<div class="btn-group">
+										<a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir (Formato 1)</a>
+										<a href="reportes/formato-cotizacion-3_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-warning" target="_blank"><i class="icon-print"></i> Imprimir (Formato 2)</a>
+									</div>
+									<?php } ?>
+								</div>
+							</form>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
 				<div class="tab-pane" id="enviarCotizacion">
 					<div class="row-fluid">
@@ -860,43 +1296,23 @@ include("includes/js-formularios.php");
 					</div>
 				</div>
 
-				<div class="tab-pane" id="cotizacionesAsociadas">
-					<?php include("cotizaciones-relacionadas.php");?>
-				</div>
-
-				<div class="tab-pane" id="seguimientos">
-					<?php
-					$consulta = $conexionBdPrincipal->query("SELECT * FROM cliente_seguimiento
-					INNER JOIN clientes ON cli_id=cseg_cliente
-					INNER JOIN usuarios ON usr_id=cseg_usuario_responsable
-					INNER JOIN clientes_tikets ON tik_id=cseg_tiket AND tik_id_cotizacion = ".$resultadoD['cotiz_id']);
-					$no = 1;
-					?>
-					<div class="row-fluid">
-						<div class="span12">
-							<?php
-							while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
-								$rutaFoto = "files/fotos/".$res['usr_foto'];
-
-								if (!empty($res['usr_foto']) && file_exists($rutaFoto)) {
-									$foto = $rutaFoto;
-								} else {
-									$rutaFoto = "images/item-pic.png";
-								}
-							?>
-								<div class="media">
-									<a href="#" class="pull-left media-thumb">
-										<img src="<?=$rutaFoto;?>" width="34" height="34" alt="user">
-									</a>
-									<div class="media-body ">
-										<h4 class="media-heading"><?=$res['cseg_fecha_reporte'];?> - <?=$res['usr_nombre'];?></h4>
-										<p><?=$res['cseg_observacion'];?></p>
-									</div>
-								</div>
-							<?php }?>
-						</div>
+			<div class="tab-pane" id="cotizacionesAsociadas">
+				<div class="lazy-loading-tab">
+					<div class="lazy-loading-spinner">
+						<div class="spinner-border"></div>
+						<p>Cargando cotizaciones asociadas...</p>
 					</div>
 				</div>
+			</div>
+
+			<div class="tab-pane" id="seguimientos">
+				<div class="lazy-loading-tab">
+					<div class="lazy-loading-spinner">
+						<div class="spinner-border"></div>
+						<p>Cargando seguimientos...</p>
+					</div>
+				</div>
+			</div>
 
 			</div>
 
@@ -906,5 +1322,555 @@ include("includes/js-formularios.php");
 	<?php include("includes/pie.php");?>
 	<script src="js/Cotizaciones.js"></script>
 </div>
+
+<script>
+// Ocultar overlay cuando la página esté completamente cargada
+window.addEventListener('load', function() {
+	// Esperar un pequeño delay para que se vea el overlay
+	setTimeout(function() {
+		const overlay = document.getElementById('loading-overlay');
+		if (overlay) {
+			overlay.classList.add('hidden');
+			
+			// Remover el overlay del DOM después de la transición
+			setTimeout(function() {
+				overlay.style.display = 'none';
+			}, 500);
+		}
+	}, 300); // 300ms de delay para que el usuario vea el overlay brevemente
+});
+
+// También ocultar si jQuery está listo (para páginas con muchos AJAX)
+$(document).ready(function() {
+	// Este es un respaldo adicional
+	setTimeout(function() {
+		const overlay = document.getElementById('loading-overlay');
+		if (overlay && !overlay.classList.contains('hidden')) {
+			overlay.classList.add('hidden');
+			setTimeout(function() {
+				overlay.style.display = 'none';
+			}, 500);
+		}
+	}, 2000); // Timeout máximo de 2 segundos
+	
+	// ========================================
+	// SISTEMA DE CARGA LAZY PARA TABS
+	// ========================================
+	
+	// Objeto para controlar qué tabs ya se han cargado
+	const loadedTabs = {
+		asociadas: false,
+		seguimientos: false
+	};
+	
+	// ID de la cotización actual
+	const cotizacionId = <?=$_GET["id"];?>;
+	
+	/**
+	 * Función para cargar el contenido de un tab via AJAX
+	 */
+	function loadTabContent(tabType, tabId) {
+		// Si ya está cargado, no hacer nada
+		if (loadedTabs[tabType]) {
+			return;
+		}
+		
+		// Mapeo de tipos a URLs
+		const urls = {
+			'asociadas': 'ajax/cotizaciones-editar-asociadas.php',
+			'seguimientos': 'ajax/cotizaciones-editar-seguimientos.php'
+		};
+		
+		const url = urls[tabType];
+		
+		if (!url) {
+			console.error('Tipo de tab no reconocido:', tabType);
+			return;
+		}
+		
+		// Obtener el contenedor del tab
+		const $tabPane = $('#' + tabId);
+		
+		// Realizar la petición AJAX
+		$.ajax({
+			url: url,
+			type: 'GET',
+			data: { id: cotizacionId },
+			dataType: 'json',
+			beforeSend: function() {
+				console.log('Cargando contenido de tab:', tabType);
+			},
+			success: function(response) {
+				if (response.success) {
+					// Reemplazar el contenido del tab con el HTML recibido
+					$tabPane.html(response.html);
+					
+					// Agregar clase de animación
+					$tabPane.addClass('tab-loaded');
+					
+					// Marcar como cargado
+					loadedTabs[tabType] = true;
+					
+					console.log('Tab cargado exitosamente:', tabType);
+				} else {
+					// Mostrar error
+					showTabError($tabPane, response.message || 'Error al cargar el contenido', tabType, tabId);
+				}
+			},
+			error: function(xhr, status, error) {
+				console.error('Error al cargar tab:', tabType, error);
+				showTabError($tabPane, 'Error al cargar el contenido. Por favor, intente nuevamente.', tabType, tabId);
+			}
+		});
+	}
+	
+	/**
+	 * Función para mostrar un error en el tab
+	 */
+	function showTabError($tabPane, message, tabType, tabId) {
+		const errorHtml = `
+			<div class="lazy-loading-error">
+				<i class="icon-exclamation-sign"></i>
+				<p>${message}</p>
+				<button class="btn btn-primary" onclick="retryLoadTab('${tabType}', '${tabId}')">
+					<i class="icon-refresh"></i> Reintentar
+				</button>
+			</div>
+		`;
+		$tabPane.html(errorHtml);
+	}
+	
+	/**
+	 * Función global para reintentar la carga (llamada desde el HTML)
+	 */
+	window.retryLoadTab = function(tabType, tabId) {
+		// Resetear el estado de carga
+		loadedTabs[tabType] = false;
+		
+		// Mostrar el spinner nuevamente
+		const $tabPane = $('#' + tabId);
+		$tabPane.html(`
+			<div class="lazy-loading-tab">
+				<div class="lazy-loading-spinner">
+					<div class="spinner-border"></div>
+					<p>Cargando contenido...</p>
+				</div>
+			</div>
+		`);
+		
+		// Intentar cargar de nuevo
+		loadTabContent(tabType, tabId);
+	};
+	
+	/**
+	 * Evento cuando se cambia de tab
+	 */
+	$('a[data-toggle="tab"]').on('shown', function(e) {
+		const $target = $(e.target);
+		const lazyLoad = $target.data('lazy-load');
+		const tabId = $target.attr('href').substring(1); // Remover el #
+		
+		// Si tiene atributo data-lazy-load, cargar el contenido
+		if (lazyLoad && !loadedTabs[lazyLoad]) {
+			loadTabContent(lazyLoad, tabId);
+		}
+	});
+	
+	// Detectar si hay un hash en la URL para cargar ese tab directamente
+	const hash = window.location.hash;
+	if (hash) {
+		const tabId = hash.substring(1);
+		const $tabLink = $('a[href="' + hash + '"]');
+		
+		if ($tabLink.length > 0) {
+			const lazyLoad = $tabLink.data('lazy-load');
+			
+			// Activar el tab
+			$tabLink.tab('show');
+			
+			// Si necesita carga lazy, cargar el contenido
+			if (lazyLoad && !loadedTabs[lazyLoad]) {
+				setTimeout(function() {
+					loadTabContent(lazyLoad, tabId);
+				}, 100);
+			}
+		}
+	}
+	
+	console.log('Sistema de carga lazy para tabs inicializado');
+	
+	// ========================================
+	// GUARDADO ASÍNCRONO DEL FORMULARIO
+	// ========================================
+	
+	/**
+	 * Función para mostrar mensajes de respuesta
+	 */
+	function mostrarMensaje(tipo, mensaje) {
+		const $mensajeDiv = $('#mensaje-guardado');
+		let icono = '';
+		let alertClass = '';
+		
+		switch(tipo) {
+			case 'success':
+				alertClass = 'alert-success';
+				icono = '<i class="icon-ok-sign"></i>';
+				break;
+			case 'error':
+				alertClass = 'alert-danger';
+				icono = '<i class="icon-exclamation-sign"></i>';
+				break;
+			case 'warning':
+				alertClass = 'alert-warning';
+				icono = '<i class="icon-warning-sign"></i>';
+				break;
+			case 'info':
+				alertClass = 'alert-info';
+				icono = '<i class="icon-info-sign"></i>';
+				break;
+		}
+		
+		$mensajeDiv.html(`
+			<div class="alert ${alertClass}">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				${icono} <strong>${mensaje}</strong>
+			</div>
+		`).fadeIn();
+		
+		// Scroll suave hacia el mensaje
+		$('html, body').animate({
+			scrollTop: $mensajeDiv.offset().top - 100
+		}, 500);
+		
+		// Auto-ocultar después de 5 segundos
+		setTimeout(function() {
+			$mensajeDiv.fadeOut();
+		}, 5000);
+	}
+	
+	/**
+	 * Función para deshabilitar/habilitar botones
+	 */
+	function toggleBotones(disabled) {
+		$('#btn-guardar-cambios, #btn-guardar-cambios-2').prop('disabled', disabled);
+		
+		if(disabled) {
+			$('#btn-text, #btn-text-2').html('Guardando... <i class="icon-spinner icon-spin"></i>');
+		} else {
+			$('#btn-text, #btn-text-2').html('Guardar cambios');
+		}
+	}
+	
+	/**
+	 * Función para actualizar la fecha de última modificación en el header
+	 */
+	function actualizarFechaModificacion(fecha) {
+		const $header = $('.widget-head.bondi-blue h3');
+		const textoActual = $header.text();
+		
+		// Buscar si ya existe "Ultima modificación"
+		if(textoActual.indexOf('Ultima modificación') !== -1) {
+			// Reemplazar la fecha existente
+			const partes = textoActual.split(' - Ultima modificación:');
+			$header.text(partes[0] + ' - Ultima modificación: ' + fecha);
+		} else {
+			// Agregar la fecha por primera vez
+			$header.text(textoActual + ' - Ultima modificación: ' + fecha);
+		}
+		
+		// Efecto visual para indicar actualización
+		$header.fadeOut(200).fadeIn(200);
+	}
+	
+	/**
+	 * Manejador del click en los botones de guardar
+	 */
+	$('#btn-guardar-cambios, #btn-guardar-cambios-2').on('click', function(e) {
+		e.preventDefault();
+		
+		console.log('Iniciando guardado asíncrono...');
+		
+		// Obtener todos los datos del formulario
+		const formData = $('#form-cotizacion-info').serialize();
+		
+		// Deshabilitar botones durante el guardado
+		toggleBotones(true);
+		
+		// Ocultar mensaje anterior si existe
+		$('#mensaje-guardado').fadeOut();
+		
+		// Realizar petición AJAX
+		$.ajax({
+			url: 'ajax/cotizaciones-guardar-asincrono.php',
+			type: 'POST',
+			data: formData,
+			dataType: 'json',
+			success: function(response) {
+				console.log('Respuesta del servidor:', response);
+				
+				if(response.success) {
+					// Mostrar mensaje de éxito
+					mostrarMensaje('success', response.message);
+					
+					// Actualizar fecha de última modificación si viene en la respuesta
+					if(response.ultima_modificacion) {
+						actualizarFechaModificacion(response.ultima_modificacion);
+					}
+					
+					// Si es el cambio de cliente, recargar página (como antes)
+					if($('#form-cotizacion-info').data('cliente-cambiado')) {
+						setTimeout(function() {
+							location.reload();
+						}, 1500);
+					}
+				} else {
+					// Mostrar mensaje de error
+					mostrarMensaje('error', response.message || 'Error al guardar los cambios');
+				}
+			},
+			error: function(xhr, status, error) {
+				console.error('Error AJAX:', {xhr, status, error});
+				
+				let mensaje = 'Error al guardar los cambios';
+				
+				// Intentar obtener mensaje del servidor
+				try {
+					const response = JSON.parse(xhr.responseText);
+					if(response.message) {
+						mensaje = response.message;
+					}
+				} catch(e) {
+					console.error('Error parseando respuesta:', e);
+				}
+				
+				mostrarMensaje('error', mensaje);
+			},
+			complete: function() {
+				// Rehabilitar botones
+				toggleBotones(false);
+				console.log('Guardado completado');
+			}
+		});
+	});
+	
+	// Prevenir submit tradicional del formulario
+	$('#form-cotizacion-info').on('submit', function(e) {
+		e.preventDefault();
+		// Simular click en el botón para usar la misma lógica
+		$('#btn-guardar-cambios').trigger('click');
+		return false;
+	});
+	
+	console.log('Sistema de guardado asíncrono inicializado');
+});
+
+// ========================================
+// FUNCIONES GLOBALES PARA OVERLAY AJAX
+// ========================================
+
+/**
+ * Muestra el overlay de operaciones AJAX
+ * @param {string} mensaje - Mensaje a mostrar (opcional)
+ */
+function showAjaxOverlay(mensaje) {
+	const $overlay = $('#ajax-overlay');
+	const $messageElement = $('#ajax-message');
+	
+	// Establecer mensaje personalizado si se proporciona
+	if (mensaje) {
+		$messageElement.text(mensaje);
+	} else {
+		$messageElement.text('Procesando...');
+	}
+	
+	// Mostrar overlay con animación
+	$overlay.css('display', 'flex').addClass('show');
+	
+	// Prevenir scroll del body
+	$('body').css('overflow', 'hidden');
+	
+	console.log('Overlay AJAX mostrado:', mensaje);
+}
+
+/**
+ * Oculta el overlay de operaciones AJAX
+ * @param {number} delay - Delay en ms antes de ocultar (opcional)
+ */
+function hideAjaxOverlay(delay) {
+	const $overlay = $('#ajax-overlay');
+	
+	if (typeof delay === 'number' && delay > 0) {
+		setTimeout(function() {
+			ocultarOverlay();
+		}, delay);
+	} else {
+		ocultarOverlay();
+	}
+	
+	function ocultarOverlay() {
+		$overlay.removeClass('show').addClass('hide');
+		
+		// Después de la animación, ocultar completamente
+		setTimeout(function() {
+			$overlay.css('display', 'none').removeClass('hide');
+			// Restaurar scroll del body
+			$('body').css('overflow', '');
+		}, 300);
+		
+		console.log('Overlay AJAX ocultado');
+	}
+}
+
+/**
+ * Muestra el overlay con un mensaje de éxito y lo oculta automáticamente
+ * @param {string} mensaje - Mensaje de éxito
+ * @param {number} duration - Duración en ms (default: 1500)
+ */
+function showAjaxSuccess(mensaje, duration) {
+	const $overlay = $('#ajax-overlay');
+	const $content = $overlay.find('.ajax-content-modern');
+	const $messageElement = $('#ajax-message');
+	const $spinner = $overlay.find('.ajax-spinner-modern');
+	
+	// Cambiar a modo éxito
+	$content.addClass('success');
+	$spinner.hide();
+	$messageElement.html('<i class="icon-ok-sign"></i> ' + (mensaje || 'Operación exitosa'));
+	
+	// Mostrar overlay
+	$overlay.css('display', 'flex').addClass('show');
+	$('body').css('overflow', 'hidden');
+	
+	// Ocultar después del tiempo especificado
+	setTimeout(function() {
+		hideAjaxOverlay();
+		// Restaurar estado original
+		setTimeout(function() {
+			$content.removeClass('success');
+			$spinner.show();
+			$messageElement.text('Procesando...');
+		}, 400);
+	}, duration || 1500);
+}
+
+/**
+ * Muestra el overlay con un mensaje de error
+ * @param {string} mensaje - Mensaje de error
+ * @param {number} duration - Duración en ms (default: 2000)
+ */
+function showAjaxError(mensaje, duration) {
+	const $overlay = $('#ajax-overlay');
+	const $content = $overlay.find('.ajax-content-modern');
+	const $messageElement = $('#ajax-message');
+	const $spinner = $overlay.find('.ajax-spinner-modern');
+	
+	// Cambiar a modo error
+	$content.addClass('error');
+	$spinner.hide();
+	$messageElement.html('<i class="icon-exclamation-sign"></i> ' + (mensaje || 'Error en la operación'));
+	
+	// Mostrar overlay
+	$overlay.css('display', 'flex').addClass('show');
+	$('body').css('overflow', 'hidden');
+	
+	// Ocultar después del tiempo especificado
+	setTimeout(function() {
+		hideAjaxOverlay();
+		// Restaurar estado original
+		setTimeout(function() {
+			$content.removeClass('error');
+			$spinner.show();
+			$messageElement.text('Procesando...');
+		}, 400);
+	}, duration || 2000);
+}
+
+/**
+ * Interceptor global para todas las peticiones AJAX de jQuery
+ * (Opcional: comentar si causa conflictos)
+ */
+/*
+$(document).ajaxStart(function() {
+	// Solo mostrar si no hay overlay ya visible
+	if (!$('#ajax-overlay').is(':visible')) {
+		showAjaxOverlay('Procesando petición...');
+	}
+}).ajaxStop(function() {
+	hideAjaxOverlay(200);
+});
+*/
+
+console.log('Funciones de overlay AJAX inicializadas');
+</script>
+
+<!-- Estilos adicionales para el spinner -->
+<style>
+.icon-spin {
+	animation: icon-spin 1s infinite linear;
+}
+
+@keyframes icon-spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+#btn-guardar-cambios:disabled,
+#btn-guardar-cambios-2:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.alert {
+	position: relative;
+	padding: 15px;
+	margin-bottom: 20px;
+	border: 1px solid transparent;
+	border-radius: 4px;
+}
+
+.alert-success {
+	color: #3c763d;
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
+}
+
+.alert-danger {
+	color: #a94442;
+	background-color: #f2dede;
+	border-color: #ebccd1;
+}
+
+.alert-warning {
+	color: #8a6d3b;
+	background-color: #fcf8e3;
+	border-color: #faebcc;
+}
+
+.alert-info {
+	color: #31708f;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
+}
+
+.alert .close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	padding: 0;
+	cursor: pointer;
+	background: transparent;
+	border: 0;
+	font-size: 21px;
+	font-weight: bold;
+	line-height: 1;
+	color: #000;
+	opacity: 0.2;
+}
+
+.alert .close:hover {
+	opacity: 0.5;
+}
+</style>
+
 </body>
 </html>
