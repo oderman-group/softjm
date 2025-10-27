@@ -169,6 +169,8 @@ include("includes/js-formularios.php");
 			var valor         = enviada.value;
 			var valorAnterior = enviada.getAttribute('data-valor-actual');
 			
+			// Mostrar overlay con mensaje específico
+			showAjaxOverlay('Actualizando producto...');
 			
 			$('#resp').empty().hide().html("Esperando...").show(1);
 			datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&tipoCliente="+(tipoCliente);
@@ -180,12 +182,20 @@ include("includes/js-formularios.php");
 					var response = JSON.parse(data);
 					if(response.success) {
 						$('#resp').empty().hide().html(response.message).show(1);
+						// Ocultar overlay con éxito
+						hideAjaxOverlay();
 					} else {
 						$('#resp').empty().hide().html('').show(1);
+						// Ocultar overlay y mostrar error
+						hideAjaxOverlay();
 						alert(response.message);
 						enviada.value = valorAnterior;
 					}
-
+				},
+				error: function() {
+					hideAjaxOverlay();
+					alert('Error al actualizar el producto');
+					enviada.value = valorAnterior;
 				}
 			});
 		}
@@ -196,6 +206,10 @@ include("includes/js-formularios.php");
 			var producto = enviada.name;
 			var proceso = 11;
 			var valor = enviada.value;
+			
+			// Mostrar overlay
+			showAjaxOverlay('Actualizando combo...');
+			
 			$('#resp').empty().hide().html("Esperando...").show(1);
 				datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo);
 					$.ajax({
@@ -204,6 +218,11 @@ include("includes/js-formularios.php");
 						data: datos,
 						success: function(data){
 						$('#resp').empty().hide().html(data).show(1);
+						hideAjaxOverlay();
+						},
+						error: function() {
+							hideAjaxOverlay();
+							alert('Error al actualizar el combo');
 						}
 					});
 		}	
@@ -213,6 +232,10 @@ include("includes/js-formularios.php");
 			var producto = enviada.name;
 			var proceso = 12;
 			var valor = enviada.value;
+			
+			// Mostrar overlay
+			showAjaxOverlay('Actualizando servicio...');
+			
 			$('#resp').empty().hide().html("Esperando...").show(1);
 				datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo);
 					$.ajax({
@@ -221,6 +244,11 @@ include("includes/js-formularios.php");
 						data: datos,
 						success: function(data){
 						$('#resp').empty().hide().html(data).show(1);
+						hideAjaxOverlay();
+						},
+						error: function() {
+							hideAjaxOverlay();
+							alert('Error al actualizar el servicio');
 						}
 					});
 		}
@@ -250,12 +278,21 @@ include("includes/js-formularios.php");
 </head>
 <body>
 
-<!-- Overlay de carga -->
+<!-- Overlay de carga inicial -->
 <div id="loading-overlay" class="loading-overlay-modern">
 	<div class="loading-content-modern">
 		<div class="spinner-modern"></div>
 		<h3 class="loading-text-modern">Cargando contenido...</h3>
 		<p class="loading-subtext-modern">Por favor espere un momento</p>
+	</div>
+</div>
+
+<!-- Overlay de operaciones AJAX -->
+<div id="ajax-overlay" class="ajax-overlay-modern" style="display: none;">
+	<div class="ajax-content-modern">
+		<div class="ajax-spinner-modern"></div>
+		<h4 class="ajax-text-modern" id="ajax-message">Procesando...</h4>
+		<p class="ajax-subtext-modern">Por favor no cierre esta ventana</p>
 	</div>
 </div>
 
@@ -420,6 +457,127 @@ include("includes/js-formularios.php");
 
 .lazy-loading-error .btn {
 	margin-top: 15px;
+}
+
+/* ========================================
+   OVERLAY AJAX PARA OPERACIONES
+   ======================================== */
+.ajax-overlay-modern {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.7);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 10000; /* Mayor que el overlay de carga inicial */
+	transition: opacity 0.3s ease;
+}
+
+.ajax-overlay-modern.show {
+	display: flex;
+	animation: fadeIn 0.3s ease;
+}
+
+.ajax-overlay-modern.hide {
+	animation: fadeOut 0.3s ease;
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+	from { opacity: 1; }
+	to { opacity: 0; }
+}
+
+.ajax-content-modern {
+	text-align: center;
+	background: white;
+	padding: 35px 50px;
+	border-radius: 15px;
+	box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+	animation: slideInScale 0.4s ease;
+	min-width: 300px;
+}
+
+@keyframes slideInScale {
+	from {
+		transform: scale(0.8) translateY(20px);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1) translateY(0);
+		opacity: 1;
+	}
+}
+
+/* Spinner para AJAX */
+.ajax-spinner-modern {
+	width: 50px;
+	height: 50px;
+	margin: 0 auto 20px;
+	border: 4px solid #f3f3f3;
+	border-top: 4px solid #667eea;
+	border-right: 4px solid #764ba2;
+	border-radius: 50%;
+	animation: spin 0.8s linear infinite;
+}
+
+.ajax-text-modern {
+	color: #333;
+	font-size: 20px;
+	font-weight: 600;
+	margin: 0 0 8px 0;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.ajax-subtext-modern {
+	color: #666;
+	font-size: 13px;
+	margin: 0;
+}
+
+/* Variantes de mensajes */
+.ajax-content-modern.success {
+	border-top: 4px solid #28a745;
+}
+
+.ajax-content-modern.error {
+	border-top: 4px solid #dc3545;
+}
+
+.ajax-content-modern.warning {
+	border-top: 4px solid #ffc107;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.ajax-content-modern {
+		padding: 25px 35px;
+		margin: 0 20px;
+		min-width: 250px;
+	}
+	
+	.ajax-spinner-modern {
+		width: 40px;
+		height: 40px;
+	}
+	
+	.ajax-text-modern {
+		font-size: 18px;
+	}
+	
+	.ajax-subtext-modern {
+		font-size: 12px;
+	}
 }
 </style>
 
@@ -1505,6 +1663,144 @@ $(document).ready(function() {
 	
 	console.log('Sistema de guardado asíncrono inicializado');
 });
+
+// ========================================
+// FUNCIONES GLOBALES PARA OVERLAY AJAX
+// ========================================
+
+/**
+ * Muestra el overlay de operaciones AJAX
+ * @param {string} mensaje - Mensaje a mostrar (opcional)
+ */
+function showAjaxOverlay(mensaje) {
+	const $overlay = $('#ajax-overlay');
+	const $messageElement = $('#ajax-message');
+	
+	// Establecer mensaje personalizado si se proporciona
+	if (mensaje) {
+		$messageElement.text(mensaje);
+	} else {
+		$messageElement.text('Procesando...');
+	}
+	
+	// Mostrar overlay con animación
+	$overlay.css('display', 'flex').addClass('show');
+	
+	// Prevenir scroll del body
+	$('body').css('overflow', 'hidden');
+	
+	console.log('Overlay AJAX mostrado:', mensaje);
+}
+
+/**
+ * Oculta el overlay de operaciones AJAX
+ * @param {number} delay - Delay en ms antes de ocultar (opcional)
+ */
+function hideAjaxOverlay(delay) {
+	const $overlay = $('#ajax-overlay');
+	
+	if (typeof delay === 'number' && delay > 0) {
+		setTimeout(function() {
+			ocultarOverlay();
+		}, delay);
+	} else {
+		ocultarOverlay();
+	}
+	
+	function ocultarOverlay() {
+		$overlay.removeClass('show').addClass('hide');
+		
+		// Después de la animación, ocultar completamente
+		setTimeout(function() {
+			$overlay.css('display', 'none').removeClass('hide');
+			// Restaurar scroll del body
+			$('body').css('overflow', '');
+		}, 300);
+		
+		console.log('Overlay AJAX ocultado');
+	}
+}
+
+/**
+ * Muestra el overlay con un mensaje de éxito y lo oculta automáticamente
+ * @param {string} mensaje - Mensaje de éxito
+ * @param {number} duration - Duración en ms (default: 1500)
+ */
+function showAjaxSuccess(mensaje, duration) {
+	const $overlay = $('#ajax-overlay');
+	const $content = $overlay.find('.ajax-content-modern');
+	const $messageElement = $('#ajax-message');
+	const $spinner = $overlay.find('.ajax-spinner-modern');
+	
+	// Cambiar a modo éxito
+	$content.addClass('success');
+	$spinner.hide();
+	$messageElement.html('<i class="icon-ok-sign"></i> ' + (mensaje || 'Operación exitosa'));
+	
+	// Mostrar overlay
+	$overlay.css('display', 'flex').addClass('show');
+	$('body').css('overflow', 'hidden');
+	
+	// Ocultar después del tiempo especificado
+	setTimeout(function() {
+		hideAjaxOverlay();
+		// Restaurar estado original
+		setTimeout(function() {
+			$content.removeClass('success');
+			$spinner.show();
+			$messageElement.text('Procesando...');
+		}, 400);
+	}, duration || 1500);
+}
+
+/**
+ * Muestra el overlay con un mensaje de error
+ * @param {string} mensaje - Mensaje de error
+ * @param {number} duration - Duración en ms (default: 2000)
+ */
+function showAjaxError(mensaje, duration) {
+	const $overlay = $('#ajax-overlay');
+	const $content = $overlay.find('.ajax-content-modern');
+	const $messageElement = $('#ajax-message');
+	const $spinner = $overlay.find('.ajax-spinner-modern');
+	
+	// Cambiar a modo error
+	$content.addClass('error');
+	$spinner.hide();
+	$messageElement.html('<i class="icon-exclamation-sign"></i> ' + (mensaje || 'Error en la operación'));
+	
+	// Mostrar overlay
+	$overlay.css('display', 'flex').addClass('show');
+	$('body').css('overflow', 'hidden');
+	
+	// Ocultar después del tiempo especificado
+	setTimeout(function() {
+		hideAjaxOverlay();
+		// Restaurar estado original
+		setTimeout(function() {
+			$content.removeClass('error');
+			$spinner.show();
+			$messageElement.text('Procesando...');
+		}, 400);
+	}, duration || 2000);
+}
+
+/**
+ * Interceptor global para todas las peticiones AJAX de jQuery
+ * (Opcional: comentar si causa conflictos)
+ */
+/*
+$(document).ajaxStart(function() {
+	// Solo mostrar si no hay overlay ya visible
+	if (!$('#ajax-overlay').is(':visible')) {
+		showAjaxOverlay('Procesando petición...');
+	}
+}).ajaxStop(function() {
+	hideAjaxOverlay(200);
+});
+*/
+
+console.log('Funciones de overlay AJAX inicializadas');
 </script>
 
 <!-- Estilos adicionales para el spinner -->
