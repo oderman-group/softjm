@@ -454,13 +454,13 @@ include("includes/js-formularios.php");
 			$versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultadoD['cotiz_version']);
 			?>
 
-			<ul class="nav nav-tabs" id="myTab1">
-				<li class="active"><a href="#cotizacion" data-toggle="tab"><i class="icon-file-alt"></i> Información de la cotización</a></li>
-				<li><a href="#itemsCotizados" data-toggle="tab" data-lazy-load="items"><i class="icon-list"></i> Items cotizados</a></li>
-				<li><a href="#enviarCotizacion" data-toggle="tab"><i class="icon-envelope"></i> Enviar cotización por correo</a></li>
-				<li><a href="#cotizacionesAsociadas" data-toggle="tab" data-lazy-load="asociadas"><i class="icon-retweet"></i> Cotizaciones asociadas</a></li>
-				<li><a href="#seguimientos" data-toggle="tab" data-lazy-load="seguimientos"><i class="icon-list-ol"></i> Seguimientos</a></li>
-			</ul>
+		<ul class="nav nav-tabs" id="myTab1">
+			<li class="active"><a href="#cotizacion" data-toggle="tab"><i class="icon-file-alt"></i> Información de la cotización</a></li>
+			<li><a href="#itemsCotizados" data-toggle="tab"><i class="icon-list"></i> Items cotizados</a></li>
+			<li><a href="#enviarCotizacion" data-toggle="tab"><i class="icon-envelope"></i> Enviar cotización por correo</a></li>
+			<li><a href="#cotizacionesAsociadas" data-toggle="tab" data-lazy-load="asociadas"><i class="icon-retweet"></i> Cotizaciones asociadas</a></li>
+			<li><a href="#seguimientos" data-toggle="tab" data-lazy-load="seguimientos"><i class="icon-list-ol"></i> Seguimientos</a></li>
+		</ul>
 
 			<div class="tab-content">
 				<div class="tab-pane active" id="cotizacion">
@@ -868,15 +868,112 @@ include("includes/js-formularios.php");
 					</div>
 				</div>
 
-			<!-- LISTADO DE LO QUE SE ESTÁ COTIZANDO -->	
-			<div class="tab-pane" id="itemsCotizados">
-				<div class="lazy-loading-tab">
-					<div class="lazy-loading-spinner">
-						<div class="spinner-border"></div>
-						<p>Cargando items cotizados...</p>
+		<!-- LISTADO DE LO QUE SE ESTÁ COTIZANDO -->	
+		<div class="tab-pane" id="itemsCotizados">
+			<div class="row-fluid">
+				<div class="span12">
+					
+					<span id="resp"></span>
+					
+					<div class="content-widgets light-gray" id="productos">
+						<div class="widget-head green">
+							<h3>PRODUCTOS</h3>
+						</div>
+						<div class="widget-container">
+							<p></p>
+							<table class="table table-striped table-bordered" id="data-table">
+							<thead>
+							<tr>
+								<th>No</th>
+								<th>Orden</th>
+								<th>Producto/Servicio</th>
+								<th>Cant.</th> 
+								<th>Valor Base</th>
+								<th>IVA</th>
+								<th>Dcto.</th>
+								<?php 
+								$colspan = 7;
+								if($resultadoD['cotiz_descuentos_especiales'] == 1){
+									$colspan = 8;
+								?>
+								<th>Dcto. Especial</th>
+								<?php }?>
+
+								<th>SUBTOTAL</th>
+							</tr>
+							</thead>
+							<tbody id="tableBody"></tbody>
+							<tfoot>
+								<tr style="font-weight: bold; font-size: 16px;">
+									<td style="text-align: right;" colspan="<?=$colspan;?>">SUBTOTAL</td>
+									<td id="subtotal">
+									<span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=!empty($subtotal) ? number_format($subtotal,0,",",".") : 0;?>
+										</span>
+									</td>
+								</tr>
+								<tr style="font-weight: bold; font-size: 16px;">
+									<td style="text-align: right;" colspan="<?=$colspan;?>">DESCUENTO</td>
+									<td id="totalDiscount"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=!empty($totalDescuento) ? number_format($envio,0,",",".") : 0;?>
+										</span></td>
+								</tr>
+								<tr style="font-weight: bold; font-size: 16px;">
+									<td style="text-align: right;" colspan="<?=$colspan;?>">IVA</td>
+									<td id="totalIva"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=!empty($totalIva) ? number_format($totalIva,0,",",".") : 0;?>
+										</span></td>
+								</tr>
+								<tr style="font-weight: bold; font-size: 16px;">
+									<td style="text-align: right;" colspan="<?=$colspan;?>">ENVÍO</td>
+									<td><?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?><?php if(!empty($envio)) echo number_format($envio,0,",","."); else echo 0;?>
+										</td>
+								</tr>
+								<tr style="font-weight: bold; font-size: 16px;">
+									<td style="text-align: right;" colspan="<?=$colspan;?>">TOTAL NETO</td>
+									<td id="total"><span class="moneda-simbolo">
+										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
+										<span class="valor-numerico"><?=!empty($subtotal) ? number_format($subtotal,0,",",".") : 0;?>
+										</span></td>
+								</tr>
+							</tfoot>	
+								
+							</table>
+
+							<?php
+							if(Modulos::validarRol([394], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
+
+								<p style="color: black; background-color: #d8ff0038; padding: 15px; font-weight: bold; font-size: 16px;">Esta cotización deja una utilidad aproximada de $<span id="utilidadTotal">0</span>
+							<?php }?>
+							
+							
+								<div class="form-actions">
+									
+									<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+									<?php
+									if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
+									?>
+									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+									<?php }?>
+									
+										
+									<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<div class="btn-group">
+										<a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir (Formato 1)</a>
+										<a href="reportes/formato-cotizacion-3_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-warning" target="_blank"><i class="icon-print"></i> Imprimir (Formato 2)</a>
+									</div>
+									<?php } ?>
+								</div>
+							</form>
+							
+						</div>
 					</div>
 				</div>
 			</div>
+		</div>
 
 				<div class="tab-pane" id="enviarCotizacion">
 					<div class="row-fluid">
@@ -1000,7 +1097,6 @@ $(document).ready(function() {
 	
 	// Objeto para controlar qué tabs ya se han cargado
 	const loadedTabs = {
-		items: false,
 		asociadas: false,
 		seguimientos: false
 	};
@@ -1019,7 +1115,6 @@ $(document).ready(function() {
 		
 		// Mapeo de tipos a URLs
 		const urls = {
-			'items': 'ajax/cotizaciones-editar-items.php',
 			'asociadas': 'ajax/cotizaciones-editar-asociadas.php',
 			'seguimientos': 'ajax/cotizaciones-editar-seguimientos.php'
 		};
@@ -1055,17 +1150,6 @@ $(document).ready(function() {
 					loadedTabs[tabType] = true;
 					
 					console.log('Tab cargado exitosamente:', tabType);
-					
-					// Si es el tab de items, inicializar la funcionalidad de Cotizaciones.js
-					if (tabType === 'items') {
-						// Esperar un momento para que el DOM se actualice
-						setTimeout(function() {
-							// Verificar si existe la función de inicialización
-							if (typeof window.initCotizacionesTable === 'function') {
-								window.initCotizacionesTable();
-							}
-						}, 100);
-					}
 				} else {
 					// Mostrar error
 					showTabError($tabPane, response.message || 'Error al cargar el contenido', tabType, tabId);
