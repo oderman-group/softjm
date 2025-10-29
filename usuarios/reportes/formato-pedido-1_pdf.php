@@ -53,10 +53,10 @@ class MIPDF extends TCPDF {
                     <td width="50%" align="right">
                         <br><br>
                         <span style="font-weight: bold;font-size: 20;"> PEDIDO #' . $this->pedid_numero . '</span><br><br>
-                        <p class="mb-0" style="line-height:3px;margin:1px"><strong>Fecha del Pedido:</strong> ' . $this->pedid_fecha_propuesta . '</p>
-                        <p class="mb-0" style="line-height:3px;"><strong>Nit/C.C.:</strong> ' . $this->cli_usuario . '</p>
-                        <p class="mb-0" style="line-height:3px;"><strong>Cliente:</strong> ' . $this->cli_nombre . '</p>
-                        <p class="mb-0" style="line-height:3px;"><strong>Dirección Cliente:</strong> ' . $this->cli_direccion . '</p>
+                        <p class="mb-0" style="line-height:16px;margin:0 0 3px 0;"><strong>Fecha del Pedido:</strong> ' . $this->pedid_fecha_propuesta . '</p>
+                        <p class="mb-0" style="line-height:16px;margin:0 0 3px 0;"><strong>Nit/C.C.:</strong> ' . $this->cli_usuario . '</p>
+                        <p class="mb-0" style="line-height:16px;margin:0 0 3px 0;"><strong>Cliente:</strong> ' . $this->cli_nombre . '</p>
+                        <p class="mb-0" style="line-height:16px;margin:0 0 3px 0;"><strong>Dirección Cliente:</strong> ' . $this->cli_direccion . '</p>
                     </td>
                 </tr>
             </table>
