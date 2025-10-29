@@ -42,21 +42,21 @@ class MIPDF extends TCPDF {
     public function Header() {
 
         $html = '
-            <table width="100%" cellpadding="2">
+            <table width="100%" cellpadding="3" cellspacing="0">
                 <tr>
-                    <td width="50%" align="left">
+                    <td width="50%" align="left" valign="top">
                         <span ><img src="'. $this->ruta_imagen.'" width="109"></span><br>
                         <p class="mb-0" style="line-height:1px;"><strong>Nit:</strong> ' . $this->conf_nit . '</p>
                         <p class="mb-0" style="line-height:1px;"><strong>Teléfono:</strong> ' . $this->conf_telefono . '</p>
                         <p class="mb-0" style="line-height:1px;"><strong>Email:</strong> ' . $this->conf_email . '</p>
                     </td>
-                    <td width="50%" align="right">
-                        <br><br>
-                        <span style="font-weight: bold;font-size: 20;"> PEDIDO #' . $this->pedid_numero . '</span><br><br>
-                        <p class="mb-0" style="line-height:3px;margin:1px"><strong>Fecha del Pedido:</strong> ' . $this->pedid_fecha_propuesta . '</p>
-                        <p class="mb-0" style="line-height:3px;"><strong>Nit/C.C.:</strong> ' . $this->cli_usuario . '</p>
-                        <p class="mb-0" style="line-height:3px;"><strong>Cliente:</strong> ' . $this->cli_nombre . '</p>
-                        <p class="mb-0" style="line-height:3px;"><strong>Dirección Cliente:</strong> ' . $this->cli_direccion . '</p>
+                    <td width="50%" align="right" valign="top">
+                        <br>
+                        <span style="font-weight: bold;font-size: 20;"> PEDIDO #' . $this->pedid_numero . '</span><br>
+                        <p style="line-height:11px;margin:2px 0 1px 0;"><strong>Fecha del Pedido:</strong> ' . $this->pedid_fecha_propuesta . '</p>
+                        <p style="line-height:11px;margin:2px 0 1px 0;"><strong>Nit/C.C.:</strong> ' . $this->cli_usuario . '</p>
+                        <p style="line-height:11px;margin:2px 0 1px 0;"><strong>Cliente:</strong> ' . $this->cli_nombre . '</p>
+                        <p style="line-height:11px;margin:2px 0 1px 0;"><strong>Dirección Cliente:</strong> ' . $this->cli_direccion . '</p>
                     </td>
                 </tr>
             </table>
@@ -112,7 +112,7 @@ $pdf->ruta_imagen = RUTA_PROYECTO.'/usuarios/files/'.$configuracion['conf_logo']
 $pdf->SetCreator('Mi Aplicación');
 $pdf->SetTitle('Impresión de Pedido - #'.$datosPedido[Pedido::$primaryKey]);
 
-$pdf->SetMargins(15, 50, 15); // Espacio para encabezado
+$pdf->SetMargins(15, 55, 15); // Espacio para encabezado (aumentado de 50 a 55)
 $pdf->SetAutoPageBreak(TRUE, 30);
 $pdf->AddPage();
 
