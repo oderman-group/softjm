@@ -25,6 +25,16 @@ $predicado = [
 $consultaCliente = Cliente::Select($predicado);
 $datosCliente = mysqli_fetch_array($consultaCliente, MYSQLI_BOTH);
 
+//Vendedor
+$nombreVendedor = "No asignado";
+if (!empty($datosPedido['pedid_vendedor'])) {
+    $consultaVendedor = mysqli_query($conexionBdPrincipal, "SELECT usr_nombre FROM usuarios WHERE usr_id='" . $datosPedido['pedid_vendedor'] . "' AND usr_id_empresa='".$idEmpresa."'");
+    if ($consultaVendedor && mysqli_num_rows($consultaVendedor) > 0) {
+        $datosVendedor = mysqli_fetch_array($consultaVendedor, MYSQLI_BOTH);
+        $nombreVendedor = $datosVendedor['usr_nombre'];
+    }
+}
+
 class MIPDF extends TCPDF {
 
     public $conf_empresa;
@@ -38,6 +48,7 @@ class MIPDF extends TCPDF {
     public $cli_direccion;
     public $conf_web;
     public $ruta_imagen;
+    public $vendedor_nombre;
 
     public function Header() {
 
@@ -49,6 +60,8 @@ class MIPDF extends TCPDF {
                         <p class="mb-0" style="line-height:1px;"><strong>Nit:</strong> ' . $this->conf_nit . '</p>
                         <p class="mb-0" style="line-height:1px;"><strong>Teléfono:</strong> ' . $this->conf_telefono . '</p>
                         <p class="mb-0" style="line-height:1px;"><strong>Email:</strong> ' . $this->conf_email . '</p>
+                        <br>
+                        <p class="mb-0" style="line-height:1px;"><strong>Vendedor:</strong> ' . $this->vendedor_nombre . '</p>
                     </td>
                     <td width="50%" align="right" valign="top">
                         <br>
@@ -71,22 +84,24 @@ class MIPDF extends TCPDF {
     }
 
     public function Footer() {
-        $this->SetY(-25); // Posición desde el fondo
-        $this->SetFont('helvetica', '', 8);
+        $this->SetY(-30); // Posición desde el fondo
+        $this->SetFont('helvetica', '', 7);
 
         $html = '
         <hr style="color:#dee2e6;">
-        <table width="100%" cellpadding="0">            
+        <table width="100%" cellpadding="2">            
             <tr>
-                <td width="33%" align="left">
+                <td width="25%" align="left" valign="top">
                 </td>
-                <td width="34%" align="center">
-                   <p>¡Gracias por tu pedido!</p>
-                    <p>Visítanos en: ' . $this->conf_web . '</p>
+                <td width="50%" align="center" valign="top" style="line-height:1.3;">
+                   <strong style="font-size:8px;">¡Gracias por tu pedido!</strong><br>
+                   Visítanos en: ' . $this->conf_web . '<br>
+                   <br>
+                   <strong>Bancos a nombre de JMendoza Equipos SAS</strong><br>
+                   Banco Bogotá N°443028204 Cuenta Corriente<br>
+                   Bancolombia N°29895245284 Cuenta Corriente
                 </td>
-                <td width="33%" align="right">
-                    <p></p>
-                    <p></p>
+                <td width="25%" align="right" valign="top">
                     Pág. ' . $this->getAliasNumPage() . ' de ' . $this->getAliasNbPages() . '
                 </td>
             </tr>
@@ -108,12 +123,13 @@ $pdf->cli_usuario = $datosCliente['cli_usuario'];
 $pdf->cli_direccion = $datosCliente['cli_direccion'];
 $pdf->conf_web = $configuracion['conf_web'];
 $pdf->ruta_imagen = RUTA_PROYECTO.'/usuarios/files/'.$configuracion['conf_logo'];
+$pdf->vendedor_nombre = $nombreVendedor;
 
 $pdf->SetCreator('Mi Aplicación');
 $pdf->SetTitle('Impresión de Pedido - #'.$datosPedido[Pedido::$primaryKey]);
 
 $pdf->SetMargins(15, 55, 15); // Espacio para encabezado (aumentado de 50 a 55)
-$pdf->SetAutoPageBreak(TRUE, 30);
+$pdf->SetAutoPageBreak(TRUE, 35); // Espacio para footer con información bancaria
 $pdf->AddPage();
 
 // Estilos y encabezado de la tabla
