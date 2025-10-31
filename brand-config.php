@@ -25,8 +25,10 @@ define('BRAND_AUTHOR', BRAND_NAME . ' Team');
 // Copyright
 define('BRAND_COPYRIGHT', 'Copyright &copy; ' . date('Y') . ' ' . BRAND_NAME . '. Todos los derechos reservados.');
 
-// URLs del logo temporal (hasta que se cambie por el real)
-// Logo temporal profesional de un ERP moderno
-define('BRAND_LOGO_TEMP_URL', 'https://via.placeholder.com/200x60/667eea/ffffff?text=ELISAB+ERP');
+// Logo temporal usando ícono
+// En lugar de imagen, usaremos un ícono de Font Awesome
+define('USE_ICON_AS_LOGO', true);
+define('BRAND_LOGO_ICON', 'fas fa-chart-line'); // Ícono temporal para ERP
+define('BRAND_LOGO_TEMP_URL', 'usuarios/files/elisab-logo.png'); // Ruta del logo definitivo
 ?>
 

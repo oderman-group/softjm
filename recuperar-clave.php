@@ -555,7 +555,14 @@ include("brand-config.php");
 
       <!-- Brand Logo -->
       <div style="text-align: center; margin-bottom: 32px;">
-        <img src="<?= BRAND_LOGO_TEMP_URL ?>" alt="Logo <?= BRAND_NAME ?>" style="max-width: 200px; height: auto;">
+        <?php if(USE_ICON_AS_LOGO): ?>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+            <i class="<?= BRAND_LOGO_ICON ?>" style="font-size: 36px; color: #667eea;"></i>
+            <h2 style="font-size: 32px; font-weight: 800; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"><?= BRAND_NAME ?></h2>
+          </div>
+        <?php else: ?>
+          <img src="<?= BRAND_LOGO_TEMP_URL ?>" alt="Logo <?= BRAND_NAME ?>" style="max-width: 200px; height: auto;">
+        <?php endif; ?>
       </div>
 
       <!-- Recovery Form -->
