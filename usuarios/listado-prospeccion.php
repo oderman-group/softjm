@@ -1,6 +1,10 @@
 <?php
 include("sesion.php");
 
+$idPagina = 419;
+
+include("includes/verificar-paginas.php");
+
 // ================== Datos Clientes ==================
 function consultarClientes() {
     global $conexionBdPrincipal, $idEmpresa, $referenciaLlegada;
