@@ -179,11 +179,9 @@ if($extension == 'xlsx'){
 
 				$f++;
 
-				// Liberar el resultado solo si existe, no ha sido cerrado y tiene filas
-				// No intentar liberar si el objeto ya está cerrado o es null
-				if ($consultaProducto instanceof mysqli_result) {
-					@mysqli_free_result($consultaProducto);
-				}
+				// No es necesario liberar manualmente el resultado mysqli
+				// PHP lo hace automáticamente al final del script o cuando la variable se reasigna
+				// Intentar liberar manualmente causa errores cuando el resultado ya fue consumido con fetch
 			}
 			
 			$numeroProductosCreados = 0;
