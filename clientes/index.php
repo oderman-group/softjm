@@ -1,5 +1,6 @@
 <?php
 include("../conexion.php");
+include("../brand-config.php");
 
 $idSeguimiento = '';
 if(isset($_GET["idseg"]) and is_numeric($_GET["idseg"])){
@@ -13,8 +14,8 @@ $errorCode = isset($_GET['error']) ? $_GET['error'] : null;
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Portal de Clientes ORION - Acceso al área de clientes">
-  <title>ORION | Portal de Clientes</title>
+  <meta name="description" content="Portal de Clientes <?= BRAND_NAME ?> - Acceso al área de clientes">
+  <title><?= BRAND_NAME ?> | Portal de Clientes</title>
   
   <link rel="shortcut icon" href="../assets-login/images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -634,7 +635,7 @@ $errorCode = isset($_GET['error']) ? $_GET['error'] : null;
   <div class="login-container">
     <div class="login-form-panel">
       <div class="brand-logo">
-        <img src="../usuarios/files/orion-600.png" alt="Logo ORION">
+        <img src="<?= BRAND_LOGO_TEMP_URL ?>" alt="Logo <?= BRAND_NAME ?>" style="max-width: 200px; height: auto;">
       </div>
 
       <div class="client-badge">
@@ -782,7 +783,7 @@ $errorCode = isset($_GET['error']) ? $_GET['error'] : null;
         </div>
 
         <div class="info-footer">
-          <p>Copyright &copy; <?= date('Y'); ?> ORION. Todos los derechos reservados.</p>
+          <p><?= BRAND_COPYRIGHT ?></p>
         </div>
       </div>
     </div>

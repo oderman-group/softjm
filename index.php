@@ -1,5 +1,6 @@
 <?php
 include("conexion.php");
+include("brand-config.php");
 
 // Parámetros de la URL
 $idSeguimiento = '';
@@ -14,9 +15,9 @@ $errorCode = isset($_GET['error']) ? $_GET['error'] : null;
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Sistema ERP y CRM ORION - Acceso al panel de administración">
-  <meta name="author" content="ORION">
-  <title>ELISAB | Iniciar Sesión</title>
+  <meta name="description" content="<?= BRAND_DESCRIPTION ?>">
+  <meta name="author" content="<?= BRAND_AUTHOR ?>">
+  <title><?= BRAND_NAME ?> | Iniciar Sesión</title>
   
   <!-- Favicon -->
   <link rel="shortcut icon" href="assets-login/images/favicon.png" />
@@ -782,7 +783,7 @@ $errorCode = isset($_GET['error']) ? $_GET['error'] : null;
     <!-- Left Panel - Login Form -->
     <div class="login-form-panel">
       <div class="brand-logo">
-        <img src="usuarios/files/orion-600.png" alt="Logo ORION">
+        <img src="<?= BRAND_LOGO_TEMP_URL ?>" alt="Logo <?= BRAND_NAME ?>" style="max-width: 200px; height: auto;">
       </div>
 
       <!-- Error Messages -->
@@ -817,7 +818,7 @@ $errorCode = isset($_GET['error']) ? $_GET['error'] : null;
       <?php endif; ?>
 
       <div class="welcome-text">
-        <h1>¡Bienvenido a ELISAB!</h1>
+        <h1>¡Bienvenido a <?= BRAND_NAME ?>!</h1>
         <p>Inicia sesión para continuar</p>
       </div>
 
@@ -957,7 +958,7 @@ $errorCode = isset($_GET['error']) ? $_GET['error'] : null;
         </div>
 
         <div class="info-footer">
-          <p>Copyright &copy; <?= date('Y'); ?> ORION. Todos los derechos reservados.</p>
+          <p><?= BRAND_COPYRIGHT ?></p>
         </div>
       </div>
     </div>

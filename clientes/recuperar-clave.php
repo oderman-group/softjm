@@ -1,10 +1,13 @@
+<?php
+include("../brand-config.php");
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Recuperación de contraseña - Portal de Clientes ORION">
-  <title>ORION | Recuperar Contraseña - Clientes</title>
+  <meta name="description" content="Recuperación de contraseña - Portal de Clientes <?= BRAND_NAME ?>">
+  <title><?= BRAND_NAME ?> | Recuperar Contraseña - Clientes</title>
   
   <link rel="shortcut icon" href="../assets-login/images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -493,7 +496,7 @@
       </div>
 
       <div style="text-align: center; margin-bottom: 32px;">
-        <img src="../usuarios/files/orion-600.png" alt="Logo ORION" style="max-width: 160px; height: auto;">
+        <img src="<?= BRAND_LOGO_TEMP_URL ?>" alt="Logo <?= BRAND_NAME ?>" style="max-width: 200px; height: auto;">
       </div>
 
       <form id="recoveryForm">
