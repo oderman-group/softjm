@@ -179,13 +179,10 @@ if($extension == 'xlsx'){
 
 				$f++;
 
-				// Liberar el resultado solo si existe y no ha sido cerrado
-				if (isset($consultaProducto) && $consultaProducto instanceof mysqli_result) {
-					try {
-						mysqli_free_result($consultaProducto);
-					} catch (Exception $e) {
-						// El resultado ya fue liberado, ignorar el error
-					}
+				// Liberar el resultado solo si existe, no ha sido cerrado y tiene filas
+				// No intentar liberar si el objeto ya está cerrado o es null
+				if ($consultaProducto instanceof mysqli_result) {
+					@mysqli_free_result($consultaProducto);
 				}
 			}
 			
