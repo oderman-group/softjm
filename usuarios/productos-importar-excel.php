@@ -179,8 +179,14 @@ if($extension == 'xlsx'){
 
 				$f++;
 
-				//Libreramos el espacio en memoria del resultado de la consulta mysqli
-				mysqli_free_result($consultaProducto);
+				// Liberar el resultado solo si existe y no ha sido cerrado
+				if (isset($consultaProducto) && $consultaProducto instanceof mysqli_result) {
+					try {
+						mysqli_free_result($consultaProducto);
+					} catch (Exception $e) {
+						// El resultado ya fue liberado, ignorar el error
+					}
+				}
 			}
 			
 			$numeroProductosCreados = 0;
