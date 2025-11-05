@@ -204,7 +204,7 @@
 							<select data-placeholder="Escoja una opción..." class="chzn-select span12" tabindex="2" name="vendedor">
 								<option value="">Todos</option>
 								<?php
-								$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios");
+								$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_bloqueado != 1");
 								while($resOp = mysqli_fetch_array($conOp)){
 									?>
 									<option value="<?=$resOp[0];?>" <?php if(!empty($_GET['vendedor']) && $resOp[0] == $_GET["vendedor"]) echo "selected";?> ><?=$resOp['usr_nombre'];?></option>
@@ -221,7 +221,7 @@
 							<select data-placeholder="Escoja una opción..." class="chzn-select span12" tabindex="2" name="asesor">
 								<option value="">Todos</option>
 								<?php
-								$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios");
+								$conOp = mysqli_query($conexionBdPrincipal, "SELECT * FROM usuarios WHERE usr_bloqueado != 1");
 								while($resOp = mysqli_fetch_array($conOp)){
 									?>
 									<option value="<?=$resOp[0];?>" <?php if(!empty($_GET['asesor']) && $resOp[0] == $_GET["asesor"]) echo "selected";?> ><?=$resOp['usr_nombre'];?></option>
