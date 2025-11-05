@@ -215,7 +215,7 @@ $html = '
 				<th style="border: 1px solid #dee2e6;" scope="row" width="20px">'.$no.'</th>
 				<td style="border: 1px solid #dee2e6;text-align: justify;" width="255px">'.$descripcionCombo.'</td>
 				<td style="border: 1px solid #dee2e6;" width="40" align="right">'.$prod['czpp_cantidad'].'</td>
-				<td style="border: 1px solid #dee2e6;" width="80" align="right">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format($prod['czpp_valor'], 0, ',', '.').'</td>
+				<td style="border: 1px solid #dee2e6;" width="80" align="right">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ',', '.').'</td>
 				<td style="border: 1px solid #dee2e6;" width="40" align="right">'.$prod['czpp_impuesto'].'%</td>
 				<td style="border: 1px solid #dee2e6;" width="40" align="right">'.$prod['czpp_descuento'].'%</td>
 				<td style="border: 1px solid #dee2e6;" width="80" align="right">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format($valorTotal, 0, ',', '.').'</td>
@@ -251,7 +251,7 @@ $html = '
 				<th style="border: 1px solid #dee2e6;" scope="row" width="20px">'.$no.'</th>
 				<td style="border: 1px solid #dee2e6;text-align: justify;" width="255px">'.$descripcionCombo.'</td>
 				<td style="border: 1px solid #dee2e6;" width="40" align="right">'.$prod['czpp_cantidad'].'</td>
-				<td style="border: 1px solid #dee2e6;" width="80" align="right">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format($prod['czpp_valor'], 0, ',', '.').'</td>
+				<td style="border: 1px solid #dee2e6;" width="80" align="right">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ',', '.').'</td>
 				<td style="border: 1px solid #dee2e6;" width="40" align="right">'.$prod['czpp_impuesto'].'%</td>
 				<td style="border: 1px solid #dee2e6;" width="40" align="right">'.$prod['czpp_descuento'].'%</td>
 				<td style="border: 1px solid #dee2e6;" width="80" align="right">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format($valorTotal, 0, ',', '.').'</td>
@@ -281,7 +281,7 @@ $html = '
 				<th style="border: 1px solid #dee2e6;" scope="row" width="20px">'.$no.'</th>
 				<td style="border: 1px solid #dee2e6;" width="255px">'.$descripcionCombo.'</td>
 				<td style="border: 1px solid #dee2e6;" width="40" align="right">'.$prod['czpp_cantidad'].'</td>
-				<td style="border: 1px solid #dee2e6;" width="80" align="right">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format($prod['czpp_valor'], 0, ',', '.').'</td>
+				<td style="border: 1px solid #dee2e6;" width="80" align="right">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ',', '.').'</td>
 				<td style="border: 1px solid #dee2e6;" width="40" align="right">'.$prod['czpp_impuesto'].'%</td>
 				<td style="border: 1px solid #dee2e6;" width="40" align="right">'.$prod['czpp_descuento'].'%</td>
 				<td style="border: 1px solid #dee2e6;" width="80" align="right">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format($valorTotal, 0, ',', '.').'</td>

@@ -130,7 +130,8 @@ $total = number_format($resultado['cotiz_valor'] + ($resultado['cotiz_valor'] * 
 							$dcto = 0;
 							$valorTotal = 0;
 
-							$valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
+							$valor_numerico = (float) str_replace(',', '.', $prod['czpp_valor']);
+							$valorTotal = ($valor_numerico * $prod['czpp_cantidad']);
 
 							if ($prod['czpp_cantidad'] > 0 and $prod['czpp_descuento'] > 0) {
 								$dcto = ($valorTotal * ($prod['czpp_descuento'] / 100));
@@ -190,7 +191,7 @@ $total = number_format($resultado['cotiz_valor'] + ($resultado['cotiz_valor'] * 
 									<span style="font-size: 9px; color: darkblue;"><?= $prod['czpp_observacion']; ?></span>
 								</td>
 								<td align="center" class="alinear"><?= $prod['czpp_cantidad']; ?></td>
-								<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format($prod['czpp_valor'], 0, ",", "."); ?></td>
+								<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ",", "."); ?></td>
 								<td align="center" class="alinear"><?= $prod['czpp_impuesto']; ?>%</td>
 								<td align="center" class="alinear">
 									<?= $prod['czpp_descuento']; ?>% <br>
@@ -220,7 +221,8 @@ $total = number_format($resultado['cotiz_valor'] + ($resultado['cotiz_valor'] * 
 							$dcto = 0;
 							$valorTotal = 0;
 
-							$valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
+							$valor_numerico = (float) str_replace(',', '.', $prod['czpp_valor']);
+							$valorTotal = ($valor_numerico * $prod['czpp_cantidad']);
 
 							if ($prod['czpp_cantidad'] > 0 and $prod['czpp_descuento'] > 0) {
 								$dcto = ($valorTotal * ($prod['czpp_descuento'] / 100));
@@ -254,7 +256,7 @@ $total = number_format($resultado['cotiz_valor'] + ($resultado['cotiz_valor'] * 
 									<span style="font-size: 9px; color: darkblue;"><?= $prod['czpp_observacion']; ?></span>
 								</td>
 								<td align="center" class="alinear"><?= $prod['czpp_cantidad']; ?></td>
-								<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format($prod['czpp_valor'], 0, ",", "."); ?></td>
+								<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ",", "."); ?></td>
 								<td align="center" class="alinear"><?= $prod['czpp_impuesto']; ?>%</td>
 								<td align="center" class="alinear">
 									<?= $prod['czpp_descuento']; ?>%<br>
@@ -282,7 +284,8 @@ $total = number_format($resultado['cotiz_valor'] + ($resultado['cotiz_valor'] * 
 							$dcto = 0;
 							$valorTotal = 0;
 
-							$valorTotal = ($prod['czpp_valor'] * $prod['czpp_cantidad']);
+							$valor_numerico = (float) str_replace(',', '.', $prod['czpp_valor']);
+							$valorTotal = ($valor_numerico * $prod['czpp_cantidad']);
 
 							if ($prod['czpp_cantidad'] > 0 and $prod['czpp_descuento'] > 0) {
 								$dcto = ($valorTotal * ($prod['czpp_descuento'] / 100));
@@ -310,7 +313,7 @@ $total = number_format($resultado['cotiz_valor'] + ($resultado['cotiz_valor'] * 
 									<span style="font-size: 9px; color: darkblue;"><?= $prod['czpp_observacion']; ?></span>
 								</td>
 								<td align="center" class="alinear"><?= $prod['czpp_cantidad']; ?></td>
-								<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format($prod['czpp_valor'], 0, ",", "."); ?></td>
+								<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ",", "."); ?></td>
 								<td align="center" class="alinear"><?= $prod['czpp_impuesto']; ?>%</td>
 								<td align="center" class="alinear"><?= $prod['czpp_descuento']; ?>%</td>
 								<td align="right" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format($valorTotal, 0, ",", "."); ?></td>

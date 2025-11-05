@@ -3,7 +3,8 @@ $dcto = 0;
 $valorTotal = 0;
 
 if($prod['czpp_valor']!=''){
-	$valorTotal = $prod['czpp_valor'] * $prod['czpp_cantidad'];
+	$valor_numerico = (float) str_replace(',', '.', $prod['czpp_valor']);
+	$valorTotal = $valor_numerico * $prod['czpp_cantidad'];
 }else{
 	$valorTotal = 0 * $prod['czpp_cantidad'];
 }
