@@ -175,7 +175,7 @@ $html = '
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="5%">'.$no.'</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px;" width="50%">'.$descripcionCombo.'</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="10%">'.$prod['czpp_cantidad'].'</td>
-				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: right;" width="15%">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format($prod['czpp_valor'], 0, ',', '.').'</td>
+				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: right;" width="15%">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ',', '.').'</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="10%">'.$prod['czpp_impuesto'].'%</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="10%">'.$prod['czpp_descuento'].'%</td>
 			</tr>';
@@ -210,7 +210,7 @@ $html = '
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="5%">'.$no.'</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px;" width="50%">'.$descripcionCombo.'</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="10%">'.$prod['czpp_cantidad'].'</td>
-				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: right;" width="15%">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format($prod['czpp_valor'], 0, ',', '.').'</td>
+				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: right;" width="15%">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ',', '.').'</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="10%">'.$prod['czpp_impuesto'].'%</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="10%">'.$prod['czpp_descuento'].'%</td>
 			</tr>';
@@ -245,7 +245,7 @@ $html = '
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="5%">'.$no.'</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px;" width="50%">'.$descripcionCombo.'</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="10%">'.$prod['czpp_cantidad'].'</td>
-				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: right;" width="15%">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format($prod['czpp_valor'], 0, ',', '.').'</td>
+				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: right;" width="15%">'.$simbolosMonedas[$resultado['cotiz_moneda']].number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ',', '.').'</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="10%">'.$prod['czpp_impuesto'].'%</td>
 				<td style="border: 1px solid #000; padding: 5px; font-size: 9px; text-align: center;" width="10%">'.$prod['czpp_descuento'].'%</td>
 			</tr>';

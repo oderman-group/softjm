@@ -182,7 +182,7 @@ $versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultado['coti
 									</td>
 
 									<td align="center" class="alinear"><?= $prod['czpp_cantidad']; ?></td>
-									<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format($prod['czpp_valor'], 0, ",", "."); ?></td>
+									<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ",", "."); ?></td>
 									<td align="center" class="alinear"><?= $prod['czpp_impuesto']; ?>%</td>
 									<td align="center" class="alinear">
 										<?= $prod['czpp_descuento']; ?>% <br>
@@ -223,7 +223,7 @@ $versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultado['coti
 										<span style="font-size: 9px; color: #0033a0;"><?= $prod['czpp_observacion']; ?></span>
 									</td>
 									<td align="center" class="alinear"><?= $prod['czpp_cantidad']; ?></td>
-									<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format($prod['czpp_valor'], 0, ",", "."); ?></td>
+									<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ",", "."); ?></td>
 									<td align="center" class="alinear"><?= $prod['czpp_impuesto']; ?>%</td>
 									<td align="center" class="alinear">
 										<?= $prod['czpp_descuento']; ?>%<br>
@@ -257,7 +257,7 @@ $versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultado['coti
 										<span style="font-size: 9px; color: darkblue;"><?= $prod['czpp_observacion']; ?></span>
 									</td>
 									<td align="center" class="alinear"><?= $prod['czpp_cantidad']; ?></td>
-									<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format($prod['czpp_valor'], 0, ",", "."); ?></td>
+									<td align="center" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format(floatval(str_replace(',', '.', $prod['czpp_valor'])), 0, ",", "."); ?></td>
 									<td align="center" class="alinear"><?= $prod['czpp_impuesto']; ?>%</td>
 									<td align="center" class="alinear"><?= $prod['czpp_descuento']; ?>%</td>
 									<td align="right" class="alinear"><?= $simbolosMonedas[$resultado['cotiz_moneda']]; ?><?= number_format($valorTotal, 0, ",", "."); ?></td>
