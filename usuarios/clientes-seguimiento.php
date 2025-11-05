@@ -1165,7 +1165,7 @@ if(!empty($_GET["idTK"])){
                                 <select name="usuario_resp">
                                     <option value="">Todos los usuarios</option>
                                     <?php
-                                    $consultaUsuarios = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id_empresa='".$idEmpresa."' ORDER BY usr_nombre");
+                                    $consultaUsuarios = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id_empresa='".$idEmpresa."' AND usr_bloqueado != 1 ORDER BY usr_nombre");
                                     while($usuario = mysqli_fetch_array($consultaUsuarios, MYSQLI_BOTH)){
                                         $selected = (isset($_GET["usuario_resp"]) && $_GET["usuario_resp"]==$usuario['usr_id']) ? "selected" : "";
                                         echo '<option value="'.$usuario['usr_id'].'" '.$selected.'>'.$usuario['usr_nombre'].'</option>';

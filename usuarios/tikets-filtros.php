@@ -82,7 +82,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="usuarioR">
 											<option value="">Todos</option>
                                             <?php
-											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios");
+											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_bloqueado != 1");
 											while($resOp = mysqli_fetch_array($conOp)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp['usr_nombre'];?></option>
