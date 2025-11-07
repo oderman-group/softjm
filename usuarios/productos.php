@@ -8,10 +8,11 @@ $pk = 'prod_id';
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
+require_once RUTA_PROYECTO . '/usuarios/class/Producto.php';
 ?>
 <!-- styles -->
 <link href="css/tablecloth.css" rel="stylesheet">
+<link href="css/loader-custom.css" rel="stylesheet">
 <!--============j avascript===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -25,6 +26,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 <script src="js/custom.js"></script>
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript">
 	$(function() {
 		$('#data-table').dataTable({
@@ -59,10 +61,10 @@ require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 
 <script type="text/javascript">
 	function productos(enviada) {
-		var campo    = enviada.title;
+		var campo = enviada.title;
 		var producto = enviada.name;
-		var proceso  = 1;
-		var valor    = enviada.value;
+		var proceso = 1;
+		var valor = enviada.value;
 
 		var costo;
 		var utilidad;
@@ -70,22 +72,22 @@ require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 		var precioNuevoIva;
 		var precioNuevoUSD;
 
-		const descuentoDealer          = document.getElementById("descuentoDealer" + producto).value;
+		const descuentoDealer = document.getElementById("descuentoDealer" + producto).value;
 		const descuentoDealerSobreCien = (descuentoDealer / 100);
-		const descuentoWeb             = document.getElementById("dctoWeb" + producto).value;
-		const descuentoWebSobreCien    = (descuentoWeb / 100);       
-		const utilidadActual           = document.getElementById("utilidad" + producto).value;
-		const utilidadSobreCien        = (utilidadActual / 100);
-		const costoActual              = document.getElementById("costo" + producto).value;
-		const costoActualUSD           = document.getElementById("costoUSD" + producto).value;
+		const descuentoWeb = document.getElementById("dctoWeb" + producto).value;
+		const descuentoWebSobreCien = (descuentoWeb / 100);
+		const utilidadActual = document.getElementById("utilidad" + producto).value;
+		const utilidadSobreCien = (utilidadActual / 100);
+		const costoActual = document.getElementById("costo" + producto).value;
+		const costoActualUSD = document.getElementById("costoUSD" + producto).value;
 
-		precioNuevo        = Math.round(parseFloat(costoActual) / (1 - parseFloat(utilidadSobreCien)));
-		precioNuevoIva     = Math.round(parseFloat(precioNuevo) + (parseFloat(precioNuevo) * 0.19));
+		precioNuevo = Math.round(parseFloat(costoActual) / (1 - parseFloat(utilidadSobreCien)));
+		precioNuevoIva = Math.round(parseFloat(precioNuevo) + (parseFloat(precioNuevo) * 0.19));
 
-		precioNuevoUSD     = Math.round(parseFloat(costoActualUSD) / (1 - parseFloat(utilidadSobreCien)));
+		precioNuevoUSD = Math.round(parseFloat(costoActualUSD) / (1 - parseFloat(utilidadSobreCien)));
 
 		const precioDealer = Math.round(precioNuevo - (precioNuevo * descuentoDealerSobreCien));
-		const precioWeb    = Math.round(precioNuevo - (precioNuevo * descuentoWebSobreCien));
+		const precioWeb = Math.round(precioNuevo - (precioNuevo * descuentoWebSobreCien));
 
 		if (campo == 'prod_utilidad' || campo == 'prod_costo') {
 			document.getElementById("precioDealer" + producto).innerHTML = "$" + precioDealer.toLocaleString();
@@ -222,10 +224,48 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 }
 ?>
 
-
 </head>
 
 <body>
+	<div id="loaderGlobal" class="section_loader">
+		<div class="loader_custom">
+			<div class="loader_1"></div>
+		</div>
+	</div>
+	<div>
+		<!-- modal para mostrar la pagina con la que interactuara el usuario -->
+		<div id="modalPagesMeta" class="modal hide fade">
+			<div class="modal-header" style="background-color: white;">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h3 style="color: black; font-size: 16px;">Selecciona la Página a autorizar</h3>
+			</div>
+			<div class="modal-body" style="background-color: white;">
+				<div id="pages_container" class="mt-6 border-t pt-4 border-gray-200">
+					<!-- Aquí aparece el selector de páginas si se requiere la autenticación -->
+				</div>
+			</div>
+			<div class="modal-footer" style="background-color: white;">
+				<a href="#" class="btn" data-dismiss="modal">Cerrar</a>
+			</div>
+		</div>
+
+		<!-- modal para incluir el texto descriptivo antes de subir el post -->
+		<div id="modalDescrptionMeta" class="modal hide fade">
+			<div class="modal-header" style="background-color: white;">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h3 style="color: black; font-size: 16px;">Subida del POST</h3>
+			</div>
+			<div class="modal-body" style="background-color: white;">
+				<h3 style="color: black; font-size: 14px;">Mensaje del Post (Editable)</h3>
+				<textarea id="post_message_input" name="post_message_input_name" rows="6" style="width: 100%;"></textarea>
+				<input type="hidden" id="idProductoFB">
+			</div>
+			<div class="modal-footer" style="background-color: white;">
+				<a href="#" class="btn" data-dismiss="modal">Cerrar</a>
+				<a href="#" class="btn btn-success" id="publicarPost" >Publicar</a>
+			</div>
+		</div>
+	</div>
 
 
 	<input type="hidden" value="<?= $tabla; ?>" name="tabla" id="tabla">
@@ -234,7 +274,6 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 	<div class="layout">
 		<?php include("includes/encabezado.php"); ?>
 
-		
 
 		<div class="main-wrapper">
 			<div class="container-fluid">
@@ -251,10 +290,10 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 								<h4 class="pull-left"><i class="icon-certificate"></i> Producto más vendido este año </h4>
 							</div>
 							<div class="board-widgets-content">
-								<span class="n-counter"><?=$productoMasVendido['total_unidades_vendidas'];?></span><span class="n-sources">Unidades</span>
+								<span class="n-counter"><?= $productoMasVendido['total_unidades_vendidas']; ?></span><span class="n-sources">Unidades</span>
 							</div>
 							<div class="board-widgets-botttom">
-								<a href="productos-editar.php?id=<?=$productoMasVendido['id_producto'];?>" target="_blank"><?=$productoMasVendido['nombre_producto'];?><i class="icon-double-angle-right"></i></a>
+								<a href="productos-editar.php?id=<?= $productoMasVendido['id_producto']; ?>" target="_blank"><?= $productoMasVendido['nombre_producto']; ?><i class="icon-double-angle-right"></i></a>
 							</div>
 						</div>
 					</div>
@@ -272,36 +311,36 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 											<li><a href="productos.php"><i class="icon-th-large"></i> Todos los productos</a></li>
 											<li><a href="javascript:history.go(-1);"><i class="icon-arrow-left"></i> Regresar</a></li>
 											<li>
-												<?php if (Modulos::validarRol([37], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+												<?php if (Modulos::validarRol([37], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<a href="productos-agregar.php"><i class="icon-plus"></i> Agregar nuevo</a>
 												<?php } ?>
 											</li>
 											<li>
-												<?php if (Modulos::validarRol([153], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+												<?php if (Modulos::validarRol([153], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<a href="productos-condiciones.php"><i class="icon-random"></i> Condicionar productos</a>
 												<?php } ?>
 											</li>
 											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Más opciones <b class="caret"></b></a>
 												<ul class="dropdown-menu">
-													<?php if (Modulos::validarRol([152], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<?php if (Modulos::validarRol([152], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 														<li><a href="productos-store.php">Editar productos Store JM</a></li>
 													<?php } ?>
-													<?php if (Modulos::validarRol([121], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<?php if (Modulos::validarRol([121], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 														<li><a href="productos-predeterminados.php">Editar Productos predeterminados</a></li>
 													<?php } ?>
-													<?php if (Modulos::validarRol([21], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<?php if (Modulos::validarRol([21], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 														<li><a href="productos-importar.php">Importar excel</a></li>
 													<?php } ?>
-													<?php if (Modulos::validarRol([208], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<?php if (Modulos::validarRol([208], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 														<li><a href="guardar-precios.php" onClick="if(!confirm('Desea guardar los precios actuales en el historial?')){return false;}">Guardar precios en historial</a></li>
 													<?php } ?>
 												</ul>
 											</li>
 										</ul>
 
-										<form action="<?=$_SERVER['PHP_SELF'];?>" method="get" class="navbar-search pull-left">
-											<div class="input-append input-icon">	
-												<input type="text" name="busqueda" placeholder="Buscar..." class="search-query span12" value="<?php if(isset($_GET["busqueda"])) echo $_GET["busqueda"]; ?>">
+										<form action="<?= $_SERVER['PHP_SELF']; ?>" method="get" class="navbar-search pull-left">
+											<div class="input-append input-icon">
+												<input type="text" name="busqueda" placeholder="Buscar..." class="search-query span12" value="<?php if (isset($_GET["busqueda"])) echo $_GET["busqueda"]; ?>">
 												<input class="btn" type="submit" value="Buscar">
 											</div>
 										</form>
@@ -312,7 +351,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 												<ul class="dropdown-menu">
 													<li><a href="productos.php">Todos</a></li>
 													<?php
-													$grupos1 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_id_empresa='".$idEmpresa."'");
+													$grupos1 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_id_empresa='" . $idEmpresa . "'");
 													while ($grupo1 = mysqli_fetch_array($grupos1, MYSQLI_BOTH)) {
 													?>
 														<li><a href="productos.php?grupo1=<?= $grupo1[0]; ?>" style="color:<?= $color; ?>"><?= $grupo1['catp_nombre']; ?></a></li>
@@ -323,7 +362,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 												<ul class="dropdown-menu">
 													<li><a href="productos.php">Todos</a></li>
 													<?php
-													$grupos2 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2 AND catp_id_empresa='".$idEmpresa."'");
+													$grupos2 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2 AND catp_id_empresa='" . $idEmpresa . "'");
 													while ($grupo2 = mysqli_fetch_array($grupos2, MYSQLI_BOTH)) {
 													?>
 														<li><a href="productos.php?grupo2=<?= $grupo2[0]; ?>" style="color:<?= $color; ?>"><?= $grupo2['catp_nombre']; ?></a></li>
@@ -334,7 +373,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 												<ul class="dropdown-menu">
 													<li><a href="productos.php">Todos</a></li>
 													<?php
-													$marcas = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."'");
+													$marcas = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='" . $idEmpresa . "'");
 													while ($marca = mysqli_fetch_array($marcas, MYSQLI_BOTH)) {
 													?>
 														<li><a href="productos.php?marca=<?= $marca[0]; ?>" style="color:<?= $color; ?>"><?= $marca[1]; ?></a></li>
@@ -410,7 +449,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 											<th>Precio lista</br>Segun dolar hoy</th>
 
 											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
-												
+
 												<th title="Sobre el precio de lista.">Descuento Dealer. (%)</th>
 												<th>Precio dealer</th>
 												<th title="Sobre el precio de lista.">Descuento Web. (%)</th>
@@ -421,7 +460,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 
 											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th>Comisión (%)</th>
-												<th>Comisión externo (%)</th>	
+												<th>Comisión externo (%)</th>
 											<?php } ?>
 
 											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
@@ -442,59 +481,59 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 									<tbody>
 										<?php
 										$limite = 100;
-										if(isset($_GET["todo"])){
+										if (isset($_GET["todo"])) {
 											if ($_GET["todo"] == 1) {
 												$limite = 10000;
 											}
 										}
 
 										$filtro = '';
-										if(isset($_GET["grupo1"])){
+										if (isset($_GET["grupo1"])) {
 											if (is_numeric($_GET["grupo1"])) {
 												$filtro .= " AND prod_grupo1='" . $_GET["grupo1"] . "'";
 											}
 										}
-										if(isset($_GET["grupo2"])){
+										if (isset($_GET["grupo2"])) {
 											if (is_numeric($_GET["grupo2"])) {
 												$filtro .= " AND prod_categoria='" . $_GET["grupo2"] . "'";
 											}
 										}
-										if(isset($_GET["marca"])){
+										if (isset($_GET["marca"])) {
 											if (is_numeric($_GET["marca"])) {
 												$filtro .= " AND prod_marca='" . $_GET["marca"] . "'";
 											}
 										}
-										if(isset($_GET["web"])){
+										if (isset($_GET["web"])) {
 											if (is_numeric($_GET["web"])) {
 												$filtro .= " AND prod_visible_web=1";
 											}
 										}
-										if(isset($_GET["pdt"])){
+										if (isset($_GET["pdt"])) {
 											if (is_numeric($_GET["pdt"])) {
 												$filtro .= " AND prod_precio_predeterminado=1";
 											}
 										}
-										if(isset($_GET["utilidad"])){
+										if (isset($_GET["utilidad"])) {
 											if ($_GET["utilidad"] == 1) {
 												$filtro .= " AND prod_utilidad=0 OR prod_utilidad=''";
 											}
 										}
-										if(isset($_GET["nopdt"])){
+										if (isset($_GET["nopdt"])) {
 											if (is_numeric($_GET["nopdt"])) {
 												$filtro .= " AND prod_precio_predeterminado=0";
 											}
 										}
-										if(isset($_GET["stock"])){
+										if (isset($_GET["stock"])) {
 											if (is_numeric($_GET["stock"])) {
 												$filtro .= " AND prod_existencias<=0";
 											}
 										}
-										if(isset($_GET["nodctomax"])){
+										if (isset($_GET["nodctomax"])) {
 											if (is_numeric($_GET["nodctomax"])) {
 												$filtro .= " AND prod_descuento1<=0";
 											}
 										}
-										if(isset($_GET["busqueda"])){
+										if (isset($_GET["busqueda"])) {
 											if ($_GET["busqueda"] != "") {
 												$filtro .= " AND (prod_referencia LIKE '%" . $_GET["busqueda"] . "%' OR prod_nombre LIKE '%" . $_GET["busqueda"] . "%')";
 											}
@@ -506,7 +545,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 											SELECT catp_id AS G2ID, catp_nombre AS G2NAME FROM productos_categorias
 										) grupo1 ON G2ID=prod_grupo1
 										LEFT JOIN marcas ON mar_id=prod_marca 
-										WHERE prod_id=prod_id AND prod_id_empresa='".$idEmpresa."' 
+										WHERE prod_id=prod_id AND prod_id_empresa='" . $idEmpresa . "' 
 										$filtro 
 										LIMIT 0, $limite
 										");
@@ -514,9 +553,9 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 										$no = 1;
 										$visible = array("SI", "SI", "NO");
 										$estadoVisible = array(2, 2, 1);
-										$comision=0;
-										$precioListaUSD=0;
-										$precioWeb=0;
+										$comision = 0;
+										$precioListaUSD = 0;
+										$precioWeb = 0;
 
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 
@@ -525,24 +564,24 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 
 											$descuentoDealer = !empty($res['prod_descuento2']) ? $res['prod_descuento2'] / 100 : 0;
 
-											if(!empty($res['prod_precio'])){
+											if (!empty($res['prod_precio'])) {
 												$precioDealer = $res['prod_precio'] - ($res['prod_precio'] * $descuentoDealer);
 											}
 
 											$descuentoWeb = 0;
-											if(!empty($res['prod_descuento_web'])){
+											if (!empty($res['prod_descuento_web'])) {
 												$descuentoWeb = $res['prod_descuento_web'] / 100;
 											}
 
-											if(!empty($res['prod_precio'])){
+											if (!empty($res['prod_precio'])) {
 												$precioWeb = $res['prod_precio'] - ($res['prod_precio'] * $descuentoWeb);
 											}
 
-											if(!empty($res['prod_utilidad']) AND !empty($res['prod_costo_dolar'])){
+											if (!empty($res['prod_utilidad']) and !empty($res['prod_costo_dolar'])) {
 												$precioListaUSD = productosPrecioListaUSD($res['prod_utilidad'], $res['prod_costo_dolar']);
 											}
 
-											if(!empty($res['prod_comision'])){
+											if (!empty($res['prod_comision'])) {
 												$comision = $res['prod_comision'] / 100;
 											}
 
@@ -563,43 +602,42 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td>
-														<a 
-															href="javascript:void(0);" 
-															onClick="pred(this)" 
-															name="<?= $res[$pk]; ?>" 
-															title="<?= $res['prod_precio_predeterminado']; ?>" 
+														<a
+															href="javascript:void(0);"
+															onClick="pred(this)"
+															name="<?= $res[$pk]; ?>"
+															title="<?= $res['prod_precio_predeterminado']; ?>"
 															id="p<?= $res[$pk]; ?>"
-															translate="no"
-														>
-															<?=$opcionSINO[$res['prod_precio_predeterminado']];?>
+															translate="no">
+															<?= $opcionSINO[$res['prod_precio_predeterminado']]; ?>
 														</a>
 													</td>
 
 													<td>
-														<a 
-															href="javascript:void(0);" 
-															onClick="visweb(this)" 
-															name="<?= $res[$pk]; ?>" 
-															title="<?= $res['prod_visible_web']; ?>" 
-															id="vw<?= $res[$pk];?>"
-															translate="no"
-														>
+														<a
+															href="javascript:void(0);"
+															onClick="visweb(this)"
+															name="<?= $res[$pk]; ?>"
+															title="<?= $res['prod_visible_web']; ?>"
+															id="vw<?= $res[$pk]; ?>"
+															translate="no">
 															<?= $opcionSINO[$res['prod_visible_web']]; ?>
 														</a>
 													</td>
 												<?php } ?>
 
 												<td align="center" style="font-weight: bold;">
-													<input 
-														type="text" 
-														title="prod_referencia" 
-														name="<?= $res[$pk]; ?>" 
-														value="<?= $res['prod_referencia']; ?>" 
-														style="width: 60px; text-align: center" 
-														onChange="productos(this)" 
-														<?php if (!Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {echo "disabled";} ?>
-														translate="no"
-													>
+													<input
+														type="text"
+														title="prod_referencia"
+														name="<?= $res[$pk]; ?>"
+														value="<?= $res['prod_referencia']; ?>"
+														style="width: 60px; text-align: center"
+														onChange="productos(this)"
+														<?php if (!Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+															echo "disabled";
+														} ?>
+														translate="no">
 													<span style="visibility: hidden;" translate="no"><?= $res['prod_referencia']; ?></span>
 												</td>
 
@@ -607,70 +645,68 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 													<div class="<?= $columna; ?>">
 														<?= $res['prod_nombre']; ?>
 														<h4>
-														<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-															<a href="productos-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
-														<?php } ?>
-														<?php if (Modulos::validarRol([61], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && Producto::numeroProcesosComerciales($res[0], $conexionBdPrincipal) == 0 && Producto::numeroCombos($res[0], $conexionBdPrincipal) == 0) {?>
-															<a href="bd_delete/productos-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
-														<?php } ?>
+															<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+																<a href="productos-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+															<?php } ?>
+															<?php if (Modulos::validarRol([61], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && Producto::numeroProcesosComerciales($res[0], $conexionBdPrincipal) == 0 && Producto::numeroCombos($res[0], $conexionBdPrincipal) == 0) { ?>
+																<a href="bd_delete/productos-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>
+															<?php } ?>
 															<!--<a href="productos-materiales.php?pdto=<?= $res[0]; ?>" data-toggle="tooltip" title="Materiales"><i class="icon-folder-open"></i></a>-->
-														<?php if (Modulos::validarRol([209], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-															<a href="productos-galeria.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Galería"><i class="icon-picture"></i></a>
-														<?php } ?>
-														<?php if (Modulos::validarRol([145], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-															<a href="bodegas-productos.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Bodegas por productos"><i class="icon-pushpin"></i></a>
-														<?php } ?>
-														<?php if (Modulos::validarRol([214], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-															<a href="productos-historial-precios.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Historial de precios"><i class="icon-time"></i></a>
-														<?php } ?>
-														<?php if (Modulos::validarRol([215], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-															<a href="bd_create/productos-replicar-guardar.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Replicar a productos de soporte" onClick="if(!confirm('Desea replicar este producto a soporte operativo?')){return false;}"><i class="icon-repeat"></i></a>
-														<?php } ?>
+															<?php if (Modulos::validarRol([209], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+																<a href="productos-galeria.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Galería"><i class="icon-picture"></i></a>
+															<?php } ?>
+															<?php if (Modulos::validarRol([145], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+																<a href="bodegas-productos.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Bodegas por productos"><i class="icon-pushpin"></i></a>
+															<?php } ?>
+															<?php if (Modulos::validarRol([214], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+																<a href="productos-historial-precios.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Historial de precios"><i class="icon-time"></i></a>
+															<?php } ?>
+															<?php if (Modulos::validarRol([215], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+																<a href="bd_create/productos-replicar-guardar.php?prod=<?= $res[0]; ?>" data-toggle="tooltip" title="Replicar a productos de soporte" onClick="if(!confirm('Desea replicar este producto a soporte operativo?')){return false;}"><i class="icon-repeat"></i></a>
+															<?php } ?>
+															<a href="javascript:void(0)" data-id_product="<?= $res[0]; ?>" id="share_button" class="js-share-product" data-toggle="tooltip" title="Compartir Producto en Facebook"><i class="fa-solid fa-share"></i></a>
 														</h4>
 													</div>
 												</td>
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td>
-														<span translate="no">COP:</span>	<input 
-																	id="costo<?= $res['prod_id']; ?>" 
-																	type="text" 
-																	alt="<?= $res['prod_utilidad']; ?>" 
-																	title="prod_costo" 
-																	name="<?= $res[$pk]; ?>" 
-																	value="<?= $res['prod_costo']; ?>" 
-																	style="width: 80px; text-align: center" 
-																	onChange="productos(this)"
-																	translate="no"
-																><br>
+														<span translate="no">COP:</span> <input
+															id="costo<?= $res['prod_id']; ?>"
+															type="text"
+															alt="<?= $res['prod_utilidad']; ?>"
+															title="prod_costo"
+															name="<?= $res[$pk]; ?>"
+															value="<?= $res['prod_costo']; ?>"
+															style="width: 80px; text-align: center"
+															onChange="productos(this)"
+															translate="no"><br>
 
-																<span translate="no">USD:</span>	<input 
-																	id="costoUSD<?= $res['prod_id']; ?>"
-																	type="text" 
-																	title="prod_costo_dolar" 
-																	name="<?= $res[$pk]; ?>" 
-																	value="<?= $res['prod_costo_dolar']; ?>" 
-																	style="width: 80px; text-align: center" 
-																	onChange="productos(this)"
-																	translate="no"
-																>
+														<span translate="no">USD:</span> <input
+															id="costoUSD<?= $res['prod_id']; ?>"
+															type="text"
+															title="prod_costo_dolar"
+															name="<?= $res[$pk]; ?>"
+															value="<?= $res['prod_costo_dolar']; ?>"
+															style="width: 80px; text-align: center"
+															onChange="productos(this)"
+															translate="no">
 													</td>
-													<?php } ?>	
+												<?php } ?>
 
-													<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 
 													<td>
-														<input 
-															id="utilidad<?= $res['prod_id']; ?>" 
-															type="text" 
-															alt="<?= $res['prod_costo']; ?>" 
-															title="prod_utilidad" 
-															name="<?= $res[$pk]; ?>" 
-															value="<?= $res['prod_utilidad']; ?>" 
-															style="width: 40px; text-align: center" 
+														<input
+															id="utilidad<?= $res['prod_id']; ?>"
+															type="text"
+															alt="<?= $res['prod_costo']; ?>"
+															title="prod_utilidad"
+															name="<?= $res[$pk]; ?>"
+															value="<?= $res['prod_utilidad']; ?>"
+															style="width: 40px; text-align: center"
 															onChange="productos(this)"
-															translate="no"
-														>
+															translate="no">
 														<span style="visibility: hidden;" translate="no"><?= $res['prod_utilidad']; ?></span>
 													</td>
 												<?php }
@@ -695,14 +731,13 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 													<td>
 														<input
 															id="descuentoDealer<?= $res['prod_id']; ?>"
-															type="text" 
-															title="prod_descuento2" 
-															name="<?= $res[$pk]; ?>" 
-															value="<?= $res['prod_descuento2']; ?>" 
-															style="width: 40px; text-align: center" 
+															type="text"
+															title="prod_descuento2"
+															name="<?= $res[$pk]; ?>"
+															value="<?= $res['prod_descuento2']; ?>"
+															style="width: 40px; text-align: center"
 															onChange="productos(this)"
-															translate="no"
-														>
+															translate="no">
 														<span style="visibility: hidden;" translate="no"><?= $res['prod_descuento2']; ?></span>
 													</td>
 
@@ -711,45 +746,46 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 													<td>
 														<input
 															id="dctoWeb<?= $res['prod_id']; ?>"
-															type="text" 
-															title="prod_descuento_web" 
-															name="<?= $res[$pk]; ?>" 
-															value="<?= $res['prod_descuento_web']; ?>" 
-															style="width: 40px; text-align: center" 
+															type="text"
+															title="prod_descuento_web"
+															name="<?= $res[$pk]; ?>"
+															value="<?= $res['prod_descuento_web']; ?>"
+															style="width: 40px; text-align: center"
 															onChange="productos(this)"
-															translate="no"
-														>
+															translate="no">
 														<span style="visibility: hidden;" translate="no"><?= $res['prod_descuento_web']; ?></span>
 													</td>
 
 													<td id="precioWeb<?= $res['prod_id']; ?>">$<?= number_format($precioWeb, 0, ",", "."); ?></td>
 
-													
+
 												<?php } ?>
 
 												<td>
-													<input type="text" title="prod_descuento1" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento1']; ?>" style="width: 40px; text-align: center" onChange="productos(this)" <?php if ($_SESSION["id"] != 7 and $_SESSION["id"] != 15) {echo "disabled";} ?>>
+													<input type="text" title="prod_descuento1" name="<?= $res[$pk]; ?>" value="<?= $res['prod_descuento1']; ?>" style="width: 40px; text-align: center" onChange="productos(this)" <?php if ($_SESSION["id"] != 7 and $_SESSION["id"] != 15) {
+																																																										echo "disabled";
+																																																									} ?>>
 													<span style="visibility: hidden;"><?= $res['prod_descuento1']; ?></span>
 												</td>
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
-														<td>
-															<input type="text" title="prod_comision" name="<?= $res[$pk]; ?>" value="<?= $res['prod_comision']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
-															<span style="visibility: hidden;"><?= $res['prod_comision']; ?></span>
-														</td>
+													<td>
+														<input type="text" title="prod_comision" name="<?= $res[$pk]; ?>" value="<?= $res['prod_comision']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
+														<span style="visibility: hidden;"><?= $res['prod_comision']; ?></span>
+													</td>
 
-														<td>
-															<input type="text" title="prod_comision_externo" name="<?= $res[$pk]; ?>" value="<?= $res['prod_comision_externo']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
-															<span style="visibility: hidden;"><?= $res['prod_comision_externo']; ?></span>
-														</td>
+													<td>
+														<input type="text" title="prod_comision_externo" name="<?= $res[$pk]; ?>" value="<?= $res['prod_comision_externo']; ?>" style="width: 40px; text-align: center" onChange="productos(this)">
+														<span style="visibility: hidden;"><?= $res['prod_comision_externo']; ?></span>
+													</td>
 
 
 												<?php
-													} 
+												}
 												?>
-												
 
-												
+
+
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td><?= $res['G2NAME']; ?></td>
@@ -799,6 +835,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 	<?php include("includes/pie.php"); ?>
 
 	</div>
+	<script src="js/apiMetaSendPost.js"></script>
 </body>
 
 </html>
