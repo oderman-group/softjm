@@ -821,7 +821,6 @@ include("includes/js-formularios.php");
 														FROM clientes 
 														WHERE cli_id_empresa='".$idEmpresa."'
 														ORDER BY cli_categoria, cli_nombre
-														LIMIT 2
 														");
 
 														$categoriaActual = 1;
