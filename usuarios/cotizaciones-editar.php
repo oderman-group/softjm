@@ -821,6 +821,7 @@ include("includes/js-formularios.php");
 														FROM clientes 
 														WHERE cli_id_empresa='".$idEmpresa."'
 														ORDER BY cli_categoria, cli_nombre
+														LIMIT 2
 														");
 
 														$categoriaActual = 1;
@@ -1076,7 +1077,7 @@ include("includes/js-formularios.php");
 									if (empty($resultadoD['cotiz_ticket'])) {
 										// Consulta optimizada: solo campos necesarios para mostrar
 										$consultaTickets = $conexionBdPrincipal->query("
-											SELECT tik_id, tik_asunto, tik_fecha_creacion
+											SELECT tik_id, tik_asunto_principal, tik_fecha_creacion
 											FROM clientes_tikets 
 											WHERE tik_cliente = '".$resultadoD['cotiz_cliente']."'
 											AND tik_id_cotizacion IS NULL
@@ -1099,7 +1100,7 @@ include("includes/js-formularios.php");
 														echo '<optgroup label="Tickets disponibles">';
 														while ($resOp = mysqli_fetch_array($consultaTickets, MYSQLI_BOTH)) {
 													?>
-															<option value="<?=$resOp['tik_id'];?>"><?="Ticket # ".$resOp['tik_id']." - ".strtoupper($resOp['tik_asunto'])." (".$resOp['tik_fecha_creacion'].")";?></option>
+															<option value="<?=$resOp['tik_id'];?>"><?="Ticket # ".$resOp['tik_id']." - ".strtoupper($resOp['tik_asunto_principal'])." (".$resOp['tik_fecha_creacion'].")";?></option>
 													<?php
 													}
 														echo '</optgroup>';
@@ -1324,34 +1325,234 @@ include("includes/js-formularios.php");
 </div>
 
 <script>
+// ========================================
+// SISTEMA DE DETECCIÓN DE ERRORES Y TIMEOUT DE SEGURIDAD
+// ========================================
+
+/**
+ * Función para ocultar el overlay y mostrar un mensaje de error si es necesario
+ * Hacerla global para que pueda ser llamada desde los botones
+ */
+window.ocultarOverlayConSeguridad = function(mostrarError) {
+	const overlay = document.getElementById('loading-overlay');
+	if (!overlay) return;
+	
+	if (mostrarError) {
+		// Cambiar el contenido del overlay para mostrar error
+		const content = overlay.querySelector('.loading-content-modern');
+		if (content) {
+			content.innerHTML = `
+				<div style="text-align: center;">
+					<i class="icon-exclamation-sign" style="font-size: 48px; color: #dc3545; margin-bottom: 15px;"></i>
+					<h3 style="color: #dc3545; margin: 0 0 10px 0;">Error al cargar la página</h3>
+					<p style="color: #666; margin: 0 0 20px 0;">Ha ocurrido un error durante la carga. Por favor, intente recargar la página.</p>
+					<button onclick="location.reload()" class="btn btn-primary" style="padding: 10px 20px; font-size: 14px;">
+						<i class="icon-refresh"></i> Recargar página
+					</button>
+				</div>
+			`;
+			// Cambiar fondo a rojo claro
+			overlay.style.background = 'linear-gradient(135deg, rgba(220, 53, 69, 0.95) 0%, rgba(200, 35, 51, 0.95) 100%)';
+		}
+	} else {
+		// Ocultar normalmente
+		overlay.classList.add('hidden');
+		setTimeout(function() {
+			overlay.style.display = 'none';
+		}, 500);
+	}
+};
+
+/**
+ * Función para detectar errores de PHP en el DOM
+ */
+function detectarErroresPHP() {
+	if (!document.body) return false;
+	
+	const bodyText = document.body.innerHTML;
+	const bodyTextLower = bodyText.toLowerCase();
+	
+	// Buscar patrones específicos de errores de PHP
+	// Estos son los formatos comunes de errores de PHP
+	const patronesError = [
+		/<b>Fatal error<\/b>[\s\S]*?<br\s*\/?>/i,
+		/<b>Warning<\/b>[\s\S]*?<br\s*\/?>/i,
+		/<b>Parse error<\/b>[\s\S]*?<br\s*\/?>/i,
+		/Maximum execution time of \d+ seconds exceeded/i,
+		/Allowed memory size of \d+ bytes exhausted/i,
+		/Fatal error:[\s\S]{0,200}in <b>[\s\S]{0,200}<\/b>/i,
+		/Warning:[\s\S]{0,200}in <b>[\s\S]{0,200}<\/b>/i
+	];
+	
+	// Verificar si hay errores visibles en el DOM
+	for (let i = 0; i < patronesError.length; i++) {
+		if (patronesError[i].test(bodyText)) {
+			// Verificar que el error esté visible (no oculto por CSS)
+			const mainContent = document.querySelector('.main-wrapper, .layout, .container-fluid');
+			
+			// Si no hay contenido principal cargado, definitivamente hay un error
+			if (!mainContent) {
+				return true;
+			}
+			
+			// Si el error aparece antes del contenido principal, es un error real
+			const errorMatch = bodyText.match(patronesError[i]);
+			if (errorMatch) {
+				const errorIndex = bodyText.indexOf(errorMatch[0]);
+				const mainIndex = bodyText.indexOf(mainContent.innerHTML);
+				
+				// Si el error aparece antes del contenido principal, es un error real
+				if (errorIndex < mainIndex || mainIndex === -1) {
+					return true;
+				}
+			}
+		}
+	}
+	
+	// Verificar también si hay texto de error visible en el body (sin etiquetas HTML de error)
+	// Esto captura errores que pueden aparecer como texto plano
+	const textoVisible = document.body.innerText || document.body.textContent || '';
+	const textoVisibleLower = textoVisible.toLowerCase();
+	
+	const indicadoresTexto = [
+		'fatal error',
+		'maximum execution time',
+		'allowed memory size',
+		'parse error'
+	];
+	
+	for (let i = 0; i < indicadoresTexto.length; i++) {
+		if (textoVisibleLower.indexOf(indicadoresTexto[i]) !== -1) {
+			// Verificar que no sea parte del contenido normal de la página
+			// Si aparece en los primeros 5000 caracteres, probablemente es un error
+			if (textoVisibleLower.indexOf(indicadoresTexto[i]) < 5000) {
+				const mainContent = document.querySelector('.main-wrapper, .layout, .container-fluid');
+				// Si no hay contenido principal, es un error
+				if (!mainContent) {
+					return true;
+				}
+			}
+		}
+	}
+	
+	return false;
+}
+
+// Timeout de seguridad máximo (15 segundos)
+const TIMEOUT_MAXIMO = 15000;
+// Variable global para controlar si el overlay ya fue ocultado
+window.overlayOcultado = false;
+
+// Manejador de errores global de JavaScript
+window.addEventListener('error', function(e) {
+	console.error('Error de JavaScript detectado:', e.error);
+	// Si hay un error de JavaScript y el overlay sigue visible, mostrar mensaje de error
+	if (!window.overlayOcultado) {
+		setTimeout(function() {
+			if (!window.overlayOcultado) {
+				window.ocultarOverlayConSeguridad(true);
+				window.overlayOcultado = true;
+			}
+		}, 1000);
+	}
+}, true);
+
+// Timeout de seguridad: si después de X segundos el overlay sigue visible, ocultarlo
+setTimeout(function() {
+	if (!window.overlayOcultado) {
+		console.warn('Timeout de seguridad: ocultando overlay después de ' + (TIMEOUT_MAXIMO/1000) + ' segundos');
+		// Verificar si hay errores antes de ocultar
+		if (detectarErroresPHP()) {
+			window.ocultarOverlayConSeguridad(true);
+		} else {
+			// Si no hay errores detectados pero el overlay sigue visible, puede ser un problema de carga lenta
+			// Mostrar un mensaje informativo
+			const overlay = document.getElementById('loading-overlay');
+			if (overlay) {
+				const content = overlay.querySelector('.loading-content-modern');
+				if (content) {
+					content.innerHTML = `
+						<div style="text-align: center;">
+							<i class="icon-time" style="font-size: 48px; color: #ffc107; margin-bottom: 15px;"></i>
+							<h3 style="color: #856404; margin: 0 0 10px 0;">Carga lenta detectada</h3>
+							<p style="color: #666; margin: 0 0 20px 0;">La página está tardando más de lo esperado. Puede recargar o esperar un momento más.</p>
+							<button onclick="location.reload()" class="btn btn-warning" style="padding: 10px 20px; font-size: 14px; margin-right: 10px;">
+								<i class="icon-refresh"></i> Recargar
+							</button>
+							<button onclick="window.ocultarOverlayConSeguridad(false); window.overlayOcultado = true;" class="btn btn-default" style="padding: 10px 20px; font-size: 14px;">
+								Continuar esperando
+							</button>
+						</div>
+					`;
+				}
+			}
+		}
+		window.overlayOcultado = true;
+	}
+}, TIMEOUT_MAXIMO);
+
+// Ocultar overlay cuando el DOM esté listo (antes de que se carguen todos los recursos)
+document.addEventListener('DOMContentLoaded', function() {
+	// Verificar errores inmediatamente cuando el DOM esté listo
+	if (detectarErroresPHP()) {
+		console.error('Error detectado en DOMContentLoaded');
+		if (!window.overlayOcultado) {
+			window.ocultarOverlayConSeguridad(true);
+			window.overlayOcultado = true;
+		}
+		return;
+	}
+	
+	// Si el DOM está listo y no hay errores, esperar un poco más antes de ocultar
+	// para dar tiempo a que se carguen los recursos
+	setTimeout(function() {
+		if (!window.overlayOcultado && !detectarErroresPHP()) {
+			window.ocultarOverlayConSeguridad(false);
+			window.overlayOcultado = true;
+		}
+	}, 500);
+});
+
 // Ocultar overlay cuando la página esté completamente cargada
 window.addEventListener('load', function() {
+	// Verificar si hay errores antes de ocultar
+	if (detectarErroresPHP()) {
+		console.error('Error detectado en window.load');
+		if (!window.overlayOcultado) {
+			window.ocultarOverlayConSeguridad(true);
+			window.overlayOcultado = true;
+		}
+		return;
+	}
+	
 	// Esperar un pequeño delay para que se vea el overlay
 	setTimeout(function() {
-		const overlay = document.getElementById('loading-overlay');
-		if (overlay) {
-			overlay.classList.add('hidden');
-			
-			// Remover el overlay del DOM después de la transición
-			setTimeout(function() {
-				overlay.style.display = 'none';
-			}, 500);
+		if (!window.overlayOcultado) {
+			window.ocultarOverlayConSeguridad(false);
+			window.overlayOcultado = true;
 		}
 	}, 300); // 300ms de delay para que el usuario vea el overlay brevemente
 });
 
 // También ocultar si jQuery está listo (para páginas con muchos AJAX)
 $(document).ready(function() {
+	// Verificar errores nuevamente cuando jQuery esté listo
+	if (detectarErroresPHP()) {
+		console.error('Error detectado después de jQuery ready');
+		if (!window.overlayOcultado) {
+			window.ocultarOverlayConSeguridad(true);
+			window.overlayOcultado = true;
+		}
+		return;
+	}
+	
 	// Este es un respaldo adicional
 	setTimeout(function() {
-		const overlay = document.getElementById('loading-overlay');
-		if (overlay && !overlay.classList.contains('hidden')) {
-			overlay.classList.add('hidden');
-			setTimeout(function() {
-				overlay.style.display = 'none';
-			}, 500);
+		if (!window.overlayOcultado) {
+			window.ocultarOverlayConSeguridad(false);
+			window.overlayOcultado = true;
 		}
-	}, 2000); // Timeout máximo de 2 segundos
+	}, 2000); // Timeout de 2 segundos
 	
 	// ========================================
 	// SISTEMA DE CARGA LAZY PARA TABS
