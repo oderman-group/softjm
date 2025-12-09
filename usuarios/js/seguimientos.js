@@ -5,7 +5,7 @@ $(document).ready(function() {
     const $fieldsetContainer = $('#' + fieldsetContainerId);
 
     const $checkboxControl = $('#miCheckboxControl'); // Selecciona el checkbox
-    const fieldIdsToControl = ['fechaPC', 'horaPC', 'minutosRecordarAntes', 'canalPC', 'asunto']; // Los IDs de tus campos
+    const fieldIdsToControl = ['fechaPC', 'horaPC', 'minutosRecordarAntes', 'canalPC', 'asunto', 'encargado']; // Los IDs de tus campos
 
     const tipoTicket = document.getElementById("tik_tipo_tiket").value;
     const tipoNegocio = document.getElementById("tik_tipo_negocio").value;
@@ -18,7 +18,12 @@ $(document).ready(function() {
 
         if (isChecked) {
             $fields.forEach($field => {
-                $field.prop('required', false);
+                // Para campos con Chosen, usar data-required, para otros usar required
+                if ($field.hasClass('chzn-select')) {
+                    $field.attr('data-required', 'false');
+                } else {
+                    $field.prop('required', false);
+                }
             });
             $fieldsetContainer.hide();
 
@@ -31,8 +36,17 @@ $(document).ready(function() {
             $fields.forEach($field => {
                 if ($field.attr('id') !== 'fechaPC' && $field.attr('id') !== 'horaPC') {
                     $field.val('');
+                    // Si es un campo con Chosen, actualizar el plugin después de limpiar
+                    if ($field.hasClass('chzn-select')) {
+                        $field.trigger('chosen:updated');
+                    }
                 }
-                $field.prop('required', true);
+                // Para campos con Chosen, usar data-required, para otros usar required
+                if ($field.hasClass('chzn-select')) {
+                    $field.attr('data-required', 'true');
+                } else {
+                    $field.prop('required', true);
+                }
             });
             $fieldsetContainer.show();
         }

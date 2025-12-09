@@ -241,7 +241,7 @@ if(!empty($tiketID) && $estadoTicket == 1){
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="bd_create/clientes-seguimiento-guardar.php" enctype="multipart/form-data">
+							<form class="form-horizontal" method="post" action="bd_create/clientes-seguimiento-guardar.php" enctype="multipart/form-data" id="formSeguimiento" novalidate>
                             <?php if ($estadoTicket == 1) {?>
                             <input type="hidden" name="idTK" value="<?=$tiketID;?>">
                             <input type="hidden" name="tipoS" value="<?=$tipoSeguimiento;?>">
@@ -251,7 +251,7 @@ if(!empty($tiketID) && $estadoTicket == 1){
                                <div class="control-group">
 									<label class="control-label">Contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" data-required="true">
 											<option value=""></option>
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$cliente."'");
@@ -313,8 +313,8 @@ if(!empty($tiketID) && $estadoTicket == 1){
 								<div class="control-group">
 									<label class="control-label">¿Cómo fue el contacto? (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="formaContacto" required>
-											<option value="1"></option>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="formaContacto" data-required="true">
+											<option value="">Escoja una opción...</option>
                                             <?php
 											$opciones = array("","La empresa contactó al cliente","El cliente contactó  a la empresa");
 											for($i=1; $i<=2; $i++){
@@ -331,8 +331,8 @@ if(!empty($tiketID) && $estadoTicket == 1){
                                 <div class="control-group">
          <label class="control-label">Canal de contacto (*)</label>
          <div class="controls">
-          <select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal" required>
-           <option value=""></option>
+          <select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal" data-required="true" id="canal">
+           <option value="">Escoja una opción...</option>
                                              <?php
            $opciones = array("","Facebook","WhatsApp","Fijo","Celular","Personal","Skype","Otro","Correo", "Sitio Web");
            for($i=1; $i<=9; $i++){
@@ -481,20 +481,20 @@ if(!empty($tiketID) && $estadoTicket == 1){
 								</script>
 								
 								<div class="control-group">
-									<label class="control-label">Medio de contacto (*)</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="canalPC" required id="canalPC">
-											<option value=""></option>
-								                                     <?php
+         <label class="control-label">Medio de contacto (*)</label>
+         <div class="controls">
+          <select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="canalPC" data-required="true" id="canalPC">
+           <option value="">Escoja una opción...</option>
+                                             <?php
 											$opciones = array("","WhatsApp","Fijo","Celular","Visitar al cliente","El cliente me visita","Skype", "Otro","Correo","Sitio Web");
 											for($i=1; $i<=9; $i++){
 												$selected = ($i == $canalPCSeleccionado) ? 'selected' : '';
 												echo '<option value="'.$i.'" '.$selected.'>'.$opciones[$i].'</option>';
 											}
 											?>
-								                             	</select>
-								                             </div>
-								                        </div>
+                                     	</select>
+                                     </div>
+                                </div>
                                 
                                 <div class="control-group">
 									<label class="control-label">Asunto a tratar (*)</label>
@@ -512,6 +512,7 @@ if(!empty($tiketID) && $estadoTicket == 1){
 											name="encargado[]" 
 											multiple 
 											id="encargado"
+											data-required="true"
 										>
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios 
@@ -588,6 +589,259 @@ $(document).ready(function(){
 </script>
 <?php } ?>
 <script src="js/seguimientos.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	// Validación personalizada para campos con Chosen que son requeridos
+	$('#formSeguimiento').on('submit', function(e) {
+		// Sincronizar valores por defecto antes de validar
+		// Asegurarse de que los selects con valores selected en HTML tengan esos valores establecidos
+		$('select.chzn-select').each(function() {
+			var $select = $(this);
+			var selectedOptions = $select.find('option[selected]');
+			
+			if (selectedOptions.length > 0) {
+				if ($select.attr('multiple')) {
+					var selectedValues = [];
+					selectedOptions.each(function() {
+						var val = $(this).val();
+						if (val && val !== '') {
+							selectedValues.push(val);
+						}
+					});
+					if (selectedValues.length > 0) {
+						var currentVal = $select.val();
+						// Si el valor actual no coincide con los valores por defecto, actualizarlo
+						if (!currentVal || (Array.isArray(currentVal) && currentVal.length === 0) || 
+							(Array.isArray(currentVal) && JSON.stringify(currentVal.sort()) !== JSON.stringify(selectedValues.sort()))) {
+							$select.val(selectedValues);
+							$select.trigger('chosen:updated');
+						}
+					}
+				} else {
+					var selectedValue = selectedOptions.first().val();
+					if (selectedValue && selectedValue !== '') {
+						var currentVal = $select.val();
+						if (!currentVal || currentVal === '') {
+							$select.val(selectedValue);
+							$select.trigger('chosen:updated');
+						}
+					}
+				}
+			}
+		});
+		var isValid = true;
+		var firstInvalidField = null;
+		var errorMessages = [];
+		
+		// Obtener todos los campos select con Chosen que son requeridos
+		$('select.chzn-select[data-required="true"]').each(function() {
+			var $select = $(this);
+			var fieldName = $select.attr('name');
+			var $controlGroup = $select.closest('.control-group');
+			var $fieldset = $controlGroup.closest('fieldset');
+			var fieldLabel = $controlGroup.find('label.control-label').text().replace('(*)', '').trim();
+			
+			// Solo validar si el campo tiene el atributo data-required activo
+			if ($select.attr('data-required') !== 'true') {
+				return; // Saltar si no es requerido
+			}
+			
+			// Verificar si el campo está visible
+			// Si está dentro de un fieldset, verificar que el fieldset esté visible
+			// Si no está dentro de un fieldset, verificar que el control-group esté visible
+			var isVisible = $controlGroup.is(':visible');
+			if ($fieldset.length > 0) {
+				isVisible = isVisible && $fieldset.is(':visible');
+			}
+			
+			if (!isVisible) {
+				return; // Saltar campos ocultos
+			}
+			
+			// Obtener el valor del select original (no del elemento visual de Chosen)
+			// Primero verificar si hay valores por defecto en el HTML que no se han aplicado
+			var selectedOptions = $select.find('option[selected]');
+			var fieldValue;
+			
+			if (selectedOptions.length > 0) {
+				// Si hay opciones marcadas como selected en el HTML, asegurarse de que estén aplicadas
+				if ($select.attr('multiple')) {
+					var defaultValues = [];
+					selectedOptions.each(function() {
+						var val = $(this).val();
+						if (val && val !== '') {
+							defaultValues.push(val);
+						}
+					});
+					if (defaultValues.length > 0) {
+						var currentVal = $select.val();
+						// Si no hay valor o está vacío, aplicar el valor por defecto
+						if (!currentVal || (Array.isArray(currentVal) && currentVal.length === 0)) {
+							$select.val(defaultValues);
+							// Leer el valor después de establecerlo
+							fieldValue = $select.val();
+						} else {
+							fieldValue = currentVal;
+						}
+					} else {
+						fieldValue = $select.val();
+					}
+				} else {
+					var defaultValue = selectedOptions.first().val();
+					if (defaultValue && defaultValue !== '') {
+						var currentVal = $select.val();
+						// Si no hay valor o está vacío, aplicar el valor por defecto
+						if (!currentVal || currentVal === '') {
+							$select.val(defaultValue);
+							// Leer el valor después de establecerlo
+							fieldValue = $select.val();
+						} else {
+							fieldValue = currentVal;
+						}
+					} else {
+						fieldValue = $select.val();
+					}
+				}
+			} else {
+				// Si no hay valores por defecto, usar el valor actual
+				fieldValue = $select.val();
+			}
+			
+			// Para selects múltiples, verificar que al menos uno esté seleccionado
+			if ($select.attr('multiple')) {
+				// Para múltiples, fieldValue debería ser un array o null
+				var hasValue = false;
+				if (Array.isArray(fieldValue)) {
+					hasValue = fieldValue.length > 0 && fieldValue.some(function(v) { return v && v !== ''; });
+				} else if (fieldValue !== null && fieldValue !== undefined && fieldValue !== '') {
+					hasValue = true;
+				}
+				
+				if (!hasValue) {
+					isValid = false;
+					if (!firstInvalidField) {
+						firstInvalidField = $select;
+					}
+					errorMessages.push('Debe seleccionar al menos una opción en: ' + fieldLabel);
+				}
+			} else {
+				// Para selects simples, verificar que tenga un valor válido (no vacío ni null)
+				var hasValue = false;
+				if (fieldValue !== null && fieldValue !== undefined && fieldValue !== '') {
+					hasValue = true;
+				}
+				
+				if (!hasValue) {
+					isValid = false;
+					if (!firstInvalidField) {
+						firstInvalidField = $select;
+					}
+					errorMessages.push('Debe seleccionar una opción en: ' + fieldLabel);
+				}
+			}
+		});
+		
+		// Verificar otros campos requeridos normales (sin Chosen)
+		$('input[required], textarea[required]').each(function() {
+			var $field = $(this);
+			var $fieldset = $field.closest('fieldset');
+			var $controlGroup = $field.closest('.control-group');
+			
+			// Solo validar si el campo es visible
+			// Si está dentro de un fieldset, verificar que el fieldset esté visible
+			// Si no está dentro de un fieldset, verificar que el control-group esté visible
+			var isVisible = $field.is(':visible') && $controlGroup.is(':visible');
+			if ($fieldset.length > 0) {
+				isVisible = isVisible && $fieldset.is(':visible');
+			}
+			
+			// Solo validar si el campo tiene el atributo required activo y está visible
+			if (isVisible && $field.prop('required')) {
+				var fieldValue = $field.val();
+				var fieldLabel = $controlGroup.find('label.control-label').text().replace('(*)', '').trim();
+				
+				if (!fieldValue || (typeof fieldValue === 'string' && fieldValue.trim() === '')) {
+					isValid = false;
+					if (!firstInvalidField) {
+						firstInvalidField = $field;
+					}
+					errorMessages.push('Debe llenar el campo: ' + fieldLabel);
+				}
+			}
+		});
+		
+		if (!isValid) {
+			e.preventDefault();
+			e.stopPropagation();
+			
+			// Mostrar mensaje de error
+			var message = 'Por favor, complete los siguientes campos obligatorios:\n\n' + errorMessages.join('\n');
+			alert(message);
+			
+			// Hacer scroll al primer campo inválido
+			if (firstInvalidField) {
+				var $controlGroup = firstInvalidField.closest('.control-group');
+				if ($controlGroup.length) {
+					$('html, body').animate({
+						scrollTop: $controlGroup.offset().top - 100
+					}, 500);
+					
+					// Si es un campo con Chosen, abrir el dropdown
+					if (firstInvalidField.hasClass('chzn-select')) {
+						firstInvalidField.trigger('chosen:open');
+					} else {
+						firstInvalidField.focus();
+					}
+				}
+			}
+			
+			return false;
+		}
+		
+		return true;
+	});
+	
+	// Asegurar que los valores por defecto se reflejen correctamente en Chosen después de inicializarse
+	// Esperar a que Chosen termine de inicializar todos los selects
+	// Usar múltiples timeouts para asegurar que Chosen esté completamente inicializado
+	setTimeout(function() {
+		$('select.chzn-select').each(function() {
+			var $select = $(this);
+			// Verificar si el select tiene opciones seleccionadas por defecto en el HTML
+			var selectedOptions = $select.find('option[selected]');
+			
+			if (selectedOptions.length > 0) {
+				// Si hay opciones seleccionadas, asegurarse de que el valor del select coincida
+				if ($select.attr('multiple')) {
+					// Para múltiples, obtener todos los valores seleccionados
+					var selectedValues = [];
+					selectedOptions.each(function() {
+						var val = $(this).val();
+						if (val && val !== '') {
+							selectedValues.push(val);
+						}
+					});
+					if (selectedValues.length > 0) {
+						$select.val(selectedValues);
+						$select.trigger('chosen:updated');
+					}
+				} else {
+					// Para simples, obtener el primer valor seleccionado
+					var selectedValue = selectedOptions.first().val();
+					if (selectedValue && selectedValue !== '') {
+						$select.val(selectedValue);
+						$select.trigger('chosen:updated');
+					}
+				}
+			} else if ($select.val()) {
+				// Si ya tiene valor pero no está marcado como selected, actualizar Chosen
+				$select.trigger('chosen:updated');
+			}
+		});
+	}, 300);
+});
+</script>
 
 <!-- Modal for Calendar -->
 <div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
