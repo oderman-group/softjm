@@ -356,6 +356,20 @@ include("includes/js-formularios.php");
     margin-right: 5px;
 }
 
+/* Dropdown cambiar módulo por página */
+.page-module-select {
+    font-size: 12px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    min-width: 120px;
+    max-width: 100%;
+}
+.page-module-select:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
 /* Checkbox personalizado */
 .custom-checkbox {
     position: relative;
@@ -402,10 +416,10 @@ include("includes/js-formularios.php");
     transform: translateX(24px);
 }
 
-/* Contador de permisos */
+/* Contador de permisos - fijo arriba a la derecha para no tapar los botones inferiores */
 .permissions-counter {
     position: fixed;
-    bottom: 100px;
+    top: 140px;
     right: 30px;
     background: white;
     padding: 20px;
@@ -549,7 +563,7 @@ include("includes/js-formularios.php");
     }
     
     .permissions-counter {
-        bottom: 70px;
+        top: 120px;
         right: 15px;
         min-width: 150px;
         padding: 15px;
@@ -896,6 +910,54 @@ include("includes/js-formularios.php");
     opacity: 0.5;
 }
 
+/* Esquema jerárquico de permisos */
+.permisos-esquema {
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+    border: 1px solid #c5d4f7;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 25px;
+}
+.permisos-esquema .esquema-titulo {
+    font-size: 15px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.permisos-esquema .esquema-titulo i { color: #667eea; }
+.permisos-esquema .esquema-diagrama {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 4px;
+    font-size: 13px;
+}
+.permisos-esquema .esquema-nodo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #c5d4f7;
+    color: #334155;
+    font-weight: 500;
+}
+.permisos-esquema .esquema-nodo i { color: #667eea; font-size: 14px; }
+.permisos-esquema .esquema-flecha {
+    color: #94a3b8;
+    font-size: 12px;
+}
+.permisos-esquema .esquema-leyenda {
+    margin-top: 12px;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
 /* Loading spinner para acciones */
 .btn-loading {
     position: relative;
@@ -945,6 +1007,26 @@ include("includes/js-formularios.php");
             
             <form class="form-horizontal" method="post" action="bd_update/actualizar-roles.php" id="formRoles">
 				<input type="hidden" name="id" value="<?=$_GET["id"];?>">
+				
+				<!-- Esquema jerárquico: cómo funcionan los permisos -->
+				<div class="permisos-esquema fade-in">
+					<div class="esquema-titulo"><i class="fa-solid fa-sitemap"></i> Estructura de permisos</div>
+					<div class="esquema-diagrama">
+						<span class="esquema-nodo"><i class="fa-solid fa-building"></i> Empresa</span>
+						<span class="esquema-flecha">→</span>
+						<span class="esquema-nodo"><i class="fa-solid fa-user-shield"></i> Roles</span>
+						<span class="esquema-flecha">→</span>
+						<span class="esquema-nodo"><i class="fa-solid fa-folder"></i> Módulos</span>
+						<span class="esquema-flecha">→</span>
+						<span class="esquema-nodo"><i class="fa-solid fa-file-lines"></i> Páginas</span>
+						<span class="esquema-flecha" style="margin-left:8px;">|</span>
+						<span class="esquema-nodo"><i class="fa-solid fa-users"></i> Usuarios</span>
+						<span style="color:#94a3b8;font-size:12px;margin-left:4px;">(asignados al rol)</span>
+					</div>
+					<div class="esquema-leyenda">
+						<strong>Resumen:</strong> Cada <strong>rol</strong> agrupa permisos por <strong>páginas</strong> (organizadas en <strong>módulos</strong>). Los <strong>usuarios</strong> se asignan a un rol y heredan acceso solo a las páginas que el rol tiene marcadas. Para dar acceso a una pantalla concreta, marque el permiso de esa página en la lista inferior.
+					</div>
+				</div>
 				
 				<!-- Card del nombre del rol -->
 				<div class="role-name-card fade-in">
@@ -1002,12 +1084,12 @@ include("includes/js-formularios.php");
 					</div>
 				</div>
 				
-				<!-- Buscador General -->
+				<!-- Buscador y filtros -->
 				<div class="search-container fade-in">
 					<h4><i class="fa-solid fa-magnifying-glass"></i> Búsqueda General de Páginas</h4>
 					<div class="search-wrapper">
 						<i class="fa-solid fa-search search-icon"></i>
-						<input type="text" id="searchGlobal" class="search-input" placeholder="Buscar páginas por nombre, módulo, descripción o ruta...">
+						<input type="text" id="searchGlobal" class="search-input" placeholder="Buscar por nombre de página, nombre del archivo (ej: listar-usuarios), módulo o descripción...">
 						<button type="button" class="clear-search" id="clearSearch"><i class="fa-solid fa-times"></i></button>
 					</div>
 					<div class="search-stats" id="searchStats"></div>
@@ -1059,9 +1141,8 @@ include("includes/js-formularios.php");
 </body>
 <script src="js/Roles.js"></script>
 <script type="text/javascript">
-	// Cargar todos los módulos y páginas al inicio
 	$(document).ready(function() {
-		const rolId = <?=$_GET['id'];?>;
+		const rolId = <?= (int)$_GET['id']; ?>;
 		cargarTodosLosModulos(rolId);
 		cargarUsuariosDelRol(rolId);
 		initSearchFunctionality();

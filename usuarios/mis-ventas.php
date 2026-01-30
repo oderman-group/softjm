@@ -312,7 +312,7 @@ include("includes/head.php");
 
 												$consultaVendedores = $conexionBdPrincipal->query("SELECT factura_vendedor, UCASE(usr_nombre) AS vendedor,
 													SUM( (czpp_valor*czpp_cantidad) * (1 - IFNULL(czpp_descuento,0)/100) ) AS sumaTotalConDcto,
-													AVG( (czpp_valor*czpp_cantidad) * (1 - IFNULL(czpp_descuento,0)/100) ) AS promVentasConDcto, SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(DISTINCT factura_id) AS numVentas, sucp_nombre, usr_id,
+													SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(DISTINCT factura_id) AS numVentas, sucp_nombre, usr_id,
 													COALESCE(um.meta_valor_ventas, usr_meta_ventas) AS meta_ventas
 													FROM cotizacion_productos
 													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_vendedor='".$_SESSION['id']."' $filtroFactura AND factura_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
@@ -331,6 +331,8 @@ include("includes/head.php");
 
 												while($datosVendedores = mysqli_fetch_array($consultaVendedores, MYSQLI_BOTH)){
 													$sumaConDcto = isset($datosVendedores['sumaTotalConDcto']) ? (float)$datosVendedores['sumaTotalConDcto'] : 0;
+													$numVentas = (int)($datosVendedores['numVentas'] ?? 0);
+													$promedioVenta = $numVentas > 0 ? round($sumaConDcto / $numVentas, 2) : 0;
 													$comision = $sumaConDcto * $pctComision;
 													$porcentaje = !empty($datosVendedores['meta_ventas']) ? ($sumaConDcto / $datosVendedores['meta_ventas']) * 100 : 0;
 													?>
@@ -341,7 +343,7 @@ include("includes/head.php");
 														<td><?=$datosVendedores['sucp_nombre'];?></td>
 														<td>$<?= number_format($sumaConDcto, 2, ",", "."); ?></td>
 														<td align="center"><?= $datosVendedores['numVentas']; ?></td>
-														<td>$<?= number_format(isset($datosVendedores['promVentasConDcto']) ? (float)$datosVendedores['promVentasConDcto'] : 0, 2, ",", "."); ?></td>
+														<td>$<?= number_format($promedioVenta, 2, ",", "."); ?></td>
 
 														<td><?=$datosVendedores['Totaldctos'];?>%</td>
 														<td><?=number_format($datosVendedores['promDcto'], 2, ",", ".");?>%</td>

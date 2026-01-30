@@ -196,29 +196,37 @@ class ItemAsociado extends BaseDatos {
     }
 
     /**
-     * 
+     * Devuelve el listado de todos los ítems (combos, productos, servicios) para mostrar en tabla.
+     * Para factura/remisión, cuando hay paquetes expandidos solo se muestran los productos individuales
+     * (no se repite el paquete por cada producto).
+     *
+     * @param int $idProceso ID del proceso (cotización, pedido, remisión, factura).
+     * @param int $tipoProceso Tipo de proceso (PROCESO_COTIZACION, PROCESO_PEDIDO, PROCESO_REMSION, PROCESO_FACTURA).
+     * @return array Lista de ítems con nombre, cantidad, valor, descuento, impuesto, observacion.
      */
     public function listadoAsociadoTodosItems($idProceso, $tipoProceso) {
-        $listadoCombos = $this->listadoAsociadoCombos($idProceso, $tipoProceso);
         $listadoProductos = $this->listadoAsociadoProductos($idProceso, $tipoProceso);
-
         $todosLosItemsParaTabla = [];
 
-        while ($combos = mysqli_fetch_array($listadoCombos, MYSQLI_BOTH)) {
-
-            $itemActual  = [
-                'nombre'      => '<a href="combos-editar.php?id='.$combos['czpp_combo'].'" target="_blank" style="color:blue; text-decoration:underline;">'.$combos['combo_nombre'].'</a>',
-                'cantidad'    => $combos['czpp_cantidad'],
-                'valor'       => $combos['czpp_valor'],
-                'descuento'   => $combos['czpp_descuento'],
-                'impuesto'    => $combos['czpp_impuesto'],
-                'observacion' => $combos['czpp_observacion']
-            ];
-
-            $todosLosItemsParaTabla[] = $itemActual;
+        // Solo agregar filas de combos cuando NO es factura ni remisión: en factura/remisión
+        // los paquetes ya están expandidos en productos individuales, y mostrar combos duplicaría el paquete.
+        if ($tipoProceso != self::PROCESO_FACTURA && $tipoProceso != self::PROCESO_REMSION) {
+            $listadoCombos = $this->listadoAsociadoCombos($idProceso, $tipoProceso);
+            while ($combos = mysqli_fetch_array($listadoCombos, MYSQLI_BOTH)) {
+                $itemActual  = [
+                    'nombre'      => '<a href="combos-editar.php?id='.$combos['czpp_combo'].'" target="_blank" style="color:blue; text-decoration:underline;">'.$combos['combo_nombre'].'</a>',
+                    'cantidad'    => $combos['czpp_cantidad'],
+                    'valor'       => $combos['czpp_valor'],
+                    'descuento'   => $combos['czpp_descuento'],
+                    'impuesto'    => $combos['czpp_impuesto'],
+                    'observacion' => $combos['czpp_observacion']
+                ];
+                $todosLosItemsParaTabla[] = $itemActual;
+            }
+            if ($listadoCombos instanceof mysqli_result) {
+                $listadoCombos->free();
+            }
         }
-
-        $listadoCombos->free();
 
         while ($producto = mysqli_fetch_array($listadoProductos, MYSQLI_BOTH)) {
 

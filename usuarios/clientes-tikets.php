@@ -18,6 +18,39 @@ require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
 
 
 <link href="css/tablecloth.css" rel="stylesheet">
+<style>
+	/* KPIs tickets - tarjetas elegantes */
+	.tickets-kpi-wrap { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 24px; }
+	.tickets-kpi-card { flex: 1; min-width: 220px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.06); transition: box-shadow .2s; }
+	.tickets-kpi-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+	.tickets-kpi-card.efectivos { border-left: 4px solid #059669; }
+	.tickets-kpi-card.no-efectivos { border-left: 4px solid #dc2626; }
+	.tickets-kpi-card .kpi-label { font-size: 13px; color: #64748b; margin-bottom: 8px; font-weight: 500; }
+	.tickets-kpi-card .kpi-value { font-size: 28px; font-weight: 700; line-height: 1.2; }
+	.tickets-kpi-card.efectivos .kpi-value { color: #059669; }
+	.tickets-kpi-card.no-efectivos .kpi-value { color: #dc2626; }
+	.tickets-kpi-card .kpi-bar-wrap { height: 8px; background: #f1f5f9; border-radius: 4px; margin-top: 12px; overflow: hidden; }
+	.tickets-kpi-card .kpi-bar { height: 100%; border-radius: 4px; transition: width .5s ease; }
+	.tickets-kpi-card.efectivos .kpi-bar { background: linear-gradient(90deg, #059669, #10b981); }
+	.tickets-kpi-card.no-efectivos .kpi-bar { background: linear-gradient(90deg, #dc2626, #ef4444); }
+	.tickets-kpi-card .kpi-sub { font-size: 11px; color: #94a3b8; margin-top: 6px; }
+	/* Panel de filtros */
+	.tickets-filtros-panel { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+	.tickets-filtros-panel .filtros-titulo { font-size: 15px; font-weight: 600; color: #334155; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px; }
+	.tickets-filtros-panel .filtros-titulo:before { content: ""; display: inline-block; width: 4px; height: 18px; background: #2563eb; border-radius: 2px; }
+	.tickets-filtros-panel .filtros-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px 20px; }
+	.tickets-filtros-panel .filtro-item label { display: block; font-size: 11px; color: #64748b; margin-bottom: 4px; font-weight: 500; }
+	.tickets-filtros-panel .filtro-item label .quitar { color: #dc2626; text-decoration: none; margin-left: 4px; }
+	.tickets-filtros-panel .filtro-item label .quitar:hover { text-decoration: underline; }
+	.tickets-filtros-panel .filtro-item input,
+	.tickets-filtros-panel .filtro-item select { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+	.tickets-filtros-panel .filtros-acciones { margin-top: 18px; padding-top: 16px; border-top: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+	.tickets-filtros-panel .btn-filtrar { padding: 8px 18px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; }
+	.tickets-filtros-panel .btn-filtrar:hover { background: #1d4ed8; }
+	.tickets-filtros-panel .btn-limpiar { padding: 8px 18px; background: #fff; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none; font-size: 13px; }
+	.tickets-filtros-panel .btn-limpiar:hover { background: #f1f5f9; color: #334155; }
+	@media (max-width: 768px) { .tickets-filtros-panel .filtros-grid { grid-template-columns: 1fr 1fr; } }
+</style>
 
 <!--============j avascript===========-->
 <script src="js/jquery.js"></script>
@@ -84,29 +117,23 @@ require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
 
 				<?php
 				$totalTicketsComerciales = Ticket::obtenerTotalTicketsComerciales($conexionBdPrincipal);
-
 				$ticketsComercialesEfectivos = Ticket::obtenerTicketsComercialesEfectivos($conexionBdPrincipal);
-				$porcentajeEfectivo = round(($ticketsComercialesEfectivos / $totalTicketsComerciales) * 100, 2);
-
+				$porcentajeEfectivo = $totalTicketsComerciales > 0 ? round(($ticketsComercialesEfectivos / $totalTicketsComerciales) * 100, 1) : 0;
 				$ticketsComercialesNoEfectivos = Ticket::obtenerTicketsComercialesNoEfectivos($conexionBdPrincipal);
-				$porcentajeNoEfectivo = round(($ticketsComercialesNoEfectivos / $totalTicketsComerciales) * 100, 2);
+				$porcentajeNoEfectivo = $totalTicketsComerciales > 0 ? round(($ticketsComercialesNoEfectivos / $totalTicketsComerciales) * 100, 1) : 0;
 				?>
-
-				<div class="row-fluid">
-					<div class="span4">
-						<h6>% Tickets comerciales efectivos</h6>
-						<div class="progress progress-success progress-striped active">
-							<div class="bar" style="width: <?=$porcentajeEfectivo;?>%">
-								<?=$porcentajeEfectivo;?>%
-							</div>
-						</div>
-
-						<h6>% Tickets comerciales NO efectivos</h6>
-						<div class="progress progress-danger progress-striped active">
-							<div class="bar" style="width: <?=$porcentajeNoEfectivo;?>%">
-								<?=$porcentajeNoEfectivo;?>%
-							</div>
-						</div>
+				<div class="tickets-kpi-wrap">
+					<div class="tickets-kpi-card efectivos">
+						<div class="kpi-label">Tickets comerciales efectivos</div>
+						<div class="kpi-value"><?= $porcentajeEfectivo; ?>%</div>
+						<div class="kpi-bar-wrap"><div class="kpi-bar" style="width: <?= min($porcentajeEfectivo, 100); ?>%;"></div></div>
+						<div class="kpi-sub"><?= $ticketsComercialesEfectivos; ?> de <?= $totalTicketsComerciales; ?> tickets</div>
+					</div>
+					<div class="tickets-kpi-card no-efectivos">
+						<div class="kpi-label">Tickets comerciales no efectivos</div>
+						<div class="kpi-value"><?= $porcentajeNoEfectivo; ?>%</div>
+						<div class="kpi-bar-wrap"><div class="kpi-bar" style="width: <?= min($porcentajeNoEfectivo, 100); ?>%;"></div></div>
+						<div class="kpi-sub"><?= $ticketsComercialesNoEfectivos; ?> de <?= $totalTicketsComerciales; ?> tickets</div>
 					</div>
 				</div>
 
@@ -159,55 +186,75 @@ require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
 							}
 							?>
 
-							<!-- Filtros -->
-							<div class="row-fluid" style="margin-bottom: 20px;">
+							<!-- Panel de filtros -->
+							<div class="tickets-filtros-panel">
 								<form method="GET" action="">
-									<?php if(isset($_GET["cte"])) { ?><input type="hidden" name="cte" value="<?=$_GET["cte"];?>"><?php } ?>
-									<div class="span2">
-										<label>Estado: <?php if(isset($_GET["estado"]) && $_GET["estado"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['estado' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
-										<select name="estado" class="form-control">
-											<option value="">Todos</option>
-											<option value="1" <?= (isset($_GET["estado"]) && $_GET["estado"]=="1") ? "selected" : ""; ?>>Abierto</option>
-											<option value="2" <?= (isset($_GET["estado"]) && $_GET["estado"]=="2") ? "selected" : ""; ?>>Cerrado</option>
-										</select>
+									<?php if(isset($_GET["cte"])) { ?><input type="hidden" name="cte" value="<?= htmlspecialchars($_GET["cte"]); ?>"><?php } ?>
+									<div class="filtros-titulo">Filtros</div>
+									<div class="filtros-grid">
+										<div class="filtro-item" style="grid-column: 1 / -1;">
+											<label>Buscar por ID o asunto <?php if(isset($_GET["busqueda"]) && $_GET["busqueda"]!="") { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['busqueda' => ''])); ?>">× quitar</a><?php } ?></label>
+											<input type="text" name="busqueda" value="<?= isset($_GET["busqueda"]) ? htmlspecialchars($_GET["busqueda"]) : ""; ?>" placeholder="ID ticket o asunto...">
+										</div>
+										<div class="filtro-item">
+											<label>Estado <?php if(isset($_GET["estado"]) && $_GET["estado"]!="") { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['estado' => ''])); ?>">×</a><?php } ?></label>
+											<select name="estado">
+												<option value="">Todos</option>
+												<option value="1" <?= (isset($_GET["estado"]) && $_GET["estado"]=="1") ? "selected" : ""; ?>>Abierto</option>
+												<option value="2" <?= (isset($_GET["estado"]) && $_GET["estado"]=="2") ? "selected" : ""; ?>>Cerrado</option>
+											</select>
+										</div>
+										<div class="filtro-item">
+											<label>Responsable <?php if(isset($_GET["resp"]) && $_GET["resp"]!="") { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['resp' => ''])); ?>">×</a><?php } ?></label>
+											<select name="resp">
+												<option value="">Todos</option>
+												<?php
+												$conResp = mysqli_query($conexionBdPrincipal, "SELECT usr_id, usr_nombre FROM usuarios WHERE usr_bloqueado != 1 ORDER BY usr_nombre");
+												while ($resResp = mysqli_fetch_array($conResp)) {
+													$sel = (isset($_GET["resp"]) && $_GET["resp"] == $resResp['usr_id']) ? ' selected' : '';
+													echo '<option value="' . (int)$resResp['usr_id'] . '"' . $sel . '>' . htmlspecialchars($resResp['usr_nombre']) . '</option>';
+												}
+												?>
+											</select>
+										</div>
+										<div class="filtro-item">
+											<label>Prioridad <?php if(isset($_GET["prioridad"]) && $_GET["prioridad"]!="") { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['prioridad' => ''])); ?>">×</a><?php } ?></label>
+											<select name="prioridad">
+												<option value="">Todas</option>
+												<option value="1" <?= (isset($_GET["prioridad"]) && $_GET["prioridad"]=="1") ? "selected" : ""; ?>>Normal</option>
+												<option value="2" <?= (isset($_GET["prioridad"]) && $_GET["prioridad"]=="2") ? "selected" : ""; ?>>Urgente</option>
+												<option value="3" <?= (isset($_GET["prioridad"]) && $_GET["prioridad"]=="3") ? "selected" : ""; ?>>Muy Urgente</option>
+											</select>
+										</div>
+										<div class="filtro-item">
+											<label>Tipo <?php if(isset($_GET["tipo"]) && $_GET["tipo"]!="") { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['tipo' => ''])); ?>">×</a><?php } ?></label>
+											<select name="tipo">
+												<option value="">Todos</option>
+												<option value="1" <?= (isset($_GET["tipo"]) && $_GET["tipo"]=="1") ? "selected" : ""; ?>>Comercial</option>
+												<option value="3" <?= (isset($_GET["tipo"]) && $_GET["tipo"]=="3") ? "selected" : ""; ?>>Soporte operativo</option>
+											</select>
+										</div>
+										<div class="filtro-item">
+											<label>Etapa <?php if(isset($_GET["etapa"]) && $_GET["etapa"]!="") { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['etapa' => ''])); ?>">×</a><?php } ?></label>
+											<select name="etapa">
+												<option value="">Todas</option>
+												<?php for($i=1; $i<=6; $i++){ ?>
+													<option value="<?= $i; ?>" <?= (isset($_GET["etapa"]) && $_GET["etapa"]==$i) ? "selected" : ""; ?>><?= $opcionesEtapa[$i]; ?></option>
+												<?php } ?>
+											</select>
+										</div>
+										<div class="filtro-item">
+											<label>Fecha inicio <?php if(isset($_GET["fecha_inicio"]) && $_GET["fecha_inicio"]!="") { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_inicio' => ''])); ?>">×</a><?php } ?></label>
+											<input type="date" name="fecha_inicio" value="<?= isset($_GET["fecha_inicio"]) ? htmlspecialchars($_GET["fecha_inicio"]) : ""; ?>">
+										</div>
+										<div class="filtro-item">
+											<label>Fecha fin <?php if(isset($_GET["fecha_fin"]) && $_GET["fecha_fin"]!="") { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_fin' => ''])); ?>">×</a><?php } ?></label>
+											<input type="date" name="fecha_fin" value="<?= isset($_GET["fecha_fin"]) ? htmlspecialchars($_GET["fecha_fin"]) : ""; ?>">
+										</div>
 									</div>
-									<div class="span2">
-										<label>Prioridad: <?php if(isset($_GET["prioridad"]) && $_GET["prioridad"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['prioridad' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
-										<select name="prioridad" class="form-control">
-											<option value="">Todas</option>
-											<option value="1" <?= (isset($_GET["prioridad"]) && $_GET["prioridad"]=="1") ? "selected" : ""; ?>>Normal</option>
-											<option value="2" <?= (isset($_GET["prioridad"]) && $_GET["prioridad"]=="2") ? "selected" : ""; ?>>Urgente</option>
-											<option value="3" <?= (isset($_GET["prioridad"]) && $_GET["prioridad"]=="3") ? "selected" : ""; ?>>Muy Urgente</option>
-										</select>
-									</div>
-									<div class="span2">
-										<label>Tipo: <?php if(isset($_GET["tipo"]) && $_GET["tipo"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['tipo' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
-										<select name="tipo" class="form-control">
-											<option value="">Todos</option>
-											<option value="1" <?= (isset($_GET["tipo"]) && $_GET["tipo"]=="1") ? "selected" : ""; ?>>Comercial</option>
-											<option value="3" <?= (isset($_GET["tipo"]) && $_GET["tipo"]=="3") ? "selected" : ""; ?>>Soporte operativo</option>
-										</select>
-									</div>
-									<div class="span2">
-										<label>Etapa: <?php if(isset($_GET["etapa"]) && $_GET["etapa"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['etapa' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
-										<select name="etapa" class="form-control">
-											<option value="">Todas</option>
-											<?php for($i=1; $i<=6; $i++){ ?>
-												<option value="<?=$i;?>" <?= (isset($_GET["etapa"]) && $_GET["etapa"]==$i) ? "selected" : ""; ?>><?=$opcionesEtapa[$i];?></option>
-											<?php } ?>
-										</select>
-									</div>
-									<div class="span2">
-										<label>Fecha Inicio: <?php if(isset($_GET["fecha_inicio"]) && $_GET["fecha_inicio"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_inicio' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
-										<input type="date" name="fecha_inicio" value="<?= isset($_GET["fecha_inicio"]) ? $_GET["fecha_inicio"] : ""; ?>" class="form-control">
-									</div>
-									<div class="span2">
-										<label>Fecha Fin: <?php if(isset($_GET["fecha_fin"]) && $_GET["fecha_fin"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_fin' => ''])) ?>" style="color:red;">x</a><?php } ?></label>
-										<input type="date" name="fecha_fin" value="<?= isset($_GET["fecha_fin"]) ? $_GET["fecha_fin"] : ""; ?>" class="form-control">
-									</div>
-									<div class="span12" style="margin-top: 10px;">
-										<button type="submit" class="btn btn-primary">Filtrar</button>
-										<a href="?<?= isset($_GET["cte"]) ? "cte=".$_GET["cte"] : ""; ?>" class="btn btn-default">Limpiar Todos</a>
+									<div class="filtros-acciones">
+										<button type="submit" class="btn-filtrar">Aplicar filtros</button>
+										<a href="?<?= isset($_GET["cte"]) ? "cte=".htmlspecialchars($_GET["cte"]) : ""; ?>" class="btn-limpiar">Limpiar todos</a>
 									</div>
 								</form>
 							</div>

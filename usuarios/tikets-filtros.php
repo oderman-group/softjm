@@ -140,6 +140,28 @@ include("includes/js-formularios.php");
                                </div>
                                
                                <div class="control-group">
+									<label class="control-label">Etapa del ticket</label>
+									<div class="controls">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="etapa">
+											<option value="">Todas</option>
+											<?php for($i=1; $i<=6; $i++){ ?>
+												<option value="<?=$i;?>"><?=$opcionesEtapa[$i];?></option>
+											<?php } ?>
+										</select>
+									</div>
+								</div>
+								<div class="control-group">
+									<label class="control-label">Cotización asociada</label>
+									<div class="controls">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="cotizAsociada">
+											<option value="">Todos</option>
+											<option value="1">Con cotización asociada</option>
+											<option value="0">Sin cotización asociada</option>
+										</select>
+									</div>
+								</div>
+                               
+                               <div class="control-group">
 									<label class="control-label">Desde</label>
 									<div class="controls">
 										<input type="date" class="span3" name="desde">
