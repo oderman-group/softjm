@@ -311,9 +311,8 @@ include("includes/head.php");
 												$pctComision = !empty($configuracion['conf_comision_vendedores']) ? ((float)$configuracion['conf_comision_vendedores'] / 100) : 0;
 
 												$consultaVendedores = $conexionBdPrincipal->query("SELECT factura_vendedor, UCASE(usr_nombre) AS vendedor,
-													SUM( (czpp_valor*czpp_cantidad) ) AS sumaTotal,
 													SUM( (czpp_valor*czpp_cantidad) * (1 - IFNULL(czpp_descuento,0)/100) ) AS sumaTotalConDcto,
-													AVG( (czpp_valor*czpp_cantidad) ) AS promVentas, SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(DISTINCT factura_id) AS numVentas, sucp_nombre, usr_id,
+													AVG( (czpp_valor*czpp_cantidad) * (1 - IFNULL(czpp_descuento,0)/100) ) AS promVentasConDcto, SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(DISTINCT factura_id) AS numVentas, sucp_nombre, usr_id,
 													COALESCE(um.meta_valor_ventas, usr_meta_ventas) AS meta_ventas
 													FROM cotizacion_productos
 													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_vendedor='".$_SESSION['id']."' $filtroFactura AND factura_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
@@ -327,7 +326,7 @@ include("includes/head.php");
 													) um ON um.um_usuario = factura_vendedor
 													WHERE czpp_tipo='".CZPP_TIPO_FACT."' AND czpp_cantidad>0
 													GROUP BY factura_vendedor
-													ORDER BY sumaTotal DESC
+													ORDER BY sumaTotalConDcto DESC
 													");
 
 												while($datosVendedores = mysqli_fetch_array($consultaVendedores, MYSQLI_BOTH)){
@@ -340,9 +339,9 @@ include("includes/head.php");
 														<td><?=$no;?></td>
 														<td><?=$datosVendedores['vendedor'];?></td>
 														<td><?=$datosVendedores['sucp_nombre'];?></td>
-														<td>$<?= number_format($datosVendedores['sumaTotal'], 2, ",", "."); ?></td>
+														<td>$<?= number_format($sumaConDcto, 2, ",", "."); ?></td>
 														<td align="center"><?= $datosVendedores['numVentas']; ?></td>
-														<td>$<?= number_format($datosVendedores['promVentas'], 2, ",", "."); ?></td>
+														<td>$<?= number_format(isset($datosVendedores['promVentasConDcto']) ? (float)$datosVendedores['promVentasConDcto'] : 0, 2, ",", "."); ?></td>
 
 														<td><?=$datosVendedores['Totaldctos'];?>%</td>
 														<td><?=number_format($datosVendedores['promDcto'], 2, ",", ".");?>%</td>
