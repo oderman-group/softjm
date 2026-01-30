@@ -71,6 +71,11 @@ include("conexion.php");
                   $idSeguimiento = $_GET["idseg"];
               }
 
+              $redirectTo = '';
+              if(!empty($_GET['redirect_to']) && is_string($_GET['redirect_to'])){
+                  $redirectTo = trim($_GET['redirect_to']);
+              }
+
               if(isset($_GET['error'])){?>
                 <p style="color:black; font-size: 16px; background-color: gold; padding: 5px;"><?php echo $msjError;?></p>
               <?php }?>
@@ -80,7 +85,8 @@ include("conexion.php");
               <h6 class="font-weight-light">Ingresa tu usuario y contraseña para empezar!</h6>
               <form class="pt-3" action="autentico.php" method="post" id="demo-form">
 
-                <input type="hidden" name="idseg" value="<?= $idSeguimiento; ?>">
+                <input type="hidden" name="idseg" value="<?= htmlspecialchars($idSeguimiento); ?>">
+                <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($redirectTo); ?>">
                 
                 <!-- En esta versión esta BD ya no influye para cambios en bd
                 solo es para mostrar el nombre de la compañía y el nombre de la bd

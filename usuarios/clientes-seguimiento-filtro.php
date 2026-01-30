@@ -200,6 +200,26 @@ include("includes/js-formularios.php");
                                     	</select>
                                     </div>
                                </div>
+								<div class="control-group">
+									<label class="control-label">Hubo demostración</label>
+									<div class="controls">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="demostracion">
+											<option value="">Todos</option>
+											<option value="1">SI</option>
+											<option value="0">NO</option>
+										</select>
+									</div>
+								</div>
+								<div class="control-group">
+									<label class="control-label">Hubo visita</label>
+									<div class="controls">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="visita">
+											<option value="">Todos</option>
+											<option value="1">SI</option>
+											<option value="0">NO</option>
+										</select>
+									</div>
+								</div>
                                
                                <div class="control-group">
 									<label class="control-label">Desde</label>
