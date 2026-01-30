@@ -194,6 +194,10 @@ include("includes/head.php");
 												$no = 1;
 
 												$filtroFactura = '';
+												$desdeMeta = (!empty($_GET["desde"])) ? $_GET["desde"] : date('Y-m-01');
+												$hastaMeta = (!empty($_GET["hasta"])) ? $_GET["hasta"] : date('Y-m-t');
+												$periodoDesde = date('Y-m', strtotime($desdeMeta));
+												$periodoHasta = date('Y-m', strtotime($hastaMeta));
 												if(isset($_GET["desde"]) and $_GET["desde"]!="" or isset($_GET["hasta"]) and  $_GET["hasta"]!=""){$filtroFactura .= " AND factura_fecha_propuesta BETWEEN '".$_GET["desde"]."' AND '".$_GET["hasta"]."'";}
 
 
@@ -296,6 +300,7 @@ include("includes/head.php");
 													<th>Prom. Ventas</th>
 													<th>Suma Dctos.</th>
 													<th>Prom. Dctos.</th>
+													<th>Comisión</th>
 													<th>Meta</th>
 													<th>Barra</th>
 												</tr>
@@ -303,21 +308,32 @@ include("includes/head.php");
 											<tbody>
 												<?php
 												$no = 1;
+												$pctComision = !empty($configuracion['conf_comision_vendedores']) ? ((float)$configuracion['conf_comision_vendedores'] / 100) : 0;
 
-												$consultaVendedores = $conexionBdPrincipal->query("SELECT factura_vendedor, UCASE(usr_nombre) AS vendedor, sum( (czpp_valor*czpp_cantidad) ) AS sumaTotal, AVG( (czpp_valor*czpp_cantidad) ) AS promVentas, SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(*) AS numVentas, sucp_nombre, usr_id, usr_meta_ventas
+												$consultaVendedores = $conexionBdPrincipal->query("SELECT factura_vendedor, UCASE(usr_nombre) AS vendedor,
+													SUM( (czpp_valor*czpp_cantidad) ) AS sumaTotal,
+													SUM( (czpp_valor*czpp_cantidad) * (1 - IFNULL(czpp_descuento,0)/100) ) AS sumaTotalConDcto,
+													AVG( (czpp_valor*czpp_cantidad) ) AS promVentas, SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(DISTINCT factura_id) AS numVentas, sucp_nombre, usr_id,
+													COALESCE(um.meta_valor_ventas, usr_meta_ventas) AS meta_ventas
 													FROM cotizacion_productos
-													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_vendedor='".$_SESSION['id']."' $filtroFactura
-													INNER JOIN usuarios ON usr_id=factura_vendedor
-													INNER JOIN sucursales_propias ON sucp_id=usr_sucursal
+													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_vendedor='".$_SESSION['id']."' $filtroFactura AND factura_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+													INNER JOIN usuarios ON usr_id=factura_vendedor AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+													INNER JOIN sucursales_propias ON sucp_id=usr_sucursal AND sucp_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+													LEFT JOIN (
+														SELECT um_usuario, SUM(um_meta) AS meta_valor_ventas FROM usuarios_metas
+														WHERE um_tipo_meta = 'VALOR_VENTAS' AND um_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'
+														AND CONCAT(um_year,'-',LPAD(um_mes,2,'0')) BETWEEN '".$periodoDesde."' AND '".$periodoHasta."'
+														GROUP BY um_usuario
+													) um ON um.um_usuario = factura_vendedor
 													WHERE czpp_tipo='".CZPP_TIPO_FACT."' AND czpp_cantidad>0
 													GROUP BY factura_vendedor
 													ORDER BY sumaTotal DESC
 													");
 
 												while($datosVendedores = mysqli_fetch_array($consultaVendedores, MYSQLI_BOTH)){
-
-													$porcentaje = ($datosVendedores['sumaTotal'] / $datosVendedores['usr_meta_ventas']) * 100;
-													
+													$sumaConDcto = isset($datosVendedores['sumaTotalConDcto']) ? (float)$datosVendedores['sumaTotalConDcto'] : 0;
+													$comision = $sumaConDcto * $pctComision;
+													$porcentaje = !empty($datosVendedores['meta_ventas']) ? ($sumaConDcto / $datosVendedores['meta_ventas']) * 100 : 0;
 													?>
 
 													<tr>
@@ -330,11 +346,12 @@ include("includes/head.php");
 
 														<td><?=$datosVendedores['Totaldctos'];?>%</td>
 														<td><?=number_format($datosVendedores['promDcto'], 2, ",", ".");?>%</td>
-														<td>$<?=number_format($datosVendedores['usr_meta_ventas'], 2, ",", ".");?></td>
+														<td>$<?= number_format($comision, 2, ",", "."); ?></td>
+														<td>$<?=!empty($datosVendedores['meta_ventas']) ? number_format($datosVendedores['meta_ventas'], 2, ",", ".") : 0;?></td>
 														<td>
 															<?=number_format($porcentaje, 2, ",", ".");?>%<br>
 															<div class="progress progress-info progress-striped">
-																<div class="bar" style="width: <?=$porcentaje;?>%">
+																<div class="bar" style="width: <?= min($porcentaje, 100); ?>%">
 																</div>
 															</div>
 														</td>

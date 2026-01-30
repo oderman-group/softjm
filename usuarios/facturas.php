@@ -324,7 +324,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/ItemAsociado.php';
 												<td><span class="badge badge-<?= $nacionEtiqueta[$res['factura_extranjera']]; ?>"><?= $nacionFactura[$res['factura_extranjera']]; ?></span></td>
 												<td><?= $res['factura_fecha_propuesta']; ?></td>
 												<td><?= $res['factura_concepto']; ?></td>
-												<td><?= $nombreCliente; ?></td>
+												<td><?php if (!empty($res['factura_cliente'])) { ?><a href="clientes-editar.php?id=<?= (int)$res['factura_cliente']; ?>"><?= $nombreCliente; ?></a><?php } else { echo $nombreCliente; } ?></td>
 												<td><?= $nombreProveedor; ?></td>
 												<td>
 													<?php

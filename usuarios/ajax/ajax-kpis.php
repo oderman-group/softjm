@@ -9,8 +9,8 @@ $resultado = array(
 
 if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" ) {
 
-
     $e_dato = json_decode($_POST["e_datos"]);
+    $idEmpresaKpi = isset($_SESSION["dataAdicional"]["id_empresa"]) ? (int)$_SESSION["dataAdicional"]["id_empresa"] : 1;
 
     $sql = "
     SELECT
@@ -24,7 +24,7 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
         cli.cli_usuario identificacion,
         cli.cli_nombre as cliente,
         fac.factura_id factura,
-        ROUND(SUM(cp.czpp_cantidad * cp.czpp_valor),2) AS total
+        ROUND(SUM((cp.czpp_cantidad * cp.czpp_valor) * (1 - IFNULL(cp.czpp_descuento,0)/100)),2) AS total
     FROM
         facturas fac
     INNER JOIN
@@ -38,7 +38,7 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
         sucursales_propias sp ON sp.sucp_id=us.usr_sucursal
     WHERE
         fac.factura_tipo = 1
-    AND fac.factura_id_empresa = 1
+    AND fac.factura_id_empresa = " . $idEmpresaKpi . "
     GROUP BY
         fac.factura_id,
         fac.factura_fecha_creacion,
@@ -154,7 +154,7 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
             us.usr_nombre as asesor,
             fac.factura_cliente,
             cli.cli_nombre as cliente,
-            ROUND(SUM(cp.czpp_cantidad * cp.czpp_valor),2) AS valor
+            ROUND(SUM((cp.czpp_cantidad * cp.czpp_valor) * (1 - IFNULL(cp.czpp_descuento,0)/100)),2) AS valor
         FROM facturas fac
         INNER JOIN cotizacion_productos cp ON cp.czpp_cotizacion = fac.factura_id AND cp.czpp_tipo = 4
         INNER JOIN  clientes cli ON cli.cli_id=fac.factura_cliente
@@ -620,8 +620,8 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
 
 }else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_detalleKpi_1_2_ventas" ) {
 
-
     $e_dato = json_decode($_POST["e_datos"]);
+    $idEmpresaKpi = isset($_SESSION["dataAdicional"]["id_empresa"]) ? (int)$_SESSION["dataAdicional"]["id_empresa"] : 1;
 
     $sql = "
         SELECT
@@ -635,13 +635,13 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
             cli.cli_usuario identificacion,
             cli.cli_nombre as cliente,
             fac.factura_id factura,
-            ROUND(SUM(cp.czpp_cantidad * cp.czpp_valor),2) AS valor
+            ROUND(SUM((cp.czpp_cantidad * cp.czpp_valor) * (1 - IFNULL(cp.czpp_descuento,0)/100)),2) AS valor
         FROM facturas fac
         INNER JOIN cotizacion_productos cp ON cp.czpp_cotizacion = fac.factura_id AND cp.czpp_tipo = 4
         INNER JOIN  clientes cli ON cli.cli_id=fac.factura_cliente
         INNER JOIN  usuarios us ON us.usr_id=fac.factura_vendedor
         INNER JOIN  sucursales_propias sp ON sp.sucp_id=us.usr_sucursal
-        WHERE fac.factura_tipo = 1 AND fac.factura_id_empresa = 1  AND".$_POST["condicion"] ."
+        WHERE fac.factura_tipo = 1 AND fac.factura_id_empresa = " . $idEmpresaKpi . "  AND ".$_POST["condicion"] ."
         GROUP BY
             fac.factura_id,
             fac.factura_fecha_creacion,
@@ -749,7 +749,7 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
             cli.cli_usuario identificacion,
             cli.cli_nombre as cliente,
             fac.factura_id factura,
-            ROUND(SUM(cp.czpp_cantidad * cp.czpp_valor),2) AS valor
+            ROUND(SUM((cp.czpp_cantidad * cp.czpp_valor) * (1 - IFNULL(cp.czpp_descuento,0)/100)),2) AS valor
         FROM facturas fac
         INNER JOIN cotizacion_productos cp ON cp.czpp_cotizacion = fac.factura_id AND cp.czpp_tipo = 4
         INNER JOIN  clientes cli ON cli.cli_id=fac.factura_cliente
@@ -1184,6 +1184,112 @@ if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_kpi_1_2_ventas" )
     }
 
     echo json_encode($resultado,512);
+}else if (isset($_POST["opcion"]) and $_POST["opcion"] == "consultar_resumen_kpis" ) {
+
+    $e_dato = isset($_POST["e_datos"]) ? json_decode($_POST["e_datos"]) : null;
+    $obj = (is_array($e_dato) && isset($e_dato[0])) ? $e_dato[0] : (is_object($e_dato) && isset($e_dato->desde) ? $e_dato : null);
+    if (!is_object($obj)) {
+        $obj = new stdClass();
+        $obj->desde = date('Y-m-01');
+        $obj->hasta = date('Y-m-d');
+        $obj->id_sucursal = '';
+        $obj->id_asesor = '';
+    }
+    $idEmpresaKpi = isset($_SESSION["dataAdicional"]["id_empresa"]) ? (int)$_SESSION["dataAdicional"]["id_empresa"] : 1;
+    $desde = isset($obj->desde) && $obj->desde !== "" ? $conexionBdPrincipal->real_escape_string($obj->desde) : date('Y-m-01');
+    $hasta = isset($obj->hasta) && $obj->hasta !== "" ? $conexionBdPrincipal->real_escape_string($obj->hasta) : date('Y-m-d');
+    $id_sucursal = isset($obj->id_sucursal) && $obj->id_sucursal !== "" ? (int)$obj->id_sucursal : 0;
+    $id_asesor = isset($obj->id_asesor) && $obj->id_asesor !== "" ? (int)$obj->id_asesor : 0;
+
+    $cond_ventas = " fac.factura_fecha_creacion BETWEEN '" . $desde . "' AND '" . $hasta . "' ";
+    if ($id_asesor > 0) $cond_ventas .= " AND fac.factura_vendedor = " . $id_asesor;
+    $cond_join = "";
+    if ($id_sucursal > 0) $cond_join = " AND us.usr_sucursal = " . $id_sucursal;
+
+    $sql_ventas = "
+    SELECT
+        COUNT(DISTINCT fac.factura_id) AS num_facturas,
+        COALESCE(ROUND(SUM((cp.czpp_cantidad * cp.czpp_valor) * (1 - IFNULL(cp.czpp_descuento,0)/100)),2),0) AS total_ventas
+    FROM facturas fac
+    INNER JOIN cotizacion_productos cp ON cp.czpp_cotizacion = fac.factura_id AND cp.czpp_tipo = 4
+    INNER JOIN usuarios us ON us.usr_id = fac.factura_vendedor
+    WHERE fac.factura_tipo = 1 AND fac.factura_id_empresa = " . $idEmpresaKpi . " AND " . $cond_ventas . $cond_join;
+    $res_ventas = mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, $sql_ventas));
+    $total_ventas = (float)($res_ventas["total_ventas"] ?? 0);
+    $num_facturas = (int)($res_ventas["num_facturas"] ?? 0);
+    $promedio_ticket = $num_facturas > 0 ? round($total_ventas / $num_facturas, 2) : 0;
+
+    $cond_cumpl = " CONCAT(um.um_year,'-',LPAD(um.um_mes,2,'0')) BETWEEN '" . substr($desde, 0, 7) . "' AND '" . substr($hasta, 0, 7) . "' ";
+    if ($id_asesor > 0) $cond_cumpl .= " AND um.um_usuario = " . $id_asesor;
+    if ($id_sucursal > 0) $cond_cumpl .= " AND u.usr_sucursal = " . $id_sucursal;
+    $sql_cumpl = "
+    SELECT COALESCE(SUM(um.um_meta),0) AS meta_total,
+           (SELECT COALESCE(ROUND(SUM((cp.czpp_cantidad * cp.czpp_valor) * (1 - IFNULL(cp.czpp_descuento,0)/100)),2),0)
+            FROM facturas fac2
+            INNER JOIN cotizacion_productos cp ON cp.czpp_cotizacion = fac2.factura_id AND cp.czpp_tipo = 4
+            INNER JOIN usuarios us2 ON us2.usr_id = fac2.factura_vendedor
+            WHERE fac2.factura_tipo = 1 AND fac2.factura_id_empresa = " . $idEmpresaKpi . "
+            AND fac2.factura_fecha_creacion BETWEEN '" . $desde . "' AND '" . $hasta . "'
+            " . ($id_asesor > 0 ? " AND fac2.factura_vendedor = " . $id_asesor : "") . "
+            " . ($id_sucursal > 0 ? " AND us2.usr_sucursal = " . $id_sucursal : "") . "
+           ) AS ejecutado_total
+    FROM usuarios_metas um
+    INNER JOIN usuarios u ON u.usr_id = um.um_usuario AND u.usr_id_empresa = " . $idEmpresaKpi . "
+    WHERE um.um_tipo_meta = 'VALOR_VENTAS' AND um.um_id_empresa = " . $idEmpresaKpi . " AND " . $cond_cumpl;
+    $res_cumpl = mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, $sql_cumpl));
+    $meta_total = (float)($res_cumpl["meta_total"] ?? 0);
+    $ejecutado_total = (float)($res_cumpl["ejecutado_total"] ?? 0);
+    $cumplimiento_cuota_pct = $meta_total > 0 ? round(($ejecutado_total / $meta_total) * 100, 1) : null;
+
+    $cond_seg = " cs.cseg_fecha_contacto BETWEEN '" . $desde . "' AND '" . $hasta . "' ";
+    if ($id_asesor > 0) $cond_seg .= " AND cs.cseg_usuario_responsable = " . $id_asesor;
+    if ($id_sucursal > 0) $cond_seg .= " AND u.usr_sucursal = " . $id_sucursal;
+    $sql_visitas = "SELECT COUNT(cs.cseg_id) AS num_visitas FROM cliente_seguimiento cs
+        INNER JOIN usuarios u ON u.usr_id = cs.cseg_usuario_responsable
+        WHERE cs.cseg_visita = 1 AND " . $cond_seg;
+    $res_visitas = mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, $sql_visitas));
+    $num_visitas = (int)($res_visitas["num_visitas"] ?? 0);
+
+    $sql_demo = "SELECT COUNT(cs.cseg_id) AS num_demostraciones FROM cliente_seguimiento cs
+        INNER JOIN usuarios u ON u.usr_id = cs.cseg_usuario_responsable
+        WHERE cs.cseg_demostracion = 1 AND " . $cond_seg;
+    $res_demo = mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, $sql_demo));
+    $num_demostraciones = (int)($res_demo["num_demostraciones"] ?? 0);
+
+    $cond_pro = " c.cli_fecha_registro BETWEEN '" . $desde . "' AND '" . $hasta . "' ";
+    if ($id_asesor > 0) $cond_pro .= " AND c.cli_responsable = " . $id_asesor;
+    if ($id_sucursal > 0) $cond_pro .= " AND u.usr_sucursal = " . $id_sucursal;
+    $sql_prospectos = "SELECT COUNT(c.cli_id) AS prospectos FROM clientes c
+        INNER JOIN usuarios u ON u.usr_id = c.cli_responsable AND u.usr_id_empresa = " . $idEmpresaKpi . "
+        WHERE c.cli_categoria IN (1,2,3) AND c.cli_fecha_registro IS NOT NULL AND " . $cond_pro;
+    $res_pro = mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, $sql_prospectos));
+    $prospectos = (int)($res_pro["prospectos"] ?? 0);
+    $cond_cli = " c.cli_fecha_ingreso BETWEEN '" . $desde . "' AND '" . $hasta . "' AND c.cli_fecha_ingreso IS NOT NULL AND c.cli_fecha_ingreso <> '0000-00-00' ";
+    if ($id_asesor > 0) $cond_cli .= " AND c.cli_responsable = " . $id_asesor;
+    if ($id_sucursal > 0) $cond_cli .= " AND u.usr_sucursal = " . $id_sucursal;
+    $sql_clientes = "SELECT COUNT(c.cli_id) AS clientes FROM clientes c
+        INNER JOIN usuarios u ON u.usr_id = c.cli_responsable AND u.usr_id_empresa = " . $idEmpresaKpi . "
+        WHERE c.cli_categoria IN (1,2,3) AND " . $cond_cli;
+    $res_cli = mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, $sql_clientes));
+    $clientes = (int)($res_cli["clientes"] ?? 0);
+    $tasa_conversion = $prospectos > 0 ? round(($clientes / $prospectos) * 100, 1) : null;
+
+    $resultado["estado"] = "ok";
+    $resultado["mensaje"] = "Resumen de KPIs";
+    $resultado["datos"] = array(
+        "total_ventas" => $total_ventas,
+        "num_facturas" => $num_facturas,
+        "promedio_ticket" => $promedio_ticket,
+        "cumplimiento_cuota_pct" => $cumplimiento_cuota_pct,
+        "num_visitas" => $num_visitas,
+        "num_demostraciones" => $num_demostraciones,
+        "tasa_conversion" => $tasa_conversion,
+        "prospectos" => $prospectos,
+        "clientes_nuevos" => $clientes,
+        "desde" => $desde,
+        "hasta" => $hasta
+    );
+    echo json_encode($resultado, 512);
 }else{
     echo json_encode(array(
         'estado' => 'ko',

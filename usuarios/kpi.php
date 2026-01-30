@@ -4,8 +4,8 @@ $idPagina = 416;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 ?>
-	<script src="js/jquery.js"></script>
-	
+	<!-- jQuery 3.x requerido por DevExtreme (dxPivotGrid/dxChart); no usar jquery.js antiguo aquí -->
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 	<link href="css/tablecloth.css" rel="stylesheet">
 
 	<script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -24,18 +24,16 @@ include("includes/head.php");
 	
 	<?php include("includes/overlay.php");?>
 
-	<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
   	<!-- DevExtreme theme -->
 	<link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/23.2.5/css/dx.light.css">
 
-	<!-- DevExtreme libraries (reference only one of them) 
-	<script type="text/javascript" src="../assets/devexpress/web/dx.all.js"></script> -->  
+	<!-- Polyfill antes de DevExtreme (evita a.default.Error is not a function) -->
+	<script src="../librerias/devexpress/web/polyfill.min.js"></script>
+	<!-- DevExtreme libraries -->
 	<script type="text/javascript" src="https://cdn3.devexpress.com/jslib/23.2.5/js/dx.all.js"></script>  
 	<script src="https://cdn3.devexpress.com/jslib/22.2.3/js/localization/dx.messages.es.js"></script>
 
 	<!-- Exportar a excel -->
-	<script src="../librerias/devexpress/web/polyfill.min.js"></script>
 	<script src="../librerias/devexpress/web/exceljs.min.js"></script>
 	<script src="../librerias/devexpress/web/FileSaver.min.js"></script>
 <?php include("includes/funciones-js.php");?>

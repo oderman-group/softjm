@@ -58,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     }).dxPopup("instance");    
 
-
     function btnKpiClic(e) {
         e.preventDefault();
 
@@ -198,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (idbtn == "kpi2") {     
 
-                divDescripcionPki.innerHTML = "<b>Cantidad:</b> Número de facturas emitidas. <b>Total:</b> Suma del valor total de las facturas. <b>Prom:</b> Promedio del valor total de las facturas.";
+                divDescripcionPki.innerHTML = "<b>Cantidad:</b> Número de facturas emitidas. <b>Total:</b> Suma del valor de venta (con descuento y sin IVA). <b>Prom:</b> Promedio del valor de venta por factura (con descuento y sin IVA).";
 
                 grdDatosChart.option({   
                     commonSeriesSettings: {

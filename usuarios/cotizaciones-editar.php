@@ -683,7 +683,7 @@ include("includes/js-formularios.php");
 				$breadCrumbFactura = 'Factura Pendiente';
 
 				if (!empty($facturaAsociadaDatos[Factura::$primaryKey])) {
-					$linkFactura = 'remisionbdg.php?busqueda='.$facturaAsociadaDatos[Factura::$primaryKey];
+					$linkFactura = 'facturas.php?busqueda='.$facturaAsociadaDatos[Factura::$primaryKey];
 					$breadCrumbFactura = 'Factura Nro. '.$facturaAsociadaDatos[Factura::$primaryKey];
 				}
 			?>
