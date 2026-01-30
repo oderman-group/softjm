@@ -225,7 +225,7 @@ include("includes/head.php");
 									<tbody>
 										<?php
 										if (isset($_GET["cte"]) and $_GET["cte"] != "") {
-											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cli_id, cli_nombre, cli_zona, cotiz_es_precotizacion
+											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cotiz_ticket, cli_id, cli_nombre, cli_zona, cotiz_es_precotizacion
 												FROM cotizacion
 								INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='" . $_GET["cte"] . "'
 								WHERE cotiz_id_empresa='".$idEmpresa."'
@@ -233,7 +233,7 @@ include("includes/head.php");
 								LIMIT $inicio, $limite
 								");
 										} else {
-											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cotiz_es_precotizacion,
+											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cotiz_ticket, cotiz_es_precotizacion,
 												cli_id, cli_nombre, cli_zona,
 												usr_id, usr_nombre 
 												FROM cotizacion
@@ -336,6 +336,14 @@ include("includes/head.php");
 												<td><?=!empty($res['usr_nombre']) ? strtoupper($res['usr_nombre']) : ""; ?></td>
 												<td><?=!empty($vendedor['usr_nombre']) ? strtoupper($vendedor['usr_nombre']) : ""; ?></td>
 												<td>
+													<?php if(
+														$IdGeneroPedido == '' &&
+														Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
+														!empty($res['cotiz_ticket']) &&
+														$res['cotiz_es_precotizacion'] != 1
+													) { ?>
+													<a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" class="btn btn-info btn-small" onClick="return confirm('¿Desea generar pedido de esta cotización?');"><i class="icon-shopping-cart"></i> Generar pedido</a>
+													<?php } ?>
 													<div class="btn-group">
 														<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span>
 														</button>
@@ -356,12 +364,11 @@ include("includes/head.php");
 																<?php } ?>
 
 																<?php if(
-																	$IdGeneroPedido == '' && 
+																	$IdGeneroPedido == '' &&
 																	Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
 																	!empty($res['cotiz_ticket']) &&
 																	$res['cotiz_es_precotizacion'] != 1
-																	) {
-																?>
+																) { ?>
 																		<li><a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $res['cotiz_id']; ?>" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}">Generar pedido</a></li>
 															<?php }?>
 

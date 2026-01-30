@@ -869,6 +869,10 @@ include("includes/js-formularios.php");
 															while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
 																$consultaVendedor = $conexionBdPrincipal->query("SELECT * FROM usuarios WHERE usr_id='".$res['cotiz_vendedor']."' AND usr_id_empresa='".$idEmpresa."'");
 																$vendedor = mysqli_fetch_array($consultaVendedor, MYSQLI_BOTH);
+
+																$consultaGpedido = $conexionBdPrincipal->query("SELECT pedid_id FROM pedidos WHERE pedid_cotizacion='".$res['cotiz_id']."' AND pedid_id_empresa='".$idEmpresa."' LIMIT 1");
+																$generoPedido = mysqli_fetch_array($consultaGpedido, MYSQLI_BOTH);
+																$yaGeneroPedido = !empty($generoPedido['pedid_id']);
 																
 																$fondoCotiz = '';
 																if($res['cotiz_vendida']==1){
@@ -936,6 +940,7 @@ include("includes/js-formularios.php");
 																			<?php } ?>		
 																			<?php //el codigo 46 no se encontro en el archivo sql ?> 
 																			<?php if (
+																				!$yaGeneroPedido &&
 																				Modulos::validarRol([381], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
 																				!empty($res['cotiz_ticket']) &&
 																				$res['cotiz_es_precotizacion'] != 1

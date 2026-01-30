@@ -31,7 +31,7 @@ while ($prod = mysqli_fetch_array($productos)) {
 
     mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento, czpp_productos_existencias)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '".$prod['czpp_cantidad']."', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_REM.", 1, '" . $prod['czpp_descuento'] . "', '" . $prod['prod_existencias'] . "')");
 
-    $resultado = Producto::sacarExistenciasProductoMultiBodega($prod['czpp_producto'], $prod['czpp_cantidad'], $conexionBdPrincipal);
+    $resultado = Producto::sacarExistenciasProductoMultiBodega($prod['czpp_producto'], $prod['czpp_cantidad'], $conexionBdPrincipal, true);
 
     if ($resultado['status'] === 'success') {
         Producto::sincronizarExistenciasConBodegas($prod['czpp_producto'], $conexionBdPrincipal);
@@ -64,7 +64,7 @@ while ($combo = mysqli_fetch_array($productosCombos, MYSQLI_ASSOC)) { // Usar MY
             // Iterar sobre cada producto dentro del JSON del combo
             foreach ($productosDelComboJSON as $comProd) {
 
-                $resultado = Producto::sacarExistenciasProductoMultiBodega($comProd['id_producto'], $comProd['cantidad_en_combo'], $conexionBdPrincipal);
+                $resultado = Producto::sacarExistenciasProductoMultiBodega($comProd['id_producto'], $comProd['cantidad_en_combo'], $conexionBdPrincipal, true);
 
                 if ($resultado['status'] === 'success') {
                     Producto::sincronizarExistenciasConBodegas($comProd['id_producto'], $conexionBdPrincipal);

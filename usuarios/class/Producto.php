@@ -64,12 +64,14 @@ class Producto extends BaseDatos {
      * @param int $idProducto El ID del producto.
      * @param int $cantidadASacar La cantidad de existencias a descontar.
      * @param mysqli $conexionBdPrincipal La conexión a la base de datos MySQLi.
+     * @param bool $transaccionExterna Si true, el llamador ya tiene una transacción abierta: no se llama begin/commit/rollback aquí.
      * @return array Un array asociativo con 'status' (success/error), 'message' y 'remaining_stock_global' (si aplica).
      */
     public static function sacarExistenciasProductoMultiBodega(
-        int $idProducto, 
-        int $cantidadASacar, 
-        $conexionBdPrincipal
+        int $idProducto,
+        int $cantidadASacar,
+        $conexionBdPrincipal,
+        bool $transaccionExterna = false
     ): array {
         // 1. Validar entradas básicas
         if ($cantidadASacar <= 0) {
@@ -79,8 +81,9 @@ class Producto extends BaseDatos {
         // Usar un ID de usuario predeterminado si no se proporciona
         $idUsuarioActualizacion = $_SESSION['id']; // Ajusta el ID por defecto si es necesario
 
-        // Iniciar una transacción para asegurar la atomicidad de la operación
-        $conexionBdPrincipal->begin_transaction();
+        if (!$transaccionExterna) {
+            $conexionBdPrincipal->begin_transaction();
+        }
 
         try {
             // 2. Sumar las existencias totales de todas las bodegas para el producto
@@ -104,7 +107,9 @@ class Producto extends BaseDatos {
 
             // 3. Verificar si hay existencias suficientes globalmente
             if ($totalExistenciasGlobal < $cantidadASacar) {
-                $conexionBdPrincipal->rollback(); // Revertir la transacción
+                if (!$transaccionExterna) {
+                    $conexionBdPrincipal->rollback();
+                }
                 return ['status' => 'error', 'message' => 'No hay existencias suficientes. Disponibles en total: ' . $totalExistenciasGlobal];
             }
 
@@ -178,19 +183,22 @@ class Producto extends BaseDatos {
 
             // 6. Confirmar la transacción si todo el descuento se realizó
             if ($cantidadPendienteADescontar === 0) {
-                $conexionBdPrincipal->commit();
+                if (!$transaccionExterna) {
+                    $conexionBdPrincipal->commit();
+                }
                 $remainingGlobal = $totalExistenciasGlobal - $cantidadASacar;
                 return ['status' => 'success', 'message' => 'Existencias descontadas exitosamente.', 'remaining_stock_global' => $remainingGlobal];
             } else {
-                // Esto no debería suceder si totalExistenciasGlobal >= cantidadASacar,
-                // pero es una salvaguarda.
-                $conexionBdPrincipal->rollback();
+                if (!$transaccionExterna) {
+                    $conexionBdPrincipal->rollback();
+                }
                 throw new Exception("No se pudo descontar la cantidad completa de las bodegas disponibles.");
             }
 
         } catch (Exception $e) {
-            // Si algo sale mal, revertir la transacción
-            $conexionBdPrincipal->rollback();
+            if (!$transaccionExterna) {
+                $conexionBdPrincipal->rollback();
+            }
             self::logError("Excepción en sacarExistenciasProductoMultiBodega: " . $e->getMessage());
             return ['status' => 'error', 'message' => 'Fallo al procesar la operación: ' . $e->getMessage()];
         }
@@ -260,6 +268,72 @@ class Producto extends BaseDatos {
         ";
 
         return mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, $sql));
+    }
+
+    /**
+     * Sincroniza un producto con Ofima
+     * Se llama automáticamente cuando se crea o actualiza un producto
+     * 
+     * @param int $productoId ID del producto a sincronizar
+     * @param mysqli $conexionBdPrincipal Conexión a la base de datos
+     * @param int $idEmpresa ID de la empresa
+     * @param string $tipoOperacion 'CREATE' o 'UPDATE'
+     * @return array Resultado de la sincronización
+     */
+    public static function sincronizarConOfima($productoId, $conexionBdPrincipal, $idEmpresa, $tipoOperacion = 'UPDATE') {
+        // Verificar si la sincronización está activa
+        $query = "SELECT apic_activo FROM api_configuracion 
+                  WHERE apic_modulo = 'productos' 
+                  AND apic_direccion = 'orion_ofima' 
+                  AND apic_id_empresa = ? 
+                  LIMIT 1";
+        
+        $stmt = $conexionBdPrincipal->prepare($query);
+        $stmt->bind_param("i", $idEmpresa);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows === 0 || $result->fetch_assoc()['apic_activo'] != 1) {
+            // Sincronización desactivada, no hacer nada
+            return [
+                'success' => false,
+                'message' => 'Sincronización desactivada'
+            ];
+        }
+        
+        // Obtener datos completos del producto
+        $query = "SELECT * FROM productos WHERE prod_id = ? AND prod_id_empresa = ?";
+        $stmt = $conexionBdPrincipal->prepare($query);
+        $stmt->bind_param("ii", $productoId, $idEmpresa);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows === 0) {
+            return [
+                'success' => false,
+                'error' => 'Producto no encontrado'
+            ];
+        }
+        
+        $producto = $result->fetch_assoc();
+        
+        // Incluir relaciones si existen
+        if (!empty($producto['prod_categoria'])) {
+            $queryCat = "SELECT catp_nombre FROM productos_categorias WHERE catp_id = ?";
+            $stmtCat = $conexionBdPrincipal->prepare($queryCat);
+            $stmtCat->bind_param("i", $producto['prod_categoria']);
+            $stmtCat->execute();
+            $catResult = $stmtCat->get_result();
+            if ($catResult->num_rows > 0) {
+                $producto['categoria_nombre'] = $catResult->fetch_assoc()['catp_nombre'];
+            }
+        }
+        
+        // Sincronizar con Ofima
+        require_once RUTA_PROYECTO.'/usuarios/class/ApiOfimaClient.php';
+        $apiClient = new ApiOfimaClient($conexionBdPrincipal, $idEmpresa);
+        
+        return $apiClient->sincronizarProducto($producto, $tipoOperacion);
     }
 
 }

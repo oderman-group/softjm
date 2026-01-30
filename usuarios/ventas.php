@@ -311,6 +311,10 @@
 												$filtroFactura = '';
 												$filtroRemision = '';
 												$filtroCliente = '';
+												$desdeMeta = !empty($_GET["desde"]) ? $_GET["desde"] : date('Y-m-01');
+												$hastaMeta = !empty($_GET["hasta"]) ? $_GET["hasta"] : date('Y-m-t');
+												$periodoDesde = date('Y-m', strtotime($desdeMeta));
+												$periodoHasta = date('Y-m', strtotime($hastaMeta));
 												if(!empty($_GET["desde"]) || !empty($_GET["hasta"])){
 													$filtroFactura .= " AND factura_fecha_propuesta BETWEEN '".$_GET["desde"]."' AND '".$_GET["hasta"]."'";
 													$filtroRemision .= " AND rem_fecha BETWEEN '".$_GET["desde"]."' AND '".$_GET["hasta"]."'";
@@ -380,7 +384,7 @@
 												}
 
 												$porcentajeGral   = !empty($metricas['met_meta_venta_mes']) ? 
-																	($sumaTotal / $metricas['met_meta_venta_mes']) * 100 : 
+																	($sumaTotalConDcto / $metricas['met_meta_venta_mes']) * 100 : 
 																	0;
 												?>
 
@@ -470,12 +474,22 @@
 
 												$ventasMejores = 0;
 
-												$consultaVendedores = mysqli_query($conexionBdPrincipal, "SELECT factura_vendedor, UCASE(usr_nombre) AS vendedor, sum( (czpp_valor*czpp_cantidad) ) AS sumaTotal, AVG( (czpp_valor*czpp_cantidad) ) AS promVentas, SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(*) AS numVentas, sucp_nombre, usr_id, usr_meta_ventas
+												$consultaVendedores = mysqli_query($conexionBdPrincipal, "SELECT factura_vendedor, UCASE(usr_nombre) AS vendedor,
+													SUM( (czpp_valor*czpp_cantidad) * (1 - IFNULL(czpp_descuento,0)/100) ) AS sumaTotal,
+													AVG( (czpp_valor*czpp_cantidad) * (1 - IFNULL(czpp_descuento,0)/100) ) AS promVentas,
+													SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(DISTINCT factura_id) AS numVentas, sucp_nombre, usr_id,
+													COALESCE(um.meta_valor_ventas, usr_meta_ventas) AS meta_ventas
 													FROM cotizacion_productos
 													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_tipo='".FACTURA_TIPO_VENTA."' $filtroFactura AND factura_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 													INNER JOIN usuarios ON usr_id=factura_vendedor AND usr_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 													INNER JOIN sucursales_propias ON sucp_id=usr_sucursal AND sucp_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 													INNER JOIN clientes ON cli_id=factura_cliente $filtroCliente AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
+													LEFT JOIN (
+														SELECT um_usuario, SUM(um_meta) AS meta_valor_ventas FROM usuarios_metas
+														WHERE um_tipo_meta = 'VALOR_VENTAS' AND um_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'
+														AND CONCAT(um_year,'-',LPAD(um_mes,2,'0')) BETWEEN '".$periodoDesde."' AND '".$periodoHasta."'
+														GROUP BY um_usuario
+													) um ON um.um_usuario = factura_vendedor
 													WHERE czpp_tipo='".CZPP_TIPO_FACT."' AND czpp_cantidad>0
 													GROUP BY factura_vendedor
 													ORDER BY sumaTotal DESC
@@ -492,7 +506,7 @@
 														$ventasMejores = 	$datosVendedores['sumaTotal'];
 													}
 
-													$porcentaje = !empty($datosVendedores['sumaTotal']) && !empty($datosVendedores['usr_meta_ventas']) ? ($datosVendedores['sumaTotal'] / $datosVendedores['usr_meta_ventas']) * 100 : 0;
+													$porcentaje = !empty($datosVendedores['sumaTotal']) && !empty($datosVendedores['meta_ventas']) ? ($datosVendedores['sumaTotal'] / $datosVendedores['meta_ventas']) * 100 : 0;
 													
 													?>
 
@@ -506,7 +520,7 @@
 
 														<td><?=$datosVendedores['Totaldctos'];?>%</td>
 														<td><?=number_format($datosVendedores['promDcto'], 2, ",", ".");?>%</td>
-														<td>$<?=!empty($datosVendedores['usr_meta_ventas']) ? number_format($datosVendedores['usr_meta_ventas'], 2, ",", ".") : 0;?></td>
+														<td>$<?=!empty($datosVendedores['meta_ventas']) ? number_format($datosVendedores['meta_ventas'], 2, ",", ".") : 0;?></td>
 														<td>
 															<?=number_format($porcentaje, 2, ",", ".");?>%<br>
 															<div class="progress progress-info progress-striped">
@@ -560,8 +574,9 @@
 
 												$no = 1;
 												$sumaTotalSucursales = 0;
-												$consultaSucursales = mysqli_query($conexionBdPrincipal, "SELECT factura_vendedor, sum( (czpp_valor*czpp_cantidad) ) AS sumaTotal,
-												AVG( (czpp_valor*czpp_cantidad) ) AS promVentas, SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(*) AS numVentas,
+												$consultaSucursales = mysqli_query($conexionBdPrincipal, "SELECT factura_vendedor,
+												SUM( (czpp_valor*czpp_cantidad) * (1 - IFNULL(czpp_descuento,0)/100) ) AS sumaTotal,
+												AVG( (czpp_valor*czpp_cantidad) * (1 - IFNULL(czpp_descuento,0)/100) ) AS promVentas, SUM(czpp_descuento) AS Totaldctos, AVG(czpp_descuento) AS promDcto, COUNT(DISTINCT factura_id) AS numVentas,
 												sucp_nombre
 												FROM cotizacion_productos
 													INNER JOIN facturas ON factura_id=czpp_cotizacion AND factura_vendedor IS NOT NULL AND factura_tipo='".FACTURA_TIPO_VENTA."' $filtroFactura AND factura_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
