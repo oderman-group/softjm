@@ -37,8 +37,17 @@ if($num>0)
 		'evento'    => null
 	];
 	//$_SESSION["idUsuario"] = $fila[0];
-	if(!isset($_POST["idseg"]) or !is_numeric($_POST["idseg"])){$url = 'usuarios/';}
-	else{$url = 'usuarios/clientes-seguimiento-editar.php?id='.$_POST["idseg"];}
+	// Redirección tras login: prioridad a redirect_to (URL completa) para ir al seguimiento u otra página
+	$url = $urlRed . '/usuarios/';
+	if (!empty(trim((string)$_POST["redirect_to"]))) {
+		$redirectTo = trim($_POST["redirect_to"]);
+		// Validar que la URL sea del mismo origen (evitar open redirect)
+		if (strpos($redirectTo, REDIRECT_ROUTE) === 0 && strpos($redirectTo, "\n") === false && strpos($redirectTo, "\r") === false) {
+			$url = $redirectTo;
+		}
+	} elseif (isset($_POST["idseg"]) && is_numeric($_POST["idseg"])) {
+		$url = $urlRed . '/usuarios/clientes-seguimiento-editar.php?id='.(int)$_POST["idseg"];
+	}
 	
 	$conexionBdPrincipal->query("UPDATE usuarios SET usr_sesion=1, usr_ultimo_ingreso=now(), usr_intentos_fallidos=0 WHERE usr_id='".$fila[0]."'");
 	//if(mysql_errno()!=0){echo mysql_error();exit();}

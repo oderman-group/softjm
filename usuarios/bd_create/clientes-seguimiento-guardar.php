@@ -195,38 +195,62 @@ if ($_POST["notf"] == 1) {
 	while ($contador < $numero) {
 		mysqli_query($conexionBdPrincipal,"INSERT INTO notificaciones(not_asunto, not_cliente, not_usuario, not_visto, not_estado, not_seguimiento, not_fecha)VALUES('" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "', '" . $_POST["cliente"] . "', '" . $_POST["encargado"][$contador] . "', 0, 1, '" . $idInsertU . "', now())");
 
+		// Obtener datos del encargado (destinatario del correo) por su ID
+		$encargadoRow = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_id='" . (int)$_POST["encargado"][$contador] . "'"));
 		$contactoCliente = [
-			'cont_email' => 'jhonoderman@gmail.com',
-			'cont_nombre' => 'Jhon Mejia'
+			'cont_email' => (!empty($encargadoRow['usr_email']) ? $encargadoRow['usr_email'] : ''),
+			'cont_nombre' => (!empty($encargadoRow['usr_nombre']) ? $encargadoRow['usr_nombre'] : 'Encargado')
 		];
+
+		// Solo enviar correo si el encargado tiene email
+		if (empty($contactoCliente['cont_email'])) {
+			$contador++;
+			continue;
+		}
 
 		$asesorDatos = [
 			'usr_email' => $asesor['usr_email'],
 			'usr_nombre' => $asesor['usr_nombre']
 		];
 
-		$_SESSION["dataAdicional"]["nombre_empresa"] = "JM EQUIPOS S.A.S.";
+		$_SESSION["dataAdicional"]["nombre_empresa"] = isset($_SESSION["dataAdicional"]["nombre_empresa"]) ? $_SESSION["dataAdicional"]["nombre_empresa"] : "JM EQUIPOS S.A.S.";
 
+		// URL directa al seguimiento; si el usuario no está logueado, el sistema lo llevará al login y luego aquí
+		$urlVerSeguimiento = REDIRECT_ROUTE.'/usuarios/clientes-seguimiento-editar.php?id='.$idInsertU.'&idTK='.$tiketID.'&cte='.$_POST["cliente"];
+
+		$nombreCliente = isset($contactoCLiente['cli_nombre']) ? $contactoCLiente['cli_nombre'] : 'Cliente';
+		$fechaProx = !empty($_POST["fechaPC"]) && $_POST["fechaPC"] != '0000-00-00' ? $_POST["fechaPC"] : 'No definida';
 		$fin = "
 		<p>
-		Hola, te informamos que <b>".$datosUsuarioActual['usr_nombre']."</b> te ha asignado un nuevo seguimiento, relacionado al cliente <b>".$contactoCLiente['cli_nombre']."</b>, con el siguiente asunto: <br>
-		<i>".$_POST["asunto"]."</i>
+		Hola <b>".htmlspecialchars($contactoCliente['cont_nombre'])."</b>,
 		</p>
-		<p>Recuerda que para entrar al link del seguimiento debes estar logueado en el sistema.</p>
-		"; // Simular el cuerpo HTML
+		<p>
+		Te informamos que <b>".htmlspecialchars($datosUsuarioActual['usr_nombre'])."</b> te ha asignado un nuevo seguimiento.
+		</p>
+		<p><strong>Detalles:</strong></p>
+		<ul>
+			<li><strong>Ticket N.º:</strong> ".$tiketID."</li>
+			<li><strong>Seguimiento N.º:</strong> ".$idInsertU."</li>
+			<li><strong>Cliente:</strong> ".htmlspecialchars($nombreCliente)."</li>
+			<li><strong>Asunto:</strong> ".htmlspecialchars($_POST["asunto"])."</li>
+			<li><strong>Fecha próximo contacto:</strong> ".$fechaProx."</li>
+		</ul>
+		<p><strong>Observaciones:</strong><br><i>".nl2br(htmlspecialchars($_POST["observaciones"]))."</i></p>
+		<p>Utiliza el botón inferior para ir directamente al seguimiento. Si no has iniciado sesión, se te pedirá ingresar y luego se te llevará a este seguimiento.</p>
+		";
 
 		// 1. Instanciar el servicio
 		$mailer = new MailerService();
 
 		// 2. Preparar el contenido del correo usando la plantilla
-		$subject =  " Nuevo seguimiento asignado relacionado al ticket ".$tiketID;
+		$subject = "Nuevo seguimiento asignado - Ticket #".$tiketID." - Seguimiento #".$idInsertU." - ".$nombreCliente;
 
 		$emailData = [
 			'subject'       => $subject,
-			'app_name'      => $_SESSION["dataAdicional"]["nombre_empresa"], // Reutiliza el nombre de la empresa
-			'content'       => $fin, // Tu contenido HTML aquí
-			'button_link'   => REDIRECT_ROUTE.'/usuarios/clientes-seguimiento.php?idTK='.$tiketID.'&seg='.$idInsertU, // Si no necesitas botón, dejar vacío
-			'button_text'   => 'Ver el seguimiento', // Si no necesitas botón, dejar vacío
+			'app_name'      => $_SESSION["dataAdicional"]["nombre_empresa"],
+			'content'       => $fin,
+			'button_link'   => $urlVerSeguimiento,
+			'button_text'   => 'Ver el seguimiento',
 			'support_email' => 'soporte@jmequipos.com',
 		];
 

@@ -6,7 +6,9 @@ date_default_timezone_set('America/Bogota');
 require_once($_SERVER['DOCUMENT_ROOT']."/softjm/constantes.php");
 
 if( $_SESSION["id"]=="" || !is_numeric($_SESSION["id"]) ){
-	header("Location:../salir.php");
+	// Conservar la URL que el usuario intentaba ver para redirigirlo tras el login
+	$urlDestino = REDIRECT_ROUTE.'/usuarios/'.basename($_SERVER['SCRIPT_NAME']).(isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] !== '' ? '?'.$_SERVER['QUERY_STRING'] : '');
+	header("Location:".REDIRECT_ROUTE."/index.php?s=11&redirect_to=".urlencode($urlDestino));
 	exit();
 }
 	
