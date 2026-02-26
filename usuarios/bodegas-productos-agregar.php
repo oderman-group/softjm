@@ -3,6 +3,12 @@ include("sesion.php");
 
 $idPagina = 146;
 include("includes/verificar-paginas.php");
+include_once(RUTA_PROYECTO."/usuarios/includes/inventario-solo-ofima.php");
+if (inventarioSoloOfimaEntrada($conexionBdPrincipal, $idEmpresa)) {
+    $prod = isset($_GET["prod"]) ? '&prod=' . intval($_GET["prod"]) : '';
+    header("Location: bodegas-productos.php?msg=solo_ofima" . $prod);
+    exit();
+}
 include("includes/head.php");
 ?>
 <!-- styles -->

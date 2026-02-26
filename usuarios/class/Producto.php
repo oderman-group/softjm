@@ -11,11 +11,25 @@ class Producto extends BaseDatos {
     public const PROD_UTILIDAD = 'prod_utilidad';
     public const PROD_COSTO    = 'prod_costo';
 
-    public static function CalcularPrecioLista(string $costo, string $utilidadSobreCien) {
-        if (empty($costo) || empty($utilidadSobreCien)) {
+    /**
+     * @param string|int|float|null $costo
+     * @param string|int|float|null $utilidadSobreCien Factor 0-1 (ej. 0.30 = 30%). En formularios a veces se pasa porcentaje/100.
+     */
+    public static function CalcularPrecioLista($costo, $utilidadSobreCien) {
+        if ($costo === null || $utilidadSobreCien === null) {
             return 0;
         }
-
+        if ($costo === '' || $utilidadSobreCien === '') {
+            return 0;
+        }
+        if (!is_numeric($costo) || !is_numeric($utilidadSobreCien)) {
+            return 0;
+        }
+        $costo = (float) $costo;
+        $utilidadSobreCien = (float) $utilidadSobreCien;
+        if ($utilidadSobreCien >= 1) {
+            return 0;
+        }
         return $costo / (1 - $utilidadSobreCien);
     }
 
@@ -316,6 +330,14 @@ class Producto extends BaseDatos {
         }
         
         $producto = $result->fetch_assoc();
+        
+        // Validar campos mínimos antes de enviar a Ofima
+        if (empty(trim($producto['prod_referencia'] ?? '')) || empty(trim($producto['prod_nombre'] ?? ''))) {
+            return [
+                'success' => false,
+                'error' => 'El producto debe tener referencia y nombre para sincronizar con Ofima'
+            ];
+        }
         
         // Incluir relaciones si existen
         if (!empty($producto['prod_categoria'])) {

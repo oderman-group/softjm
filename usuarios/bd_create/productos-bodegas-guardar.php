@@ -4,8 +4,13 @@ require_once("../sesion.php");
 $idPagina = 275;
 
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
-
+include_once(RUTA_PROYECTO."/usuarios/includes/inventario-solo-ofima.php");
 include_once RUTA_PROYECTO."/usuarios/class/Producto.php";
+
+if (inventarioSoloOfimaEntrada($conexionBdPrincipal, $idEmpresa)) {
+    echo '<script type="text/javascript">alert("Las existencias solo se actualizan desde Ofima. No puede crear ni editar existencias por bodega desde el CRM."); window.location.href="../bodegas-productos.php?prod=' . (isset($_POST["producto"]) ? intval($_POST["producto"]) : '') . '";</script>';
+    exit();
+}
 
 $bpp = $conexionBdPrincipal->query("SELECT * FROM productos_bodegas WHERE prodb_producto='" . $_POST["producto"] . "' AND prodb_bodega='" . $_POST["bodega"] . "'")->num_rows;
 

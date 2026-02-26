@@ -1,0 +1,227 @@
+/**
+ * CRM Professional - Encabezado y componentes globales
+ * Diseño profesional e intuitivo para el panel
+ */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+/* ---- Encabezado ---- */
+.top-nav {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.top-nav .navbar-inner {
+  min-height: 56px !important;
+  padding: 0 0 0 8px;
+  border: none;
+}
+
+.top-nav .container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.top-nav .home-link a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 56px;
+  color: rgba(255, 255, 255, 0.95) !important;
+  transition: background 0.2s ease;
+}
+
+.top-nav .home-link a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff !important;
+}
+
+.top-nav .nav-collapse {
+  flex: 1;
+}
+
+.top-nav .nav {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.top-nav .nav > li > a {
+  padding: 0 14px;
+  height: 56px;
+  line-height: 56px !important;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92) !important;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.top-nav .nav > li > a:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+.top-nav .nav > li > a i {
+  font-size: 14px;
+  margin-right: 6px;
+  opacity: 0.9;
+}
+
+/* Nombre empresa en nav */
+.top-nav .nav > li:first-child > a {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+/* Dropdown del menú principal */
+.top-nav .nav .dropdown-menu {
+  margin-top: 0;
+  padding: 6px 0;
+  min-width: 200px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  background: #fff !important;
+}
+
+.top-nav .nav .dropdown-menu ul {
+  background: transparent !important;
+  padding: 0;
+  margin: 0;
+}
+
+.top-nav .nav .dropdown-menu ul li a,
+.top-nav .nav .dropdown-menu li a {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155 !important;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.top-nav .nav .dropdown-menu ul li a:hover,
+.top-nav .nav .dropdown-menu li a:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.top-nav .nav .dropdown-menu ul li a i,
+.top-nav .nav .dropdown-menu li a i {
+  margin-right: 10px;
+  width: 18px;
+  text-align: center;
+  color: #64748b;
+}
+
+/* ---- Zona derecha: usuario y notificaciones ---- */
+.notification-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.notification-nav .btn-notification {
+  height: 56px !important;
+  line-height: 56px !important;
+  padding: 0 14px !important;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.95) !important;
+  transition: background 0.2s ease;
+}
+
+.notification-nav .btn-notification:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fff !important;
+}
+
+/* Dropdown usuario (Mi cuenta) */
+.header-user-menu .btn-notification {
+  width: auto !important;
+  min-width: 52px;
+  padding: 0 14px !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.header-user-menu .btn-notification .icon-angle-down {
+  margin-left: 6px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.header-user-dropdown {
+  margin-top: 6px !important;
+  padding: 8px 0 !important;
+  min-width: 220px;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
+  background: #fff !important;
+}
+
+.header-user-dropdown li a {
+  padding: 11px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155 !important;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.header-user-dropdown li a:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.header-user-dropdown li.divider {
+  margin: 6px 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.header-user-dropdown li a i {
+  margin-right: 10px;
+  width: 18px;
+  text-align: center;
+  color: #64748b;
+}
+
+/* Dropdown notificaciones */
+.notification-nav .dropdown-menu {
+  margin-top: 6px !important;
+  padding: 12px !important;
+  min-width: 320px;
+  max-width: 380px;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
+  background: #fff !important;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.notification-nav .dropdown-menu .notify-h {
+  display: block;
+  padding: 8px 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.notification-nav .open .btn-notification {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+}
+
+/* Badge de notificaciones */
+.notify-tip {
+  font-size: 11px !important;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  line-height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+}

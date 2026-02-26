@@ -82,5 +82,14 @@ WHERE cotiz_id='" . $_GET["id"] . "'");
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
+// Sincronizar pedido con Ofima (Orion → Ofima). No bloquea si falla.
+try {
+    require_once RUTA_PROYECTO.'/usuarios/class/ApiOfimaClient.php';
+    $apiOfima = new ApiOfimaClient($conexionBdPrincipal, $idEmpresa);
+    $apiOfima->sincronizarPedido($idInsert, 'CREATE');
+} catch (Exception $e) {
+    error_log("Error al sincronizar pedido con Ofima: " . $e->getMessage());
+}
+
 echo '<script type="text/javascript">window.location.href="../pedidos.php?busqueda=' . $idInsert . '";</script>';
 exit();

@@ -1,9 +1,17 @@
 <?php
 include("sesion.php");
+include_once RUTA_PROYECTO."/usuarios/includes/inventario-solo-ofima.php";
 include_once RUTA_PROYECTO."/usuarios/class/Producto.php";
 
 $idPagina = 207;
 include("includes/verificar-paginas.php");
+
+$blockedInventarioSoloOfima = inventarioSoloOfimaEntrada($conexionBdPrincipal, $idEmpresa);
+if ($blockedInventarioSoloOfima) {
+	$message = 'Las existencias solo se actualizan desde Ofima. No puede importar existencias desde el CRM.';
+	$tipoAlerta = 'warning';
+	$tituloMensaje = 'No permitido';
+}
 
 require '../librerias/Excel/vendor/autoload.php';
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -19,7 +27,7 @@ $nombreArchivo = $destino.$fullArchivo;
 $tipoAlerta   = "danger";
 $tituloMensaje = "Error!";
 
-if ($extension == 'xlsx') {
+if ($extension == 'xlsx' && !$blockedInventarioSoloOfima) {
 
 	if ($_FILES['planilla']['error'] != UPLOAD_ERR_OK){
 		$message = 'Ha ocurrido un error al subir el archivo: '.$_FILES['planilla']['error'];
@@ -158,7 +166,9 @@ if ($extension == 'xlsx') {
 	}
 
 } else {
-	$message = "Este archivo no es admitido, por favor verifique que el archivo a importar sea un excel (.xlsx)";
+	if (!$blockedInventarioSoloOfima) {
+		$message = "Este archivo no es admitido, por favor verifique que el archivo a importar sea un excel (.xlsx)";
+	}
 }
 
 if ($tipoAlerta == 'success') {

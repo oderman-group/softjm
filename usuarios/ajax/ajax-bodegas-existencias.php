@@ -1,6 +1,12 @@
 <?php
 include("../sesion.php");
+include_once RUTA_PROYECTO."/usuarios/includes/inventario-solo-ofima.php";
 include_once RUTA_PROYECTO."/usuarios/class/Producto.php";
+
+if (inventarioSoloOfimaEntrada($conexionBdPrincipal, $idEmpresa)) {
+	echo '<div class="alert alert-danger"><strong>No permitido.</strong> Las existencias solo se actualizan desde Ofima.</div>';
+	exit();
+}
 
 try {
 	if (empty($_GET["idRegistro"])) {

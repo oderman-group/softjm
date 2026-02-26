@@ -87,6 +87,14 @@ if ($_POST["asesor"] != "") {
     $conexionBdPrincipal->query("INSERT INTO clientes_usuarios(cliu_usuario, cliu_cliente, cliu_fecha)VALUES('" . $_POST["asesor"] . "'," . $_POST["id"] . ", now())");
 }
 
+// Sincronizar con Ofima (Orion → Ofima)
+try {
+    require_once RUTA_PROYECTO . '/usuarios/class/Cliente.php';
+    Cliente::sincronizarConOfima($_POST["id"], $conexionBdPrincipal, $idEmpresa, 'UPDATE');
+} catch (Exception $e) {
+    error_log('Error al sincronizar cliente con Ofima: ' . $e->getMessage());
+}
+
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 echo '<script type="text/javascript">window.location.href="../clientes-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
