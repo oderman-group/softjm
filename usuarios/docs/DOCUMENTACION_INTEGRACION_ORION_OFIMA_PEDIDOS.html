@@ -129,6 +129,13 @@
             <li><strong>Orion → Ofima:</strong> Orion (CRM) envía a Ofima (ERP) cuando se crean o actualizan <strong>clientes</strong>, <strong>productos</strong> o <strong>pedidos</strong>. Ofima debe exponer una URL por módulo que acepte POST (crear) y PUT (actualizar), con HTTP Basic Auth.</li>
             <li><strong>Ofima → Orion:</strong> Ofima envía a Orion cuando desea sincronizar <strong>clientes</strong>, <strong>productos</strong>, <strong>inventario</strong> (existencias por bodega) o <strong>bodegas</strong>. Orion expone endpoints REST; autenticación: <strong>Bearer JWT</strong> (recomendado) o HTTP Basic Auth. El JWT se obtiene del endpoint de login.</li>
         </ul>
+        <p><strong>URLs de Orion (para endpoints que Ofima llama):</strong></p>
+        <table>
+            <tr><th>Entorno</th><th>URL base</th></tr>
+            <tr><td>Pruebas</td><td class="endpoint-path">https://developer.orioncrm.com.co/</td></tr>
+            <tr><td>Producción</td><td class="endpoint-path">https://app.orioncrm.com.co/</td></tr>
+        </table>
+        <p>Los endpoints de Orion (login, clientes, productos, inventario, bodegas) se construyen añadiendo la ruta al final de la URL base (ej. <code>https://developer.orioncrm.com.co/usuarios/api/orion/auth.php</code>).</p>
         <p><strong>Índice:</strong></p>
         <div class="toc">
             <ul>
@@ -229,7 +236,12 @@
     <!-- ========== ORION EXPONE (Ofima llama) ========== -->
     <div class="card" id="orion-expone">
         <h2>4. Endpoints que Orion expone (Ofima → Orion)</h2>
-        <p>Base URL de ejemplo: <code>https://[dominio-orion]/usuarios/api/orion/</code>. Sustituir por la URL base real que proporcione el equipo Orion.</p>
+        <p><strong>URL base según entorno:</strong></p>
+        <ul>
+            <li><strong>Pruebas:</strong> <code>https://developer.orioncrm.com.co</code></li>
+            <li><strong>Producción:</strong> <code>https://app.orioncrm.com.co</code></li>
+        </ul>
+        <p>Ejemplo de URL completa para login en pruebas: <code>https://developer.orioncrm.com.co/usuarios/api/orion/auth.php</code>. En producción usar <code>https://app.orioncrm.com.co/usuarios/api/orion/</code> + el archivo correspondiente (auth.php, clientes-recibir.php, etc.).</p>
         <p><strong>Autenticación:</strong> En todos los endpoints, Ofima puede usar:</p>
         <ul>
             <li><strong>Bearer JWT</strong> (recomendado): header <code>Authorization: Bearer &lt;token&gt;</code>. El token se obtiene del endpoint de login (apartado 4.1).</li>
