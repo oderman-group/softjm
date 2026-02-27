@@ -334,38 +334,152 @@ class ApiOfimaClient {
     }
     
     /**
-     * Carga ítems del pedido (cotizacion_productos tipo PED), con referencia del producto.
+     * Carga ítems del pedido (cotizacion_productos tipo PED).
+     * Productos sueltos se añaden tal cual; los combos se desglosan en líneas de producto para Ofima.
      */
     private function cargarItemsPedido($pedidId) {
         if (!defined('CZPP_TIPO_PED')) {
             return [];
         }
+        $tipoPed = CZPP_TIPO_PED;
+        $items = [];
+
+        // 1) Líneas que son productos (no combo)
         $stmt = $this->conexionBdPrincipal->prepare(
-            "SELECT cp.czpp_id, cp.czpp_producto, cp.czpp_cantidad, cp.czpp_valor, cp.czpp_descuento, cp.czpp_impuesto, cp.czpp_combo, prod.prod_referencia 
+            "SELECT cp.czpp_id, cp.czpp_producto, cp.czpp_cantidad, cp.czpp_valor, cp.czpp_descuento, cp.czpp_impuesto, prod.prod_referencia 
              FROM cotizacion_productos cp 
              LEFT JOIN productos prod ON prod.prod_id = cp.czpp_producto 
-             WHERE cp.czpp_cotizacion = ? AND cp.czpp_tipo = ? AND (cp.czpp_producto IS NOT NULL AND cp.czpp_producto != '')
+             WHERE cp.czpp_cotizacion = ? AND cp.czpp_tipo = ? AND (cp.czpp_producto IS NOT NULL AND cp.czpp_producto != '') AND (cp.czpp_combo IS NULL OR cp.czpp_combo = '')
              ORDER BY cp.czpp_orden, cp.czpp_id"
+        );
+        if ($stmt) {
+            $stmt->bind_param("ii", $pedidId, $tipoPed);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $items[] = [
+                    'producto_id' => (int) $row['czpp_producto'],
+                    'referencia' => isset($row['prod_referencia']) ? $row['prod_referencia'] : '',
+                    'cantidad' => (float) $row['czpp_cantidad'],
+                    'valor' => (float) $row['czpp_valor'],
+                    'descuento' => isset($row['czpp_descuento']) ? (float) $row['czpp_descuento'] : 0,
+                    'impuesto' => isset($row['czpp_impuesto']) ? (float) $row['czpp_impuesto'] : 0
+                ];
+            }
+        }
+
+        // 2) Líneas que son combos: desglosar en productos
+        $stmtCombo = $this->conexionBdPrincipal->prepare(
+            "SELECT cp.czpp_cantidad, cp.czpp_valor, cp.czpp_descuento, cp.czpp_impuesto, cp.czpp_productos_en_combo_generar_pedido, cp.czpp_combo 
+             FROM cotizacion_productos cp 
+             WHERE cp.czpp_cotizacion = ? AND cp.czpp_tipo = ? AND cp.czpp_combo IS NOT NULL AND cp.czpp_combo != ''
+             ORDER BY cp.czpp_orden, cp.czpp_id"
+        );
+        if (!$stmtCombo) {
+            return $items;
+        }
+        $stmtCombo->bind_param("ii", $pedidId, $tipoPed);
+        $stmtCombo->execute();
+        $resultCombo = $stmtCombo->get_result();
+        $productIdsParaRef = [];
+
+        while ($comboRow = $resultCombo->fetch_assoc()) {
+            $cantidadCombos = !empty($comboRow['czpp_cantidad']) ? (float) $comboRow['czpp_cantidad'] : 1;
+            $impuestoCombo = isset($comboRow['czpp_impuesto']) ? (float) $comboRow['czpp_impuesto'] : 0;
+            $descuentoCombo = isset($comboRow['czpp_descuento']) ? (float) $comboRow['czpp_descuento'] : 0;
+            $jsonProductos = isset($comboRow['czpp_productos_en_combo_generar_pedido']) ? $comboRow['czpp_productos_en_combo_generar_pedido'] : '';
+
+            $productosCombo = [];
+            if ($jsonProductos !== '' && $jsonProductos !== null) {
+                $decoded = json_decode($jsonProductos, true);
+                if (is_array($decoded)) {
+                    $productosCombo = $decoded;
+                }
+            }
+            if (empty($productosCombo)) {
+                $comboId = (int) $comboRow['czpp_combo'];
+                $productosCombo = $this->obtenerProductosComboDesdeTabla($comboId);
+            }
+            foreach ($productosCombo as $comProd) {
+                $idProd = isset($comProd['id_producto']) ? (int) $comProd['id_producto'] : (isset($comProd['prod_id']) ? (int) $comProd['prod_id'] : 0);
+                if ($idProd <= 0) {
+                    continue;
+                }
+                $cantidadEnCombo = isset($comProd['cantidad_en_combo']) ? (float) $comProd['cantidad_en_combo'] : (isset($comProd['copp_cantidad']) ? (float) $comProd['copp_cantidad'] : 1);
+                $cantidadTotal = $cantidadEnCombo * $cantidadCombos;
+                if ($cantidadTotal <= 0) {
+                    continue;
+                }
+                $precioUnit = isset($comProd['precio_unitario_cotizado']) ? (float) $comProd['precio_unitario_cotizado'] : (isset($comProd['copp_precio']) ? (float) $comProd['copp_precio'] : 0);
+                $descCombo = isset($comProd['descuento_del_combo']) ? (float) $comProd['descuento_del_combo'] : 0;
+                $valorUnit = $precioUnit - ($precioUnit * ($descCombo / 100));
+                $items[] = [
+                    'producto_id' => $idProd,
+                    'referencia' => '',
+                    'cantidad' => $cantidadTotal,
+                    'valor' => round($valorUnit, 2),
+                    'descuento' => $descuentoCombo,
+                    'impuesto' => $impuestoCombo
+                ];
+                $productIdsParaRef[$idProd] = true;
+            }
+        }
+
+        if (!empty($productIdsParaRef)) {
+            $ids = array_keys($productIdsParaRef);
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $stmtRef = $this->conexionBdPrincipal->prepare("SELECT prod_id, prod_referencia FROM productos WHERE prod_id IN ($placeholders) AND prod_id_empresa = ?");
+            if ($stmtRef) {
+                $tipos = str_repeat('i', count($ids)) . 'i';
+                $params = array_merge($ids, [$this->idEmpresa]);
+                $refs = [];
+                foreach ($params as $key => $value) {
+                    $refs[$key] = &$params[$key];
+                }
+                array_unshift($refs, $tipos);
+                call_user_func_array([$stmtRef, 'bind_param'], $refs);
+                $stmtRef->execute();
+                $resRef = $stmtRef->get_result();
+                $mapRef = [];
+                while ($r = $resRef->fetch_assoc()) {
+                    $mapRef[(int) $r['prod_id']] = isset($r['prod_referencia']) ? $r['prod_referencia'] : '';
+                }
+                foreach ($items as $idx => $it) {
+                    if (($it['referencia'] ?? '') === '' && isset($mapRef[$it['producto_id']])) {
+                        $items[$idx]['referencia'] = $mapRef[$it['producto_id']];
+                    }
+                }
+            }
+        }
+
+        return $items;
+    }
+
+    /**
+     * Obtiene los productos de un combo desde combos_productos (fallback si no hay JSON en la línea del pedido).
+     */
+    private function obtenerProductosComboDesdeTabla($comboId) {
+        $stmt = $this->conexionBdPrincipal->prepare(
+            "SELECT copp_producto AS id_producto, copp_cantidad AS cantidad_en_combo, copp_precio AS precio_unitario_cotizado 
+             FROM combos_productos 
+             WHERE copp_combo = ?"
         );
         if (!$stmt) {
             return [];
         }
-        $tipoPed = CZPP_TIPO_PED;
-        $stmt->bind_param("ii", $pedidId, $tipoPed);
+        $stmt->bind_param("i", $comboId);
         $stmt->execute();
         $result = $stmt->get_result();
-        $items = [];
+        $list = [];
         while ($row = $result->fetch_assoc()) {
-            $items[] = [
-                'producto_id' => (int) $row['czpp_producto'],
-                'referencia' => $row['prod_referencia'] ?? '',
-                'cantidad' => (float) $row['czpp_cantidad'],
-                'valor' => (float) $row['czpp_valor'],
-                'descuento' => isset($row['czpp_descuento']) ? (float) $row['czpp_descuento'] : 0,
-                'impuesto' => isset($row['czpp_impuesto']) ? (float) $row['czpp_impuesto'] : 0
+            $list[] = [
+                'id_producto' => (int) $row['id_producto'],
+                'cantidad_en_combo' => (float) $row['cantidad_en_combo'],
+                'precio_unitario_cotizado' => (float) $row['precio_unitario_cotizado'],
+                'descuento_del_combo' => 0
             ];
         }
-        return $items;
+        return $list;
     }
     
     /**
