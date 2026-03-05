@@ -132,10 +132,11 @@
         <p><strong>URLs de Orion (para endpoints que Ofima llama):</strong></p>
         <table>
             <tr><th>Entorno</th><th>URL base</th></tr>
-            <tr><td>Pruebas</td><td class="endpoint-path">https://developer.orioncrm.com.co/</td></tr>
-            <tr><td>Producción</td><td class="endpoint-path">https://app.orioncrm.com.co/</td></tr>
+            <tr><td>Pruebas</td><td class="endpoint-path">https://developer.orioncrm.com.co/softjm/</td></tr>
+            <tr><td>Producción</td><td class="endpoint-path">https://app.orioncrm.com.co/softjm/</td></tr>
         </table>
-        <p>Los endpoints de Orion (login, clientes, productos, inventario, bodegas) se construyen añadiendo la ruta al final de la URL base (ej. <code>https://developer.orioncrm.com.co/usuarios/api/orion/auth.php</code>).</p>
+        <p>Los endpoints de Orion (login, clientes, productos, inventario, bodegas) se construyen añadiendo la ruta al final de la URL base (ej. <code>https://developer.orioncrm.com.co/softjm/usuarios/api/orion/auth.php</code>).</p>
+        <p><strong>Credenciales de autenticación:</strong> Las credenciales (usuario, contraseña o acceso al login JWT) para ambos flujos deben <strong>solicitarse al administrador técnico del sistema</strong>. No se incluyen en esta documentación por seguridad.</p>
         <p><strong>Índice:</strong></p>
         <div class="toc">
             <ul>
@@ -160,7 +161,7 @@
         <p>Cuando <strong>Orion llama a Ofima</strong>, Orion envía:</p>
         <ul>
             <li><strong>Headers:</strong> <code>Content-Type: application/json</code>, <code>Accept: application/json</code></li>
-            <li><strong>Autenticación:</strong> HTTP Basic Auth (usuario y contraseña configurados en Orion por módulo). Ofima debe validar estas credenciales y responder 401 si son inválidas.</li>
+            <li><strong>Autenticación:</strong> HTTP Basic Auth (usuario y contraseña configurados en Orion por módulo). Ofima debe validar estas credenciales y responder 401 si son inválidas. Las credenciales que Orion utiliza para llamar a Ofima las asigna el <strong>administrador técnico del sistema</strong>; Ofima debe solicitarlas para configurar la validación en su lado.</li>
         </ul>
         <p>En todos los casos, respuesta HTTP <strong>2xx</strong> = éxito; <strong>4xx/5xx</strong> = error (Orion lo registra y no reintenta en la misma acción).</p>
     </div>
@@ -238,21 +239,22 @@
         <h2>4. Endpoints que Orion expone (Ofima → Orion)</h2>
         <p><strong>URL base según entorno:</strong></p>
         <ul>
-            <li><strong>Pruebas:</strong> <code>https://developer.orioncrm.com.co</code></li>
-            <li><strong>Producción:</strong> <code>https://app.orioncrm.com.co</code></li>
+            <li><strong>Pruebas:</strong> <code>https://developer.orioncrm.com.co/softjm/</code></li>
+            <li><strong>Producción:</strong> <code>https://app.orioncrm.com.co/softjm/</code></li>
         </ul>
-        <p>Ejemplo de URL completa para login en pruebas: <code>https://developer.orioncrm.com.co/usuarios/api/orion/auth.php</code>. En producción usar <code>https://app.orioncrm.com.co/usuarios/api/orion/</code> + el archivo correspondiente (auth.php, clientes-recibir.php, etc.).</p>
+        <p>Ejemplo de URL completa para login en pruebas: <code>https://developer.orioncrm.com.co/softjm/usuarios/api/orion/auth.php</code>. En producción usar <code>https://app.orioncrm.com.co/softjm/usuarios/api/orion/</code> + el archivo correspondiente (auth.php, clientes-recibir.php, etc.).</p>
         <p><strong>Autenticación:</strong> En todos los endpoints, Ofima puede usar:</p>
         <ul>
             <li><strong>Bearer JWT</strong> (recomendado): header <code>Authorization: Bearer &lt;token&gt;</code>. El token se obtiene del endpoint de login (apartado 4.1).</li>
             <li><strong>HTTP Basic Auth</strong>: usuario y contraseña configurados en Orion para la dirección <code>ofima_orion</code> (por módulo). Si no se envía JWT, Orion espera Basic Auth.</li>
         </ul>
+        <p>Las credenciales (usuario y contraseña para login/Basic Auth) deben <strong>solicitarse al administrador técnico del sistema</strong>; no se proporcionan en esta documentación.</p>
         <p>Si se usa JWT, el <code>id_empresa</code> se toma del token; si se usa Basic Auth, puede enviarse <code>id_empresa</code> en el body (opcional, por defecto 1).</p>
 
         <h3 class="flow-badge flow-ofima-orion">4.1 Login (obtener JWT)</h3>
         <table>
             <tr><th>Método</th><td><span class="badge badge-post">POST</span></td></tr>
-            <tr><th>URL</th><td class="endpoint-path">/usuarios/api/orion/auth.php</td></tr>
+            <tr><th>URL</th><td class="endpoint-path">/softjm/usuarios/api/orion/auth.php</td></tr>
             <tr><th>Auth</th><td>Basic Auth o body JSON con <code>usuario</code> y <code>password</code></td></tr>
         </table>
         <p>Body opcional: <code>{ "usuario": "...", "password": "...", "id_empresa": 1 }</code></p>
@@ -269,7 +271,7 @@
         <h3 class="flow-badge flow-ofima-orion">4.2 Clientes (Ofima → Orion)</h3>
         <table>
             <tr><th>Método</th><td><span class="badge badge-post">POST</span></td></tr>
-            <tr><th>URL</th><td class="endpoint-path">/usuarios/api/orion/clientes-recibir.php</td></tr>
+            <tr><th>URL</th><td class="endpoint-path">/softjm/usuarios/api/orion/clientes-recibir.php</td></tr>
             <tr><th>Auth</th><td>Bearer JWT o Basic Auth</td></tr>
         </table>
         <h4>Body JSON (campos requeridos: identificacion, nombre):</h4>
@@ -289,7 +291,7 @@
         <h3 class="flow-badge flow-ofima-orion">4.3 Productos (Ofima → Orion)</h3>
         <table>
             <tr><th>Método</th><td><span class="badge badge-post">POST</span></td></tr>
-            <tr><th>URL</th><td class="endpoint-path">/usuarios/api/orion/productos-recibir.php</td></tr>
+            <tr><th>URL</th><td class="endpoint-path">/softjm/usuarios/api/orion/productos-recibir.php</td></tr>
             <tr><th>Auth</th><td>Bearer JWT o Basic Auth</td></tr>
         </table>
         <h4>Body JSON (campos requeridos: referencia, nombre):</h4>
@@ -315,7 +317,7 @@
         <h3 class="flow-badge flow-ofima-orion">4.4 Inventario (Ofima → Orion)</h3>
         <table>
             <tr><th>Método</th><td><span class="badge badge-post">POST</span></td></tr>
-            <tr><th>URL</th><td class="endpoint-path">/usuarios/api/orion/inventario-recibir.php</td></tr>
+            <tr><th>URL</th><td class="endpoint-path">/softjm/usuarios/api/orion/inventario-recibir.php</td></tr>
             <tr><th>Auth</th><td>Bearer JWT o Basic Auth</td></tr>
         </table>
         <p>Actualiza existencias por producto y bodega. Orion actualiza <code>productos_bodegas</code> y recalcula <code>prod_existencias</code> del producto.</p>
@@ -338,7 +340,7 @@
         <h3 class="flow-badge flow-ofima-orion">4.5 Bodegas (Ofima → Orion)</h3>
         <table>
             <tr><th>Método</th><td><span class="badge badge-post">POST</span></td></tr>
-            <tr><th>URL</th><td class="endpoint-path">/usuarios/api/orion/bodegas-recibir.php</td></tr>
+            <tr><th>URL</th><td class="endpoint-path">/softjm/usuarios/api/orion/bodegas-recibir.php</td></tr>
             <tr><th>Auth</th><td>Bearer JWT o Basic Auth</td></tr>
         </table>
         <h4>Body JSON (referencia y nombre obligatorios):</h4>
