@@ -241,17 +241,18 @@ if(!empty($tiketID) && $estadoTicket == 1){
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="bd_create/clientes-seguimiento-guardar.php" enctype="multipart/form-data" id="formSeguimiento" novalidate>
+							<form class="form-horizontal" method="post" action="bd_create/clientes-seguimiento-guardar.php" enctype="multipart/form-data" id="formAgregarSeguimiento" novalidate>
                             <?php if ($estadoTicket == 1) {?>
                             <input type="hidden" name="idTK" value="<?=$tiketID;?>">
                             <input type="hidden" name="tipoS" value="<?=$tipoSeguimiento;?>">
                             <input type="hidden" name="cliente" value="<?=$cliente;?>">
+							<div id="seguimientoFormAlert" class="alert alert-error" style="display:none; margin: 10px 0;"></div>
                             
                                
                                <div class="control-group">
 									<label class="control-label">Contacto (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" data-required="true">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" id="contacto" required>
 											<option value=""></option>
                                             <?php
 											$conOp = mysqli_query($conexionBdPrincipal,"SELECT * FROM contactos WHERE cont_cliente_principal='".$cliente."'");
@@ -313,8 +314,8 @@ if(!empty($tiketID) && $estadoTicket == 1){
 								<div class="control-group">
 									<label class="control-label">¿Cómo fue el contacto? (*)</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="formaContacto" data-required="true">
-											<option value="">Escoja una opción...</option>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="formaContacto" id="formaContacto" required>
+											<option value="1"></option>
                                             <?php
 											$opciones = array("","La empresa contactó al cliente","El cliente contactó  a la empresa");
 											for($i=1; $i<=2; $i++){
@@ -331,8 +332,8 @@ if(!empty($tiketID) && $estadoTicket == 1){
                                 <div class="control-group">
          <label class="control-label">Canal de contacto (*)</label>
          <div class="controls">
-          <select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal" data-required="true" id="canal">
-           <option value="">Escoja una opción...</option>
+          <select data-placeholder="Escoja una opción..." class="chzn-select span6" tabindex="2" name="canal" id="canal" required>
+           <option value=""></option>
                                              <?php
            $opciones = array("","Facebook","WhatsApp","Fijo","Celular","Personal","Skype","Otro","Correo", "Sitio Web");
            for($i=1; $i<=9; $i++){
@@ -348,7 +349,7 @@ if(!empty($tiketID) && $estadoTicket == 1){
                                 <div class="control-group">
 									<label class="control-label">Observaciones/Descripción (*)</label>
 									<div class="controls">
-										<textarea name="observaciones" style="width: 80%" required></textarea>
+										<textarea name="observaciones" id="observaciones" style="width: 80%" required></textarea>
 									</div>
 								</div>
                                 
@@ -511,6 +512,7 @@ if(!empty($tiketID) && $estadoTicket == 1){
 											tabindex="2" 
 											name="encargado[]" 
 											multiple 
+											required
 											id="encargado"
 											data-required="true"
 										>
@@ -563,7 +565,7 @@ if(!empty($tiketID) && $estadoTicket == 1){
                                
 									<div class="form-actions">
 										<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-										<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
+										<button type="submit" class="btn btn-info" id="btnGuardarSeguimiento"><i class="icon-save"></i> <span class="btn-text">Guardar cambios</span></button>
 									</div>
 								<?php } else {?>
 									<div class="alert alert-info">

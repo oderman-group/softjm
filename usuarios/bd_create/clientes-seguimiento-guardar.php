@@ -4,8 +4,34 @@ require_once("../sesion.php");
 include_once(RUTA_PROYECTO."/usuarios/class/Api/JmEquipos.php");
 require_once RUTA_PROYECTO.'/usuarios/class/MailerService.php';
 
-if (empty($_POST["encargado"])) {
-	$_POST["encargado"] = $_SESSION["id"];
+// Normaliza encargado para evitar inconsistencias entre escalar y arreglo.
+$encargadosSeleccionados = [];
+if (isset($_POST["encargado"])) {
+	$encargadosInput = is_array($_POST["encargado"]) ? $_POST["encargado"] : [$_POST["encargado"]];
+	foreach ($encargadosInput as $encargadoId) {
+		$encargadoId = (int)$encargadoId;
+		if ($encargadoId > 0) {
+			$encargadosSeleccionados[] = $encargadoId;
+		}
+	}
+	$encargadosSeleccionados = array_values(array_unique($encargadosSeleccionados));
+}
+$cierreTicket = isset($_POST["cerrarTK"]) && (int)$_POST["cerrarTK"] === 1;
+$fallbackEncargado = false;
+
+if (!$cierreTicket && empty($encargadosSeleccionados)) {
+	$encargadosSeleccionados = [(int)$_SESSION["id"]];
+	$fallbackEncargado = true;
+}
+
+$_POST["encargado"] = $encargadosSeleccionados;
+$numero = count($encargadosSeleccionados);
+$encargadoPrincipal = ($numero > 0) ? $encargadosSeleccionados[0] : 0;
+
+if ($fallbackEncargado) {
+	$avisoFallback = "[Sistema] Encargado del próximo contacto asignado automáticamente al usuario en sesión: no se detectó selección en el formulario.";
+	$_POST["observaciones"] = trim((string)($_POST["observaciones"] ?? ""));
+	$_POST["observaciones"] .= (empty($_POST["observaciones"]) ? "" : "\n\n") . $avisoFallback;
 }
 
 
@@ -21,7 +47,7 @@ if (empty($_POST["idTK"]) && empty($_POST["tiketCreado"])) {
 	}
 }
 if (empty($_POST["fechaPC"])) $_POST["fechaPC"] = '0000-00-00';
-if (empty($_POST["encargado"])) $_POST["encargado"] = 0;
+$archivo = '';
 
 if (!empty($_FILES['archivo']['name'])) {
 	$archivo = $_FILES['archivo']['name'];
@@ -30,7 +56,7 @@ if (!empty($_FILES['archivo']['name'])) {
 }
 
 $datos = 0;
-if ($_POST["datos"] == 1) {
+if (!empty($_POST["datos"]) && $_POST["datos"] == 1) {
 	$datos = 1;
 }
 
@@ -42,20 +68,18 @@ if (!empty($_POST["cotizacion"])) {
 $vendio = 0;
 
 $demostracion = 0;
-if ($_POST["demostracion"] == 1) {
+if (!empty($_POST["demostracion"]) && $_POST["demostracion"] == 1) {
 	$demostracion = 1;
 }
 
 $visita = 0;
-if ($_POST["visita"] == 1) {
+if (!empty($_POST["visita"]) && $_POST["visita"] == 1) {
 	$visita = 1;
 }
 
-if (!empty($_POST["encargado"])) {
-	$numero = (count($_POST["encargado"]));
-
+if ($numero > 0) {
 	if ($numero == 1) {
-		mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_archivo, cseg_cotizo, cseg_consiguio_datos, cseg_forma_contacto, cseg_demostracion,cseg_visita, cseg_hora_proximo_contacto, cseg_minutos_recordar_anticipadamente)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["encargado"][0] . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $archivo . "','" . $cotizo . "','" . $datos . "','" . $_POST["formaContacto"] . "','" . $demostracion . "','" . $visita . "','" . $_POST["horaPC"] . "','" . $_POST["minutosRecordarAntes"] . "')");
+		mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_usuario_encargado, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_archivo, cseg_cotizo, cseg_consiguio_datos, cseg_forma_contacto, cseg_demostracion,cseg_visita, cseg_hora_proximo_contacto, cseg_minutos_recordar_anticipadamente)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $encargadoPrincipal . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $archivo . "','" . $cotizo . "','" . $datos . "','" . $_POST["formaContacto"] . "','" . $demostracion . "','" . $visita . "','" . $_POST["horaPC"] . "','" . $_POST["minutosRecordarAntes"] . "')");
 		$idInsertU = mysqli_insert_id($conexionBdPrincipal);
 	} elseif ($numero > 1) {
 		mysqli_query($conexionBdPrincipal,"INSERT INTO cliente_seguimiento(cseg_cliente, cseg_fecha_reporte, cseg_observacion, cseg_usuario_responsable, cseg_fecha_proximo_contacto, cseg_asunto, cseg_cotizacion, cseg_fecha_contacto, cseg_tipo, cseg_contacto, cseg_tiket, cseg_canal, cseg_canal_proximo_contacto, cseg_varios, cseg_archivo, cseg_forma_contacto, cseg_demostracion,cseg_visita, cseg_hora_proximo_contacto, cseg_minutos_recordar_anticipadamente)VALUES('" . $_POST["cliente"] . "',now(),'" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["observaciones"]) . "','" . $_SESSION["id"] . "','" . $_POST["fechaPC"] . "','" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "','" . $_POST["cotizacion"] . "','" . $_POST["fechaContacto"] . "','" . $_POST["tipoS"] . "','" . $_POST["contacto"] . "','" . $tiketID . "','" . $_POST["canal"] . "','" . $_POST["canalPC"] . "','" . $numero . "','" . $archivo . "','" . $_POST["formaContacto"] . "','" . $demostracion . "','" . $visita . "','" . $_POST["horaPC"] . "','" . $_POST["minutosRecordarAntes"] . "')");
@@ -76,7 +100,7 @@ if (!empty($_POST["cotizacion"])) {
 }
 
 
-if ($_POST["cerrarTK"] == 1) {
+if (!empty($_POST["cerrarTK"]) && $_POST["cerrarTK"] == 1) {
 	mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET 
 	tik_estado='".TIK_ESTADO_CERRADO."', 
 	tik_fecha_cierre=NOW(), 
@@ -189,14 +213,14 @@ if(!empty($_POST["portafolios"])){
 
 
 	
-if ($_POST["notf"] == 1) {
+if (!empty($_POST["notf"]) && $_POST["notf"] == 1 && $numero > 0) {
 
 	$contador = 0;
 	while ($contador < $numero) {
-		mysqli_query($conexionBdPrincipal,"INSERT INTO notificaciones(not_asunto, not_cliente, not_usuario, not_visto, not_estado, not_seguimiento, not_fecha)VALUES('" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "', '" . $_POST["cliente"] . "', '" . $_POST["encargado"][$contador] . "', 0, 1, '" . $idInsertU . "', now())");
+		mysqli_query($conexionBdPrincipal,"INSERT INTO notificaciones(not_asunto, not_cliente, not_usuario, not_visto, not_estado, not_seguimiento, not_fecha)VALUES('" . mysqli_real_escape_string($conexionBdPrincipal,$_POST["asunto"]) . "', '" . $_POST["cliente"] . "', '" . $encargadosSeleccionados[$contador] . "', 0, 1, '" . $idInsertU . "', now())");
 
 		// Obtener datos del encargado (destinatario del correo) por su ID
-		$encargadoRow = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_id='" . (int)$_POST["encargado"][$contador] . "'"));
+		$encargadoRow = mysqli_fetch_array(mysqli_query($conexionBdPrincipal, "SELECT usr_id, usr_nombre, usr_email FROM usuarios WHERE usr_id='" . (int)$encargadosSeleccionados[$contador] . "'"));
 		$contactoCliente = [
 			'cont_email' => (!empty($encargadoRow['usr_email']) ? $encargadoRow['usr_email'] : ''),
 			'cont_nombre' => (!empty($encargadoRow['usr_nombre']) ? $encargadoRow['usr_nombre'] : 'Encargado')
@@ -284,9 +308,9 @@ if ($_POST["notf"] == 1) {
 
 }
 
-if ($_POST["notfCliente"] == 1 and $_POST["canalPC"] != 4) {
+if (!empty($_POST["notfCliente"]) && (int)($_POST["canalPC"] ?? 0) != 4 && $encargadoPrincipal > 0) {
 	$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='" . $_POST["cliente"] . "'"));
-	$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $_POST["encargado"] . "'"));
+	$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $encargadoPrincipal . "'"));
 	$fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
 	$fin .= '
 				<center>
@@ -324,9 +348,9 @@ if ($_POST["notfCliente"] == 1 and $_POST["canalPC"] != 4) {
 	// @mail($sdestinatario, $ssubject, $shtml, $sheader);
 }
 
-if ($_POST["canalPC"] == 4) {
+if ((int)($_POST["canalPC"] ?? 0) == 4 && $encargadoPrincipal > 0) {
 	$cliente = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM clientes WHERE cli_id='" . $_POST["cliente"] . "'"));
-	$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $_POST["encargado"] . "'"));
+	$contacto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='" . $encargadoPrincipal . "'"));
 	$fin =  '<html><body style="background-color:' . $configuracion["conf_fondo_boletin"] . ';">';
 	$fin .= '
 				<center>
