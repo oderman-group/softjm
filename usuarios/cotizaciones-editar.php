@@ -4,7 +4,6 @@ include("sesion.php");
 $idPagina = 79;
 
 include("includes/verificar-paginas.php");
-include("includes/head.php");
 
 // ========================================
 // CONSULTA PRINCIPAL OPTIMIZADA
@@ -131,7 +130,29 @@ if(count($contactos) == 0){
 		$contactos[] = $cont;
 	}
 }
+
+require '../usuarios/class/CotizacionesEditar.php';
+
+if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaProductos') {
+	$htmlTablaProductos = CotizacionesEditar::generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
+	echo $htmlTablaProductos;
+	exit; 
+}
+
+if (!empty($_POST['action']) && $_POST['action'] === 'generarTablacombos') {
+	$htmlTablaCombos = CotizacionesEditar::generarTablacombos($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
+	echo $htmlTablaCombos;
+	exit; 
+}
+
+if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaServicios') {
+	$htmlTablaServicios = CotizacionesEditar::generarTablaServicios($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
+	echo $htmlTablaServicios;
+	exit; 
+}
 ?>
+
+<?php include("includes/head.php"); ?>
 
 <link href="css/chosen.css" rel="stylesheet">
 <link href="../assets-login/plugins/select2/css/select2.css" rel="stylesheet" />
@@ -254,27 +275,6 @@ include("includes/js-formularios.php");
 		}
 	</script>
 <?php }?>
-<?php
-		require '../usuarios/class/CotizacionesEditar.php';
-
-		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaProductos') {
-			$htmlTablaProductos = CotizacionesEditar::generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
-			echo $htmlTablaProductos;
-			exit; 
-		}
-
-		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablacombos') {
-			$htmlTablaCombos = CotizacionesEditar::generarTablacombos($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
-			echo $htmlTablaCombos;
-			exit; 
-		}
-
-		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaServicios') {
-			$htmlTablaServicios = CotizacionesEditar::generarTablaServicios($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
-			echo $htmlTablaServicios;
-			exit; 
-		}
-?>
 </head>
 <body>
 
