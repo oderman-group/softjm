@@ -18,6 +18,26 @@ $(document).ready(function () {
         return $tbody.find("tr");
     }
 
+    function renderRowsByType(response, rowClassSelector, debugLabel) {
+        var $rows = extractTableRows(response);
+        var $typedRows = $rows.filter(rowClassSelector);
+
+        // Compatibilidad con respuestas sin clases.
+        if (!$typedRows.length && $rows.length) {
+            $typedRows = $rows;
+        }
+
+        $('#tableBody ' + rowClassSelector).remove();
+
+        if ($typedRows.length) {
+            $('#tableBody').append($typedRows);
+            return true;
+        }
+
+        console.warn('No se encontraron filas para', debugLabel, response);
+        return false;
+    }
+
     let productSelect = $("#product-select").select2({
         placeholder: "Escoja una opción...",
         multiple: true,
@@ -111,10 +131,9 @@ $(document).ready(function () {
                     action: "generarTablaProductos"
                 },
                 success: function (response) {
-                    var $rows = extractTableRows(response);
-                    $('#tableBody .producto').remove();
-                    if ($rows.length) {
-                        $('#tableBody').append($rows);
+                    var rendered = renderRowsByType(response, '.producto', 'productos');
+                    if (!rendered) {
+                        $('#resp').html('<div class="alert alert-warning">No se pudieron cargar los productos cotizados. Recargue la página.</div>');
                     }
                 }
             });
@@ -150,11 +169,7 @@ $(document).ready(function () {
                     action: "generarTablacombos"
                 },
                 success: function (response) {
-                    var $rows = extractTableRows(response);
-                    $('#tableBody .combo').remove();
-                    if ($rows.length) {
-                        $('#tableBody').append($rows);
-                    }
+                    renderRowsByType(response, '.combo', 'combos');
                 }
             });
         }
@@ -189,11 +204,7 @@ $(document).ready(function () {
                     action: "generarTablaServicios"
                 },
                 success: function (response) {
-                    var $rows = extractTableRows(response);
-                    $('#tableBody .servicio').remove();
-                    if ($rows.length) {
-                        $('#tableBody').append($rows);
-                    }
+                    renderRowsByType(response, '.servicio', 'servicios');
                 }
             });
         }
