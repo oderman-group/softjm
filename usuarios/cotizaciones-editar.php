@@ -1686,7 +1686,9 @@ $(document).ready(function() {
 			const lazyLoad = $tabLink.data('lazy-load');
 			
 			// Activar el tab
-			$tabLink.tab('show');
+			if ($.fn.tab) {
+				$tabLink.tab('show');
+			}
 			
 			// Si necesita carga lazy, cargar el contenido
 			if (lazyLoad && !loadedTabs[lazyLoad]) {
