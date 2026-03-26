@@ -5,14 +5,17 @@ $(document).ready(function () {
         var html = typeof response === "string" ? response : "";
         var bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
         var rawContent = bodyMatch ? bodyMatch[1] : html;
-        var parsedNodes = $.parseHTML(rawContent, document, true) || [];
-        var $rows = $(parsedNodes).filter("tr.producto, tr.combo, tr.servicio");
+        var $container = $("<table><tbody></tbody></table>");
+        var $tbody = $container.find("tbody");
+        $tbody.html(rawContent);
 
-        if (!$rows.length) {
-            $rows = $(parsedNodes).find("tr.producto, tr.combo, tr.servicio");
+        var $rows = $tbody.find("tr.producto, tr.combo, tr.servicio");
+        if ($rows.length) {
+            return $rows;
         }
 
-        return $rows;
+        // Fallback: en caso de respuestas antiguas sin clases, tomar todas las filas válidas.
+        return $tbody.find("tr");
     }
 
     let productSelect = $("#product-select").select2({
