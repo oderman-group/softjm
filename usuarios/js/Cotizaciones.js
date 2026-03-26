@@ -1,6 +1,20 @@
 var idEditar = document.getElementById("id");
 
 $(document).ready(function () {
+    function extractTableRows(response) {
+        var html = typeof response === "string" ? response : "";
+        var bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        var rawContent = bodyMatch ? bodyMatch[1] : html;
+        var parsedNodes = $.parseHTML(rawContent, document, true) || [];
+        var $rows = $(parsedNodes).filter("tr.producto, tr.combo, tr.servicio");
+
+        if (!$rows.length) {
+            $rows = $(parsedNodes).find("tr.producto, tr.combo, tr.servicio");
+        }
+
+        return $rows;
+    }
+
     let productSelect = $("#product-select").select2({
         placeholder: "Escoja una opción...",
         multiple: true,
@@ -94,11 +108,11 @@ $(document).ready(function () {
                     action: "generarTablaProductos"
                 },
                 success: function (response) {
-                    let bodyStart = response.indexOf('<body>');
-                    let bodyEnd = response.indexOf('</body>');
-                    let bodyContent = response.slice(bodyStart + 6, bodyEnd);
+                    var $rows = extractTableRows(response);
                     $('#tableBody .producto').remove();
-                    $('#tableBody').append(bodyContent);
+                    if ($rows.length) {
+                        $('#tableBody').append($rows);
+                    }
                 }
             });
         }
@@ -133,11 +147,11 @@ $(document).ready(function () {
                     action: "generarTablacombos"
                 },
                 success: function (response) {
-                    let bodyStart = response.indexOf('<body>');
-                    let bodyEnd = response.indexOf('</body>');
-                    let bodyContent = response.slice(bodyStart + 6, bodyEnd);
+                    var $rows = extractTableRows(response);
                     $('#tableBody .combo').remove();
-                    $('#tableBody').append(bodyContent);
+                    if ($rows.length) {
+                        $('#tableBody').append($rows);
+                    }
                 }
             });
         }
@@ -172,11 +186,11 @@ $(document).ready(function () {
                     action: "generarTablaServicios"
                 },
                 success: function (response) {
-                    let bodyStart = response.indexOf('<body>');
-                    let bodyEnd = response.indexOf('</body>');
-                    let bodyContent = response.slice(bodyStart + 6, bodyEnd);
+                    var $rows = extractTableRows(response);
                     $('#tableBody .servicio').remove();
-                    $('#tableBody').append(bodyContent);
+                    if ($rows.length) {
+                        $('#tableBody').append($rows);
+                    }
                 }
             });
         }
