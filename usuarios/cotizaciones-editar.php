@@ -184,7 +184,7 @@ include("includes/js-formularios.php");
 	<script type="text/javascript">
 		function productos(enviada){
 			var tipoCliente   = enviada.alt;
-			var campo         = enviada.title;
+			var campo         = enviada.getAttribute('data-campo') || enviada.title;
 			var producto      = enviada.name;
 			var proceso       = 2;
 			var valor         = enviada.value;
@@ -223,7 +223,7 @@ include("includes/js-formularios.php");
 
 
 		function combos(enviada){
-			var campo = enviada.title;
+			var campo = enviada.getAttribute('data-campo') || enviada.title;
 			var producto = enviada.name;
 			var proceso = 11;
 			var valor = enviada.value;
@@ -249,7 +249,7 @@ include("includes/js-formularios.php");
 		}	
 
 		function servicios(enviada){
-			var campo = enviada.title;
+			var campo = enviada.getAttribute('data-campo') || enviada.title;
 			var producto = enviada.name;
 			var proceso = 12;
 			var valor = enviada.value;

@@ -101,7 +101,7 @@ class CotizacionesEditar {
 
             $htmlTabla .= '<a href="productos-editar.php?id=' . $prod['prod_id'] . '" target="_blank">' . $prod['prod_nombre'] . ' <b>(Quedan '.$prod['prod_existencias'].' unds.)</b></a><br>';
             $htmlTabla .= '<span style="font-size: 9px; color: darkblue;">' . $prod['prod_descripcion_corta'] . '</span><br>';
-            $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_observacion'].'">' . $prod['czpp_observacion'] . '</textarea></p>';
+            $htmlTabla .= '<p><textarea data-campo="czpp_observacion" title="Observaciones" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_observacion'].'">' . $prod['czpp_observacion'] . '</textarea></p>';
             $htmlTabla .= '</td>';
             $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_cantidad'].'"></td>';
             $htmlTabla .= '<td>';
@@ -257,7 +257,7 @@ class CotizacionesEditar {
             }
 
             $htmlTabla .= '</span><br>';
-            $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.'>' . $prod['czpp_observacion'] . '</textarea></p>';
+            $htmlTabla .= '<p><textarea data-campo="czpp_observacion" title="Observaciones" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.'>' . $prod['czpp_observacion'] . '</textarea></p>';
             $htmlTabla .= '</td>';
             $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             $htmlTabla .= '<td '.$alarmaValorComboDiferente.'>';
@@ -351,7 +351,7 @@ class CotizacionesEditar {
             }
 
             $htmlTabla .= '<a href="servicios-editar.php?id=' . $prod['serv_id'] . '" target="_blank">' . $prod['serv_nombre'] . '</a><br>';
-            $htmlTabla .= '<p><textarea title="czpp_observacion" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.'>' . $prod['czpp_observacion'] . '</textarea></p>';
+            $htmlTabla .= '<p><textarea data-campo="czpp_observacion" title="Observaciones" name="' . $prod['czpp_id'] . '" onChange="productos(this)" style="width: 300px;" rows="4" '.$camposCotizacionDisabled.'>' . $prod['czpp_observacion'] . '</textarea></p>';
             $htmlTabla .= '</td>';
             $htmlTabla .= '<td><input type="number" title="czpp_cantidad" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_cantidad'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
             $htmlTabla .= '<td><input type="text" alt="' . $resultadoD['cli_categoria'] . '" title="czpp_valor" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_valor'] . '" onChange="productos(this)" style="width: 200px;" translate="no" '.$camposCotizacionDisabled.'></td>';
