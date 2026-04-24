@@ -2,6 +2,19 @@
 include("../sesion.php");
 include_once RUTA_PROYECTO."/usuarios/class/Producto.php";
 
+/**
+ * Devuelve el nombre de columna válido en cotizacion_productos.
+ * En BD la columna es czpp_observacion (sin tilde); si el cliente envía czpp_observación u otra variante, el UPDATE falla.
+ */
+function cotizacionProductoCampoActualizable(string $campo): string
+{
+	$campo = trim($campo);
+	if ($campo !== '' && preg_match('/^czpp_observaci[óo]n$/u', $campo)) {
+		return 'czpp_observacion';
+	}
+	return $campo;
+}
+
 //EDITAR PRODUCTOS
 if ($_POST["proceso"] == 1) {
 
@@ -60,12 +73,14 @@ if ($_POST["proceso"] == 1) {
 //PRODUCTOS DE LA COTIZACIÓN
 if ($_POST["proceso"] == 2) {
 	try {
+		$campoCotizacion = cotizacionProductoCampoActualizable((string)($_POST['campo'] ?? ''));
+
 		$consultaProducto=mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
 		INNER JOIN productos ON prod_id=czpp_producto 
 		WHERE czpp_id='".$_POST["producto"]."' ");
 		$datosProducto = mysqli_fetch_array($consultaProducto, MYSQLI_BOTH);
 
-		if ($_POST["campo"] == 'czpp_descuento') {
+		if ($campoCotizacion == 'czpp_descuento') {
 			if ($_POST["valor"] > $datosProducto['prod_descuento1']) {
 				$response = [
 					'success' => false,
@@ -76,7 +91,7 @@ if ($_POST["proceso"] == 2) {
 			}
 		}
 
-		if ($_POST["campo"] == 'czpp_valor') {
+		if ($campoCotizacion == 'czpp_valor') {
 			if($_POST["valor"] < $datosProducto['prod_precio']) {
 
 				$response = [
@@ -90,7 +105,7 @@ if ($_POST["proceso"] == 2) {
 		}
 
 		mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET 
-		".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."', 
+		".$campoCotizacion."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."', 
 		czpp_ultima_actualizacion=now(), 
 		czpp_cantidad_actualizaciones=czpp_cantidad_actualizaciones+1, 
 		czpp_usuario_ultima_actualizacion='".$_SESSION["id"]."' 
@@ -312,7 +327,9 @@ if ($_POST["proceso"]==7) {
 
 //PRODUCTOS DE LA REMISIÓN
 if($_POST["proceso"]==8){
-	if($_POST["campo"]=='czpp_descuento'){
+	$campoCotizacion = cotizacionProductoCampoActualizable((string)($_POST['campo'] ?? ''));
+
+	if($campoCotizacion=='czpp_descuento'){
 		$datosProducto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos INNER JOIN productos ON prod_id=czpp_producto
 		WHERE czpp_id='".$_POST["producto"]."'
 		"), MYSQLI_BOTH);
@@ -323,7 +340,7 @@ if($_POST["proceso"]==8){
 		}
 	}
 
-	if($_POST["campo"]=='czpp_cantidad'){
+	if($campoCotizacion=='czpp_cantidad'){
 		$datosProducto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
 		INNER JOIN productos_bodegas ON prodb_producto=czpp_producto AND prodb_bodega=czpp_bodega
 		WHERE czpp_id='".$_POST["producto"]."'
@@ -350,7 +367,7 @@ if($_POST["proceso"]==8){
 		
 	}
 
-	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$campoCotizacion."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
 	
 	
 	//echo '<script type="text/javascript">location.reload();</script>';
@@ -358,7 +375,9 @@ if($_POST["proceso"]==8){
 
 //PRODUCTOS DE LA IMPORTACIÓN
 if($_POST["proceso"]==9){
-	if($_POST["campo"]=='czpp_descuento'){
+	$campoCotizacion = cotizacionProductoCampoActualizable((string)($_POST['campo'] ?? ''));
+
+	if($campoCotizacion=='czpp_descuento'){
 		$datosProducto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos INNER JOIN productos ON prod_id=czpp_producto
 		WHERE czpp_id='".$_POST["producto"]."'
 		"), MYSQLI_BOTH);
@@ -369,7 +388,7 @@ if($_POST["proceso"]==9){
 		}
 	}
 
-	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
+	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$campoCotizacion."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
 	
 	
 	//echo '<script type="text/javascript">location.reload();</script>';
@@ -387,12 +406,14 @@ if($_POST["proceso"]==10){
 //DESCUENTO DE COMBOS DE LA COTIZACIÓN
 if($_POST["proceso"]==11){
 
+	$campoCotizacion = cotizacionProductoCampoActualizable((string)($_POST['campo'] ?? ''));
+
 	$datosProducto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
 	INNER JOIN combos ON combo_id=czpp_combo
 	WHERE czpp_id='".$_POST["producto"]."'
 	"), MYSQLI_BOTH);
 
-	if($_POST["campo"]=='czpp_descuento'){
+	if($campoCotizacion=='czpp_descuento'){
 		
 		if($_POST["valor"] > $datosProducto['combo_descuento_maximo']){
 			echo '<script type="text/javascript">alert("El descuento que está otorgando es mayor al máximo permitido para este combo, el cual es de '.$datosProducto['combo_descuento_maximo'].'%.");</script>';
@@ -401,7 +422,7 @@ if($_POST["proceso"]==11){
 	}
 
 
-	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."', czpp_ultima_actualizacion=now(), czpp_cantidad_actualizaciones=czpp_cantidad_actualizaciones+1, czpp_usuario_ultima_actualizacion='".$_SESSION["id"]."' 
+	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$campoCotizacion."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."', czpp_ultima_actualizacion=now(), czpp_cantidad_actualizaciones=czpp_cantidad_actualizaciones+1, czpp_usuario_ultima_actualizacion='".$_SESSION["id"]."' 
 	WHERE czpp_id='".$_POST["producto"]."'");
 	
 	
@@ -411,7 +432,9 @@ if($_POST["proceso"]==11){
 //DESCUENTO DE Servicios DE LA COTIZACIÓN
 if($_POST["proceso"]==12){
 
-	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$_POST["campo"]."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
+	$campoCotizacion = cotizacionProductoCampoActualizable((string)($_POST['campo'] ?? ''));
+
+	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$campoCotizacion."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");
 }
 
 if ($_POST["proceso"] != 2) {
