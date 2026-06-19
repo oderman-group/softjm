@@ -68,29 +68,29 @@ foreach ($filasClientes as $res) {
         }
     }
     ?>
-    <tr title="<?= htmlspecialchars($titleEstado) ?>">
+    <tr title="<?= htmlspecialchars($titleEstado ?? '') ?>">
         <td style="background-color: <?= $fondoPapelera ?>;">
             <?php if ($res['cli_retirado'] == 1) { ?>
                 <span style="color:red;"><strike>(R) <?= $no ?></strike></span>
             <?php } else { echo $no; } ?>
         </td>
         <td style="background-color: <?= $fondoPapelera ?>;">
-            <?= htmlspecialchars($res['ciu_nombre'] . ', ' . $res['dep_nombre'] . ' (03' . $res['dep_indicativo'] . ')') ?>
+            <?= htmlspecialchars(trim(($res['ciu_nombre'] ?? '') . ', ' . ($res['dep_nombre'] ?? '') . ' (03' . ($res['dep_indicativo'] ?? '') . ')'), ENT_QUOTES, 'UTF-8') ?>
         </td>
         <td style="background-color: <?= $fondoColorCat ?>;">
-            <?php echo '<b>Creado:</b> ' . htmlspecialchars($res['cli_fecha_registro']); ?><br>
+            <?php echo '<b>Creado:</b> ' . htmlspecialchars($res['cli_fecha_registro'] ?? ''); ?><br>
             <?php echo '<b>Tipo documento</b>:' . ($tipoDocumento[$res['cli_tipo_documento']] ?? '') . ' | '; ?>
-            <?php echo '<b>Nro. Documento</b>:' . htmlspecialchars($res['cli_usuario']); ?> | <?php echo '<b>Categoría:</b> ' . $categ; ?><br>
-            <?php echo '<span style="font-size:16px;">' . htmlspecialchars($res['cli_nombre']); ?></span>
+            <?php echo '<b>Nro. Documento</b>:' . htmlspecialchars($res['cli_usuario'] ?? ''); ?> | <?php echo '<b>Categoría:</b> ' . $categ; ?><br>
+            <?php echo '<span style="font-size:16px;">' . htmlspecialchars($res['cli_nombre'] ?? ''); ?></span>
             <?php
             $etiquetasClienteListado = $etiquetasPorCliente[$clienteId] ?? [];
             if (!empty($etiquetasClienteListado)) {
                 echo Etiqueta::renderBadges($etiquetasClienteListado, 'crm-etiquetas--compact cliente-listado-etiquetas');
             }
             ?>
-            <?php if ($res['cli_telefono'] != '') echo '<br><b>Tel:</b> ' . htmlspecialchars($res['cli_telefono']); ?>
-            <?php if ($res['cli_celular'] != '') echo '<br><b>Cel:</b> ' . htmlspecialchars($res['cli_celular']); ?>
-            <?php if ($res['cli_email'] != '') echo ' | <b>Email:</b> ' . htmlspecialchars($res['cli_email']); ?>
+            <?php if (!empty($res['cli_telefono'])) echo '<br><b>Tel:</b> ' . htmlspecialchars($res['cli_telefono']); ?>
+            <?php if (!empty($res['cli_celular'])) echo '<br><b>Cel:</b> ' . htmlspecialchars($res['cli_celular']); ?>
+            <?php if (!empty($res['cli_email'])) echo ' | <b>Email:</b> ' . htmlspecialchars($res['cli_email']); ?>
 
             <h4 style="margin-top:5px;">
                 <?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
@@ -117,7 +117,7 @@ foreach ($filasClientes as $res) {
                 <a href="#"
                    class="js-notas-internas-cliente"
                    data-cliente-id="<?= $clienteId ?>"
-                   data-cliente-nombre="<?= htmlspecialchars($res['cli_nombre'], ENT_QUOTES, 'UTF-8') ?>"
+                   data-cliente-nombre="<?= htmlspecialchars($res['cli_nombre'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                    data-toggle="tooltip"
                    title="Notas internas"><i class="icon-comment"></i></a>&nbsp;
             </h4>

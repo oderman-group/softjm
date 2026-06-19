@@ -490,7 +490,7 @@ body.drawer-open {
     <button type="button" class="drawer-btn drawer-btn-secondary" id="btnCancelarDrawerCliente">Cancelar</button>
     <button type="submit" form="formCrearClienteRapido" class="drawer-btn drawer-btn-primary" id="btnGuardarClienteRapido">
       <i class="fa fa-save" aria-hidden="true"></i>
-      <span>Guardar</span>
+      <span class="drawer-btn-label">Guardar</span>
     </button>
   </div>
 </aside>
@@ -522,19 +522,20 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btnCerrar) btnCerrar.disabled = estado;
     if (btnCancel) btnCancel.disabled = estado;
     if (!btnGuardar) return;
-    var label = btnGuardar.querySelector('span');
+    var label = btnGuardar.querySelector('.drawer-btn-label');
     if (!label) return;
+    var spinner = btnGuardar.querySelector('.drawer-spinner');
     if (estado) {
       label.textContent = 'Guardando...';
-      if (!btnGuardar.querySelector('.drawer-spinner')) {
-        var spinner = document.createElement('span');
+      if (!spinner) {
+        spinner = document.createElement('span');
         spinner.className = 'drawer-spinner';
+        spinner.setAttribute('aria-hidden', 'true');
         btnGuardar.insertBefore(spinner, label);
       }
     } else {
       label.textContent = 'Guardar';
-      var sp = btnGuardar.querySelector('.drawer-spinner');
-      if (sp) sp.remove();
+      if (spinner) spinner.remove();
     }
   }
 
