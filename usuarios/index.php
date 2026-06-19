@@ -8,6 +8,7 @@ include("includes/head.php");
 <link href="css/jquery.gritter.css" rel="stylesheet">
 <link href="css/tablecloth.css" rel="stylesheet">
 <link href="css/dashboard-home.css" rel="stylesheet">
+<link href="css/crm-etiquetas.css" rel="stylesheet">
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -38,6 +39,9 @@ include("includes/head.php");
 </head>
 
 <body class="dashboard-home">
+  <?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+    include("includes/drawer-crear-cliente.php");
+  } ?>
   <div class="layout">
     <?php include("includes/encabezado.php"); ?>
 
@@ -102,10 +106,10 @@ include("includes/head.php");
             <?php } ?>
 
             <?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
-              <a href="clientes-agregar.php" class="dashboard-shortcut-card" data-accent="cliente">
+              <button type="button" class="dashboard-shortcut-card" data-accent="cliente" id="btnCrearClienteRapido" aria-haspopup="dialog">
                 <span class="shortcut-icon"><i class="fa fa-user-plus" aria-hidden="true"></i></span>
                 <p class="shortcut-label">Crear cliente</p>
-              </a>
+              </button>
             <?php } ?>
 
             <?php if (Modulos::validarRol([416], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>

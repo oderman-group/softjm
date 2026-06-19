@@ -58,22 +58,11 @@ function productosPrecioListaUSD($porcentajeUtilidad, $costoEnDolares){
 }
 
 function contarClientesPorDepto($depto){
+	global $conexionBdAdmin, $conexionBdPrincipal, $idEmpresa;
 
-	global $conexionBdAdmin, $conexionBdPrincipal;
+	$mapa = Cliente::conteoClientesPorDepartamento($idEmpresa, $conexionBdPrincipal, $conexionBdAdmin);
 
-	$consultaDeptos = $conexionBdAdmin->query("SELECT ciu_id FROM localidad_ciudades
-	WHERE ciu_departamento='".$depto."'");
-
-	while($deptos = mysqli_fetch_array($consultaDeptos, MYSQLI_BOTH)){
-		
-		$consultaContarClientes = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".clientes 
-		INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad AND ciu_departamento='".$depto."'
-		WHERE (cli_papelera IS NULL OR cli_papelera=0)
-		");
-		
-		return $contarClientes = $consultaContarClientes->num_rows;
-	}	
-
+	return $mapa[intval($depto)] ?? 0;
 }
 
 function validarVariableGet($get){

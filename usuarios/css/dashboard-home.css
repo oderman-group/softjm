@@ -7,12 +7,23 @@
 .dashboard-home .main-wrapper {
   background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   min-height: calc(100vh - 120px);
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.dashboard-home .main-wrapper > .container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+  max-width: 100%;
 }
 
 .dashboard-home .dashboard-home-inner {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem 1.25rem 3rem;
+  box-sizing: border-box;
 }
 
 .dashboard-home #cargarAxios {
@@ -51,40 +62,64 @@
 /* Grid de accesos rápidos */
 .dashboard-home .dashboard-shortcuts {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  width: 100%;
+}
+
+.dashboard-home .dashboard-shortcuts > .dashboard-shortcut-card {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .dashboard-home .dashboard-shortcut-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   text-decoration: none;
   background: #fff;
   border-radius: 14px;
-  padding: 1.5rem;
+  padding: 1.25rem 1.375rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(226, 232, 240, 0.8);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
   color: #0f172a;
+  width: 100%;
+  max-width: 100%;
+  min-height: 118px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+button.dashboard-shortcut-card {
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .dashboard-home .dashboard-shortcut-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
+  z-index: 2;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
   border-color: #cbd5e1;
   color: #0f172a;
 }
 
 .dashboard-home .dashboard-shortcut-card .shortcut-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   color: #fff;
-  margin-bottom: 1rem;
+  margin-bottom: 0.875rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
 }
 
 .dashboard-home .dashboard-shortcut-card .shortcut-label {
@@ -94,6 +129,7 @@
   line-height: 1.35;
   margin: 0;
   color: #0f172a;
+  word-break: break-word;
 }
 
 /* Colores por tipo de acceso */
@@ -108,6 +144,13 @@
 .dashboard-home .dashboard-shortcut-card[data-accent="kpi"] .shortcut-icon { background: linear-gradient(135deg, #166534 0%, #14532d 100%); }
 .dashboard-home .dashboard-shortcut-card[data-accent="prospeccion"] .shortcut-icon { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); }
 
+@media (min-width: 576px) {
+  .dashboard-home .dashboard-shortcuts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.125rem;
+  }
+}
+
 @media (min-width: 768px) {
   .dashboard-home .dashboard-home-inner {
     padding: 2.5rem 1.5rem 3.5rem;
@@ -119,13 +162,14 @@
   }
 
   .dashboard-home .dashboard-shortcuts {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
   }
 }
 
 @media (min-width: 1200px) {
   .dashboard-home .dashboard-shortcuts {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.5rem;
   }
 }

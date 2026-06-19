@@ -37,7 +37,19 @@ if ($_POST["pais"]!="Colombia") {
 
 $clienteInsitucional = $_POST["clienteInstitucional"] == 1 ? 1 : 0;
 
-$conexionBdPrincipal->query("UPDATE clientes SET 
+require_once RUTA_PROYECTO . '/usuarios/class/Cliente.php';
+require_once RUTA_PROYECTO . '/usuarios/class/Etiqueta.php';
+$direccion = strtoupper(Cliente::construirDireccionNomenclatura([
+    'op1' => $_POST['op1'] ?? '',
+    'op2' => $_POST['op2'] ?? '',
+    'op3' => $_POST['op3'] ?? '',
+    'op4' => $_POST['op4'] ?? '',
+    'op5' => $_POST['op5'] ?? '',
+    'op6' => $_POST['op6'] ?? '',
+    'op7' => $_POST['op7'] ?? '',
+]));
+
+$conexionBdPrincipal->query("UPDATE clientes SET
 cli_nombre='" . $_POST["nombre"] . "', 
 cli_referencia='" . $_POST["referencia"] . "', 
 cli_email='" . $_POST["email"] . "', 
@@ -45,7 +57,7 @@ cli_telefono='" . $_POST["telefono"] . "',
 cli_ciudad='" . $ciudad . "', 
 cli_usuario='" . trim($_POST["usuarioCliente"]) . "', 
 cli_clave='" . $_POST["claveCliente"] . "', 
-cli_direccion='" . $_POST["direccion"] . "', 
+cli_direccion='" . $direccion . "', 
 cli_zona='" . $zona[2] . "', 
 cli_celular='" . $_POST["celular"] . "', 
 cli_telefonos='" . $_POST["telefonos"] . "', 
@@ -87,9 +99,18 @@ if ($_POST["asesor"] != "") {
     $conexionBdPrincipal->query("INSERT INTO clientes_usuarios(cliu_usuario, cliu_cliente, cliu_fecha)VALUES('" . $_POST["asesor"] . "'," . $_POST["id"] . ", now())");
 }
 
+$etiquetasPost = isset($_POST['etiquetas']) && is_array($_POST['etiquetas']) ? $_POST['etiquetas'] : [];
+Etiqueta::sincronizarAsignaciones(
+    Etiqueta::MODULO_CLIENTE,
+    intval($_POST['id']),
+    $etiquetasPost,
+    intval($_SESSION['id']),
+    intval($idEmpresa),
+    $conexionBdPrincipal
+);
+
 // Sincronizar con Ofima (Orion → Ofima)
 try {
-    require_once RUTA_PROYECTO . '/usuarios/class/Cliente.php';
     Cliente::sincronizarConOfima($_POST["id"], $conexionBdPrincipal, $idEmpresa, 'UPDATE');
 } catch (Exception $e) {
     error_log('Error al sincronizar cliente con Ofima: ' . $e->getMessage());
