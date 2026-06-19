@@ -64,5 +64,13 @@ if ($_POST["contactoP"] == 1) {
     mysqli_query($conexionBdPrincipal,"INSERT INTO contactos(cont_nombre, cont_telefono, cont_email, cont_cliente_principal, cont_celular, cont_telefonos)VALUES('" . $_POST["nombre"] . "', '" . $_POST["telefono"] . "', '" . $_POST["email"] . "', '" . $idInsertU . "', '" . $_POST["celular"] . "','" . $_POST["telefonos"] . "')");
 }
 
+// Sincronizar con Ofima (Orion → Ofima)
+try {
+    require_once RUTA_PROYECTO . '/usuarios/class/Cliente.php';
+    Cliente::sincronizarConOfima($idInsertU, $conexionBdPrincipal, $idEmpresa, 'CREATE');
+} catch (Exception $e) {
+    error_log('Error al sincronizar cliente con Ofima: ' . $e->getMessage());
+}
+
 echo '<script type="text/javascript">window.location.href="../clientes-editar.php?id=' . $idInsertU . '&msg=1";</script>';
 exit();

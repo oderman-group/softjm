@@ -1910,6 +1910,37 @@ form.cmxform label.error {
 .btn-notification i {
 	margin:0px !important;
 }
+/* Menú usuario en encabezado (Mi cuenta) */
+.header-user-menu .btn-notification {
+	width: auto;
+	min-width: 50px;
+	padding: 0 12px !important;
+	font-size: 14px;
+}
+.header-user-menu .btn-notification .icon-user {
+	margin-right: 6px !important;
+}
+.header-user-menu .header-user-name {
+	white-space: nowrap;
+	max-width: 140px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+}
+@media (max-width: 768px) {
+	.header-user-menu .header-user-name {
+		display: none;
+	}
+}
+.header-user-dropdown li a {
+	display: block;
+	padding: 8px 15px;
+}
+.header-user-dropdown li a i {
+	margin-right: 8px;
+	width: 18px;
+	text-align: center;
+}
 .search-box {
 	margin:15px;
 	position:relative;

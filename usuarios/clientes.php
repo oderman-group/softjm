@@ -8,10 +8,13 @@ include(RUTA_PROYECTO."/usuarios/class/Cliente.php");
 
 $clienteConMasVenta = Cliente::obtenerDatosClienteConMasComprasAgnoActual($idEmpresa, $conexionBdPrincipal);
 $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBdPrincipal);
+$conteoPorDepartamento = Cliente::conteoClientesPorDepartamento($idEmpresa, $conexionBdPrincipal, $conexionBdAdmin);
+$conteoPorGrupoDealer  = Cliente::conteoClientesPorGrupoDealer($idEmpresa, $conexionBdPrincipal);
 ?>
 <!-- styles -->
 
 <link href="css/tablecloth.css" rel="stylesheet">
+<link href="css/crm-etiquetas.css" rel="stylesheet">
 
 <!--============j avascript===========-->
 <script src="js/jquery.js"></script>
@@ -256,21 +259,17 @@ $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBd
 												<ul class="dropdown-menu">
 													<li><a href="clientes.php">Todos</a></li>
 													<?php
-													$grupos = $conexionBdPrincipal->query("SELECT * FROM dealer WHERE deal_id_empresa='".$idEmpresa."'");
+													$grupos = $conexionBdPrincipal->query("SELECT deal_id, deal_nombre FROM dealer WHERE deal_id_empresa='".$idEmpresa."' ORDER BY deal_nombre");
 													while($grupo = mysqli_fetch_array($grupos, MYSQLI_BOTH)){
 														
 														$color = 'white';
 														if(isset($_GET["grupo"])){
 															if($grupo[0]==$_GET["grupo"]) $color = 'black' ;
 														}
-										
-														$consultaContarClientes = $conexionBdPrincipal->query("SELECT COUNT(*) FROM clientes_categorias
-														INNER JOIN clientes ON cli_id=cpcat_cliente AND (cli_papelera=0 OR  cli_papelera IS NULL)
-														WHERE cpcat_categoria='".$grupo[0]."' AND cli_id_empresa='".$idEmpresa."'
-														");
-														$contarClientes = mysqli_fetch_array($consultaContarClientes, MYSQLI_BOTH);
+
+														$contarClientesGrupo = $conteoPorGrupoDealer[intval($grupo[0])] ?? 0;
 													?>
-													<li><a href="clientes.php?grupo=<?=$grupo[0];?>" style="color:<?=$color;?>"><?=$grupo['deal_nombre']." (".$contarClientes[0].")";?></a></li>
+													<li><a href="clientes.php?grupo=<?=$grupo[0];?>" style="color:<?=$color;?>"><?=$grupo['deal_nombre']." (".$contarClientesGrupo.")";?></a></li>
 													<?php }?>
 												</ul>
 											</li>
@@ -324,8 +323,8 @@ $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBd
 						if($deptos[0]==$_GET["dpto"]) $color = 'green' ;
 					}
 
-					$contarClientes = contarClientesPorDepto($deptos[0]);
-                ?>  	
+					$contarClientes = $conteoPorDepartamento[intval($deptos[0])] ?? 0;
+                ?>
 					<a href="clientes.php?dpto=<?=$deptos[0];?>" style="margin-bottom:10px; color:<?=$color;?>"><?=$deptos[1]." (".$contarClientes.")";?></a><br>
 					
                 <?php }?>
@@ -338,66 +337,7 @@ $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBd
 							<div class="widget-head green">
 								<h3><?=$paginaActual['pag_nombre'];?></h3>
 							</div>
-							<?php
-							$filtro = "";
-							if (isset($_GET["pap"]) and $_GET["pap"] == 1) {
-								$filtro .= " AND cli_papelera=1";
-							}
-
-							$filtroGrupos = '';
-							if (isset($_GET["grupo"]) and is_numeric($_GET["grupo"])) {
-								$filtroGrupos .= "LEFT JOIN clientes_categorias ON cpcat_cliente=cli_id AND cpcat_categoria='" . $_GET["grupo"] . "'";
-							}
-
-							$tipoDoc="";
-							if (isset($_GET["tipoDoc"]) and is_numeric($_GET["tipoDoc"])) {
-								$filtro .= " AND cli_tipo_documento='" . $_GET["tipoDoc"] . "'";
-								$tipoDoc=$_GET["tipoDoc"];
-							}
-
-							if(Modulos::validarRol([385], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
-								$filtro.=' AND cli_ciudad!="1122"';
-							}
-
-							if (isset($_GET["clientesNuevos"])) {
-								$filtro .= " AND year(cli_fecha_ingreso)=".date("Y")." AND month(cli_fecha_ingreso)=".date("m");
-							}
-
-							if (isset($_GET["categoria"]) && is_numeric($_GET["categoria"])) {
-								$filtro .= " AND cli_categoria=".$_GET["categoria"];
-							}
-							if (isset($_GET["fecha_registro_inicio"]) and $_GET["fecha_registro_inicio"] != "") {
-								$filtro .= " AND cli_fecha_registro >= '" . $_GET["fecha_registro_inicio"] . " 00:00:00'";
-							}
-							if (isset($_GET["fecha_registro_fin"]) and $_GET["fecha_registro_fin"] != "") {
-								$filtro .= " AND cli_fecha_registro <= '" . $_GET["fecha_registro_fin"] . " 23:59:59'";
-							}
-							if (isset($_GET["fecha_ingreso_inicio"]) and $_GET["fecha_ingreso_inicio"] != "") {
-								$filtro .= " AND cli_fecha_ingreso >= '" . $_GET["fecha_ingreso_inicio"] . " 00:00:00' AND cli_categoria = 2";
-							}
-							if (isset($_GET["fecha_ingreso_fin"]) and $_GET["fecha_ingreso_fin"] != "") {
-								$filtro .= " AND cli_fecha_ingreso <= '" . $_GET["fecha_ingreso_fin"] . " 23:59:59' AND cli_categoria = 2";
-							}
-							?>
-
-							<?php
-							$dpto="";
-							if (isset($_GET["dpto"]) and $_GET["dpto"]!="") {
-								$SQL = "SELECT * FROM ".MAINBD.".clientes
-								LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
-								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento AND dep_id='".$_GET["dpto"]."'
-								$filtroGrupos
-								WHERE cli_id=cli_id ".$filtro."";
-								$dpto=$_GET["dpto"];
-							}else{
-								$SQL = "SELECT * FROM ".MAINBD.".clientes
-								LEFT JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=cli_ciudad
-								INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento 
-								$filtroGrupos
-								WHERE cli_id=cli_id ".$filtro."
-								";					
-							}
-							?>
+							<?php include("includes/clientes-listado-filtros.php"); ?>
 
 							<div class="widget-container">
 								<div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
@@ -420,9 +360,11 @@ $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBd
 											<th>RM</th>
 										</tr>
 									</thead>
-									<tbody id="clientes_buscar">	
-									<?php include("fetch-buscar-clientes.php"); ?>					
-
+									<tbody id="clientes_buscar">
+									<?php
+									include("includes/clientes-listado-cargar.php");
+									include("includes/clientes-listado-render-filas.php");
+									?>
 									</tbody>
 								</table>
 							</div>
@@ -437,8 +379,13 @@ $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBd
 				var valor = document.getElementById('btn_buscar').value;
 				var tbody = document.getElementById('clientes_buscar');
 				tbody.innerHTML='';
-    
-				fetch('fetch-buscar-clientes.php?buscar='+valor+'&inicio=<?=$inicio?>&limite=<?=$limite?>&tipoDoc=<?=$tipoDoc?>&dpto=<?=$dpto?>&filtroGrupos=<?=$filtroGrupos?>', {
+
+				var params = new URLSearchParams(window.location.search);
+				params.set('buscar', valor);
+				params.set('inicio', '<?= isset($_GET["inicio"]) ? intval($_GET["inicio"]) : 1 ?>');
+				params.set('limite', '<?= intval($limite) ?>');
+
+				fetch('fetch-buscar-clientes.php?' + params.toString(), {
 					method: 'GET'
 				})
 				.then(response => response.text())
@@ -453,6 +400,7 @@ $clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBd
 	</div>
 
 	<?php include("includes/pie.php"); ?>
+	<?php include("includes/drawer-notas-internas-cliente.php"); ?>
 	</div>
 
 </body>

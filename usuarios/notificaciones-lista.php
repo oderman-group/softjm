@@ -3,8 +3,9 @@
 $idPagina = 43;
 $paginaActual['pag_nombre'] = "Notificaciones";
 ?>
-<?php 
+<?php
 include("includes/verificar-paginas.php");
+require_once RUTA_PROYECTO . '/usuarios/class/Notificacion.php';
 mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_usuario='".$_SESSION["id"]."' AND not_varios IS NULL");
 ?>
 <?php include("includes/head.php");?>
@@ -172,11 +173,11 @@ mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE n
 							if(is_numeric($_GET["idNot"])){
 								mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE not_id='".$_GET["idNot"]."'");
 								
-								mysqli_query($conexionBdPrincipal,"DELETE FROM notificaciones WHERE not_seguimiento='".$_GET["idSeg"]."' AND not_id!='".$_GET["idNot"]."'");
-								
-								mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_usuario_encargado='".$_SESSION["id"]."' WHERE cseg_id='".$_GET["idSeg"]."'");
-								
-							}	
+								if (!empty($_GET["idSeg"]) && is_numeric($_GET["idSeg"]) && (int) $_GET["idSeg"] > 0) {
+									mysqli_query($conexionBdPrincipal,"DELETE FROM notificaciones WHERE not_seguimiento='".$_GET["idSeg"]."' AND not_id!='".$_GET["idNot"]."'");
+									mysqli_query($conexionBdPrincipal,"UPDATE cliente_seguimiento SET cseg_usuario_encargado='".$_SESSION["id"]."' WHERE cseg_id='".$_GET["idSeg"]."'");
+								}
+							}
 							
 							$sql = "SELECT * FROM notificaciones 
 							INNER JOIN clientes ON cli_id=not_cliente 
@@ -212,7 +213,11 @@ mysqli_query($conexionBdPrincipal,"UPDATE notificaciones SET not_visto=1 WHERE n
                                 <td><a href="bd_update/notificaciones-estado-actualizar.php?get=20&id=<?=$res['not_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Cambiar de estado"><span class="label label-<?=$etiquetaE;?>"><?=$estado;?></span></a></td>
                                 <td>	
 								<h4>
+                                <?php if (Notificacion::tieneSeguimiento($res)) { ?>
                                 	<a href="clientes-seguimiento.php?cte=<?=$res['cli_id'];?>&seg=<?=$res['not_seguimiento'];?>" data-toggle="tooltip" title="Seguimiento del cliente" target="new"><i class="icon-list-ol"></i></a>
+                                <?php } else { ?>
+                                    <a href="<?= htmlspecialchars(Notificacion::obtenerUrlDestino($res)) ?>" data-toggle="tooltip" title="Editar cliente" target="new"><i class="icon-edit"></i></a>
+                                <?php } ?>
                                     <a href="clientes-contactos.php?cte=<?=$res['cli_id'];?>&emg=1" data-toggle="tooltip" title="Contactos del cliente" target="new"><i class="icon-group"></i></a>
                                     <a href="bd_delete/notificaciones-eliminar.php?id=<?=$res['not_id'];?>&get=16" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar notificación"><i class="icon-remove-sign"></i></a>
                                 </h4>	

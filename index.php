@@ -1,187 +1,118 @@
 <?php
 include("conexion.php");
+
+$msjError = '';
+if (isset($_GET['error'])) {
+  switch ($_GET['error']) {
+    case 1: $msjError = 'El usuario no existe.'; break;
+    case 2: $msjError = 'La clave no es correcta.'; break;
+    case 3: $msjError = 'Los intentos fallidos de acceso superan el límite.'; break;
+    case 4: $msjError = 'Su usuario se encuentra bloqueado.'; break;
+    default: $msjError = 'Error de acceso.'; break;
+  }
+}
+
+$idSeguimiento = isset($_GET['idseg']) && is_numeric($_GET['idseg']) ? $_GET['idseg'] : '';
+$redirectTo = !empty($_GET['redirect_to']) && is_string($_GET['redirect_to']) ? trim($_GET['redirect_to']) : '';
+
+$showCaptcha = isset($_GET['error']) && (int)$_GET['error'] === 3;
+if ($showCaptcha) {
+  $numA1 = rand(1, 10);
+  $numA2 = rand(1, 10);
+  $resultadoA = $numA1 + $numA2;
+}
 ?>
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>ORIÓN</title>
-  <!-- plugins:css -->
-  <link rel="stylesheet" href="assets-login/vendors/iconfonts/font-awesome/css/all.min.css">
-  <link rel="stylesheet" href="assets-login/vendors/css/vendor.bundle.base.css">
-  <link rel="stylesheet" href="assets-login/vendors/css/vendor.bundle.addons.css">
-  <!-- endinject -->
-  <!-- plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
-  <link rel="stylesheet" href="assets-login/css/style.css">
-  <!-- endinject -->
-  <link rel="shortcut icon" href="assets-login/images/favicon.png" />
-
-
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <title>Iniciar sesión · ORION CRM</title>
+  <link rel="shortcut icon" href="assets-login/images/favicon.png">
+  <link rel="stylesheet" href="assets-login/css/crm-auth.css">
   <script src="https://kit.fontawesome.com/e84fa1cf78.js" crossorigin="anonymous"></script>
-
-
 </head>
+<body class="crm-auth-page">
+  <div class="crm-auth-wrapper">
+    <main class="crm-auth-form-panel">
+      <div class="crm-auth-card">
+        <img src="usuarios/files/orion-600.png" alt="ORION" class="crm-auth-logo">
 
-<body>
-  <div class="container-scroller">
-    <div class="container-fluid page-body-wrapper full-page-wrapper">
-      <div class="content-wrapper d-flex align-items-stretch auth auth-img-bg">
-        <div class="row flex-grow">
-          <div class="col-lg-6 d-flex align-items-center justify-content-center">
-          
-            <div class="auth-form-transparent text-left p-3">
-              <div class="brand-logo">
-                <img src="usuarios/files/orion-600.png" alt="Logo Orion">
-              </div>
+        <h1 class="crm-auth-title">Bienvenido a ORION</h1>
+        <p class="crm-auth-subtitle">Ingresa tu usuario y contraseña para acceder al CRM.</p>
 
-              <?php 
-              if(isset($_GET['error'])){
-                switch ($_GET['error']) {
-                  case 1:
-                    $msjError = 'El usuario no existe.';
-                  break;
+        <?php if ($msjError !== ''): ?>
+          <div class="crm-alert crm-alert-error" role="alert">
+            <span class="crm-alert-icon" aria-hidden="true"><i class="fa-solid fa-circle-exclamation"></i></span>
+            <span><?= htmlspecialchars($msjError) ?></span>
+          </div>
+        <?php endif; ?>
 
-                  case 2:
-                    $msjError = 'La clave no es correcta';
-                  break;
-                  
-                  case 3:
-                    $msjError = 'Los intentos fallidos de acceso superan el límite';
-                  break;
+        <form class="crm-auth-form" action="autentico.php" method="post" id="demo-form">
+          <input type="hidden" name="idseg" value="<?= htmlspecialchars($idSeguimiento) ?>">
+          <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($redirectTo) ?>">
+          <input type="hidden" name="bd" value="<?= htmlspecialchars(MAINBD ?? '') ?>">
 
-                  case 4:
-                    $msjError = 'Su usuario se encuentra bloqueado';
-                  break;
-
-
-                  default:
-                    $msjError = 'No hay mensaje';
-                  break;
-                }
-              }
-
-              $idSeguimiento = '';
-              if(isset($_GET["idseg"]) and is_numeric($_GET["idseg"])){
-                  $idSeguimiento = $_GET["idseg"];
-              }
-
-              $redirectTo = '';
-              if(!empty($_GET['redirect_to']) && is_string($_GET['redirect_to'])){
-                  $redirectTo = trim($_GET['redirect_to']);
-              }
-
-              if(isset($_GET['error'])){?>
-                <p style="color:black; font-size: 16px; background-color: gold; padding: 5px;"><?php echo $msjError;?></p>
-              <?php }?>
-
-
-              <h4>Bienvenido a ORION</h4>
-              <h6 class="font-weight-light">Ingresa tu usuario y contraseña para empezar!</h6>
-              <form class="pt-3" action="autentico.php" method="post" id="demo-form">
-
-                <input type="hidden" name="idseg" value="<?= htmlspecialchars($idSeguimiento); ?>">
-                <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($redirectTo); ?>">
-                
-                <!-- En esta versión esta BD ya no influye para cambios en bd
-                solo es para mostrar el nombre de la compañía y el nombre de la bd
-                al ingresar al sistema -->
-                <input type="hidden" name="bd" value="<?=MAINBD;?>">
-
-                <div class="form-group">
-                  <label for="exampleInputEmail">Usuario</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend bg-transparent">
-                      <span class="input-group-text bg-transparent border-right-0">
-                        <i class="fa fa-user text-primary"></i>
-                      </span>
-                    </div>
-                    <input type="text" class="form-control form-control-lg border-left-0" placeholder="Usuario" name="Usuario">
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="exampleInputPassword">Contraseña</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend bg-transparent">
-                      <span class="input-group-text bg-transparent border-right-0">
-                        <i class="fa fa-lock text-primary"></i>
-                      </span>
-                    </div>
-                    <input type="password" class="form-control form-control-lg border-left-0" placeholder="Contraseña" name="Clave" id="passwordInput">
-                    <div class="input-group-prepend bg-transparent" onclick="mostrarClave()">
-                      <span class="input-group-text bg-transparent border-left-0">
-                      <i class="fa-solid fa-eye" id="icoVer"></i>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <script>
-                    function mostrarClave() {
-                        var campo = document.getElementById("passwordInput");
-                        var icoVer = document.getElementById("icoVer");
-
-                        if (campo.type === "password") {
-                            campo.type = "text";
-                            icoVer.classList.remove("fa-eye");
-                            icoVer.classList.add("fa-eye-slash");
-                        } else {
-                            campo.type = "password";
-                            icoVer.classList.remove("fa-eye-slash");
-                            icoVer.classList.add("fa-eye");
-                        }
-                    }
-                </script>
-
-                <?php
-                if (isset($_GET["error"]) and $_GET["error"] == 3) {
-                  $numA1 = rand(1, 10);
-                  $numA2 = rand(1, 10);
-                  $resultadoA = $numA1 + $numA2;
-                ?>
-                  <p style="color: tomato;"><b>Valida que no eres un Robot</b><br>
-                    Escribe el resultado de la siguiente operación.</p>
-                  <input type="hidden" name="sumaReal" value="<?= md5($resultadoA); ?>" />
-                  <input type="text" class="form-control form-control-lg border-left-0" name="suma" placeholder="Cuánto es <?= $numA1 . "+" . $numA2; ?>?" required autocomplete="off" style="font-weight: bold;" />
-                <?php } ?>
-
-                <div class="my-2 d-flex justify-content-between align-items-center">
-                  <a href="recuperar-clave.php" class="auth-link text-black">Olvidaste tu clave?</a>
-                </div>
-
-                <div class="my-3">
-                  <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">ENTRAR</button>
-                </div>
-              </form>
+          <div class="crm-field">
+            <label class="crm-label" for="crm-user">Usuario</label>
+            <div class="crm-input-wrap">
+              <span class="crm-input-icon" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
+              <input type="text" id="crm-user" name="Usuario" placeholder="Usuario" autocomplete="username" autofocus>
             </div>
           </div>
-          <div class="col-lg-6 login-half-bg d-flex flex-row">
-            <p class="text-white font-weight-medium text-center flex-grow align-self-end">Copyright &copy; 2019 Todos los derechos reservados.</p>
+
+          <div class="crm-field">
+            <label class="crm-label" for="crm-password">Contraseña</label>
+            <div class="crm-input-wrap">
+              <span class="crm-input-icon" aria-hidden="true"><i class="fa-solid fa-lock"></i></span>
+              <input type="password" id="crm-password" name="Clave" placeholder="Contraseña" autocomplete="current-password">
+              <button type="button" class="crm-toggle-password" onclick="crmTogglePassword()" aria-label="Mostrar u ocultar contraseña">
+                <i class="fa-solid fa-eye" id="crm-ico-ver" aria-hidden="true"></i>
+              </button>
+            </div>
           </div>
-        </div>
+
+          <?php if ($showCaptcha): ?>
+            <div class="crm-captcha-box">
+              <p>Valida que no eres un robot</p>
+              <p style="font-weight: 400; color: inherit;">Escribe el resultado de: <strong><?= $numA1 ?> + <?= $numA2 ?></strong></p>
+              <input type="hidden" name="sumaReal" value="<?= md5($resultadoA) ?>">
+              <input type="text" name="suma" placeholder="Resultado" required autocomplete="off" style="margin-top: 0.5rem;">
+            </div>
+          <?php endif; ?>
+
+          <div class="crm-auth-links">
+            <a href="recuperar-clave.php" class="crm-auth-link">¿Olvidaste tu clave?</a>
+          </div>
+
+          <button type="submit" class="crm-btn-primary">Entrar</button>
+        </form>
       </div>
-      <!-- content-wrapper ends -->
-    </div>
-    <!-- page-body-wrapper ends -->
+    </main>
+
+    <aside class="crm-auth-brand-panel">
+      <div class="crm-auth-brand-content">
+        <p class="crm-auth-brand-quote">Gestiona clientes, pedidos e inventario en un solo lugar.</p>
+        <p class="crm-auth-brand-desc">Plataforma CRM profesional para equipos que buscan eficiencia y control.</p>
+      </div>
+      <footer class="crm-auth-footer">
+        &copy; <?= date('Y') ?> ORION CRM. Todos los derechos reservados.
+      </footer>
+    </aside>
   </div>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="assets-login/vendors/js/vendor.bundle.base.js"></script>
-  <script src="assets-login/vendors/js/vendor.bundle.addons.js"></script>
-  <!-- endinject -->
-  <!-- inject:js -->
-  <script src="assets-login/js/off-canvas.js"></script>
-  <script src="assets-login/js/hoverable-collapse.js"></script>
-  <script src="assets-login/js/misc.js"></script>
-  <script src="assets-login/js/settings.js"></script>
-  <script src="assets-login/js/todolist.js"></script>
-  <!-- endinject -->
+
+  <script>
+    function crmTogglePassword() {
+      var campo = document.getElementById('crm-password');
+      var icono = document.querySelector('#crm-ico-ver');
+      if (campo.type === 'password') {
+        campo.type = 'text';
+        icono.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        campo.type = 'password';
+        icono.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+  </script>
 </body>
-
-
 </html>

@@ -1,6 +1,7 @@
 <?php 
 include("logica-menu.php");
-?>	
+require_once RUTA_PROYECTO . '/usuarios/class/Notificacion.php';
+?>
 <div class="loader"></div>
 
 <?php if($datosUsuarioActual['usr_id']==7 || $datosUsuarioActual['usr_id']==2 || isset($_SESSION['admin']) ){?>
@@ -89,14 +90,12 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 				</ul>
 				</div>
 				<div class="btn-toolbar pull-right notification-nav">
-
 				<?php
 				$notificaciones = mysqli_query($conexionBdPrincipal, "SELECT * FROM notificaciones
 				INNER JOIN clientes ON cli_id=not_cliente AND cli_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'
 				WHERE not_usuario='".$_SESSION["id"]."' AND not_visto=0 AND not_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' LIMIT 0,5");
 				$numNotf = mysqli_num_rows($notificaciones);
 				?>
-					
 					<div class="btn-group">
 						<div class="dropdown">
 						<a class="btn btn-notification dropdown-toggle" data-toggle="dropdown"><i class="icon-globe"><?php if($numNotf>0){?><span class="notify-tip"><?=$numNotf;?></span><?php }?></i></a>
@@ -107,7 +106,7 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 									$color = 'black';
 									if($notf['not_varios']==1){$color = 'red';}
 								?>
-                                <a href="notificaciones-lista.php?idNot=<?=$notf['not_id']?>&idSeg=<?=$notf['not_seguimiento']?>" class="msg-container clearfix"><span class="notification-thumb"><img src="images/notify-thumb.png" width="50" height="50" alt="user-thumb"></span><span class="notification-intro" style="color: <?=$color;?>;"> <?=$notf['not_asunto']?> - <b><?=$notf['cli_nombre']?></b><span class="notify-time"> <?=$notf['not_fecha']?> </span></span></a>
+                                <a href="<?= htmlspecialchars(Notificacion::obtenerUrlDestino($notf)) ?>" class="msg-container clearfix"><span class="notification-thumb"><img src="images/notify-thumb.png" width="50" height="50" alt="user-thumb"></span><span class="notification-intro" style="color: <?=$color;?>;"> <?=$notf['not_asunto']?> - <b><?=$notf['cli_nombre']?></b><span class="notify-time"> <?=$notf['not_fecha']?> </span></span></a>
                                 <?php }?>
                                 
 								<a href="notificaciones-lista.php" class="btn btn-primary btn-large btn-block"> Ver todo</a>
@@ -115,15 +114,22 @@ require_once(RUTA_PROYECTO."/usuarios/config/colores-encabezado.php");
 						</div>
 					</div>
 
-					
-
-
-
-
-					<div class="btn-group">
-						<div class="dropdown">
-							<a href="../salir.php" class="btn btn-notification"><i class="icon-signout"></i></a>
-						</div>
+					<?php
+					$nombreUsuario = !empty($datosUsuarioActual['usr_nombre']) ? htmlspecialchars($datosUsuarioActual['usr_nombre']) : (!empty($datosUsuarioActual['usr_seudonimo']) ? htmlspecialchars($datosUsuarioActual['usr_seudonimo']) : 'Usuario');
+					?>
+					<div class="btn-group dropdown header-user-menu">
+						<a class="btn btn-notification dropdown-toggle" data-toggle="dropdown" href="#" title="Mi cuenta">
+							<i class="icon-user"></i>
+							<span class="header-user-name"><?= $nombreUsuario ?></span>
+							<b class="icon-angle-down"></b>
+						</a>
+						<ul class="dropdown-menu pull-right header-user-dropdown">
+							<li><a href="<?= REDIRECT_ROUTE ?>/usuarios/mis-ventas.php"><i class="icon-shopping-cart"></i> Mis ventas</a></li>
+							<li><a href="<?= REDIRECT_ROUTE ?>/usuarios/calendario.php"><i class="icon-calendar"></i> Mi calendario</a></li>
+							<li><a href="<?= REDIRECT_ROUTE ?>/usuarios/perfil-editar.php"><i class="icon-bar-chart"></i> Editar perfil</a></li>
+							<li class="divider"></li>
+							<li><a href="<?= REDIRECT_ROUTE ?>/salir.php"><i class="icon-signout"></i> Salir</a></li>
+						</ul>
 					</div>
 
 				</div>

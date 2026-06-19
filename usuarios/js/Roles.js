@@ -2,6 +2,8 @@
 var select = null; // Se inicializa cuando el DOM esté listo
 var todasLasPaginas = []; // Array para almacenar todas las páginas
 var paginasFiltradas = []; // Array para las páginas filtradas por búsqueda
+var listaModulosGlobal = []; // Lista de todos los módulos (id, nombre) para el dropdown
+var rolIdGlobal = 0; // ID del rol actual para recargar tras cambiar módulo
 
 // Inicializar select cuando el DOM esté listo
 function initSelect() {
@@ -118,8 +120,9 @@ function cargarTodosLosModulos(tipoUsuario) {
     .then(response => response.json())
     .then(data => {
         console.log('Datos recibidos del servidor:', data);
-        console.log('Primera página de ejemplo:', data.paginas && data.paginas[0]);
         todasLasPaginas = data.paginas || [];
+        listaModulosGlobal = (data.modulos || []).map(m => ({ id: m.id, nombre: m.nombre }));
+        rolIdGlobal = tipoUsuario;
         renderizarModulos(data.modulos || []);
         actualizarContadores();
     })
@@ -156,7 +159,7 @@ function renderizarModulos(modulos) {
                 </div>
             </div>
             <div class="module-content ${index === 0 ? 'active' : ''}" id="module-content-${modulo.id}">
-                ${renderizarTablaPaginas(modulo.paginas, modulo.id)}
+                ${renderizarTablaPaginas(modulo.paginas, modulo.id, modulos)}
             </div>
         </div>
         `;
@@ -169,12 +172,14 @@ function renderizarModulos(modulos) {
 /**
  * Renderiza la tabla de páginas de un módulo
  * @param {array} paginas - Array de páginas del módulo
- * @param {int} moduloId - ID del módulo
+ * @param {int} moduloId - ID del módulo actual
+ * @param {array} todosLosModulos - Array de todos los módulos (id, nombre) para el dropdown
  */
-function renderizarTablaPaginas(paginas, moduloId) {
+function renderizarTablaPaginas(paginas, moduloId, todosLosModulos) {
     if (paginas.length === 0) {
         return '<div style="padding: 20px; text-align: center; color: #999;">No hay páginas en este módulo</div>';
     }
+    const modulos = todosLosModulos || listaModulosGlobal;
     
     let html = `
     <div class="pages-table-container">
@@ -189,6 +194,7 @@ function renderizarTablaPaginas(paginas, moduloId) {
                 <tr>
                     <th width="80">ID</th>
                     <th>Nombre de la Página</th>
+                    <th width="140">Módulo</th>
                     <th width="150">Ruta</th>
                     <th width="120" style="text-align: center;">Permiso</th>
                 </tr>
@@ -199,8 +205,16 @@ function renderizarTablaPaginas(paginas, moduloId) {
     paginas.forEach(pagina => {
         const checked = pagina.tiene_permiso ? 'checked' : '';
         const descripcion = pagina.descripcion || 'Sin descripción disponible';
+        const rutaCompleta = (pagina.ruta || '').toLowerCase();
+        const rutaFinal = rutaCompleta.split('/').pop() || rutaCompleta;
+        const moduloActual = pagina.modulo_id != null ? pagina.modulo_id : moduloId;
+        let optionsModulo = '';
+        modulos.forEach(m => {
+            const sel = (m.id === moduloActual) ? ' selected' : '';
+            optionsModulo += `<option value="${m.id}"${sel}>${escapeHtml(m.nombre)}</option>`;
+        });
         html += `
-        <tr data-page-id="${pagina.id}" data-page-name="${pagina.nombre.toLowerCase()}" data-page-route="${(pagina.ruta || '').toLowerCase()}" data-page-description="${descripcion.toLowerCase()}">
+        <tr data-page-id="${pagina.id}" data-page-name="${pagina.nombre.toLowerCase()}" data-page-route="${rutaCompleta}" data-page-route-end="${rutaFinal}" data-page-description="${descripcion.toLowerCase()}" data-page-permiso="${pagina.tiene_permiso ? '1' : '0'}">
             <td><strong>#${pagina.id}</strong></td>
             <td>
                 <div class="page-info">
@@ -208,6 +222,11 @@ function renderizarTablaPaginas(paginas, moduloId) {
                     ${pagina.descripcion ? `<span class="page-description"><i class="fa-solid fa-info-circle"></i> ${pagina.descripcion}</span>` : ''}
                     ${pagina.ruta ? `<span class="page-route"><i class="fa-solid fa-file-code"></i> ${pagina.ruta}</span>` : ''}
                 </div>
+            </td>
+            <td>
+                <select class="page-module-select form-control" data-page-id="${pagina.id}" title="Cambiar módulo (se guarda automáticamente)" onchange="cambiarModuloPagina(${pagina.id}, this.value)">
+                    ${optionsModulo}
+                </select>
             </td>
             <td><code style="font-size: 11px;">${pagina.ruta || 'N/A'}</code></td>
             <td style="text-align: center;">
@@ -232,6 +251,12 @@ function renderizarTablaPaginas(paginas, moduloId) {
     `;
     
     return html;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ========== TOGGLE MODULE (EXPANDIR/CONTRAER) ==========
@@ -399,7 +424,6 @@ function buscarPaginas(searchTerm) {
         mostrarTodasLasPaginas();
         return;
     }
-    
     const term = searchTerm.toLowerCase();
     const allRows = document.querySelectorAll('.table-modern tbody tr');
     let visibleCount = 0;
@@ -413,18 +437,18 @@ function buscarPaginas(searchTerm) {
     allRows.forEach(row => {
         totalCount++;
         const pageName = row.getAttribute('data-page-name') || '';
-        const pageRoute = row.getAttribute('data-page-route') || '';
+        const pageRouteEnd = row.getAttribute('data-page-route-end') || row.getAttribute('data-page-route') || '';
         const pageDescription = row.getAttribute('data-page-description') || '';
         const moduleElement = row.closest('.module-view');
         const moduleName = moduleElement ? 
             moduleElement.querySelector('.module-title span').textContent.toLowerCase() : '';
         
-        if (pageName.includes(term) || pageRoute.includes(term) || moduleName.includes(term) || pageDescription.includes(term)) {
+        const matchSearch = pageName.includes(term) || pageRouteEnd.includes(term) || moduleName.includes(term) || pageDescription.includes(term);
+        const show = matchSearch;
+        if (show) {
             row.style.display = 'table-row';
             row.classList.remove('hidden-by-search');
             visibleCount++;
-            
-            // Mostrar el módulo que contiene esta página
             if (moduleElement) {
                 moduleElement.style.display = 'block';
                 const content = moduleElement.querySelector('.module-content');
@@ -438,13 +462,10 @@ function buscarPaginas(searchTerm) {
         }
     });
     
-    // Ocultar módulos sin resultados visibles
     document.querySelectorAll('.module-view').forEach(module => {
         if (module.style.display !== 'none') {
             const visibleRows = module.querySelectorAll('.table-modern tbody tr:not(.hidden-by-search)');
-            if (visibleRows.length === 0) {
-                module.style.display = 'none';
-            }
+            if (visibleRows.length === 0) module.style.display = 'none';
         }
     });
     
@@ -456,6 +477,40 @@ function buscarPaginas(searchTerm) {
         ${visibleCount === 0 ? '<span style="color: #f44336; margin-left: 10px;">No se encontraron resultados</span>' : ''}
     `;
     searchStats.classList.add('active');
+}
+
+// ========== CAMBIAR MÓDULO DE UNA PÁGINA ==========
+/**
+ * Cambia el módulo asociado a una página. Guardado automático vía AJAX.
+ * @param {int} paginaId - ID de la página
+ * @param {string} moduloId - ID del nuevo módulo
+ */
+function cambiarModuloPagina(paginaId, moduloId) {
+    if (!moduloId) return;
+    const selectEl = document.querySelector('.page-module-select[data-page-id="' + paginaId + '"]');
+    if (selectEl) selectEl.disabled = true;
+    const formData = new FormData();
+    formData.append('pagina_id', paginaId);
+    formData.append('modulo_id', moduloId);
+    fetch('ajax/ajax-pagina-cambiar-modulo.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarNotificacion('Módulo actualizado correctamente. Recargando...', 'success');
+            if (rolIdGlobal) cargarTodosLosModulos(rolIdGlobal);
+        } else {
+            mostrarNotificacion(data.error || 'Error al cambiar el módulo', 'error');
+            if (selectEl) selectEl.disabled = false;
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        mostrarNotificacion('Error de conexión', 'error');
+        if (selectEl) selectEl.disabled = false;
+    });
 }
 
 // ========== MOSTRAR TODAS LAS PÁGINAS ==========
@@ -470,8 +525,6 @@ function mostrarTodasLasPaginas() {
             row.style.display = 'table-row';
             row.classList.remove('hidden-by-search');
         });
-        
-        // Contraer todos excepto el primero
         const content = module.querySelector('.module-content');
         const arrow = module.querySelector('[id^="arrow-"]');
         if (module === document.querySelector('.module-view:first-child')) {

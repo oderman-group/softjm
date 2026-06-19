@@ -1,0 +1,607 @@
+/**
+ * Cliente editar - Vista comercial profesional
+ */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+.cliente-editar-page .main-wrapper {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  min-height: auto;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+.cliente-editar-page .main-wrapper > .container-fluid.cliente-editar-inner {
+  width: 95%;
+  max-width: none;
+  margin: 0 auto;
+  padding-left: 0;
+  padding-right: 0;
+  box-sizing: border-box;
+}
+
+.cliente-editar-page .cliente-editar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Resumen comercial */
+.cliente-editar-page .cliente-resumen {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.cliente-editar-page .cliente-resumen-header {
+  margin-bottom: 1rem;
+}
+
+.cliente-editar-page .cliente-resumen-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.35rem 0;
+  line-height: 1.2;
+}
+
+.cliente-editar-page .cliente-resumen-subtitle {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.cliente-editar-page .cliente-resumen-meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.cliente-editar-page .cliente-resumen-meta-block {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem 0.875rem;
+  min-width: 0;
+}
+
+.cliente-editar-page .cliente-resumen-meta-etiquetas {
+  border-left: 3px solid #6366f1;
+}
+
+.cliente-editar-page .cliente-resumen-meta-estado {
+  border-left: 3px solid #94a3b8;
+}
+
+.cliente-editar-page .cliente-resumen-meta-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.65rem;
+  margin-bottom: 0.55rem;
+}
+
+.cliente-editar-page .cliente-resumen-meta-label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #334155;
+}
+
+.cliente-editar-page .cliente-resumen-meta-hint {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.6875rem;
+  color: #94a3b8;
+}
+
+.cliente-editar-page .cliente-resumen-meta-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.65rem;
+}
+
+.cliente-editar-page .cliente-resumen-sin-etiquetas {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.8125rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.cliente-editar-page .cliente-resumen-meta-link {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4f46e5;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cliente-editar-page .cliente-resumen-meta-link:hover {
+  text-decoration: underline;
+}
+
+.cliente-editar-page .cliente-resumen-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.cliente-editar-page .cliente-resumen-badges-sistema .cliente-badge {
+  border: 1px dashed #cbd5e1;
+}
+
+.cliente-editar-page .cliente-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.cliente-editar-page .cliente-badge-categoria { background: #ede9fe; color: #5b21b6; }
+.cliente-editar-page .cliente-badge-nivel { background: #dbeafe; color: #1d4ed8; }
+.cliente-editar-page .cliente-badge-credito { background: #dcfce7; color: #166534; }
+.cliente-editar-page .cliente-badge-sincredito { background: #f1f5f9; color: #475569; }
+
+.cliente-editar-page .cliente-resumen-timeline-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #334155;
+  margin: 0 0 0.75rem 0;
+}
+
+.cliente-editar-page .cliente-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.cliente-editar-page .cliente-kpi-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  min-width: 0;
+}
+
+.cliente-editar-page .cliente-kpi-label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.cliente-editar-page .cliente-kpi-value {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.cliente-editar-page .cliente-kpi-value a {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.cliente-editar-page .cliente-kpi-value a:hover {
+  text-decoration: underline;
+}
+
+/* Timeline evolución */
+.cliente-editar-page .cliente-timeline {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+.cliente-editar-page .cliente-timeline::before {
+  content: "";
+  position: absolute;
+  top: 1.65rem;
+  left: 8%;
+  right: 8%;
+  height: 3px;
+  background: #e2e8f0;
+  z-index: 0;
+}
+
+.cliente-editar-page .cliente-timeline-step {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.cliente-editar-page .cliente-timeline-step .circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+}
+
+.cliente-editar-page .cliente-timeline-step.registro .circle { background: #f59e0b; }
+.cliente-editar-page .cliente-timeline-step.compra .circle { background: #16a34a; }
+.cliente-editar-page .cliente-timeline-step.ultima .circle { background: #0284c7; }
+
+.cliente-editar-page .cliente-timeline-step .title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.cliente-editar-page .cliente-timeline-step .date {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+}
+
+/* Widget principal */
+.cliente-editar-page .cliente-editar-widget {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: visible;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.cliente-editar-page .cliente-editar-widget .widget-head {
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%) !important;
+  border: none;
+  padding: 1rem 1.25rem;
+  border-radius: 14px 14px 0 0;
+  overflow: hidden;
+}
+
+.cliente-editar-page .cliente-editar-widget .widget-head h3 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Un solo scroll de página: Bootstrap aplica overflow:auto en .tab-content */
+.cliente-editar-page .cliente-editar-widget .tab-content {
+  overflow: visible;
+  max-height: none;
+  height: auto;
+}
+
+.cliente-editar-page .cliente-editar-tabs {
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 0 0.75rem;
+  margin: 0;
+}
+
+.cliente-editar-page .cliente-editar-tabs > li > a {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #475569 !important;
+  padding: 0.875rem 0.75rem;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.cliente-editar-page .cliente-editar-tabs > li.active > a,
+.cliente-editar-page .cliente-editar-tabs > li > a:hover {
+  color: #1d4ed8 !important;
+  background: transparent !important;
+  border-bottom: 2px solid #1d4ed8 !important;
+}
+
+.cliente-editar-page .tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 4px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.cliente-editar-page .cliente-editar-tabs > li.active > a .tab-count {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.cliente-editar-page .cliente-editar-widget .widget-container {
+  padding: 1.25rem;
+}
+
+/* Formulario — layout propio, sin depender de form-horizontal de Bootstrap */
+.cliente-editar-page .cliente-form-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 0;
+}
+
+.cliente-editar-page .cliente-form-section {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem 1.375rem;
+  background: #fff;
+}
+
+.cliente-editar-page .cliente-form-section-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.35rem 0;
+}
+
+.cliente-editar-page .cliente-form-section-desc {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0 0 1.125rem 0;
+}
+
+.cliente-editar-page .cliente-form-grid {
+  display: grid;
+  gap: 1rem 1.125rem;
+}
+
+.cliente-editar-page .cliente-form-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cliente-editar-page .cliente-form-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cliente-editar-page .cliente-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.cliente-editar-page .cliente-field-full {
+  grid-column: 1 / -1;
+}
+
+.cliente-editar-page .cliente-field-label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.3;
+  margin: 0;
+  float: none;
+  width: auto;
+  text-align: left;
+}
+
+.cliente-editar-page .cliente-field-input,
+.cliente-editar-page .cliente-field select.cliente-field-input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 36px;
+  margin: 0;
+  padding: 0.45rem 0.65rem;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.875rem;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cliente-editar-page .cliente-field-input:focus,
+.cliente-editar-page .cliente-field select.cliente-field-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.cliente-editar-page .cliente-field-input[readonly] {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.cliente-editar-page .cliente-field-hint {
+  font-size: 0.75rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.cliente-editar-page .cliente-field-checkbox {
+  padding-top: 0.15rem;
+}
+
+.cliente-editar-page .cliente-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+}
+
+.cliente-editar-page .cliente-checkbox input[type="checkbox"] {
+  margin: 0;
+}
+
+/* Chosen.js dentro del formulario */
+.cliente-editar-page .cliente-field .chzn-container {
+  width: 100% !important;
+  max-width: 100%;
+  font-size: 0.875rem;
+}
+
+.cliente-editar-page .cliente-field .chzn-container-single .chzn-single {
+  height: 36px;
+  line-height: 34px;
+  border-radius: 8px;
+  border-color: #cbd5e1;
+  background: #fff;
+  box-shadow: none;
+}
+
+.cliente-editar-page .cliente-field .chzn-container-multi .chzn-choices {
+  border-radius: 8px;
+  border-color: #cbd5e1;
+  background: #fff;
+  min-height: 36px;
+  padding: 4px 6px;
+}
+
+.cliente-editar-page .cliente-field .chzn-container-active .chzn-single,
+.cliente-editar-page .cliente-field .chzn-container-active .chzn-choices {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+/* Dirección — nomenclatura */
+.cliente-editar-page .cliente-direccion-nomenclatura {
+  width: 100%;
+}
+
+.cliente-editar-page .cliente-direccion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.875rem 1rem;
+  padding: 0.875rem 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.cliente-editar-page .cliente-direccion-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.cliente-editar-page .cliente-direccion-campo-complemento {
+  grid-column: 1 / -1;
+}
+
+.cliente-editar-page .cliente-direccion-campo-label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.cliente-editar-page .cliente-direccion-campo input[type="text"],
+.cliente-editar-page .cliente-direccion-campo select {
+  width: 100%;
+  min-height: 36px;
+  margin: 0;
+  padding: 0.45rem 0.65rem;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: #fff;
+}
+
+.cliente-editar-page .cliente-direccion-campo .chzn-container {
+  width: 100% !important;
+}
+
+.cliente-editar-page .cliente-direccion-campo .chzn-container-single .chzn-single {
+  height: 36px;
+  line-height: 34px;
+  border-radius: 8px;
+  border-color: #cbd5e1;
+}
+
+.cliente-editar-page .cliente-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.25rem 0 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+}
+
+.cliente-editar-page .cliente-form-actions .btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+@media (max-width: 991px) {
+  .cliente-editar-page .cliente-resumen-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .cliente-editar-page .cliente-kpi-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cliente-editar-page .cliente-timeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cliente-editar-page .cliente-timeline::before {
+    display: none;
+  }
+
+  .cliente-editar-page .cliente-form-grid-2,
+  .cliente-editar-page .cliente-form-grid-3,
+  .cliente-editar-page .cliente-direccion-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .cliente-editar-page .cliente-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cliente-editar-page .cliente-timeline {
+    grid-template-columns: 1fr;
+  }
+}

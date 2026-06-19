@@ -51,10 +51,20 @@
     prod_descripcion_corta='" . $conexionBdPrincipal->real_escape_string($_POST["descripcion"]) . "', 
     prod_costo_dolar='" . $_POST["costoDolar"] . "', 
     prod_referencia='" . $_POST["referencia"] . "', 
-    prod_existencias='" . $_POST["cant"] . "', 
     prod_proveedor='" . $_POST["proveedor"] . "', 
     prod_descripcion_larga='" . $conexionBdPrincipal->real_escape_string($_POST["descripcionLarga"]) . "' 
     WHERE prod_id='" . $_POST["id"] . "' AND prod_id_empresa={$idEmpresa}");
+
+    // Recalcular prod_existencias desde productos_bodegas (origen de la verdad)
+    Producto::sincronizarExistenciasConBodegas($_POST["id"], $conexionBdPrincipal);
+
+    // Sincronizar con Ofima (en segundo plano, no bloquea si falla)
+    try {
+        Producto::sincronizarConOfima($_POST["id"], $conexionBdPrincipal, $idEmpresa, 'UPDATE');
+    } catch (Exception $e) {
+        // Log del error pero no interrumpir el flujo
+        error_log("Error al sincronizar producto con Ofima: " . $e->getMessage());
+    }
 
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 

@@ -35,7 +35,7 @@
 
 <link href="css/styles.css" rel="stylesheet">
 <link href="css/theme-blue.css" rel="stylesheet">
-
+<link href="css/crm-professional.css" rel="stylesheet">
 
 <link href='https://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <!--fav and touch icons -->

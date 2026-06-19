@@ -1,111 +1,67 @@
+<?php
+$msgSuccess = isset($_GET['msg']) && (int)$_GET['msg'] === 1;
+$msgError   = isset($_GET['msg']) && (int)$_GET['msg'] === 2;
+?>
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>ORIÓN</title>
-  <!-- plugins:css -->
-  <link rel="stylesheet" href="assets-login/vendors/iconfonts/font-awesome/css/all.min.css">
-  <link rel="stylesheet" href="assets-login/vendors/css/vendor.bundle.base.css">
-  <link rel="stylesheet" href="assets-login/vendors/css/vendor.bundle.addons.css">
-  <!-- endinject -->
-  <!-- plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
-  <link rel="stylesheet" href="assets-login/css/style.css">
-  <!-- endinject -->
-  <link rel="shortcut icon" href="assets-login/images/favicon.png" />
-
-
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <title>Recuperar contraseña · ORION CRM</title>
+  <link rel="shortcut icon" href="assets-login/images/favicon.png">
+  <link rel="stylesheet" href="assets-login/css/crm-auth.css">
   <script src="https://kit.fontawesome.com/e84fa1cf78.js" crossorigin="anonymous"></script>
-
-
 </head>
+<body class="crm-auth-page">
+  <div class="crm-auth-wrapper">
+    <main class="crm-auth-form-panel">
+      <div class="crm-auth-card">
+        <img src="usuarios/files/orion-600.png" alt="ORION" class="crm-auth-logo">
 
-<body>
-  <div class="container-scroller">
-    <div class="container-fluid page-body-wrapper full-page-wrapper">
-      <div class="content-wrapper d-flex align-items-stretch auth auth-img-bg">
-        <div class="row flex-grow">
+        <h1 class="crm-auth-title">Recuperar contraseña</h1>
+        <p class="crm-auth-subtitle">Ingresa tu usuario o correo registrado y te enviaremos las instrucciones.</p>
 
-        
-          <div class="col-lg-6 d-flex align-items-center justify-content-center">
+        <?php if ($msgSuccess): ?>
+          <div class="crm-alert crm-alert-success" role="alert">
+            <span class="crm-alert-icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+            <span><strong>Éxito.</strong> Tus credenciales han sido enviadas al correo proporcionado. Revisa tu bandeja de entrada.</span>
+          </div>
+        <?php endif; ?>
 
-          
+        <?php if ($msgError): ?>
+          <div class="crm-alert crm-alert-error" role="alert">
+            <span class="crm-alert-icon" aria-hidden="true"><i class="fa-solid fa-circle-exclamation"></i></span>
+            <span>No se encontró un usuario con el correo electrónico proporcionado.</span>
+          </div>
+        <?php endif; ?>
 
-            <div class="auth-form-transparent text-left p-3">
-
-            <?php 
-              if(!empty($_GET["msg"])){
-                if($_GET["msg"]==1){
-            ?>
-              <div class="alert alert-success">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <i class="icon-ok"></i><strong>Exito!</strong> Tus credenciales de acceso han sido enviadas al correo electrónico proporcionado. Verifica por favor.
-              </div>
-            <?php
-              }
-              if($_GET["msg"]==2){
-            ?>
-              <div class="alert alert-danger">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <i class="icon-exclamation-sign"></i><strong>Error!</strong> No fue encontrado un registro de usuario con el correo electrónico proporcionado.
-              </div>
-            <?php }}?>
-              <div class="brand-logo">
-                <img src="usuarios/files/orion-600.png" alt="Logo Orion">
-              </div>
-              <h4>Recuperar contraseña</h4>
-              <h6 class="font-weight-light">Ingresa tu usuarios o email registrado</h6>
-              <form class="pt-3" action="recuperar-clave-guardar.php" method="post" id="demo-form">
-
-                <div class="form-group">
-                  <label for="exampleInputEmail">Usuarios o Email</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend bg-transparent">
-                      <span class="input-group-text bg-transparent border-right-0">
-                        <i class="fa fa-user text-primary"></i>
-                      </span>
-                    </div>
-                    <input type="email" class="form-control form-control-lg border-left-0" placeholder="Usuarios o Email" name="email">
-                  </div>
-                </div>
-
-                <div class="my-2 d-flex justify-content-between align-items-center">
-                  <a href="index.php" class="auth-link text-black">Volver al inicio</a>
-                </div>
-
-                <div class="my-3">
-                  <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">RECUPERAR CLAVE</button>
-                </div>
-              </form>
+        <form class="crm-auth-form" action="recuperar-clave-guardar.php" method="post" id="demo-form">
+          <div class="crm-field">
+            <label class="crm-label" for="crm-email">Usuario o correo electrónico</label>
+            <div class="crm-input-wrap">
+              <span class="crm-input-icon" aria-hidden="true"><i class="fa-solid fa-envelope"></i></span>
+              <input type="text" id="crm-email" name="email" placeholder="Usuario o correo electrónico" autocomplete="email" autofocus>
             </div>
           </div>
-          <div class="col-lg-6 login-half-bg d-flex flex-row">
-            <p class="text-white font-weight-medium text-center flex-grow align-self-end">Copyright &copy; 2019 Todos los derechos reservados.</p>
+
+          <div class="crm-auth-links">
+            <a href="index.php" class="crm-auth-link">Volver al inicio de sesión</a>
           </div>
-        </div>
+
+          <button type="submit" class="crm-btn-primary">Recuperar clave</button>
+        </form>
       </div>
-      <!-- content-wrapper ends -->
-    </div>
-    <!-- page-body-wrapper ends -->
+    </main>
+
+    <aside class="crm-auth-brand-panel">
+      <div class="crm-auth-brand-content">
+        <p class="crm-auth-brand-quote">Recupera el acceso a tu cuenta de forma segura.</p>
+        <p class="crm-auth-brand-desc">Te enviaremos un correo con las instrucciones para restablecer tu contraseña.</p>
+      </div>
+      <footer class="crm-auth-footer">
+        &copy; <?= date('Y') ?> ORION CRM. Todos los derechos reservados.
+      </footer>
+    </aside>
   </div>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="assets-login/vendors/js/vendor.bundle.base.js"></script>
-  <script src="assets-login/vendors/js/vendor.bundle.addons.js"></script>
-  <!-- endinject -->
-  <!-- inject:js -->
-  <script src="assets-login/js/off-canvas.js"></script>
-  <script src="assets-login/js/hoverable-collapse.js"></script>
-  <script src="assets-login/js/misc.js"></script>
-  <script src="assets-login/js/settings.js"></script>
-  <script src="assets-login/js/todolist.js"></script>
-  <!-- endinject -->
 </body>
-
-
 </html>

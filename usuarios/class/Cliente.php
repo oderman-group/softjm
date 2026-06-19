@@ -224,4 +224,478 @@ class Cliente extends BaseDatos {
         return mysqli_fetch_array($consulta, MYSQLI_ASSOC)['cantidad'];
     }
 
+    /**
+     * Sincroniza un cliente con Ofima (Orion → Ofima).
+     * Se llama al crear o actualizar un cliente.
+     *
+     * @param int     $clienteId          ID del cliente.
+     * @param mysqli  $conexionBdPrincipal Conexión a la base de datos.
+     * @param int     $idEmpresa          ID de la empresa.
+     * @param string  $tipoOperacion      'CREATE' o 'UPDATE'
+     * @return array Resultado de la sincronización
+     */
+    public static function sincronizarConOfima($clienteId, $conexionBdPrincipal, $idEmpresa, $tipoOperacion = 'UPDATE') {
+        $query = "SELECT apic_activo FROM api_configuracion 
+                  WHERE apic_modulo = 'clientes' 
+                  AND apic_direccion = 'orion_ofima' 
+                  AND apic_id_empresa = ? 
+                  LIMIT 1";
+        $stmt = $conexionBdPrincipal->prepare($query);
+        $stmt->bind_param("i", $idEmpresa);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows === 0 || $result->fetch_assoc()['apic_activo'] != 1) {
+            return ['success' => false, 'message' => 'Sincronización desactivada'];
+        }
+
+        $query = "SELECT * FROM clientes WHERE cli_id = ? AND cli_id_empresa = ?";
+        $stmt = $conexionBdPrincipal->prepare($query);
+        $stmt->bind_param("ii", $clienteId, $idEmpresa);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows === 0) {
+            return ['success' => false, 'error' => 'Cliente no encontrado'];
+        }
+        $cliente = $result->fetch_assoc();
+
+        if (empty(trim($cliente['cli_usuario'] ?? '')) || empty(trim($cliente['cli_nombre'] ?? ''))) {
+            return [
+                'success' => false,
+                'error'   => 'El cliente debe tener documento (NIT) y nombre para sincronizar con Ofima'
+            ];
+        }
+
+        require_once RUTA_PROYECTO . '/usuarios/class/ApiOfimaClient.php';
+        $apiClient = new ApiOfimaClient($conexionBdPrincipal, $idEmpresa);
+        return $apiClient->sincronizarCliente($cliente, $tipoOperacion);
+    }
+
+    /**
+     * Obtiene en una sola consulta las fechas clave de evolución comercial del cliente.
+     */
+    public static function obtenerEvolucionComercial(int $idCliente, int $idEmpresa, $conexionBdPrincipal) {
+        $idCliente = intval($idCliente);
+        $idEmpresa = intval($idEmpresa);
+
+        $sql = "
+            SELECT
+                (SELECT MIN(c.cotiz_fecha_propuesta)
+                 FROM cotizacion c
+                 WHERE c.cotiz_cliente = '" . $idCliente . "'
+                   AND c.cotiz_es_precotizacion = 0
+                   AND c.cotiz_id_empresa = '" . $idEmpresa . "') AS primera_cotizacion,
+                (SELECT MIN(f.factura_fecha_creacion)
+                 FROM facturas f
+                 WHERE f.factura_cliente = '" . $idCliente . "'
+                   AND f.factura_tipo = " . FACTURA_TIPO_VENTA . "
+                   AND f.factura_estado = 1) AS primera_compra,
+                (SELECT MAX(f.factura_fecha_creacion)
+                 FROM facturas f
+                 WHERE f.factura_cliente = '" . $idCliente . "'
+                   AND f.factura_tipo = " . FACTURA_TIPO_VENTA . "
+                   AND f.factura_estado = 1) AS ultima_compra
+        ";
+
+        $consulta = $conexionBdPrincipal->query($sql);
+        return mysqli_fetch_array($consulta, MYSQLI_ASSOC) ?: [];
+    }
+
+    /**
+     * Contadores operativos del cliente para la vista comercial.
+     */
+    public static function obtenerContadoresRelacionados(int $idCliente, int $idEmpresa, $conexionBdPrincipal) {
+        $idCliente = intval($idCliente);
+        $idEmpresa = intval($idEmpresa);
+
+        $sql = "
+            SELECT
+                (SELECT COUNT(*) FROM sucursales WHERE sucu_cliente_principal = '" . $idCliente . "') AS sucursales,
+                (SELECT COUNT(*) FROM contactos WHERE cont_cliente_principal = '" . $idCliente . "') AS contactos,
+                (SELECT COUNT(*) FROM clientes_tikets WHERE tik_cliente = '" . $idCliente . "') AS tickets,
+                (SELECT COUNT(*) FROM clientes_tikets WHERE tik_cliente = '" . $idCliente . "' AND tik_estado = 1) AS tickets_abiertos,
+                (SELECT COUNT(*) FROM cliente_seguimiento WHERE cseg_cliente = '" . $idCliente . "') AS seguimientos,
+                (SELECT COUNT(*) FROM cotizacion WHERE cotiz_cliente = '" . $idCliente . "' AND cotiz_id_empresa = '" . $idEmpresa . "') AS cotizaciones,
+                (SELECT COUNT(*) FROM facturacion WHERE fact_cliente = '" . $idCliente . "' AND fact_id_empresa = '" . $idEmpresa . "') AS facturas,
+                (SELECT COUNT(*) FROM clientes_notas_internas WHERE clin_cliente = '" . $idCliente . "' AND clin_id_empresa = '" . $idEmpresa . "') AS notas_internas
+        ";
+
+        $consulta = $conexionBdPrincipal->query($sql);
+        return mysqli_fetch_array($consulta, MYSQLI_ASSOC) ?: [];
+    }
+
+    /**
+     * IDs de grupos (dealer) asociados al cliente.
+     */
+    public static function obtenerGruposCliente(int $idCliente, $conexionBdPrincipal) {
+        $grupos = [];
+        $consulta = $conexionBdPrincipal->query("
+            SELECT cpcat_categoria
+            FROM clientes_categorias
+            WHERE cpcat_cliente = '" . intval($idCliente) . "'
+        ");
+
+        while ($fila = mysqli_fetch_array($consulta, MYSQLI_ASSOC)) {
+            $grupos[] = intval($fila['cpcat_categoria']);
+        }
+
+        return $grupos;
+    }
+
+    /**
+     * Usuario asesor asociado al cliente.
+     */
+    public static function obtenerAsesorCliente(int $idCliente, $conexionBdPrincipal) {
+        $consulta = $conexionBdPrincipal->query("
+            SELECT cliu_usuario
+            FROM clientes_usuarios
+            WHERE cliu_cliente = '" . intval($idCliente) . "'
+            LIMIT 1
+        ");
+
+        $fila = mysqli_fetch_array($consulta, MYSQLI_ASSOC);
+        return $fila ? intval($fila['cliu_usuario']) : null;
+    }
+
+    /**
+     * Tipos de vía y puntos cardinales usados en la nomenclatura de dirección.
+     */
+    public static function obtenerTiposViaDireccion(): array {
+        return [
+            'Calle', 'Carrera', 'Avenida', 'Avenida Carrera', 'Avenida Calle',
+            'Circular', 'Circunvalar', 'Diagonal', 'Manzana', 'Transversal', 'Vía',
+        ];
+    }
+
+    public static function obtenerPuntosCardinalesDireccion(): array {
+        return ['Este', 'Norte', 'Occidente', 'Oeste', 'Oriente', 'Sur'];
+    }
+
+    /**
+     * Descompone una dirección guardada con la nomenclatura estándar del CRM.
+     */
+    public static function parsearDireccionNomenclatura(string $direccion): array {
+        $partes = [
+            'op1' => '', 'op2' => '', 'op3' => '', 'op4' => '',
+            'op5' => '', 'op6' => '', 'op7' => '',
+        ];
+
+        $direccion = trim($direccion);
+        if ($direccion === '') {
+            return $partes;
+        }
+
+        $tiposVia = self::obtenerTiposViaDireccion();
+        usort($tiposVia, static function ($a, $b) {
+            return strlen($b) - strlen($a);
+        });
+
+        $resto = $direccion;
+        foreach ($tiposVia as $tipo) {
+            if (stripos($resto, $tipo) === 0) {
+                $partes['op1'] = $tipo;
+                $resto = trim(substr($resto, strlen($tipo)));
+                break;
+            }
+        }
+
+        if (preg_match('/^(\S+)\s+(.+?)\s+#\s+(\S+)\s+(.+?)\s+-\s+(\S+)\s+-\s+(.+)$/u', $resto, $coincidencias)) {
+            $partes['op2'] = trim($coincidencias[1]);
+            $partes['op3'] = self::normalizarPuntoCardinal(trim($coincidencias[2]));
+            $partes['op4'] = trim($coincidencias[3]);
+            $partes['op5'] = self::normalizarPuntoCardinal(trim($coincidencias[4]));
+            $partes['op6'] = trim($coincidencias[5]);
+            $partes['op7'] = trim($coincidencias[6]);
+            return $partes;
+        }
+
+        if ($partes['op1'] === '') {
+            $partes['op7'] = $direccion;
+        } else {
+            $partes['op7'] = $resto;
+        }
+
+        return $partes;
+    }
+
+    /**
+     * Construye la dirección con la nomenclatura estándar del CRM.
+     */
+    public static function construirDireccionNomenclatura(array $partes): string {
+        return trim(
+            ($partes['op1'] ?? '') . ' ' .
+            ($partes['op2'] ?? '') . ' ' .
+            ($partes['op3'] ?? '') . ' # ' .
+            ($partes['op4'] ?? '') . ' ' .
+            ($partes['op5'] ?? '') . ' - ' .
+            ($partes['op6'] ?? '') . ' - ' .
+            ($partes['op7'] ?? '')
+        );
+    }
+
+    private static function normalizarPuntoCardinal(string $valor): string {
+        foreach (self::obtenerPuntosCardinalesDireccion() as $punto) {
+            if (strcasecmp($valor, $punto) === 0) {
+                return $punto;
+            }
+        }
+
+        return $valor;
+    }
+
+    /**
+     * Filtros compartidos del listado de clientes (clientes.php y fetch-buscar-clientes.php).
+     */
+    public static function prepararFiltrosListado(
+        array $get,
+        int $idEmpresa,
+        $conexionBdPrincipal,
+        bool $excluirCiudadDesconocida = false
+    ): array {
+        $idEmpresa = intval($idEmpresa);
+        $where     = " AND cli.cli_id_empresa = '" . $idEmpresa . "'";
+        $joinExtra = '';
+
+        if (isset($get['pap']) && (int) $get['pap'] === 1) {
+            $where .= ' AND cli.cli_papelera = 1';
+        }
+
+        if (isset($get['grupo']) && is_numeric($get['grupo'])) {
+            $joinExtra = " INNER JOIN clientes_categorias cpcat ON cpcat.cpcat_cliente = cli.cli_id AND cpcat.cpcat_categoria = '" . intval($get['grupo']) . "'";
+        }
+
+        if (isset($get['tipoDoc']) && is_numeric($get['tipoDoc'])) {
+            $where .= " AND cli.cli_tipo_documento = '" . intval($get['tipoDoc']) . "'";
+        }
+
+        if ($excluirCiudadDesconocida) {
+            $where .= " AND cli.cli_ciudad != '1122'";
+        }
+
+        if (isset($get['clientesNuevos'])) {
+            $where .= ' AND YEAR(cli.cli_fecha_ingreso) = ' . date('Y') . ' AND MONTH(cli.cli_fecha_ingreso) = ' . date('m');
+        }
+
+        if (isset($get['categoria']) && is_numeric($get['categoria'])) {
+            $where .= ' AND cli.cli_categoria = ' . intval($get['categoria']);
+        }
+
+        if (!empty($get['fecha_registro_inicio'])) {
+            $fecha = mysqli_real_escape_string($conexionBdPrincipal, $get['fecha_registro_inicio']);
+            $where .= " AND cli.cli_fecha_registro >= '" . $fecha . " 00:00:00'";
+        }
+
+        if (!empty($get['fecha_registro_fin'])) {
+            $fecha = mysqli_real_escape_string($conexionBdPrincipal, $get['fecha_registro_fin']);
+            $where .= " AND cli.cli_fecha_registro <= '" . $fecha . " 23:59:59'";
+        }
+
+        if (!empty($get['fecha_ingreso_inicio'])) {
+            $fecha = mysqli_real_escape_string($conexionBdPrincipal, $get['fecha_ingreso_inicio']);
+            $where .= " AND cli.cli_fecha_ingreso >= '" . $fecha . " 00:00:00' AND cli.cli_categoria = 2";
+        }
+
+        if (!empty($get['fecha_ingreso_fin'])) {
+            $fecha = mysqli_real_escape_string($conexionBdPrincipal, $get['fecha_ingreso_fin']);
+            $where .= " AND cli.cli_fecha_ingreso <= '" . $fecha . " 23:59:59' AND cli.cli_categoria = 2";
+        }
+
+        if (!empty($get['buscar'])) {
+            $termino = mysqli_real_escape_string($conexionBdPrincipal, $get['buscar']);
+            $where  .= " AND (cli.cli_usuario LIKE '%" . $termino . "%' OR cli.cli_nombre LIKE '%" . $termino . "%')";
+        }
+
+        $dpto = '';
+        if (isset($get['dpto']) && $get['dpto'] !== '') {
+            $dpto  = intval($get['dpto']);
+            $where .= " AND dep.dep_id = '" . $dpto . "'";
+        }
+
+        return [
+            'where'      => $where,
+            'join_extra' => $joinExtra,
+            'dpto'       => $dpto,
+            'tipo_doc'   => isset($get['tipoDoc']) && is_numeric($get['tipoDoc']) ? intval($get['tipoDoc']) : '',
+        ];
+    }
+
+    public static function sqlJoinsUbicacionListado(): string {
+        return '
+            LEFT JOIN ' . BDADMIN . '.localidad_ciudades ciu ON ciu.ciu_id = cli.cli_ciudad
+            INNER JOIN ' . BDADMIN . '.localidad_departamentos dep ON dep.dep_id = ciu.ciu_departamento
+        ';
+    }
+
+    public static function sqlConteoListado(string $joinExtra, string $where): string {
+        return 'SELECT COUNT(DISTINCT cli.cli_id)
+            FROM ' . MAINBD . '.clientes cli
+            ' . self::sqlJoinsUbicacionListado() . '
+            ' . $joinExtra . '
+            WHERE 1=1 ' . $where;
+    }
+
+    public static function sqlFilasListado(string $joinExtra, string $where, int $inicio, int $limite): string {
+        $inicio = max(0, intval($inicio));
+        $limite = max(1, intval($limite));
+
+        return 'SELECT
+                cli.cli_id,
+                cli.cli_sesion,
+                cli.cli_papelera,
+                cli.cli_estado_mercadeo,
+                cli.cli_estado_mercadeo_fecha,
+                cli.cli_zona,
+                cli.cli_categoria,
+                cli.cli_retirado,
+                cli.cli_fecha_registro,
+                cli.cli_tipo_documento,
+                cli.cli_usuario,
+                cli.cli_nombre,
+                cli.cli_telefono,
+                cli.cli_celular,
+                cli.cli_email,
+                ciu.ciu_nombre,
+                dep.dep_nombre,
+                dep.dep_indicativo
+            FROM ' . MAINBD . '.clientes cli
+            ' . self::sqlJoinsUbicacionListado() . '
+            ' . $joinExtra . '
+            WHERE 1=1 ' . $where . '
+            ORDER BY cli.cli_id DESC
+            LIMIT ' . $inicio . ', ' . $limite;
+    }
+
+    /**
+     * Contadores TK/SG/SC/CT/FC/RM para un lote de clientes (una sola consulta).
+     */
+    public static function contadoresRelacionadosBatch(array $clienteIds, $conexionBdPrincipal): array {
+        $clienteIds = array_values(array_filter(array_map('intval', $clienteIds)));
+        if (empty($clienteIds)) {
+            return [];
+        }
+
+        $idsSql = implode(',', $clienteIds);
+        $mapa   = [];
+        foreach ($clienteIds as $idCliente) {
+            $mapa[$idCliente] = [0, 0, 0, 0, 0, 0];
+        }
+
+        $consulta = $conexionBdPrincipal->query("
+            SELECT
+                cli.cli_id,
+                (SELECT COUNT(*) FROM clientes_tikets WHERE tik_cliente = cli.cli_id) AS cnt_tickets,
+                (SELECT COUNT(*)
+                 FROM cliente_seguimiento cs
+                 INNER JOIN clientes_tikets ct ON ct.tik_id = cs.cseg_tiket
+                 WHERE cs.cseg_cliente = cli.cli_id) AS cnt_seguimientos,
+                (SELECT COUNT(*) FROM sucursales WHERE sucu_cliente_principal = cli.cli_id) AS cnt_sucursales,
+                (SELECT COUNT(*) FROM contactos WHERE cont_cliente_principal = cli.cli_id) AS cnt_contactos,
+                (SELECT COUNT(*) FROM facturacion WHERE fact_cliente = cli.cli_id) AS cnt_facturas,
+                (SELECT COUNT(*) FROM remisiones WHERE rem_cliente = cli.cli_id) AS cnt_remisiones
+            FROM clientes cli
+            WHERE cli.cli_id IN (" . $idsSql . ")
+        ");
+
+        if (!$consulta) {
+            return $mapa;
+        }
+
+        while ($fila = mysqli_fetch_assoc($consulta)) {
+            $id = intval($fila['cli_id']);
+            $mapa[$id] = [
+                intval($fila['cnt_tickets']),
+                intval($fila['cnt_seguimientos']),
+                intval($fila['cnt_sucursales']),
+                intval($fila['cnt_contactos']),
+                intval($fila['cnt_facturas']),
+                intval($fila['cnt_remisiones']),
+            ];
+        }
+
+        return $mapa;
+    }
+
+    /**
+     * Zonas y clientes asignados al usuario para filtrar filas del listado.
+     */
+    public static function permisosVisibilidadListado(int $usuarioId, $conexionBdPrincipal): array {
+        $usuarioId = intval($usuarioId);
+        $zonas     = [];
+        $clientes  = [];
+
+        $consultaZonas = $conexionBdPrincipal->query("
+            SELECT zpu_zona FROM zonas_usuarios WHERE zpu_usuario = '" . $usuarioId . "'
+        ");
+        while ($fila = mysqli_fetch_assoc($consultaZonas)) {
+            $zonas[] = intval($fila['zpu_zona']);
+        }
+
+        $consultaClientes = $conexionBdPrincipal->query("
+            SELECT cliu_cliente FROM clientes_usuarios WHERE cliu_usuario = '" . $usuarioId . "'
+        ");
+        while ($fila = mysqli_fetch_assoc($consultaClientes)) {
+            $clientes[] = intval($fila['cliu_cliente']);
+        }
+
+        return [
+            'zonas'    => $zonas,
+            'clientes' => $clientes,
+        ];
+    }
+
+    public static function usuarioPuedeVerClienteEnListado(array $permisos, int $zonaId, int $clienteId): bool {
+        return in_array($zonaId, $permisos['zonas'], true)
+            || in_array($clienteId, $permisos['clientes'], true);
+    }
+
+    /**
+     * Conteo de clientes activos por departamento (una consulta).
+     */
+    public static function conteoClientesPorDepartamento(int $idEmpresa, $conexionBdPrincipal, $conexionBdAdmin): array {
+        $idEmpresa = intval($idEmpresa);
+        $mapa      = [];
+
+        $consulta = $conexionBdPrincipal->query("
+            SELECT dep.dep_id, COUNT(DISTINCT cli.cli_id) AS total
+            FROM " . MAINBD . ".clientes cli
+            INNER JOIN " . BDADMIN . ".localidad_ciudades ciu ON ciu.ciu_id = cli.cli_ciudad
+            INNER JOIN " . BDADMIN . ".localidad_departamentos dep ON dep.dep_id = ciu.ciu_departamento
+            WHERE cli.cli_id_empresa = '" . $idEmpresa . "'
+              AND (cli.cli_papelera IS NULL OR cli.cli_papelera = 0)
+            GROUP BY dep.dep_id
+        ");
+
+        if ($consulta) {
+            while ($fila = mysqli_fetch_assoc($consulta)) {
+                $mapa[intval($fila['dep_id'])] = intval($fila['total']);
+            }
+        }
+
+        return $mapa;
+    }
+
+    /**
+     * Conteo de clientes activos por grupo dealer (una consulta).
+     */
+    public static function conteoClientesPorGrupoDealer(int $idEmpresa, $conexionBdPrincipal): array {
+        $idEmpresa = intval($idEmpresa);
+        $mapa      = [];
+
+        $consulta = $conexionBdPrincipal->query("
+            SELECT cc.cpcat_categoria, COUNT(*) AS total
+            FROM clientes_categorias cc
+            INNER JOIN clientes cli ON cli.cli_id = cc.cpcat_cliente
+                AND cli.cli_id_empresa = '" . $idEmpresa . "'
+                AND (cli.cli_papelera = 0 OR cli.cli_papelera IS NULL)
+            GROUP BY cc.cpcat_categoria
+        ");
+
+        if ($consulta) {
+            while ($fila = mysqli_fetch_assoc($consulta)) {
+                $mapa[intval($fila['cpcat_categoria'])] = intval($fila['total']);
+            }
+        }
+
+        return $mapa;
+    }
+
 }

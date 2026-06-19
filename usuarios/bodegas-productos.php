@@ -3,6 +3,8 @@ include("sesion.php");
 
 $idPagina = 145;
 include("includes/verificar-paginas.php");
+include_once(RUTA_PROYECTO."/usuarios/includes/inventario-solo-ofima.php");
+$inventarioSoloOfima = inventarioSoloOfimaEntrada($conexionBdPrincipal, $idEmpresa);
 include("includes/head.php");
 ?>
 <!-- styles -->
@@ -116,7 +118,7 @@ include("includes/head.php");
 					<a href="productos.php" class="btn btn-primary"><i class="icon-arrow"></i> Ir a productos</a>
 
 					<?php 
-					if (isset($_GET["prod"])) {
+					if (isset($_GET["prod"]) && !$inventarioSoloOfima) {
 						if (Modulos::validarRol([146], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 					?>
 							<a href="bodegas-productos-agregar.php?prod=<?=$_GET["prod"];?>" class="btn btn-danger">
@@ -125,6 +127,9 @@ include("includes/head.php");
 					<?php 
 						} 
 					}
+					if ($inventarioSoloOfima) {
+						echo '<span class="label label-info">Las existencias solo se actualizan desde Ofima.</span>';
+					}
 					?>
 
 					<?php if (Modulos::validarRol([212], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
@@ -132,7 +137,9 @@ include("includes/head.php");
 					<?php } ?>
 					<a href="bodegas-exportar-excel.php?bod=<?=$_GET["bod"];?>&prod=<?=$_GET["prod"];?>" class="btn btn-warning"><i class="icon-download"></i> Exportar a excel</a>
 
+					<?php if (!$inventarioSoloOfima) { ?>
 					<a href="javascript:void(0);" class="btn btn-success" id="uploadButton"><i class="icon-upload"></i> Actualizar desde excel</a>
+					<?php } ?>
 				</p>
 
 				<div id="uploadForm">
@@ -196,27 +203,28 @@ include("includes/head.php");
 												<td><?= $res['bod_nombre']; ?></td>
 												<td><?= $res['prod_referencia']. " - ".$res['prod_nombre']; ?></td>
 												<td>
+													<?php if ($inventarioSoloOfima) { ?>
+													<span><?= $res['prodb_existencias']; ?></span>
+													<?php } else { ?>
 													<input
 													    id="<?= $res['prodb_id'];?>"
 														name="prodb_existencias"
 														type="number" 
 														value="<?= $res['prodb_existencias']; ?>"
 														min="0"
-														style="
-															width: 50px;
-															text-align: center;
-														"
+														style="width: 50px; text-align: center;"
 														tabindex="1"
 														data-id-producto="<?=$res['prodb_producto'];?>"
 														onChange="actualizarExistencias(this)"
 													>
+													<?php } ?>
 												</td>
 												<td><?= $res['prodb_fecha_actualizacion']; ?></td>
 												<td><?= $res['usr_nombre']; ?></td>
 												<td>
 													<h4>
 													
-													<?php if (Modulos::validarRol([146], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<?php if (!$inventarioSoloOfima && Modulos::validarRol([146], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 														<a href="bodegas-productos-agregar.php?id=<?= $res[0]; ?>&prod=<?= $res['prod_id']; ?>&bod=<?= $res['bod_id']; ?>&ex=<?= $res['prodb_existencias']; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
 													<?php } ?>
 													<?php if (Modulos::validarRol([213], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) {?>

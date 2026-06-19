@@ -1,6 +1,12 @@
 <?php
-$consultaTotal = $conexionBdPrincipal->query($SQL);
-$numTotal = $consultaTotal->num_rows;
+if (isset($SQLCount)) {
+	$resultadoConteo = $conexionBdPrincipal->query($SQLCount);
+	$filaConteo      = mysqli_fetch_array($resultadoConteo, MYSQLI_NUM);
+	$numTotal        = intval($filaConteo[0] ?? 0);
+} else {
+	$consultaTotal = $conexionBdPrincipal->query($SQL);
+	$numTotal      = $consultaTotal->num_rows;
+}
 $limite = $configuracion['conf_paginacion'];
 
 $dpto =  "";

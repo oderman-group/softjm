@@ -19,6 +19,15 @@
         }
     }
 
+    // Sincronizar con Ofima (en segundo plano, no bloquea si falla)
+    try {
+        require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
+        Producto::sincronizarConOfima($idInsertU, $conexionBdPrincipal, $_SESSION["dataAdicional"]["id_empresa"], 'CREATE');
+    } catch (Exception $e) {
+        // Log del error pero no interrumpir el flujo
+        error_log("Error al sincronizar producto con Ofima: " . $e->getMessage());
+    }
+
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
 	echo '<script type="text/javascript">window.location.href="../productos-editar.php?id=' . $idInsertU . '&msg=1";</script>';

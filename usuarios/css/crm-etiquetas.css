@@ -1,0 +1,156 @@
+/**
+ * Etiquetas CRM — estilo WhatsApp, reutilizable en listados y fichas
+ */
+.crm-etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.45rem;
+  align-items: center;
+}
+
+.crm-etiquetas--compact .crm-etiqueta {
+  font-size: 0.6875rem;
+  padding: 0.15rem 0.5rem;
+}
+
+.crm-etiqueta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.cliente-etiquetas-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.cliente-etiquetas-leyenda {
+  flex: 0 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin: 0 0 0.15rem 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.cliente-etiquetas-leyenda-item--activa {
+  color: #334155;
+  font-weight: 600;
+}
+
+.cliente-etiqueta-option {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cliente-etiqueta-option input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.cliente-etiqueta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 2px solid var(--etiq-color, #64748b);
+  background: #fff;
+  color: var(--etiq-color, #64748b);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease, transform 0.12s ease;
+}
+
+.cliente-etiqueta-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  font-size: 0;
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.cliente-etiqueta-check::before {
+  content: "";
+  width: 4px;
+  height: 7px;
+  border-right: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+/* Inactiva: solo contorno, fondo blanco */
+.cliente-etiqueta-option:not(.is-active) .cliente-etiqueta-pill {
+  opacity: 0.88;
+}
+
+.cliente-etiqueta-option:not(.is-active):hover .cliente-etiqueta-pill {
+  background: color-mix(in srgb, var(--etiq-fondo, #f8fafc) 45%, #fff);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+}
+
+/* Activa / seleccionada: relleno completo + check */
+.cliente-etiqueta-option.is-active .cliente-etiqueta-pill,
+.cliente-etiqueta-option input:checked + .cliente-etiqueta-pill {
+  background-color: var(--etiq-fondo, #e2e8f0);
+  color: var(--etiq-color, #334155);
+  border-color: var(--etiq-color, #334155);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--etiq-fondo, #e2e8f0) 65%, transparent),
+    0 2px 6px rgba(15, 23, 42, 0.1);
+  transform: translateY(-1px);
+  opacity: 1;
+}
+
+.cliente-etiqueta-option.is-active .cliente-etiqueta-check,
+.cliente-etiqueta-option input:checked + .cliente-etiqueta-pill .cliente-etiqueta-check {
+  opacity: 1;
+  background-color: var(--etiq-color, #334155);
+  border-color: var(--etiq-color, #334155);
+}
+
+.cliente-etiqueta-option.is-active .cliente-etiqueta-check::before,
+.cliente-etiqueta-option input:checked + .cliente-etiqueta-pill .cliente-etiqueta-check::before {
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+}
+
+.cliente-etiqueta-option.is-active .cliente-etiqueta-text,
+.cliente-etiqueta-option input:checked + .cliente-etiqueta-pill .cliente-etiqueta-text {
+  font-weight: 700;
+}
+
+.crm-etiquetas--resumen .crm-etiqueta {
+  font-size: 0.8125rem;
+  padding: 0.28rem 0.75rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.cliente-listado-etiquetas {
+  margin: 0.35rem 0 0.15rem 0;
+}
