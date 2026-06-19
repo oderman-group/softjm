@@ -326,7 +326,7 @@ body.drawer-notas-open {
     <button type="button" class="drawer-btn drawer-btn-secondary" id="btnCancelarDrawerNotas">Cerrar</button>
     <button type="submit" form="formNotaInternaDrawer" class="drawer-btn drawer-btn-primary" id="btnGuardarNotaDrawer">
       <i class="icon-save" aria-hidden="true"></i>
-      <span>Guardar nota</span>
+      <span class="drawer-btn-label">Guardar nota</span>
     </button>
   </div>
 </aside>
@@ -409,18 +409,20 @@ body.drawer-notas-open {
     btnGuardar.disabled = estado;
     btnCerrar.disabled = estado;
     btnCancel.disabled = estado;
-    var label = btnGuardar.querySelector('span');
+    var label = btnGuardar.querySelector('.drawer-btn-label');
+    if (!label) return;
+    var spinner = btnGuardar.querySelector('.drawer-spinner');
     if (estado) {
       label.textContent = 'Guardando...';
-      if (!btnGuardar.querySelector('.drawer-spinner')) {
-        var spinner = document.createElement('span');
+      if (!spinner) {
+        spinner = document.createElement('span');
         spinner.className = 'drawer-spinner';
+        spinner.setAttribute('aria-hidden', 'true');
         btnGuardar.insertBefore(spinner, label);
       }
     } else {
       label.textContent = 'Guardar nota';
-      var sp = btnGuardar.querySelector('.drawer-spinner');
-      if (sp) sp.remove();
+      if (spinner) spinner.remove();
     }
   }
 
@@ -554,20 +556,23 @@ body.drawer-notas-open {
     })
       .then(function (res) { return res.json(); })
       .then(function (data) {
-        setGuardando(false);
         if (data.success) {
           textarea.value = '';
           alertExito.textContent = data.message;
           alertExito.classList.add('is-visible');
-          return cargarNotas(clienteActualId);
+          return cargarNotas(clienteActualId).catch(function (err) {
+            lista.innerHTML = '<p class="drawer-notas-vacio">' + escaparHtml(err.message) + '</p>';
+          });
         }
         alertError.textContent = data.message || 'No se pudo guardar la nota.';
         alertError.classList.add('is-visible');
       })
       .catch(function () {
-        setGuardando(false);
         alertError.textContent = 'Error de conexión. Intente nuevamente.';
         alertError.classList.add('is-visible');
+      })
+      .finally(function () {
+        setGuardando(false);
       });
   });
 })();
