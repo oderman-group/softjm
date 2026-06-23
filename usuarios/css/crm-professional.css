@@ -25,7 +25,7 @@
   align-items: center;
   flex-wrap: nowrap;
   width: 100%;
-  max-width: none;
+  max-width: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -108,10 +108,17 @@
 }
 
 /* Nombre empresa en nav */
+.top-nav .nav > li.top-nav-brand-desktop > a,
 .top-nav .nav > li:first-child > a {
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.02em;
+}
+
+.top-nav-brand-link {
+  font-weight: 700 !important;
+  color: #fde047 !important;
+  font-size: 14px !important;
 }
 
 /* Dropdown del menú principal */
@@ -204,6 +211,21 @@
   display: block;
 }
 
+/* Escritorio: menú principal solo por hover (evita doble desplegable con .open) */
+@media (min-width: 1400px) {
+  .top-nav .nav > li > .dropdown-menu {
+    display: none;
+  }
+
+  .top-nav .nav > li.dropdown:hover > .dropdown-menu {
+    display: block !important;
+  }
+
+  .top-nav .nav > li.dropdown.open:not(:hover) > .dropdown-menu {
+    display: none !important;
+  }
+}
+
 /* ---- Zona derecha: usuario y notificaciones ---- */
 .notification-nav {
   display: flex;
@@ -278,6 +300,105 @@
   color: #64748b;
 }
 
+.header-user-dropdown-head {
+  display: none;
+  padding: 14px 18px 10px;
+}
+
+.header-user-dropdown-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+.header-user-dropdown-name {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+/* Botón hamburguesa — oculto en escritorio */
+.navbar .btn.btn-navbar.top-nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
+  float: none !important;
+  text-align: center !important;
+  line-height: 1 !important;
+}
+
+.top-nav-toggle-bars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 18px;
+  height: 14px;
+  position: relative;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+
+.navbar .btn.btn-navbar.top-nav-toggle .icon-bar {
+  display: block;
+  width: 18px;
+  height: 2px;
+  margin: 0 !important;
+  padding: 0;
+  background: #fff;
+  border-radius: 1px;
+  box-shadow: none !important;
+  float: none !important;
+  position: relative;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.navbar .btn.btn-navbar.top-nav-toggle .icon-bar + .icon-bar {
+  margin-top: 0 !important;
+}
+
+.top-nav-brand-mobile {
+  display: none;
+  flex: 1;
+  min-width: 0;
+  padding: 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fde047;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 56px;
+}
+
+.top-nav-toolbar {
+  flex-shrink: 0;
+}
+
+.top-nav-header-bar {
+  display: contents;
+}
+
+.top-nav-drawer-head {
+  display: none;
+}
+
 /* Dropdown notificaciones */
 .notification-nav .dropdown-menu {
   margin-top: 6px !important;
@@ -323,5 +444,100 @@
   .top-nav .navbar-inner {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+  }
+}
+
+/* ---- Escritorio ancho (nav horizontal) ---- */
+@media (min-width: 1400px) {
+  .navbar .btn.btn-navbar.top-nav-toggle {
+    display: none !important;
+  }
+
+  .top-nav-brand-mobile {
+    display: none !important;
+  }
+
+  .top-nav-header-bar {
+    display: contents;
+  }
+
+  .top-nav-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .top-nav .home-link {
+    order: 0;
+    flex-shrink: 0;
+  }
+
+  .top-nav-main-collapse {
+    order: 1;
+    flex: 1 1 0%;
+    min-width: 0;
+    max-width: calc(100% - 300px);
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .top-nav-main-collapse.collapse {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .top-nav .nav-collapse {
+    min-width: 0;
+    overflow: visible !important;
+  }
+
+  .top-nav .nav {
+    flex-wrap: nowrap;
+    overflow: visible !important;
+  }
+
+  .top-nav .nav > li {
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .top-nav .nav .dropdown-submenu:hover > .dropdown-menu {
+    display: block !important;
+  }
+
+  .top-nav-toolbar {
+    order: 2;
+    flex-shrink: 0;
+    margin-left: auto !important;
+    position: relative;
+    z-index: 20;
+    padding-left: 0.5rem;
+  }
+
+  .top-nav-mobile-panel-head {
+    display: none !important;
+  }
+}
+
+/* Escritorio compacto: menos padding en ítems del menú */
+@media (min-width: 1400px) and (max-width: 1599px) {
+  .top-nav .nav > li.top-nav-brand-desktop {
+    display: none;
+  }
+
+  .top-nav .nav > li > a {
+    padding: 0 8px;
+    font-size: 11px;
+  }
+
+  .top-nav .nav > li > a i {
+    font-size: 12px;
+    margin-right: 4px;
+  }
+
+  .header-user-menu .header-user-name {
+    max-width: 120px;
   }
 }

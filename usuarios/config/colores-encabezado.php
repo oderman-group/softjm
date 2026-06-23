@@ -33,4 +33,26 @@
 .dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a {
 	background-color: <?=$colorEncabezado['cxe_fondo_submenu_hover'];?>;
 }
+
+@media (max-width: 1399px) {
+	.top-nav-main-collapse {
+		background-color: <?=$colorEncabezado['cxe_fondo'];?>;
+	}
+
+	.top-nav.is-mobile .nav > li > a,
+	.top-nav.is-mobile .nav > li > .top-nav-menu-trigger {
+		color: <?=$colorEncabezado['cxe_text_items'];?> !important;
+	}
+
+	.top-nav.is-mobile .nav .dropdown-menu li a,
+	.top-nav.is-mobile .nav .dropdown-menu li .top-nav-submenu-trigger {
+		color: <?=$colorEncabezado['cxe_text_items'];?> !important;
+	}
+}
+
+@media (min-width: 1400px) {
+	.top-nav-toolbar {
+		background-color: <?=$colorEncabezado['cxe_fondo'];?>;
+	}
+}
 </style>
