@@ -7,7 +7,20 @@ class Api_JmEquipos {
     public const JM_URL_ARCHIVOS_PORTAFOLIOS = 'https://jmequipos.com/archivos/catalogos/';
 
     public static function getData(string $url): array {
-        $response = file_get_contents($url);
-        return json_decode($response, true);
+        $response = @file_get_contents($url);
+        if ($response === false) {
+            return ['data' => []];
+        }
+
+        $data = json_decode($response, true);
+        if (!is_array($data)) {
+            return ['data' => []];
+        }
+
+        if (!isset($data['data']) || !is_array($data['data'])) {
+            $data['data'] = [];
+        }
+
+        return $data;
     }
 }

@@ -62,7 +62,7 @@ try {
     
     $consultaProspectos = $conexionBdPrincipal->query("SELECT *
     FROM prospectos_importacion_detalles
-    INNER JOIN prospectos_importacion ON pi_id=pid_id_archivo
+    INNER JOIN prospectos_importacion ON pi_id=pid_id_archivo AND (pi_asesor_encargado = '".$_SESSION["id"]."' || pi_created_by = '".$_SESSION["id"]."')
     ");
 
     while ($prospectos = mysqli_fetch_assoc($consultaProspectos)) {
@@ -73,7 +73,9 @@ try {
             'email'          => $prospectos['pid_email'],
             'gestion_estado' => $prospectos['pid_estado'],
             'notas_previas'  => $prospectos['pid_notas'],
-            'fuente'         => $prospectos['pi_fuente']
+            'fuente'         => $referenciaLlegada[$prospectos['pi_fuente']],
+            'fuente_id'      => $prospectos['pi_fuente'],
+            'ciudad'         => $prospectos['pi_ciudad_evento'],
         ];
     }
 

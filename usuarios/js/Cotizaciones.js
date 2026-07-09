@@ -1,6 +1,43 @@
 var idEditar = document.getElementById("id");
 
 $(document).ready(function () {
+    function extractTableRows(response) {
+        var html = typeof response === "string" ? response : "";
+        var bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        var rawContent = bodyMatch ? bodyMatch[1] : html;
+        var $container = $("<table><tbody></tbody></table>");
+        var $tbody = $container.find("tbody");
+        $tbody.html(rawContent);
+
+        var $rows = $tbody.find("tr.producto, tr.combo, tr.servicio");
+        if ($rows.length) {
+            return $rows;
+        }
+
+        // Fallback: en caso de respuestas antiguas sin clases, tomar todas las filas válidas.
+        return $tbody.find("tr");
+    }
+
+    function renderRowsByType(response, rowClassSelector, debugLabel) {
+        var $rows = extractTableRows(response);
+        var $typedRows = $rows.filter(rowClassSelector);
+
+        // Compatibilidad con respuestas sin clases.
+        if (!$typedRows.length && $rows.length) {
+            $typedRows = $rows;
+        }
+
+        $('#tableBody ' + rowClassSelector).remove();
+
+        if ($typedRows.length) {
+            $('#tableBody').append($typedRows);
+            return true;
+        }
+
+        console.warn('No se encontraron filas para', debugLabel, response);
+        return false;
+    }
+
     let productSelect = $("#product-select").select2({
         placeholder: "Escoja una opción...",
         multiple: true,
@@ -94,11 +131,10 @@ $(document).ready(function () {
                     action: "generarTablaProductos"
                 },
                 success: function (response) {
-                    let bodyStart = response.indexOf('<body>');
-                    let bodyEnd = response.indexOf('</body>');
-                    let bodyContent = response.slice(bodyStart + 6, bodyEnd);
-                    $('#tableBody .producto').remove();
-                    $('#tableBody').append(bodyContent);
+                    var rendered = renderRowsByType(response, '.producto', 'productos');
+                    if (!rendered) {
+                        $('#resp').html('<div class="alert alert-warning">No se pudieron cargar los productos cotizados. Recargue la página.</div>');
+                    }
                 }
             });
         }
@@ -133,11 +169,7 @@ $(document).ready(function () {
                     action: "generarTablacombos"
                 },
                 success: function (response) {
-                    let bodyStart = response.indexOf('<body>');
-                    let bodyEnd = response.indexOf('</body>');
-                    let bodyContent = response.slice(bodyStart + 6, bodyEnd);
-                    $('#tableBody .combo').remove();
-                    $('#tableBody').append(bodyContent);
+                    renderRowsByType(response, '.combo', 'combos');
                 }
             });
         }
@@ -172,11 +204,7 @@ $(document).ready(function () {
                     action: "generarTablaServicios"
                 },
                 success: function (response) {
-                    let bodyStart = response.indexOf('<body>');
-                    let bodyEnd = response.indexOf('</body>');
-                    let bodyContent = response.slice(bodyStart + 6, bodyEnd);
-                    $('#tableBody .servicio').remove();
-                    $('#tableBody').append(bodyContent);
+                    renderRowsByType(response, '.servicio', 'servicios');
                 }
             });
         }

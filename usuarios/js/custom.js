@@ -28,23 +28,33 @@ $(function () {
 
     $('#myTab a').click(function (e) {
         e.preventDefault();
-        $(this).tab('show');
+        if ($.fn.tab) {
+            $(this).tab('show');
+        }
     });
 	$('#myTab1 a').click(function (e) {
         e.preventDefault();
-        $(this).tab('show');
+        if ($.fn.tab) {
+            $(this).tab('show');
+        }
     });
 	$('#myTab2 a').click(function (e) {
         e.preventDefault();
-        $(this).tab('show');
+        if ($.fn.tab) {
+            $(this).tab('show');
+        }
     });
 	$('#chat-tab a').click(function (e) {
         e.preventDefault();
-        $(this).tab('show');
+        if ($.fn.tab) {
+            $(this).tab('show');
+        }
     });
-    $('.left-primary-nav li a').tooltip({
-        placement: 'right'
-    });
+    if ($.fn.tooltip) {
+        $('.left-primary-nav li a').tooltip({
+            placement: 'right'
+        });
+    }
 });
 
 
@@ -54,9 +64,11 @@ $(function () {
 
 $(function () {
 
-    $('.top-right-toolbar a').tooltip({
-        placement: "top"
-    });
+    if ($.fn.tooltip) {
+        $('.top-right-toolbar a').tooltip({
+            placement: "top"
+        });
+    }
 
 
 });

@@ -4,7 +4,6 @@ include("sesion.php");
 $idPagina = 79;
 
 include("includes/verificar-paginas.php");
-include("includes/head.php");
 
 // ========================================
 // CONSULTA PRINCIPAL OPTIMIZADA
@@ -131,7 +130,29 @@ if(count($contactos) == 0){
 		$contactos[] = $cont;
 	}
 }
+
+require '../usuarios/class/CotizacionesEditar.php';
+
+if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaProductos') {
+	$htmlTablaProductos = CotizacionesEditar::generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
+	echo $htmlTablaProductos;
+	exit; 
+}
+
+if (!empty($_POST['action']) && $_POST['action'] === 'generarTablacombos') {
+	$htmlTablaCombos = CotizacionesEditar::generarTablacombos($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
+	echo $htmlTablaCombos;
+	exit; 
+}
+
+if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaServicios') {
+	$htmlTablaServicios = CotizacionesEditar::generarTablaServicios($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
+	echo $htmlTablaServicios;
+	exit; 
+}
 ?>
+
+<?php include("includes/head.php"); ?>
 
 <link href="css/chosen.css" rel="stylesheet">
 <link href="../assets-login/plugins/select2/css/select2.css" rel="stylesheet" />
@@ -163,7 +184,7 @@ include("includes/js-formularios.php");
 	<script type="text/javascript">
 		function productos(enviada){
 			var tipoCliente   = enviada.alt;
-			var campo         = enviada.title;
+			var campo         = enviada.getAttribute('data-campo') || enviada.title;
 			var producto      = enviada.name;
 			var proceso       = 2;
 			var valor         = enviada.value;
@@ -202,7 +223,7 @@ include("includes/js-formularios.php");
 
 
 		function combos(enviada){
-			var campo = enviada.title;
+			var campo = enviada.getAttribute('data-campo') || enviada.title;
 			var producto = enviada.name;
 			var proceso = 11;
 			var valor = enviada.value;
@@ -228,7 +249,7 @@ include("includes/js-formularios.php");
 		}	
 
 		function servicios(enviada){
-			var campo = enviada.title;
+			var campo = enviada.getAttribute('data-campo') || enviada.title;
 			var producto = enviada.name;
 			var proceso = 12;
 			var valor = enviada.value;
@@ -254,27 +275,6 @@ include("includes/js-formularios.php");
 		}
 	</script>
 <?php }?>
-<?php
-		require '../usuarios/class/CotizacionesEditar.php';
-
-		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaProductos') {
-			$htmlTablaProductos = CotizacionesEditar::generarTablaProductos($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
-			echo $htmlTablaProductos;
-			exit; 
-		}
-
-		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablacombos') {
-			$htmlTablaCombos = CotizacionesEditar::generarTablacombos($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
-			echo $htmlTablaCombos;
-			exit; 
-		}
-
-		if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaServicios') {
-			$htmlTablaServicios = CotizacionesEditar::generarTablaServicios($conexionBdPrincipal, $resultadoD,$simbolosMonedas, $idEmpresa);
-			echo $htmlTablaServicios;
-			exit; 
-		}
-?>
 </head>
 <body>
 
@@ -1686,7 +1686,9 @@ $(document).ready(function() {
 			const lazyLoad = $tabLink.data('lazy-load');
 			
 			// Activar el tab
-			$tabLink.tab('show');
+			if ($.fn.tab) {
+				$tabLink.tab('show');
+			}
 			
 			// Si necesita carga lazy, cargar el contenido
 			if (lazyLoad && !loadedTabs[lazyLoad]) {
