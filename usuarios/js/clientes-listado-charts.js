@@ -9,6 +9,7 @@
     return;
   }
 
+  var chartsReady = false;
   var meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
   var palette = ['#2563eb', '#059669', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#db2777', '#65a30d', '#ea580c', '#4f46e5'];
   var chartDefaults = {
@@ -86,18 +87,42 @@
     });
   }
 
-  createBarChart('chartClientesRegistroMes', meses, data.por_mes_registro || [], false, '#2563eb');
-  createBarChart('chartClientesIngresoMes', meses, data.por_mes_ingreso || [], false, '#059669');
-
-  createDoughnutChart('chartClientesCategoria', data.por_categoria);
-  createDoughnutChart('chartClientesTipoDoc', data.por_tipo_documento);
-
-  if ((data.por_estado_mercadeo || []).length) {
-    createDoughnutChart('chartClientesEstadoMercadeo', data.por_estado_mercadeo);
+  function resizeClientesAnalyticsCharts() {
+    var section = document.getElementById('clientesAnalytics');
+    if (!section) return;
+    section.querySelectorAll('canvas').forEach(function (canvas) {
+      var chart = Chart.getChart(canvas);
+      if (chart) chart.resize();
+    });
   }
 
-  var depto = mapChartData(data.por_departamento);
-  if (depto.labels.length) {
-    createBarChart('chartClientesDepartamento', depto.labels, depto.values, true);
+  function initClientesAnalyticsCharts() {
+    if (chartsReady) {
+      resizeClientesAnalyticsCharts();
+      return;
+    }
+    chartsReady = true;
+
+    createBarChart('chartClientesRegistroMes', meses, data.por_mes_registro || [], false, '#2563eb');
+    createBarChart('chartClientesIngresoMes', meses, data.por_mes_ingreso || [], false, '#059669');
+
+    createDoughnutChart('chartClientesCategoria', data.por_categoria);
+    createDoughnutChart('chartClientesTipoDoc', data.por_tipo_documento);
+
+    if ((data.por_estado_mercadeo || []).length) {
+      createDoughnutChart('chartClientesEstadoMercadeo', data.por_estado_mercadeo);
+    }
+
+    var depto = mapChartData(data.por_departamento);
+    if (depto.labels.length) {
+      createBarChart('chartClientesDepartamento', depto.labels, depto.values, true);
+    }
+  }
+
+  window.initClientesAnalyticsCharts = initClientesAnalyticsCharts;
+
+  var section = document.getElementById('clientesAnalytics');
+  if (section && !section.classList.contains('is-collapsed')) {
+    initClientesAnalyticsCharts();
   }
 })();

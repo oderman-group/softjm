@@ -5,23 +5,29 @@
  */
 $resumenAnual = $ticketsAnalytics['resumen'] ?? [];
 $anioAnalytics = intval($ticketsAnalytics['anio'] ?? date('Y'));
+$analyticsTotal = intval($resumenAnual['total'] ?? 0);
+$analyticsAbiertos = intval($resumenAnual['abiertos'] ?? 0);
+$analyticsTasa = floatval($resumenAnual['tasa_ganados'] ?? 0);
 ?>
-<section class="tickets-analytics" id="ticketsAnalytics">
+<section class="tickets-analytics tickets-collapsible is-collapsed" id="ticketsAnalytics" data-collapsible="analytics">
   <div class="tickets-panel">
-    <div class="tickets-panel-header is-neutral">
-      <div>
-        <h3>Indicadores comerciales <?= $anioAnalytics; ?></h3>
-        <p>Resumen del año en curso para seguimiento gerencial y comercial</p>
-      </div>
-    </div>
-    <div class="tickets-panel-body">
+    <button type="button" class="tickets-collapsible-toggle tickets-panel-header is-neutral" id="tickets-analytics-toggle" aria-expanded="false" aria-controls="tickets-analytics-body">
+      <span class="tickets-collapsible-heading">
+        <span class="tickets-collapsible-title">Indicadores comerciales <?= $anioAnalytics; ?></span>
+        <span class="tickets-collapsible-summary">
+          <?= $analyticsTotal; ?> tickets · <?= $analyticsAbiertos; ?> abiertos · <?= $analyticsTasa; ?>% tasa ganados
+        </span>
+      </span>
+      <i class="icon-chevron-down tickets-collapsible-icon" aria-hidden="true"></i>
+    </button>
+    <div class="tickets-collapsible-body tickets-panel-body" id="tickets-analytics-body" hidden>
       <div class="tickets-analytics-kpis">
         <div class="tickets-analytics-kpi">
-          <strong><?= intval($resumenAnual['total'] ?? 0); ?></strong>
+          <strong><?= $analyticsTotal; ?></strong>
           <span>Tickets creados</span>
         </div>
         <div class="tickets-analytics-kpi">
-          <strong><?= intval($resumenAnual['abiertos'] ?? 0); ?></strong>
+          <strong><?= $analyticsAbiertos; ?></strong>
           <span>Abiertos</span>
         </div>
         <div class="tickets-analytics-kpi">
@@ -37,7 +43,7 @@ $anioAnalytics = intval($ticketsAnalytics['anio'] ?? date('Y'));
           <span>Cerrados ganados</span>
         </div>
         <div class="tickets-analytics-kpi">
-          <strong><?= floatval($resumenAnual['tasa_ganados'] ?? 0); ?>%</strong>
+          <strong><?= $analyticsTasa; ?>%</strong>
           <span>Tasa ganados / cerrados</span>
         </div>
       </div>

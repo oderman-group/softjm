@@ -148,5 +148,7 @@ foreach ($filasClientes as $res) {
 }
 
 if ($filasVisibles === 0) {
-    echo '<tr><td colspan="20" class="clientes-empty">No hay clientes que coincidan con los filtros aplicados.</td></tr>';
+    echo '<tr class="clientes-empty-row">';
+    echo '<td colspan="9" class="clientes-empty">No hay clientes que coincidan con los filtros aplicados.</td>';
+    echo '</tr>';
 }

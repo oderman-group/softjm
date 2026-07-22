@@ -9,6 +9,7 @@
     return;
   }
 
+  var chartsReady = false;
   var meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
   var palette = ['#2563eb', '#059669', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#db2777', '#65a30d'];
   var chartDefaults = {
@@ -86,20 +87,44 @@
     });
   }
 
-  createBarChart('chartTicketsMes', meses, data.por_mes || [], false);
+  function resizeAnalyticsCharts() {
+    var section = document.getElementById('ticketsAnalytics');
+    if (!section) return;
+    section.querySelectorAll('canvas').forEach(function (canvas) {
+      var chart = Chart.getChart(canvas);
+      if (chart) chart.resize();
+    });
+  }
 
-  var etapa = mapChartData(data.por_etapa);
-  createBarChart('chartTicketsEtapa', etapa.labels, etapa.values, true);
+  function initTicketsAnalyticsCharts() {
+    if (chartsReady) {
+      resizeAnalyticsCharts();
+      return;
+    }
+    chartsReady = true;
 
-  createDoughnutChart('chartTicketsEstado', data.por_estado);
-  createDoughnutChart('chartTicketsTipo', data.por_tipo);
-  createDoughnutChart('chartTicketsPrioridad', data.por_prioridad);
+    createBarChart('chartTicketsMes', meses, data.por_mes || [], false);
 
-  var resp = mapChartData(data.por_responsable);
-  createBarChart('chartTicketsResponsable', resp.labels, resp.values, true);
+    var etapa = mapChartData(data.por_etapa);
+    createBarChart('chartTicketsEtapa', etapa.labels, etapa.values, true);
 
-  if (!data.es_vista_cliente && (data.top_clientes || []).length) {
-    var clientes = mapChartData(data.top_clientes);
-    createBarChart('chartTicketsClientes', clientes.labels, clientes.values, true);
+    createDoughnutChart('chartTicketsEstado', data.por_estado);
+    createDoughnutChart('chartTicketsTipo', data.por_tipo);
+    createDoughnutChart('chartTicketsPrioridad', data.por_prioridad);
+
+    var resp = mapChartData(data.por_responsable);
+    createBarChart('chartTicketsResponsable', resp.labels, resp.values, true);
+
+    if (!data.es_vista_cliente && (data.top_clientes || []).length) {
+      var clientes = mapChartData(data.top_clientes);
+      createBarChart('chartTicketsClientes', clientes.labels, clientes.values, true);
+    }
+  }
+
+  window.initTicketsAnalyticsCharts = initTicketsAnalyticsCharts;
+
+  var section = document.getElementById('ticketsAnalytics');
+  if (section && !section.classList.contains('is-collapsed')) {
+    initTicketsAnalyticsCharts();
   }
 })();

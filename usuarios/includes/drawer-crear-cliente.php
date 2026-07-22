@@ -564,10 +564,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  if (!overlay || !drawer || !btnAbrir) return;
+  if (!overlay || !drawer || !form) return;
 
   document.body.appendChild(overlay);
   document.body.appendChild(drawer);
+
+  var lastTrigger = null;
 
   function ocultarAlertas() {
     alertExito.classList.remove('is-visible');
@@ -599,7 +601,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (notaTextarea) notaTextarea.value = '';
   }
 
-  function abrirDrawer() {
+  function abrirDrawer(trigger) {
+    lastTrigger = trigger || null;
     ocultarAlertas();
     limpiarErrores();
     setGuardando(false);
@@ -607,12 +610,14 @@ document.addEventListener('DOMContentLoaded', function () {
     form.reset();
     resetEtiquetasVisuales();
     resetNotaInterna();
-    grupoEvento.style.display = 'none';
+    if (grupoEvento) grupoEvento.style.display = 'none';
     overlay.classList.add('is-open');
     drawer.classList.add('is-open');
     document.body.classList.add('drawer-open');
     overlay.setAttribute('aria-hidden', 'false');
-    setTimeout(function () { nombreInput.focus(); }, 350);
+    setTimeout(function () {
+      if (nombreInput) nombreInput.focus();
+    }, 350);
   }
 
   function cerrarDrawer() {
@@ -628,8 +633,14 @@ document.addEventListener('DOMContentLoaded', function () {
     drawer.classList.remove('is-open');
     document.body.classList.remove('drawer-open');
     overlay.setAttribute('aria-hidden', 'true');
-    btnAbrir.focus();
+    if (lastTrigger && typeof lastTrigger.focus === 'function') {
+      lastTrigger.focus();
+    } else if (btnAbrir && typeof btnAbrir.focus === 'function') {
+      btnAbrir.focus();
+    }
   }
+
+  window.abrirDrawerCrearCliente = abrirDrawer;
 
   function validarFormulario() {
     limpiarErrores();
@@ -665,7 +676,7 @@ document.addEventListener('DOMContentLoaded', function () {
     form.reset();
     resetEtiquetasVisuales();
     resetNotaInterna();
-    grupoEvento.style.display = 'none';
+    if (grupoEvento) grupoEvento.style.display = 'none';
     mostrarFormulario(false);
 
     alertError.classList.remove('is-visible');
@@ -683,23 +694,34 @@ document.addEventListener('DOMContentLoaded', function () {
       form.reset();
       resetEtiquetasVisuales();
       resetNotaInterna();
-      grupoEvento.style.display = 'none';
-      nombreInput.focus();
+      if (grupoEvento) grupoEvento.style.display = 'none';
+      if (nombreInput) nombreInput.focus();
     });
   }
 
-  btnAbrir.addEventListener('click', function (e) {
+  function onAbrirClick(e) {
     e.preventDefault();
-    abrirDrawer();
+    abrirDrawer(e.currentTarget);
+  }
+
+  if (btnAbrir) {
+    btnAbrir.addEventListener('click', onAbrirClick);
+  }
+
+  document.querySelectorAll('.js-abrir-crear-cliente').forEach(function (btn) {
+    if (btn === btnAbrir) return;
+    btn.addEventListener('click', onAbrirClick);
   });
 
-  btnCerrar.addEventListener('click', cerrarDrawer);
-  btnCancel.addEventListener('click', cerrarDrawer);
+  if (btnCerrar) btnCerrar.addEventListener('click', cerrarDrawer);
+  if (btnCancel) btnCancel.addEventListener('click', cerrarDrawer);
   overlay.addEventListener('click', cerrarDrawer);
 
-  referencia.addEventListener('change', function () {
-    grupoEvento.style.display = this.value === '4' ? 'block' : 'none';
-  });
+  if (referencia) {
+    referencia.addEventListener('change', function () {
+      if (grupoEvento) grupoEvento.style.display = this.value === '4' ? 'block' : 'none';
+    });
+  }
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && drawer.classList.contains('is-open')) {

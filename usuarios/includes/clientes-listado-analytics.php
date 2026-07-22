@@ -6,27 +6,33 @@
 $resumenAnual = $clientesAnalytics['resumen'] ?? [];
 $cartera      = $clientesAnalytics['cartera'] ?? [];
 $anioAnalytics = intval($clientesAnalytics['anio'] ?? date('Y'));
+$analyticsTotal = intval($cartera['total'] ?? 0);
+$analyticsRegistrados = intval($resumenAnual['registrados_anio'] ?? 0);
+$analyticsNuevos = intval($resumenAnual['nuevos_clientes'] ?? 0);
 ?>
-<section class="clientes-analytics" id="clientesAnalytics">
+<section class="clientes-analytics clientes-collapsible is-collapsed" id="clientesAnalytics" data-collapsible="analytics">
   <div class="clientes-panel">
-    <div class="clientes-panel-header is-neutral">
-      <div>
-        <h3>Indicadores de cartera <?= $anioAnalytics; ?></h3>
-        <p>Resumen del año en curso para gestión comercial y mercadeo</p>
-      </div>
-    </div>
-    <div class="clientes-panel-body">
+    <button type="button" class="clientes-collapsible-toggle clientes-panel-header is-neutral" id="clientes-analytics-toggle" aria-expanded="false" aria-controls="clientes-analytics-body">
+      <span class="clientes-collapsible-heading">
+        <span class="clientes-collapsible-title">Indicadores de cartera <?= $anioAnalytics; ?></span>
+        <span class="clientes-collapsible-summary">
+          <?= $analyticsTotal; ?> activos · <?= $analyticsRegistrados; ?> registrados · <?= $analyticsNuevos; ?> nuevos clientes
+        </span>
+      </span>
+      <i class="icon-chevron-down clientes-collapsible-icon" aria-hidden="true"></i>
+    </button>
+    <div class="clientes-collapsible-body clientes-panel-body" id="clientes-analytics-body" hidden>
       <div class="clientes-analytics-kpis">
         <div class="clientes-analytics-kpi">
-          <strong><?= intval($cartera['total'] ?? 0); ?></strong>
+          <strong><?= $analyticsTotal; ?></strong>
           <span>Clientes activos en cartera</span>
         </div>
         <div class="clientes-analytics-kpi">
-          <strong><?= intval($resumenAnual['registrados_anio'] ?? 0); ?></strong>
+          <strong><?= $analyticsRegistrados; ?></strong>
           <span>Registrados <?= $anioAnalytics; ?></span>
         </div>
         <div class="clientes-analytics-kpi">
-          <strong><?= intval($resumenAnual['nuevos_clientes'] ?? 0); ?></strong>
+          <strong><?= $analyticsNuevos; ?></strong>
           <span>Nuevos clientes (ingreso)</span>
         </div>
         <div class="clientes-analytics-kpi">

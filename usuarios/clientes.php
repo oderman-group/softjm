@@ -18,7 +18,17 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script type="text/javascript">
 	$(function() {
-		$('#data-table').dataTable({
+		var $table = $('#data-table');
+		if (!$table.length || $table.find('tbody tr.clientes-empty-row').length) {
+			return;
+		}
+
+		// Evita el alert modal de DataTables 1.9 ante filas inconsistentes.
+		if ($.fn.dataTableExt) {
+			$.fn.dataTableExt.sErrMode = 'mute';
+		}
+
+		$table.dataTable({
 			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t",
 			"bPaginate": false,
 			"bInfo": false,
@@ -31,6 +41,9 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 </head>
 
 <body class="clientes-page">
+	<?php if (!empty($listadoPermisos['agregarCliente'])) {
+		include("includes/drawer-crear-cliente.php");
+	} ?>
 	<div class="layout">
 		<?php include("includes/encabezado.php"); ?>
 
@@ -45,7 +58,7 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 					<div class="clientes-hero-actions">
 						<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
 						<?php if ($listadoPermisos['agregarCliente']) { ?>
-							<a href="clientes-agregar.php" class="btn btn-success"><i class="icon-plus"></i> Agregar cliente</a>
+							<a href="clientes-agregar.php" class="btn btn-success js-abrir-crear-cliente" aria-haspopup="dialog"><i class="icon-plus"></i> Agregar cliente</a>
 						<?php } ?>
 						<?php if ($listadoPermisos['importarClientes']) { ?>
 							<a href="clientes-importar.php" class="btn btn-info"><i class="icon-upload"></i> Importar</a>
@@ -53,46 +66,64 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 					</div>
 				</div>
 
-				<div class="clientes-kpi-grid">
-					<div class="clientes-kpi-card is-primary">
-						<div class="clientes-kpi-label">Cartera activa</div>
-						<div class="clientes-kpi-value"><?= intval($clientesCartera['total'] ?? 0); ?></div>
-						<div class="clientes-kpi-hint">
-							<?= intval($clientesCartera['clientes'] ?? 0); ?> clientes ·
-							<?= intval($clientesCartera['prospectos'] ?? 0); ?> prospectos
+				<?php
+				$clientesKpiTotal = intval($clientesCartera['total'] ?? 0);
+				$clientesKpiRegistrados = intval($clientesResumenAnual['registrados_anio'] ?? 0);
+				$clientesKpiConvertidos = intval($clientesResumenAnual['nuevos_clientes'] ?? 0);
+				?>
+				<section class="clientes-collapsible is-collapsed" data-collapsible="kpi" aria-labelledby="clientes-kpi-toggle">
+					<button type="button" class="clientes-collapsible-toggle" id="clientes-kpi-toggle" aria-expanded="false" aria-controls="clientes-kpi-body">
+						<span class="clientes-collapsible-heading">
+							<span class="clientes-collapsible-title">Indicadores de cartera</span>
+							<span class="clientes-collapsible-summary">
+								<?= $clientesKpiTotal; ?> activos · <?= $clientesKpiRegistrados; ?> registrados · <?= $clientesKpiConvertidos; ?> convertidos
+							</span>
+						</span>
+						<i class="icon-chevron-down clientes-collapsible-icon" aria-hidden="true"></i>
+					</button>
+					<div class="clientes-collapsible-body" id="clientes-kpi-body" hidden>
+						<div class="clientes-kpi-grid">
+							<div class="clientes-kpi-card is-primary">
+								<div class="clientes-kpi-label">Cartera activa</div>
+								<div class="clientes-kpi-value"><?= $clientesKpiTotal; ?></div>
+								<div class="clientes-kpi-hint">
+									<?= intval($clientesCartera['clientes'] ?? 0); ?> clientes ·
+									<?= intval($clientesCartera['prospectos'] ?? 0); ?> prospectos
+								</div>
+							</div>
+							<div class="clientes-kpi-card is-success">
+								<div class="clientes-kpi-label">Registrados <?= $clientesAnioActual; ?></div>
+								<div class="clientes-kpi-value"><?= $clientesKpiRegistrados; ?></div>
+								<div class="clientes-kpi-hint">Nuevos registros en el año</div>
+							</div>
+							<div class="clientes-kpi-card is-warning">
+								<div class="clientes-kpi-label">Nuevos clientes</div>
+								<div class="clientes-kpi-value"><?= intval($clientesNuevosEsteMes); ?></div>
+								<div class="clientes-kpi-hint">
+									<a href="clientes.php?clientesNuevos=1">Este mes · ver listado</a>
+								</div>
+							</div>
+							<div class="clientes-kpi-card is-info">
+								<div class="clientes-kpi-label">Top compras <?= $clientesAnioActual; ?></div>
+								<div class="clientes-kpi-value"><?= intval($clienteConMasVenta['cantidad'] ?? 0); ?></div>
+								<div class="clientes-kpi-hint">
+									<?php if (!empty($clienteConMasVenta['factura_cliente'])) { ?>
+										<a href="clientes-editar.php?id=<?= intval($clienteConMasVenta['factura_cliente']); ?>" target="_blank">
+											<?= htmlspecialchars($clienteConMasVenta['nombreCliente'] ?? 'Sin datos'); ?>
+										</a>
+									<?php } else { ?>
+										Sin datos de facturación
+									<?php } ?>
+								</div>
+							</div>
+							<div class="clientes-kpi-card is-danger">
+								<div class="clientes-kpi-label">Convertidos <?= $clientesAnioActual; ?></div>
+								<div class="clientes-kpi-value"><?= $clientesKpiConvertidos; ?></div>
+								<div class="clientes-kpi-hint">Por fecha de ingreso como cliente</div>
+							</div>
 						</div>
 					</div>
-					<div class="clientes-kpi-card is-success">
-						<div class="clientes-kpi-label">Registrados <?= $clientesAnioActual; ?></div>
-						<div class="clientes-kpi-value"><?= intval($clientesResumenAnual['registrados_anio'] ?? 0); ?></div>
-						<div class="clientes-kpi-hint">Nuevos registros en el año</div>
-					</div>
-					<div class="clientes-kpi-card is-warning">
-						<div class="clientes-kpi-label">Nuevos clientes</div>
-						<div class="clientes-kpi-value"><?= intval($clientesNuevosEsteMes); ?></div>
-						<div class="clientes-kpi-hint">
-							<a href="clientes.php?clientesNuevos=1">Este mes · ver listado</a>
-						</div>
-					</div>
-					<div class="clientes-kpi-card is-info">
-						<div class="clientes-kpi-label">Top compras <?= $clientesAnioActual; ?></div>
-						<div class="clientes-kpi-value"><?= intval($clienteConMasVenta['cantidad'] ?? 0); ?></div>
-						<div class="clientes-kpi-hint">
-							<?php if (!empty($clienteConMasVenta['factura_cliente'])) { ?>
-								<a href="clientes-editar.php?id=<?= intval($clienteConMasVenta['factura_cliente']); ?>" target="_blank">
-									<?= htmlspecialchars($clienteConMasVenta['nombreCliente'] ?? 'Sin datos'); ?>
-								</a>
-							<?php } else { ?>
-								Sin datos de facturación
-							<?php } ?>
-						</div>
-					</div>
-					<div class="clientes-kpi-card is-danger">
-						<div class="clientes-kpi-label">Convertidos <?= $clientesAnioActual; ?></div>
-						<div class="clientes-kpi-value"><?= intval($clientesResumenAnual['nuevos_clientes'] ?? 0); ?></div>
-						<div class="clientes-kpi-hint">Por fecha de ingreso como cliente</div>
-					</div>
-				</div>
+				</section>
 
 				<?php include("includes/notificaciones.php"); ?>
 
@@ -156,62 +187,94 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 									$tipoDocActivo   = isset($_GET['tipoDoc']) ? intval($_GET['tipoDoc']) : 0;
 									$grupoActivo     = isset($_GET['grupo']) ? intval($_GET['grupo']) : 0;
 									?>
-									<a href="clientes.php?<?= http_build_query($paramsTodos); ?>" class="clientes-chip<?= $categoriaActiva === 0 && $tipoDocActivo === 0 && $grupoActivo === 0 ? ' is-active' : ''; ?>">Todos</a>
-									<?php
-									$categoriasChip = [1 => 'Prospecto', 2 => 'Cliente', 3 => 'Dealer'];
-									foreach ($categoriasChip as $catId => $catLabel) {
-										$paramsCat = $filtrosGetPreservados;
-										$paramsCat['categoria'] = $catId;
-										?>
-										<a href="clientes.php?<?= http_build_query($paramsCat); ?>" class="clientes-chip<?= $categoriaActiva === $catId ? ' is-active' : ''; ?>"><?= $catLabel; ?></a>
-									<?php } ?>
-									<a href="clientes.php?<?= http_build_query(array_merge($filtrosGetPreservados, ['tipoDoc' => 2])); ?>" class="clientes-chip<?= $tipoDocActivo === 2 ? ' is-active' : ''; ?>">NIT</a>
-									<a href="clientes.php?<?= http_build_query(array_merge($filtrosGetPreservados, ['tipoDoc' => 3])); ?>" class="clientes-chip<?= $tipoDocActivo === 3 ? ' is-active' : ''; ?>">Cédula</a>
-									<?php foreach ($gruposDealerListado as $grupo) {
-										$idGrupo = intval($grupo['deal_id']);
-										$paramsGrupo = $filtrosGetPreservados;
-										$paramsGrupo['grupo'] = $idGrupo;
-										?>
-										<a href="clientes.php?<?= http_build_query($paramsGrupo); ?>" class="clientes-chip<?= $grupoActivo === $idGrupo ? ' is-active' : ''; ?>">
-											<?= htmlspecialchars($grupo['deal_nombre']); ?> (<?= intval($conteoPorGrupoDealer[$idGrupo] ?? 0); ?>)
-										</a>
-									<?php } ?>
+									<div class="clientes-chips">
+										<a href="clientes.php?<?= http_build_query($paramsTodos); ?>" class="clientes-chip<?= $categoriaActiva === 0 && $tipoDocActivo === 0 && $grupoActivo === 0 ? ' is-active' : ''; ?>">Todos</a>
+										<?php
+										$categoriasChip = [1 => 'Prospecto', 2 => 'Cliente', 3 => 'Dealer'];
+										foreach ($categoriasChip as $catId => $catLabel) {
+											$paramsCat = $filtrosGetPreservados;
+											$paramsCat['categoria'] = $catId;
+											?>
+											<a href="clientes.php?<?= http_build_query($paramsCat); ?>" class="clientes-chip<?= $categoriaActiva === $catId ? ' is-active' : ''; ?>"><?= $catLabel; ?></a>
+										<?php } ?>
+										<a href="clientes.php?<?= http_build_query(array_merge($filtrosGetPreservados, ['tipoDoc' => 2])); ?>" class="clientes-chip<?= $tipoDocActivo === 2 ? ' is-active' : ''; ?>">NIT</a>
+										<a href="clientes.php?<?= http_build_query(array_merge($filtrosGetPreservados, ['tipoDoc' => 3])); ?>" class="clientes-chip<?= $tipoDocActivo === 3 ? ' is-active' : ''; ?>">Cédula</a>
+									</div>
+									<div class="clientes-grupo-select">
+										<label for="filtroGrupoCliente">Grupo</label>
+										<select id="filtroGrupoCliente" name="grupo">
+											<option value="">Todos los grupos</option>
+											<?php foreach ($gruposDealerListado as $grupo) {
+												$idGrupo = intval($grupo['deal_id']);
+												$conteoGrupo = intval($conteoPorGrupoDealer[$idGrupo] ?? 0);
+												?>
+												<option value="<?= $idGrupo; ?>"<?= $grupoActivo === $idGrupo ? ' selected' : ''; ?>>
+													<?= htmlspecialchars($grupo['deal_nombre']); ?> (<?= $conteoGrupo; ?>)
+												</option>
+											<?php } ?>
+										</select>
+									</div>
 								</div>
 
-								<div class="clientes-filtros-panel">
-									<form method="GET" action="">
-										<?php foreach ($filtrosGetPreservados as $clave => $valor) { ?>
-											<input type="hidden" name="<?= htmlspecialchars($clave); ?>" value="<?= htmlspecialchars((string) $valor); ?>">
-										<?php } ?>
-										<div class="filtros-titulo">Filtros de búsqueda</div>
-										<div class="filtros-grid">
-											<div class="filtro-item filtro-item--full">
-												<label>Buscar <?php if (!empty($_GET['buscar'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['buscar' => ''])); ?>">× quitar</a><?php } ?></label>
-												<input type="text" name="buscar" id="btn_buscar" value="<?= isset($_GET['buscar']) ? htmlspecialchars($_GET['buscar']) : ''; ?>" placeholder="Nombre o documento del cliente...">
+								<?php
+								$clientesFiltrosCampos = ['buscar', 'fecha_registro_inicio', 'fecha_registro_fin', 'fecha_ingreso_inicio', 'fecha_ingreso_fin'];
+								$clientesFiltrosActivos = 0;
+								foreach ($clientesFiltrosCampos as $campoFiltro) {
+									if (isset($_GET[$campoFiltro]) && $_GET[$campoFiltro] !== '') {
+										$clientesFiltrosActivos++;
+									}
+								}
+								?>
+								<div class="clientes-filtros-panel clientes-collapsible is-collapsed" data-collapsible="filtros">
+									<button type="button" class="clientes-collapsible-toggle" id="clientes-filtros-toggle" aria-expanded="false" aria-controls="clientes-filtros-body">
+										<span class="clientes-collapsible-heading">
+											<span class="clientes-collapsible-title">Filtros de búsqueda</span>
+											<?php if ($clientesFiltrosActivos > 0) { ?>
+												<span class="clientes-collapsible-badge"><?= $clientesFiltrosActivos; ?> activo<?= $clientesFiltrosActivos === 1 ? '' : 's'; ?></span>
+											<?php } else { ?>
+												<span class="clientes-collapsible-summary">Buscar por nombre, documento o fechas</span>
+											<?php } ?>
+										</span>
+										<i class="icon-chevron-down clientes-collapsible-icon" aria-hidden="true"></i>
+									</button>
+									<div class="clientes-collapsible-body" id="clientes-filtros-body" hidden>
+										<form method="GET" action="">
+											<?php foreach ($filtrosGetPreservados as $clave => $valor) {
+												if (in_array($clave, ['fecha_registro_inicio', 'fecha_registro_fin', 'fecha_ingreso_inicio', 'fecha_ingreso_fin'], true)) {
+													continue;
+												}
+												?>
+												<input type="hidden" name="<?= htmlspecialchars($clave); ?>" value="<?= htmlspecialchars((string) $valor); ?>">
+											<?php } ?>
+											<div class="filtros-grid">
+												<div class="filtro-item filtro-item--full">
+													<label>Buscar <?php if (!empty($_GET['buscar'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['buscar' => ''])); ?>">× quitar</a><?php } ?></label>
+													<input type="text" name="buscar" id="btn_buscar" value="<?= isset($_GET['buscar']) ? htmlspecialchars($_GET['buscar']) : ''; ?>" placeholder="Nombre o documento del cliente...">
+												</div>
+												<div class="filtro-item">
+													<label>Creación inicio <?php if (!empty($_GET['fecha_registro_inicio'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_registro_inicio' => ''])); ?>">×</a><?php } ?></label>
+													<input type="date" name="fecha_registro_inicio" value="<?= isset($_GET['fecha_registro_inicio']) ? htmlspecialchars($_GET['fecha_registro_inicio']) : ''; ?>">
+												</div>
+												<div class="filtro-item">
+													<label>Creación fin <?php if (!empty($_GET['fecha_registro_fin'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_registro_fin' => ''])); ?>">×</a><?php } ?></label>
+													<input type="date" name="fecha_registro_fin" value="<?= isset($_GET['fecha_registro_fin']) ? htmlspecialchars($_GET['fecha_registro_fin']) : ''; ?>">
+												</div>
+												<div class="filtro-item">
+													<label>Ingreso cliente inicio <?php if (!empty($_GET['fecha_ingreso_inicio'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_ingreso_inicio' => ''])); ?>">×</a><?php } ?></label>
+													<input type="date" name="fecha_ingreso_inicio" value="<?= isset($_GET['fecha_ingreso_inicio']) ? htmlspecialchars($_GET['fecha_ingreso_inicio']) : ''; ?>">
+												</div>
+												<div class="filtro-item">
+													<label>Ingreso cliente fin <?php if (!empty($_GET['fecha_ingreso_fin'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_ingreso_fin' => ''])); ?>">×</a><?php } ?></label>
+													<input type="date" name="fecha_ingreso_fin" value="<?= isset($_GET['fecha_ingreso_fin']) ? htmlspecialchars($_GET['fecha_ingreso_fin']) : ''; ?>">
+												</div>
 											</div>
-											<div class="filtro-item">
-												<label>Creación inicio <?php if (!empty($_GET['fecha_registro_inicio'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_registro_inicio' => ''])); ?>">×</a><?php } ?></label>
-												<input type="date" name="fecha_registro_inicio" value="<?= isset($_GET['fecha_registro_inicio']) ? htmlspecialchars($_GET['fecha_registro_inicio']) : ''; ?>">
+											<div class="clientes-filtros-acciones">
+												<button type="submit" class="clientes-btn-primary"><i class="icon-search"></i> Filtrar</button>
+												<a href="clientes.php" class="clientes-btn-secondary">Limpiar filtros</a>
+												<button type="button" class="clientes-btn-primary" id="btnSubmitBuscar"><i class="icon-search"></i> Buscar en vivo</button>
 											</div>
-											<div class="filtro-item">
-												<label>Creación fin <?php if (!empty($_GET['fecha_registro_fin'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_registro_fin' => ''])); ?>">×</a><?php } ?></label>
-												<input type="date" name="fecha_registro_fin" value="<?= isset($_GET['fecha_registro_fin']) ? htmlspecialchars($_GET['fecha_registro_fin']) : ''; ?>">
-											</div>
-											<div class="filtro-item">
-												<label>Ingreso cliente inicio <?php if (!empty($_GET['fecha_ingreso_inicio'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_ingreso_inicio' => ''])); ?>">×</a><?php } ?></label>
-												<input type="date" name="fecha_ingreso_inicio" value="<?= isset($_GET['fecha_ingreso_inicio']) ? htmlspecialchars($_GET['fecha_ingreso_inicio']) : ''; ?>">
-											</div>
-											<div class="filtro-item">
-												<label>Ingreso cliente fin <?php if (!empty($_GET['fecha_ingreso_fin'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_ingreso_fin' => ''])); ?>">×</a><?php } ?></label>
-												<input type="date" name="fecha_ingreso_fin" value="<?= isset($_GET['fecha_ingreso_fin']) ? htmlspecialchars($_GET['fecha_ingreso_fin']) : ''; ?>">
-											</div>
-										</div>
-										<div class="clientes-filtros-acciones">
-											<button type="submit" class="clientes-btn-primary"><i class="icon-search"></i> Filtrar</button>
-											<a href="clientes.php" class="clientes-btn-secondary">Limpiar filtros</a>
-											<button type="button" class="clientes-btn-primary" id="btnSubmitBuscar"><i class="icon-search"></i> Buscar en vivo</button>
-										</div>
-									</form>
+										</form>
+									</div>
 								</div>
 
 								<div class="clientes-pagination">
@@ -255,29 +318,78 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 	</div>
 
 	<script>
-		document.getElementById('btnSubmitBuscar').addEventListener('click', buscar);
-		document.getElementById('btn_buscar').addEventListener('keydown', function (event) {
-			if (event.key === 'Enter') {
-				event.preventDefault();
-				buscar();
+		(function () {
+			function toggleCollapsible(section) {
+				var toggle = section.querySelector('.clientes-collapsible-toggle');
+				var body = section.querySelector('.clientes-collapsible-body');
+				if (!toggle || !body) return;
+
+				var willExpand = section.classList.contains('is-collapsed');
+				section.classList.toggle('is-collapsed', !willExpand);
+				toggle.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
+				if (willExpand) {
+					body.removeAttribute('hidden');
+					if (section.id === 'clientesAnalytics' && typeof window.initClientesAnalyticsCharts === 'function') {
+						window.initClientesAnalyticsCharts();
+					}
+				} else {
+					body.setAttribute('hidden', '');
+				}
 			}
-		});
 
-		function buscar() {
-			var valor = document.getElementById('btn_buscar').value;
-			var tbody = document.getElementById('clientes_buscar');
-			tbody.innerHTML = '';
+			document.querySelectorAll('.clientes-collapsible').forEach(function (section) {
+				var toggle = section.querySelector('.clientes-collapsible-toggle');
+				if (!toggle) return;
+				toggle.addEventListener('click', function () {
+					toggleCollapsible(section);
+				});
+			});
 
-			var params = new URLSearchParams(window.location.search);
-			params.set('buscar', valor);
-			params.set('inicio', '<?= isset($_GET["inicio"]) ? intval($_GET["inicio"]) : 1 ?>');
-			params.set('limite', '<?= intval($limite ?? ($configuracion['conf_paginacion'] ?? 50)) ?>');
+			var grupoSelect = document.getElementById('filtroGrupoCliente');
+			if (grupoSelect) {
+				grupoSelect.addEventListener('change', function () {
+					var params = new URLSearchParams(window.location.search);
+					if (this.value) {
+						params.set('grupo', this.value);
+					} else {
+						params.delete('grupo');
+					}
+					params.delete('inicio');
+					var query = params.toString();
+					window.location.href = 'clientes.php' + (query ? '?' + query : '');
+				});
+			}
 
-			fetch('fetch-buscar-clientes.php?' + params.toString(), { method: 'GET' })
-				.then(function (response) { return response.text(); })
-				.then(function (data) { tbody.innerHTML = data; })
-				.catch(function (error) { console.error('Error:', error); });
-		}
+			var btnBuscar = document.getElementById('btnSubmitBuscar');
+			var inputBuscar = document.getElementById('btn_buscar');
+			if (btnBuscar) {
+				btnBuscar.addEventListener('click', buscar);
+			}
+			if (inputBuscar) {
+				inputBuscar.addEventListener('keydown', function (event) {
+					if (event.key === 'Enter') {
+						event.preventDefault();
+						buscar();
+					}
+				});
+			}
+
+			function buscar() {
+				var valor = document.getElementById('btn_buscar').value;
+				var tbody = document.getElementById('clientes_buscar');
+				tbody.innerHTML = '';
+
+				var params = new URLSearchParams(window.location.search);
+				params.set('buscar', valor);
+				params.set('inicio', '<?= isset($_GET["inicio"]) ? intval($_GET["inicio"]) : 1 ?>');
+				params.set('limite', '<?= intval($limite ?? ($configuracion['conf_paginacion'] ?? 50)) ?>');
+
+				fetch('fetch-buscar-clientes.php?' + params.toString(), { method: 'GET' })
+					.then(function (response) { return response.text(); })
+					.then(function (data) { tbody.innerHTML = data; })
+					.catch(function (error) { console.error('Error:', error); });
+			}
+		})();
 	</script>
 
 	<?php include("includes/drawer-notas-internas-cliente.php"); ?>
