@@ -28,7 +28,9 @@ try {
         } else if ($_POST["ticket"] != 'NO_TICKET') {
             $ticketId = $_POST["ticket"];
             mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets 
-            SET tik_id_cotizacion = ".$_POST["id"]."
+            SET tik_id_cotizacion = ".$_POST["id"].",
+            tik_cliente = '".intval($_POST["cliente"])."',
+            tik_sucursal = '".intval($_POST["sucursal"])."'
             WHERE tik_id=".$ticketId);
         }
     }

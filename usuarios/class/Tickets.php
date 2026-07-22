@@ -41,6 +41,66 @@ class Ticket extends BaseDatos {
     }
 
     /**
+     * Alinea el cliente (y opcionalmente la sucursal) del ticket vinculado a una cotización.
+     * Cubre ambos enlaces: tik_id_cotizacion y cotiz_ticket.
+     */
+    public static function sincronizarClienteDesdeCotizacion(
+        int $idCotizacion,
+        int $idCliente,
+        $conexionBdPrincipal,
+        ?int $idSucursal = null
+    ): bool {
+        $idCotizacion = intval($idCotizacion);
+        $idCliente = intval($idCliente);
+
+        if ($idCotizacion <= 0 || $idCliente <= 0) {
+            return false;
+        }
+
+        $ids = [];
+
+        $porCotizacion = mysqli_query(
+            $conexionBdPrincipal,
+            "SELECT tik_id FROM " . self::$schema . "." . self::$tableName . "
+             WHERE tik_id_cotizacion = " . $idCotizacion
+        );
+        if ($porCotizacion) {
+            while ($row = mysqli_fetch_assoc($porCotizacion)) {
+                $ids[] = (int) $row['tik_id'];
+            }
+        }
+
+        $porFk = mysqli_query(
+            $conexionBdPrincipal,
+            "SELECT cotiz_ticket FROM " . MAINBD . ".cotizacion
+             WHERE cotiz_id = " . $idCotizacion . "
+               AND cotiz_ticket IS NOT NULL
+               AND cotiz_ticket > 0
+             LIMIT 1"
+        );
+        if ($porFk && ($row = mysqli_fetch_assoc($porFk)) && !empty($row['cotiz_ticket'])) {
+            $ids[] = (int) $row['cotiz_ticket'];
+        }
+
+        $ids = array_values(array_unique(array_filter($ids)));
+        if (empty($ids)) {
+            return false;
+        }
+
+        $setSucursal = '';
+        if ($idSucursal !== null && $idSucursal > 0) {
+            $setSucursal = ", tik_sucursal = " . intval($idSucursal);
+        }
+
+        return (bool) mysqli_query(
+            $conexionBdPrincipal,
+            "UPDATE " . self::$schema . "." . self::$tableName . "
+             SET tik_cliente = " . $idCliente . $setSucursal . "
+             WHERE tik_id IN (" . implode(',', $ids) . ")"
+        );
+    }
+
+    /**
      * 
      */
     public static function obtenerTotalTicketsComerciales($conexionBdPrincipal) {
