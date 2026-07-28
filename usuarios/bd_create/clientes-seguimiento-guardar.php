@@ -93,6 +93,7 @@ if ($numero > 0) {
 if (!empty($_POST["cotizacion"])) {
 	mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets SET 
 	tik_id_cotizacion=".$_POST["cotizacion"].",
+	tik_cliente='".intval($_POST["cliente"])."',
 	tik_etapa = 3
 	WHERE tik_id='" . $tiketID . "'");
 

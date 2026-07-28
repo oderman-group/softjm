@@ -1,5 +1,6 @@
 <?php
 include("../sesion.php");
+require_once RUTA_PROYECTO.'/usuarios/class/Tickets.php';
 
 $idPagina = 79;
 
@@ -20,7 +21,7 @@ try {
 
     // Verificar que la cotización existe y pertenece a la empresa
     $verificarCotiz = $conexionBdPrincipal->query("
-        SELECT cotiz_id, cotiz_vendida 
+        SELECT cotiz_id, cotiz_vendida, cotiz_cliente, cotiz_sucursal, cotiz_ticket
         FROM cotizacion 
         WHERE cotiz_id = '".$cotizacionId."' AND cotiz_id_empresa = '".$idEmpresa."'
     ");
@@ -38,6 +39,9 @@ try {
 
     // Construir la consulta de actualización dinámicamente
     $updates = [];
+    $clienteNuevo = null;
+    $sucursalNueva = null;
+    $ticketAsociadoId = null;
 
     // Proveedor (opcional)
     if (isset($_POST['proveedor'])) {
@@ -47,14 +51,14 @@ try {
 
     // Cliente (obligatorio)
     if (isset($_POST['cliente']) && !empty($_POST['cliente'])) {
-        $cliente = intval($_POST['cliente']);
-        $updates[] = "cotiz_cliente = '".$cliente."'";
+        $clienteNuevo = intval($_POST['cliente']);
+        $updates[] = "cotiz_cliente = '".$clienteNuevo."'";
     }
 
     // Sucursal (obligatorio)
     if (isset($_POST['sucursal']) && !empty($_POST['sucursal'])) {
-        $sucursal = intval($_POST['sucursal']);
-        $updates[] = "cotiz_sucursal = '".$sucursal."'";
+        $sucursalNueva = intval($_POST['sucursal']);
+        $updates[] = "cotiz_sucursal = '".$sucursalNueva."'";
     }
 
     // Contacto (obligatorio)
@@ -120,11 +124,11 @@ try {
     // Ticket asociado
     if (isset($_POST['ticket']) && $_POST['ticket'] !== 'NO_TICKET') {
         if ($_POST['ticket'] === 'TICKET_AUTO') {
-            // Lógica para crear ticket automático (si es necesario)
+            // La creación automática de ticket no está implementada en el guardado asíncrono
             $updates[] = "cotiz_ticket = NULL";
         } else {
-            $ticket = intval($_POST['ticket']);
-            $updates[] = "cotiz_ticket = '".$ticket."'";
+            $ticketAsociadoId = intval($_POST['ticket']);
+            $updates[] = "cotiz_ticket = '".$ticketAsociadoId."'";
         }
     }
 
@@ -143,9 +147,35 @@ try {
         throw new Exception('Error al actualizar: ' . $conexionBdPrincipal->error);
     }
 
+    $filasCotizacion = $conexionBdPrincipal->affected_rows;
+
+    // Si se asoció un ticket existente, alinear también tik_id_cotizacion y cliente
+    if ($ticketAsociadoId !== null && $ticketAsociadoId > 0) {
+        $clienteTicket = $clienteNuevo !== null ? $clienteNuevo : intval($cotizacion['cotiz_cliente']);
+        $sucursalTicket = $sucursalNueva !== null ? $sucursalNueva : intval($cotizacion['cotiz_sucursal']);
+
+        $setSucursal = $sucursalTicket > 0 ? ", tik_sucursal = '".$sucursalTicket."'" : "";
+        $conexionBdPrincipal->query("
+            UPDATE clientes_tikets
+            SET tik_id_cotizacion = '".$cotizacionId."',
+                tik_cliente = '".$clienteTicket."'
+                ".$setSucursal."
+            WHERE tik_id = '".$ticketAsociadoId."'
+        ");
+    }
+
+    // Si cambió el cliente de la cotización, sincronizar el ticket vinculado
+    if ($clienteNuevo !== null && $clienteNuevo > 0) {
+        Ticket::sincronizarClienteDesdeCotizacion(
+            $cotizacionId,
+            $clienteNuevo,
+            $conexionBdPrincipal,
+            $sucursalNueva
+        );
+    }
+
     // Verificar si se actualizó algo
-    if ($conexionBdPrincipal->affected_rows === 0) {
-        // No es necesariamente un error, podría no haber cambios
+    if ($filasCotizacion === 0 && $ticketAsociadoId === null && $clienteNuevo === null) {
         echo json_encode([
             'success' => true,
             'message' => 'No se detectaron cambios',
@@ -165,7 +195,7 @@ try {
     echo json_encode([
         'success' => true,
         'message' => 'Cambios guardados exitosamente',
-        'affected_rows' => $conexionBdPrincipal->affected_rows,
+        'affected_rows' => $filasCotizacion,
         'ultima_modificacion' => $fecha['cotiz_ultima_modificacion']
     ]);
 
@@ -177,4 +207,3 @@ try {
     ]);
 }
 ?>
-

@@ -698,4 +698,212 @@ class Cliente extends BaseDatos {
         return $mapa;
     }
 
+    private static function construirWhereAnualListado(int $anio, int $idEmpresa, bool $excluirCiudadDesconocida): string {
+        $anio      = intval($anio);
+        $idEmpresa = intval($idEmpresa);
+        $where     = " AND cli.cli_id_empresa = '" . $idEmpresa . "'";
+        $where    .= " AND (cli.cli_papelera IS NULL OR cli.cli_papelera = 0)";
+        $where    .= " AND cli.cli_fecha_registro >= '" . $anio . "-01-01 00:00:00'";
+        $where    .= " AND cli.cli_fecha_registro <= '" . $anio . "-12-31 23:59:59'";
+
+        if ($excluirCiudadDesconocida) {
+            $where .= " AND cli.cli_ciudad != '1122'";
+        }
+
+        return $where;
+    }
+
+    private static function construirWhereCarteraActiva(int $idEmpresa, bool $excluirCiudadDesconocida): string {
+        $idEmpresa = intval($idEmpresa);
+        $where     = " AND cli.cli_id_empresa = '" . $idEmpresa . "'";
+        $where    .= " AND (cli.cli_papelera IS NULL OR cli.cli_papelera = 0)";
+
+        if ($excluirCiudadDesconocida) {
+            $where .= " AND cli.cli_ciudad != '1122'";
+        }
+
+        return $where;
+    }
+
+    private static function appendFiltrosVisibilidadAnalyticsWhere(
+        string $where,
+        int $usuarioId,
+        bool $restringirPorZona
+    ): string {
+        if (!$restringirPorZona) {
+            return $where;
+        }
+
+        $usuarioId = intval($usuarioId);
+        $where    .= " AND (
+            cli.cli_zona IN (
+                SELECT zpu_zona
+                FROM " . MAINBD . ".zonas_usuarios
+                WHERE zpu_usuario = '" . $usuarioId . "'
+            )
+            OR cli.cli_id IN (
+                SELECT cliu_cliente
+                FROM " . MAINBD . ".clientes_usuarios
+                WHERE cliu_usuario = '" . $usuarioId . "'
+            )
+        )";
+
+        return $where;
+    }
+
+    /**
+     * Estadísticas agregadas del año en curso para gráficos del listado de clientes.
+     */
+    public static function obtenerEstadisticasAnuales(
+        $conexionBdPrincipal,
+        int $anio,
+        int $idEmpresa,
+        int $usuarioId,
+        bool $restringirPorZona,
+        bool $excluirCiudadDesconocida
+    ): array {
+        $whereAnual = self::construirWhereAnualListado($anio, $idEmpresa, $excluirCiudadDesconocida);
+        $whereAnual = self::appendFiltrosVisibilidadAnalyticsWhere($whereAnual, $usuarioId, $restringirPorZona);
+
+        $whereCartera = self::construirWhereCarteraActiva($idEmpresa, $excluirCiudadDesconocida);
+        $whereCartera = self::appendFiltrosVisibilidadAnalyticsWhere($whereCartera, $usuarioId, $restringirPorZona);
+
+        $fromAnual = '
+            FROM ' . MAINBD . '.clientes cli
+            ' . self::sqlJoinsUbicacionListado() . '
+            WHERE 1=1 ' . $whereAnual;
+
+        $fromCartera = '
+            FROM ' . MAINBD . '.clientes cli
+            ' . self::sqlJoinsUbicacionListado() . '
+            WHERE 1=1 ' . $whereCartera;
+
+        $resumen = mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, "
+            SELECT
+                COUNT(DISTINCT cli.cli_id) AS total,
+                SUM(CASE WHEN cli.cli_categoria = 1 THEN 1 ELSE 0 END) AS prospectos,
+                SUM(CASE WHEN cli.cli_categoria = 2 THEN 1 ELSE 0 END) AS clientes,
+                SUM(CASE WHEN cli.cli_categoria = 3 THEN 1 ELSE 0 END) AS dealers,
+                SUM(CASE WHEN cli.cli_tipo_documento = 2 THEN 1 ELSE 0 END) AS nit,
+                SUM(CASE WHEN cli.cli_tipo_documento = 3 THEN 1 ELSE 0 END) AS cedula
+            " . $fromAnual)) ?: [];
+
+        $cartera = mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, "
+            SELECT
+                COUNT(DISTINCT cli.cli_id) AS total,
+                SUM(CASE WHEN cli.cli_categoria = 1 THEN 1 ELSE 0 END) AS prospectos,
+                SUM(CASE WHEN cli.cli_categoria = 2 THEN 1 ELSE 0 END) AS clientes,
+                SUM(CASE WHEN cli.cli_categoria = 3 THEN 1 ELSE 0 END) AS dealers
+            " . $fromCartera)) ?: [];
+
+        $porMesRegistro = array_fill(1, 12, 0);
+        $consultaMes = mysqli_query($conexionBdPrincipal, "
+            SELECT MONTH(cli.cli_fecha_registro) AS mes, COUNT(DISTINCT cli.cli_id) AS total
+            " . $fromAnual . "
+            GROUP BY MONTH(cli.cli_fecha_registro)
+        ");
+        while ($consultaMes && ($fila = mysqli_fetch_assoc($consultaMes))) {
+            $mes = intval($fila['mes']);
+            if ($mes >= 1 && $mes <= 12) {
+                $porMesRegistro[$mes] = intval($fila['total']);
+            }
+        }
+
+        $whereIngreso = $whereAnual . "
+            AND cli.cli_categoria = " . CLI_CATEGORIA_CLIENTE . "
+            AND cli.cli_fecha_ingreso >= '" . intval($anio) . "-01-01 00:00:00'
+            AND cli.cli_fecha_ingreso <= '" . intval($anio) . "-12-31 23:59:59'";
+        $fromIngreso = '
+            FROM ' . MAINBD . '.clientes cli
+            ' . self::sqlJoinsUbicacionListado() . '
+            WHERE 1=1 ' . $whereIngreso;
+
+        $porMesIngreso = array_fill(1, 12, 0);
+        $consultaIngreso = mysqli_query($conexionBdPrincipal, "
+            SELECT MONTH(cli.cli_fecha_ingreso) AS mes, COUNT(DISTINCT cli.cli_id) AS total
+            " . $fromIngreso . "
+            GROUP BY MONTH(cli.cli_fecha_ingreso)
+        ");
+        while ($consultaIngreso && ($fila = mysqli_fetch_assoc($consultaIngreso))) {
+            $mes = intval($fila['mes']);
+            if ($mes >= 1 && $mes <= 12) {
+                $porMesIngreso[$mes] = intval($fila['total']);
+            }
+        }
+
+        $nuevosClientesAnio = array_sum($porMesIngreso);
+
+        $porCategoria = [
+            ['label' => 'Prospecto', 'total' => intval($resumen['prospectos'] ?? 0)],
+            ['label' => 'Cliente', 'total' => intval($resumen['clientes'] ?? 0)],
+            ['label' => 'Dealer', 'total' => intval($resumen['dealers'] ?? 0)],
+        ];
+
+        $porTipoDocumento = [
+            ['label' => 'NIT', 'total' => intval($resumen['nit'] ?? 0)],
+            ['label' => 'Cédula', 'total' => intval($resumen['cedula'] ?? 0)],
+        ];
+
+        $porDepartamento = [];
+        $consultaDepto = mysqli_query($conexionBdPrincipal, "
+            SELECT dep.dep_nombre AS label, COUNT(DISTINCT cli.cli_id) AS total
+            " . $fromAnual . "
+            GROUP BY dep.dep_id, dep.dep_nombre
+            ORDER BY total DESC
+            LIMIT 10
+        ");
+        while ($consultaDepto && ($fila = mysqli_fetch_assoc($consultaDepto))) {
+            $porDepartamento[] = [
+                'label' => $fila['label'] ?? 'Sin departamento',
+                'total' => intval($fila['total']),
+            ];
+        }
+
+        $porEstadoMercadeo = [];
+        $labelsEstado = [
+            0 => 'Sin estado',
+            2 => 'Número equivocado',
+            5 => 'Actualizado',
+            6 => 'Papelera mercadeo',
+        ];
+        $consultaEstado = mysqli_query($conexionBdPrincipal, "
+            SELECT cli.cli_estado_mercadeo AS id, COUNT(DISTINCT cli.cli_id) AS total
+            " . $fromAnual . "
+            GROUP BY cli.cli_estado_mercadeo
+            ORDER BY total DESC
+        ");
+        while ($consultaEstado && ($fila = mysqli_fetch_assoc($consultaEstado))) {
+            $id = intval($fila['id']);
+            $porEstadoMercadeo[] = [
+                'label' => $labelsEstado[$id] ?? ('Estado ' . $id),
+                'total' => intval($fila['total']),
+            ];
+        }
+
+        $totalRegistrados = intval($resumen['total'] ?? 0);
+
+        return [
+            'anio'               => intval($anio),
+            'resumen'            => [
+                'registrados_anio'  => $totalRegistrados,
+                'nuevos_clientes'   => $nuevosClientesAnio,
+                'prospectos_anio'   => intval($resumen['prospectos'] ?? 0),
+                'clientes_anio'     => intval($resumen['clientes'] ?? 0),
+                'dealers_anio'      => intval($resumen['dealers'] ?? 0),
+            ],
+            'cartera'            => [
+                'total'      => intval($cartera['total'] ?? 0),
+                'prospectos' => intval($cartera['prospectos'] ?? 0),
+                'clientes'   => intval($cartera['clientes'] ?? 0),
+                'dealers'    => intval($cartera['dealers'] ?? 0),
+            ],
+            'por_mes_registro'   => array_values($porMesRegistro),
+            'por_mes_ingreso'    => array_values($porMesIngreso),
+            'por_categoria'      => $porCategoria,
+            'por_tipo_documento' => $porTipoDocumento,
+            'por_departamento'   => $porDepartamento,
+            'por_estado_mercadeo'=> $porEstadoMercadeo,
+        ];
+    }
+
 }

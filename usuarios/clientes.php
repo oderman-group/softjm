@@ -4,404 +4,396 @@ $idPagina = 9;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
 
-include(RUTA_PROYECTO."/usuarios/class/Cliente.php");
-
-$clienteConMasVenta = Cliente::obtenerDatosClienteConMasComprasAgnoActual($idEmpresa, $conexionBdPrincipal);
-$clientesNuevosEsteMes = Cliente::clientesNuevosEstesMes($idEmpresa, $conexionBdPrincipal);
-$conteoPorDepartamento = Cliente::conteoClientesPorDepartamento($idEmpresa, $conexionBdPrincipal, $conexionBdAdmin);
-$conteoPorGrupoDealer  = Cliente::conteoClientesPorGrupoDealer($idEmpresa, $conexionBdPrincipal);
+include(RUTA_PROYECTO . "/usuarios/class/Cliente.php");
+require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 ?>
-<!-- styles -->
-
-<link href="css/tablecloth.css" rel="stylesheet">
 <link href="css/crm-etiquetas.css" rel="stylesheet">
+<link href="css/clientes-listado.css" rel="stylesheet">
 
-<!--============j avascript===========-->
 <script src="js/jquery.js"></script>
-<script src="js/jquery-ui-1.10.1.custom.min.js"></script>
 <script src="js/bootstrap.js"></script>
-<script src="js/accordion.nav.js"></script>
-<script src="js/jquery.tablecloth.js"></script>
 <script src="js/jquery.dataTables.js"></script>
-<script src="js/ZeroClipboard.js"></script>
 <script src="js/dataTables.bootstrap.js"></script>
-<script src="js/TableTools.js"></script>
 <script src="js/custom.js"></script>
-<script src="js/respond.min.js"></script>
-<script src="js/ios-orientationchange-fix.js"></script>
-<script src="js/bootbox.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script type="text/javascript">
-	
-            $(function () {
-		$('#data-table').dataTable({
-			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-
-		});
-	});
-	$(function () {
-		$('.tbl-simple').dataTable({
-			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-		});
-	});
-
-	$(function () {
-		$(".tbl-paper-theme").tablecloth({
-			theme: "paper"
-		});
-	});
-
-	$(function () {
-		$(".tbl-dark-theme").tablecloth({
-			theme: "dark"
-		});
-	});
-	$(function () {
-		$('.tbl-paper-theme,.tbl-dark-theme').dataTable({
-			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-		});
-	});
-</script>
-
-<link rel="stylesheet" href="css/modal/jquery-ui.css">
-<!--<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
-<script>
-	$( function() {
-
-		var dialog, form,
-
-			// From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
-			emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
-			name = $( "#name" ),
-			email = $( "#email" ),
-			password = $( "#password" ),
-			allFields = $( [] ).add( name ).add( email ).add( password ),
-			tips = $( ".validateTips" );
-
-		function addUser() {
-
-			if ( valid ) {
-				$( "#users tbody" ).append( "<tr>" +
-					"<td>" + name.val() + "</td>" +
-					"<td>" + email.val() + "</td>" +
-					"<td>" + password.val() + "</td>" +
-					"</tr>" );
-				dialog.dialog( "close" );
-			}
-			return valid;
+	$(function() {
+		var $table = $('#data-table');
+		if (!$table.length || $table.find('tbody tr.clientes-empty-row').length) {
+			return;
 		}
 
-		dialog = $( "#dialog-form" ).dialog({
-			autoOpen: false,
-			height: 650,
-			width: 450,
-			modal: true,
-			buttons: {
-				Cancel: function() {
-					dialog.dialog( "close" );
-				}
-			},
-			close: function() {
-				form[ 0 ].reset();
-				allFields.removeClass( "ui-state-error" );
-			}
-		});
+		// Evita el alert modal de DataTables 1.9 ante filas inconsistentes.
+		if ($.fn.dataTableExt) {
+			$.fn.dataTableExt.sErrMode = 'mute';
+		}
 
-		form = dialog.find( "form" ).on( "submit", function( event ) {
-			event.preventDefault();
-			addUser();
+		$table.dataTable({
+			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t",
+			"bPaginate": false,
+			"bInfo": false,
+			"aaSorting": []
 		});
-
-		$( ".create-user" ).button().on( "click", function() {
-			dialog.dialog( "open" );
 	});
-} );
 </script>
 
-<?php include("includes/funciones-js.php");?>
+<?php include("includes/funciones-js.php"); ?>
 </head>
-<body>
 
+<body class="clientes-page">
+	<?php if (!empty($listadoPermisos['agregarCliente'])) {
+		include("includes/drawer-crear-cliente.php");
+	} ?>
 	<div class="layout">
-		<?php include("includes/encabezado.php");?>
+		<?php include("includes/encabezado.php"); ?>
 
 		<div class="main-wrapper">
-			<div class="container-fluid">
-				<?php include("includes/notificaciones.php");?>
+			<div class="container-fluid clientes-page-inner">
 
-				<div class="row-fluid">
-					<div class="span3">
-						<div class="board-widgets magenta">
-							<div class="board-widgets-head clearfix">
-								<h4 class="pull-left"><i class="icon-user"></i> Cliente con más compras este año </h4>
-							</div>
-							<div class="board-widgets-content">
-								<span class="n-counter"><?=$clienteConMasVenta['cantidad'];?></span><span class="n-sources">Compras</span>
-							</div>
-							<div class="board-widgets-botttom">
-								<a href="clientes-editar.php?id=<?=$clienteConMasVenta['factura_cliente'];?>" target="_blank"><?=$clienteConMasVenta['nombreCliente'];?><i class="icon-double-angle-right"></i></a>
-							</div>
-						</div>
+				<div class="clientes-hero">
+					<div>
+						<h1 class="clientes-hero-title"><?= htmlspecialchars($paginaActual['pag_nombre'] ?? 'Clientes'); ?></h1>
+						<p class="clientes-hero-subtitle">Gestión de cartera, prospectos y relaciones comerciales</p>
 					</div>
-
-					<div class="span3">
-						<div class="board-widgets green">
-							<div class="board-widgets-head clearfix">
-								<h4 class="pull-left"><i class="icon-star"></i> Cliente nuevos este mes </h4>
-							</div>
-							<div class="board-widgets-content">
-								<span class="n-counter"><?=$clientesNuevosEsteMes;?></span><span class="n-sources">Nuevos</span>
-							</div>
-							<div class="board-widgets-botttom">
-								<a href="clientes.php?clientesNuevos=1">Ver clientes recientes</a>
-							</div>
-						</div>
+					<div class="clientes-hero-actions">
+						<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
+						<?php if ($listadoPermisos['agregarCliente']) { ?>
+							<a href="clientes-agregar.php" class="btn btn-success js-abrir-crear-cliente" aria-haspopup="dialog"><i class="icon-plus"></i> Agregar cliente</a>
+						<?php } ?>
+						<?php if ($listadoPermisos['importarClientes']) { ?>
+							<a href="clientes-importar.php" class="btn btn-info"><i class="icon-upload"></i> Importar</a>
+						<?php } ?>
 					</div>
 				</div>
 
-				<!-- Filtros de Fechas -->
-				<div class="row-fluid" style="margin-top: 20px;">
-					<div class="span12">
-						<div class="content-widgets light-gray">
-							<div class="widget-head green" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border-radius: 10px; cursor: pointer;" data-toggle="collapse" data-target="#filtersCollapse">
-								<h3 style="text-align: center; margin: 0; padding: 10px;"><i class="icon-filter"></i> Filtros de Fechas <i class="icon-chevron-down pull-right"></i></h3>
-							</div>
-							<div class="widget-container">
-								<div id="filtersCollapse" class="in collapse" style="padding: 20px; background: #f8f9fa; border: 2px solid #007bff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-top: none; border-top-left-radius: 0; border-top-right-radius: 0;">
-								<form method="GET" action="" class="form-horizontal">
-									<?php if(isset($_GET["dpto"])) { ?><input type="hidden" name="dpto" value="<?=$_GET["dpto"];?>"><?php } ?>
-									<?php if(isset($_GET["tipoDoc"])) { ?><input type="hidden" name="tipoDoc" value="<?=$_GET["tipoDoc"];?>"><?php } ?>
-									<?php if(isset($_GET["categoria"])) { ?><input type="hidden" name="categoria" value="<?=$_GET["categoria"];?>"><?php } ?>
-									<?php if(isset($_GET["grupo"])) { ?><input type="hidden" name="grupo" value="<?=$_GET["grupo"];?>"><?php } ?>
-									<div class="control-group">
-										<div class="span3">
-											<label class="control-label" style="font-weight: bold;">Fecha Creación Inicio: <?php if(isset($_GET["fecha_registro_inicio"]) && $_GET["fecha_registro_inicio"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_registro_inicio' => ''])) ?>" style="color:red; font-weight: bold;">x</a><?php } ?></label>
-											<div class="controls">
-												<input type="date" name="fecha_registro_inicio" value="<?= isset($_GET["fecha_registro_inicio"]) ? $_GET["fecha_registro_inicio"] : ""; ?>" class="form-control" style="width: 100%;">
-											</div>
-										</div>
-										<div class="span3">
-											<label class="control-label" style="font-weight: bold;">Fecha Creación Fin: <?php if(isset($_GET["fecha_registro_fin"]) && $_GET["fecha_registro_fin"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_registro_fin' => ''])) ?>" style="color:red; font-weight: bold;">x</a><?php } ?></label>
-											<div class="controls">
-												<input type="date" name="fecha_registro_fin" value="<?= isset($_GET["fecha_registro_fin"]) ? $_GET["fecha_registro_fin"] : ""; ?>" class="form-control" style="width: 100%;">
-											</div>
-										</div>
-										<div class="span3">
-											<label class="control-label" style="font-weight: bold;">Fecha Cliente Inicio: <?php if(isset($_GET["fecha_ingreso_inicio"]) && $_GET["fecha_ingreso_inicio"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_ingreso_inicio' => ''])) ?>" style="color:red; font-weight: bold;">x</a><?php } ?></label>
-											<div class="controls">
-												<input type="date" name="fecha_ingreso_inicio" value="<?= isset($_GET["fecha_ingreso_inicio"]) ? $_GET["fecha_ingreso_inicio"] : ""; ?>" class="form-control" style="width: 100%;">
-											</div>
-										</div>
-										<div class="span3">
-											<label class="control-label" style="font-weight: bold;">Fecha Cliente Fin: <?php if(isset($_GET["fecha_ingreso_fin"]) && $_GET["fecha_ingreso_fin"]!="") { ?><a href="?<?= http_build_query(array_diff_key($_GET, ['fecha_ingreso_fin' => ''])) ?>" style="color:red; font-weight: bold;">x</a><?php } ?></label>
-											<div class="controls">
-												<input type="date" name="fecha_ingreso_fin" value="<?= isset($_GET["fecha_ingreso_fin"]) ? $_GET["fecha_ingreso_fin"] : ""; ?>" class="form-control" style="width: 100%;">
-											</div>
-										</div>
-									</div>
-									<div class="form-actions" style="text-align: center; margin-top: 20px;">
-										<button type="submit" class="btn btn-success btn-large"><i class="icon-search"></i> Filtrar</button>
-										<a href="?<?= http_build_query(array_intersect_key($_GET, array_flip(['dpto','tipoDoc','categoria','grupo']))) ?>" class="btn btn-warning btn-large"><i class="icon-refresh"></i> Limpiar Todos</a>
-									</div>
-								</form>
+				<?php
+				$clientesKpiTotal = intval($clientesCartera['total'] ?? 0);
+				$clientesKpiRegistrados = intval($clientesResumenAnual['registrados_anio'] ?? 0);
+				$clientesKpiConvertidos = intval($clientesResumenAnual['nuevos_clientes'] ?? 0);
+				?>
+				<section class="clientes-collapsible is-collapsed" data-collapsible="kpi" aria-labelledby="clientes-kpi-toggle">
+					<button type="button" class="clientes-collapsible-toggle" id="clientes-kpi-toggle" aria-expanded="false" aria-controls="clientes-kpi-body">
+						<span class="clientes-collapsible-heading">
+							<span class="clientes-collapsible-title">Indicadores de cartera</span>
+							<span class="clientes-collapsible-summary">
+								<?= $clientesKpiTotal; ?> activos · <?= $clientesKpiRegistrados; ?> registrados · <?= $clientesKpiConvertidos; ?> convertidos
+							</span>
+						</span>
+						<i class="icon-chevron-down clientes-collapsible-icon" aria-hidden="true"></i>
+					</button>
+					<div class="clientes-collapsible-body" id="clientes-kpi-body" hidden>
+						<div class="clientes-kpi-grid">
+							<div class="clientes-kpi-card is-primary">
+								<div class="clientes-kpi-label">Cartera activa</div>
+								<div class="clientes-kpi-value"><?= $clientesKpiTotal; ?></div>
+								<div class="clientes-kpi-hint">
+									<?= intval($clientesCartera['clientes'] ?? 0); ?> clientes ·
+									<?= intval($clientesCartera['prospectos'] ?? 0); ?> prospectos
 								</div>
 							</div>
+							<div class="clientes-kpi-card is-success">
+								<div class="clientes-kpi-label">Registrados <?= $clientesAnioActual; ?></div>
+								<div class="clientes-kpi-value"><?= $clientesKpiRegistrados; ?></div>
+								<div class="clientes-kpi-hint">Nuevos registros en el año</div>
+							</div>
+							<div class="clientes-kpi-card is-warning">
+								<div class="clientes-kpi-label">Nuevos clientes</div>
+								<div class="clientes-kpi-value"><?= intval($clientesNuevosEsteMes); ?></div>
+								<div class="clientes-kpi-hint">
+									<a href="clientes.php?clientesNuevos=1">Este mes · ver listado</a>
+								</div>
+							</div>
+							<div class="clientes-kpi-card is-info">
+								<div class="clientes-kpi-label">Top compras <?= $clientesAnioActual; ?></div>
+								<div class="clientes-kpi-value"><?= intval($clienteConMasVenta['cantidad'] ?? 0); ?></div>
+								<div class="clientes-kpi-hint">
+									<?php if (!empty($clienteConMasVenta['factura_cliente'])) { ?>
+										<a href="clientes-editar.php?id=<?= intval($clienteConMasVenta['factura_cliente']); ?>" target="_blank">
+											<?= htmlspecialchars($clienteConMasVenta['nombreCliente'] ?? 'Sin datos'); ?>
+										</a>
+									<?php } else { ?>
+										Sin datos de facturación
+									<?php } ?>
+								</div>
+							</div>
+							<div class="clientes-kpi-card is-danger">
+								<div class="clientes-kpi-label">Convertidos <?= $clientesAnioActual; ?></div>
+								<div class="clientes-kpi-value"><?= $clientesKpiConvertidos; ?></div>
+								<div class="clientes-kpi-hint">Por fecha de ingreso como cliente</div>
+							</div>
 						</div>
 					</div>
-				</div>
+				</section>
 
-				<div class="row-fluid">
-					<div class="span12">
-						<div class="navbar">
-							<div class="navbar-inner">
-								<div class="container">
-									<div class="nav-collapse collapse navbar-responsive-collapse">
-										<ul class="nav">
-											<li><a href="clientes.php"><i class="icon-group"></i> Todos los clientes</a></li>
-											<li><a href="javascript:history.go(-1);"><i class="icon-arrow-left"></i> Regresar</a></li>
-											<li>
-												<?php if (Modulos::validarRol([10], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-													<a href="clientes-agregar.php"><i class="icon-plus"></i> Agregar nuevo</a>
-												<?php } ?>
-											</li>
-											<li>
-												<?php if (Modulos::validarRol([252], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-													<a href="clientes-importar.php"><i class="icon-upload"></i> Cargar masivamente</a>
-												<?php } ?>
-											</li>
-											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Más opciones <b class="caret"></b></a>
-												<ul class="dropdown-menu">
-													<?php if (Modulos::validarRol([103], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-														<li><a href="clientes-filtro.php">Imprimir informe</a></li>
-													<?php } ?>
-													<?php if (Modulos::validarRol([264], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-														<li><a href="excel_exportar/clientes-exportar.php?dpto=<?php if(isset($_GET["dpto"])) echo $_GET["dpto"];?>" target="_blank">Exportar a Excel</a></li>
-													<?php } ?>
-													<?php if (Modulos::validarRol([57], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-														<li><a href="bd_update/clientes-actualizar-claves.php" onClick="if(!confirm('Desea ejecutar esta accion?')){return false;}">Cambiar todas las claves</a></li>
-													<?php } ?>
-													<?php if (Modulos::validarRol([2], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-														<li><a href="clientes.php?pap=1">Ver clientes en papelera</a></li>
-													<?php } ?>
-												</ul>
-											</li>
-										</ul>
+				<?php include("includes/notificaciones.php"); ?>
 
-										<form action="#<?=$_SERVER['PHP_SELF'];?>" method="get" class="navbar-search pull-left">
-											<div class="input-append input-icon">	
-												<input type="text" name="busqueda" placeholder="Buscar..." id="btn_buscar" class="search-query span12" value="<?php if(isset($_GET["buscar"])) echo $_GET["buscar"]; ?>">
-												<input class="btn" id="btnSubmitBuscar" type="button" value="Buscar">
+				<div class="clientes-layout">
+					<aside class="clientes-sidebar">
+						<div class="clientes-sidebar-header">
+							<h4>Departamentos</h4>
+						</div>
+						<div class="clientes-sidebar-body">
+							<?php
+							$dptoActivo = isset($_GET['dpto']) ? intval($_GET['dpto']) : 0;
+							$totalTodos = array_sum($conteoPorDepartamento);
+							?>
+							<a href="clientes.php?<?= http_build_query(array_diff_key($filtrosGetPreservados, ['dpto' => ''])); ?>"
+							   class="clientes-depto-link<?= $dptoActivo === 0 ? ' is-active' : ''; ?>">
+								<span>Todos</span>
+								<span class="clientes-depto-count"><?= intval($totalTodos); ?></span>
+							</a>
+							<?php foreach ($departamentosListado as $depto) {
+								$idDepto = intval($depto['dep_id']);
+								$paramsDepto = $filtrosGetPreservados;
+								$paramsDepto['dpto'] = $idDepto;
+								?>
+								<a href="clientes.php?<?= http_build_query($paramsDepto); ?>"
+								   class="clientes-depto-link<?= $dptoActivo === $idDepto ? ' is-active' : ''; ?>">
+									<span><?= htmlspecialchars($depto['dep_nombre']); ?></span>
+									<span class="clientes-depto-count"><?= intval($conteoPorDepartamento[$idDepto] ?? 0); ?></span>
+								</a>
+							<?php } ?>
+						</div>
+					</aside>
+
+					<div>
+						<div class="clientes-panel">
+							<div class="clientes-panel-header">
+								<div>
+									<h3>Listado de clientes</h3>
+									<p>Consulte, filtre y acceda al detalle de cada registro</p>
+								</div>
+								<div class="clientes-panel-toolbar">
+									<?php if ($listadoPermisos['imprimirInforme']) { ?>
+										<a href="clientes-filtro.php" class="clientes-toolbar-btn"><i class="icon-print"></i> Informe</a>
+									<?php } ?>
+									<?php if ($listadoPermisos['exportarExcel']) { ?>
+										<a href="excel_exportar/clientes-exportar.php?dpto=<?= isset($_GET['dpto']) ? intval($_GET['dpto']) : ''; ?>" target="_blank" class="clientes-toolbar-btn"><i class="icon-download"></i> Excel</a>
+									<?php } ?>
+									<?php if ($listadoPermisos['verPapelera']) { ?>
+										<a href="clientes.php?pap=1" class="clientes-toolbar-btn"><i class="icon-trash"></i> Papelera</a>
+									<?php } ?>
+									<?php if ($listadoPermisos['cambiarClaves']) { ?>
+										<a href="bd_update/clientes-actualizar-claves.php" class="clientes-toolbar-btn" onclick="return confirm('¿Desea ejecutar esta acción?');"><i class="icon-key"></i> Claves</a>
+									<?php } ?>
+								</div>
+							</div>
+							<div class="clientes-panel-body">
+
+								<div class="clientes-chips-row">
+									<?php
+									$paramsTodos = array_diff_key($filtrosGetPreservados, ['categoria' => '', 'tipoDoc' => '', 'grupo' => '']);
+									$categoriaActiva = isset($_GET['categoria']) ? intval($_GET['categoria']) : 0;
+									$tipoDocActivo   = isset($_GET['tipoDoc']) ? intval($_GET['tipoDoc']) : 0;
+									$grupoActivo     = isset($_GET['grupo']) ? intval($_GET['grupo']) : 0;
+									?>
+									<div class="clientes-chips">
+										<a href="clientes.php?<?= http_build_query($paramsTodos); ?>" class="clientes-chip<?= $categoriaActiva === 0 && $tipoDocActivo === 0 && $grupoActivo === 0 ? ' is-active' : ''; ?>">Todos</a>
+										<?php
+										$categoriasChip = [1 => 'Prospecto', 2 => 'Cliente', 3 => 'Dealer'];
+										foreach ($categoriasChip as $catId => $catLabel) {
+											$paramsCat = $filtrosGetPreservados;
+											$paramsCat['categoria'] = $catId;
+											?>
+											<a href="clientes.php?<?= http_build_query($paramsCat); ?>" class="clientes-chip<?= $categoriaActiva === $catId ? ' is-active' : ''; ?>"><?= $catLabel; ?></a>
+										<?php } ?>
+										<a href="clientes.php?<?= http_build_query(array_merge($filtrosGetPreservados, ['tipoDoc' => 2])); ?>" class="clientes-chip<?= $tipoDocActivo === 2 ? ' is-active' : ''; ?>">NIT</a>
+										<a href="clientes.php?<?= http_build_query(array_merge($filtrosGetPreservados, ['tipoDoc' => 3])); ?>" class="clientes-chip<?= $tipoDocActivo === 3 ? ' is-active' : ''; ?>">Cédula</a>
+									</div>
+									<div class="clientes-grupo-select">
+										<label for="filtroGrupoCliente">Grupo</label>
+										<select id="filtroGrupoCliente" name="grupo">
+											<option value="">Todos los grupos</option>
+											<?php foreach ($gruposDealerListado as $grupo) {
+												$idGrupo = intval($grupo['deal_id']);
+												$conteoGrupo = intval($conteoPorGrupoDealer[$idGrupo] ?? 0);
+												?>
+												<option value="<?= $idGrupo; ?>"<?= $grupoActivo === $idGrupo ? ' selected' : ''; ?>>
+													<?= htmlspecialchars($grupo['deal_nombre']); ?> (<?= $conteoGrupo; ?>)
+												</option>
+											<?php } ?>
+										</select>
+									</div>
+								</div>
+
+								<?php
+								$clientesFiltrosCampos = ['buscar', 'fecha_registro_inicio', 'fecha_registro_fin', 'fecha_ingreso_inicio', 'fecha_ingreso_fin'];
+								$clientesFiltrosActivos = 0;
+								foreach ($clientesFiltrosCampos as $campoFiltro) {
+									if (isset($_GET[$campoFiltro]) && $_GET[$campoFiltro] !== '') {
+										$clientesFiltrosActivos++;
+									}
+								}
+								?>
+								<div class="clientes-filtros-panel clientes-collapsible is-collapsed" data-collapsible="filtros">
+									<button type="button" class="clientes-collapsible-toggle" id="clientes-filtros-toggle" aria-expanded="false" aria-controls="clientes-filtros-body">
+										<span class="clientes-collapsible-heading">
+											<span class="clientes-collapsible-title">Filtros de búsqueda</span>
+											<?php if ($clientesFiltrosActivos > 0) { ?>
+												<span class="clientes-collapsible-badge"><?= $clientesFiltrosActivos; ?> activo<?= $clientesFiltrosActivos === 1 ? '' : 's'; ?></span>
+											<?php } else { ?>
+												<span class="clientes-collapsible-summary">Buscar por nombre, documento o fechas</span>
+											<?php } ?>
+										</span>
+										<i class="icon-chevron-down clientes-collapsible-icon" aria-hidden="true"></i>
+									</button>
+									<div class="clientes-collapsible-body" id="clientes-filtros-body" hidden>
+										<form method="GET" action="">
+											<?php foreach ($filtrosGetPreservados as $clave => $valor) {
+												if (in_array($clave, ['fecha_registro_inicio', 'fecha_registro_fin', 'fecha_ingreso_inicio', 'fecha_ingreso_fin'], true)) {
+													continue;
+												}
+												?>
+												<input type="hidden" name="<?= htmlspecialchars($clave); ?>" value="<?= htmlspecialchars((string) $valor); ?>">
+											<?php } ?>
+											<div class="filtros-grid">
+												<div class="filtro-item filtro-item--full">
+													<label>Buscar <?php if (!empty($_GET['buscar'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['buscar' => ''])); ?>">× quitar</a><?php } ?></label>
+													<input type="text" name="buscar" id="btn_buscar" value="<?= isset($_GET['buscar']) ? htmlspecialchars($_GET['buscar']) : ''; ?>" placeholder="Nombre o documento del cliente...">
+												</div>
+												<div class="filtro-item">
+													<label>Creación inicio <?php if (!empty($_GET['fecha_registro_inicio'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_registro_inicio' => ''])); ?>">×</a><?php } ?></label>
+													<input type="date" name="fecha_registro_inicio" value="<?= isset($_GET['fecha_registro_inicio']) ? htmlspecialchars($_GET['fecha_registro_inicio']) : ''; ?>">
+												</div>
+												<div class="filtro-item">
+													<label>Creación fin <?php if (!empty($_GET['fecha_registro_fin'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_registro_fin' => ''])); ?>">×</a><?php } ?></label>
+													<input type="date" name="fecha_registro_fin" value="<?= isset($_GET['fecha_registro_fin']) ? htmlspecialchars($_GET['fecha_registro_fin']) : ''; ?>">
+												</div>
+												<div class="filtro-item">
+													<label>Ingreso cliente inicio <?php if (!empty($_GET['fecha_ingreso_inicio'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_ingreso_inicio' => ''])); ?>">×</a><?php } ?></label>
+													<input type="date" name="fecha_ingreso_inicio" value="<?= isset($_GET['fecha_ingreso_inicio']) ? htmlspecialchars($_GET['fecha_ingreso_inicio']) : ''; ?>">
+												</div>
+												<div class="filtro-item">
+													<label>Ingreso cliente fin <?php if (!empty($_GET['fecha_ingreso_fin'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_ingreso_fin' => ''])); ?>">×</a><?php } ?></label>
+													<input type="date" name="fecha_ingreso_fin" value="<?= isset($_GET['fecha_ingreso_fin']) ? htmlspecialchars($_GET['fecha_ingreso_fin']) : ''; ?>">
+												</div>
+											</div>
+											<div class="clientes-filtros-acciones">
+												<button type="submit" class="clientes-btn-primary"><i class="icon-search"></i> Filtrar</button>
+												<a href="clientes.php" class="clientes-btn-secondary">Limpiar filtros</a>
+												<button type="button" class="clientes-btn-primary" id="btnSubmitBuscar"><i class="icon-search"></i> Buscar en vivo</button>
 											</div>
 										</form>
-
-										<ul class="nav pull-right">
-											<li class="divider-vertical"></li>
-											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Grupos <b class="caret"></b></a>
-												<ul class="dropdown-menu">
-													<li><a href="clientes.php">Todos</a></li>
-													<?php
-													$grupos = $conexionBdPrincipal->query("SELECT deal_id, deal_nombre FROM dealer WHERE deal_id_empresa='".$idEmpresa."' ORDER BY deal_nombre");
-													while($grupo = mysqli_fetch_array($grupos, MYSQLI_BOTH)){
-														
-														$color = 'white';
-														if(isset($_GET["grupo"])){
-															if($grupo[0]==$_GET["grupo"]) $color = 'black' ;
-														}
-
-														$contarClientesGrupo = $conteoPorGrupoDealer[intval($grupo[0])] ?? 0;
-													?>
-													<li><a href="clientes.php?grupo=<?=$grupo[0];?>" style="color:<?=$color;?>"><?=$grupo['deal_nombre']." (".$contarClientesGrupo.")";?></a></li>
-													<?php }?>
-												</ul>
-											</li>
-											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Tipo documento <b class="caret"></b></a>
-												<ul class="dropdown-menu">
-													<li><a href="clientes.php">Todos</a></li>
-													<li><a href="clientes.php?tipoDoc=2&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">NIT</a></li>
-													<li><a href="clientes.php?tipoDoc=3&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Cédula</a></li>
-												</ul>
-											</li>
-											<li class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">Categoría <b class="caret"></b></a>
-												<ul class="dropdown-menu">
-													<li><a href="clientes.php">Todos</a></li>
-													<li><a href="clientes.php?categoria=1&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Prospecto</a></li>
-													<li><a href="clientes.php?categoria=2&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Cliente</a></li>
-													<li><a href="clientes.php?categoria=3&grupo=<?php if(isset($_GET["grupo"])) echo $_GET["grupo"];?>">Dealer</a></li>
-												</ul>
-											</li>
-										</ul>
 									</div>
-									<!-- /.nav-collapse -->
+								</div>
+
+								<div class="clientes-pagination">
+									<?php include("includes/clientes-listado-filtros.php"); ?>
+									<?php include("includes/paginacion.php"); ?>
+								</div>
+								<p class="clientes-leyenda">TK = Tickets · SG = Seguimientos · SC = Sucursales · CT = Contactos · FC = Facturas · RM = Remisiones</p>
+
+								<div class="clientes-table-wrap">
+									<table class="clientes-table" id="data-table">
+										<thead>
+											<tr>
+												<th>No</th>
+												<th>Ubicación</th>
+												<th>Información</th>
+												<th>TK</th>
+												<th>SG</th>
+												<th>SC</th>
+												<th>CT</th>
+												<th>FC</th>
+												<th>RM</th>
+											</tr>
+										</thead>
+										<tbody id="clientes_buscar">
+										<?php
+										include("includes/clientes-listado-cargar.php");
+										include("includes/clientes-listado-render-filas.php");
+										?>
+										</tbody>
+									</table>
 								</div>
 							</div>
-							<!-- /navbar-inner -->
 						</div>
 					</div>
 				</div>
 
-				<div class="row-fluid">
+				<?php include __DIR__ . '/includes/clientes-listado-analytics.php'; ?>
 
-					<div class="span2">
-						<div class="content-widgets light-gray">
-							<div class="widget-head green">
-								<h5 align="center" style="color:white;">DEPARTAMENTOS</h5>
-							</div>
-
-							<div class="widget-container">
-								<a href="clientes.php" style="margin-bottom:10px;">TODOS</a><br>
-								<?php
-                if(Modulos::validarRol([387], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
-					$departamentos = $conexionBdAdmin->query("SELECT * FROM localidad_departamentos ORDER BY dep_nombre");
-				}else{
-					$departamentos = $conexionBdAdmin->query("SELECT * FROM ".BDADMIN.".localidad_departamentos
-					INNER JOIN ".MAINBD.".zonas_usuarios ON zpu_usuario='".$_SESSION["id"]."' AND zpu_zona=dep_id
-					ORDER BY dep_nombre");
-				}
-                while($deptos = mysqli_fetch_array($departamentos, MYSQLI_BOTH)){
-                    
-					$color = 'blue';
-					if(isset($_GET["dpto"])){
-						if($deptos[0]==$_GET["dpto"]) $color = 'green' ;
-					}
-
-					$contarClientes = $conteoPorDepartamento[intval($deptos[0])] ?? 0;
-                ?>
-					<a href="clientes.php?dpto=<?=$deptos[0];?>" style="margin-bottom:10px; color:<?=$color;?>"><?=$deptos[1]." (".$contarClientes.")";?></a><br>
-					
-                <?php }?>
-							</div>
-						</div>
-					</div>
-
-					<div class="span10">
-						<div class="content-widgets light-gray">
-							<div class="widget-head green">
-								<h3><?=$paginaActual['pag_nombre'];?></h3>
-							</div>
-							<?php include("includes/clientes-listado-filtros.php"); ?>
-
-							<div class="widget-container">
-								<div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
-									<p style="margin: 10px;"><?php include("includes/paginacion.php");?></p>
-									<p style="font-size: 11px; text-align:center; margin-top:40px;">
-										TK = Tickets | SG = Seguimientos | SC = Sucursales | CT = Contactos | FC = Facturas | RM = Remisiones
-									</p>
-								</div>
-								<table class="table table-striped table-bordered">
-									<thead>
-										<tr>
-											<th>No</th>
-											<th>Ciudad, Departamento(Ind.)</th>
-											<th>Información</th>
-											<th>TK</th>
-											<th>SG</th>
-											<th>SC</th>
-											<th>CT</th>
-											<th>FC</th>
-											<th>RM</th>
-										</tr>
-									</thead>
-									<tbody id="clientes_buscar">
-									<?php
-									include("includes/clientes-listado-cargar.php");
-									include("includes/clientes-listado-render-filas.php");
-									?>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
 			</div>
 		</div>
-		<script>
-			btnSubmitBuscar.addEventListener('click',function(event){buscar()});
-			function buscar(){
+	</div>
+
+	<script>
+		(function () {
+			function toggleCollapsible(section) {
+				var toggle = section.querySelector('.clientes-collapsible-toggle');
+				var body = section.querySelector('.clientes-collapsible-body');
+				if (!toggle || !body) return;
+
+				var willExpand = section.classList.contains('is-collapsed');
+				section.classList.toggle('is-collapsed', !willExpand);
+				toggle.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
+				if (willExpand) {
+					body.removeAttribute('hidden');
+					if (section.id === 'clientesAnalytics' && typeof window.initClientesAnalyticsCharts === 'function') {
+						window.initClientesAnalyticsCharts();
+					}
+				} else {
+					body.setAttribute('hidden', '');
+				}
+			}
+
+			document.querySelectorAll('.clientes-collapsible').forEach(function (section) {
+				var toggle = section.querySelector('.clientes-collapsible-toggle');
+				if (!toggle) return;
+				toggle.addEventListener('click', function () {
+					toggleCollapsible(section);
+				});
+			});
+
+			var grupoSelect = document.getElementById('filtroGrupoCliente');
+			if (grupoSelect) {
+				grupoSelect.addEventListener('change', function () {
+					var params = new URLSearchParams(window.location.search);
+					if (this.value) {
+						params.set('grupo', this.value);
+					} else {
+						params.delete('grupo');
+					}
+					params.delete('inicio');
+					var query = params.toString();
+					window.location.href = 'clientes.php' + (query ? '?' + query : '');
+				});
+			}
+
+			var btnBuscar = document.getElementById('btnSubmitBuscar');
+			var inputBuscar = document.getElementById('btn_buscar');
+			if (btnBuscar) {
+				btnBuscar.addEventListener('click', buscar);
+			}
+			if (inputBuscar) {
+				inputBuscar.addEventListener('keydown', function (event) {
+					if (event.key === 'Enter') {
+						event.preventDefault();
+						buscar();
+					}
+				});
+			}
+
+			function buscar() {
 				var valor = document.getElementById('btn_buscar').value;
 				var tbody = document.getElementById('clientes_buscar');
-				tbody.innerHTML='';
+				tbody.innerHTML = '';
 
 				var params = new URLSearchParams(window.location.search);
 				params.set('buscar', valor);
 				params.set('inicio', '<?= isset($_GET["inicio"]) ? intval($_GET["inicio"]) : 1 ?>');
-				params.set('limite', '<?= intval($limite) ?>');
+				params.set('limite', '<?= intval($limite ?? ($configuracion['conf_paginacion'] ?? 50)) ?>');
 
-				fetch('fetch-buscar-clientes.php?' + params.toString(), {
-					method: 'GET'
-				})
-				.then(response => response.text())
-				.then(data => {
-					tbody.innerHTML=data;
-				})
-				.catch(error => {
-					console.error('Error:', error);
-				});						
+				fetch('fetch-buscar-clientes.php?' + params.toString(), { method: 'GET' })
+					.then(function (response) { return response.text(); })
+					.then(function (data) { tbody.innerHTML = data; })
+					.catch(function (error) { console.error('Error:', error); });
 			}
-		</script>
-	</div>
+		})();
+	</script>
 
-	<?php include("includes/pie.php"); ?>
 	<?php include("includes/drawer-notas-internas-cliente.php"); ?>
-	</div>
-
+	<script src="js/clientes-listado-charts.js"></script>
+	<?php include("includes/pie.php"); ?>
 </body>
 </html>

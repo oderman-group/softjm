@@ -41,6 +41,8 @@ $idInsert = mysqli_insert_id($conexionBdPrincipal);
 if ($_POST["ticket"] != 'NO_TICKET') {
     mysqli_query($conexionBdPrincipal,"UPDATE clientes_tikets 
     SET tik_id_cotizacion = ".$idInsert.",
+    tik_cliente = '".intval($_POST["cliente"])."',
+    tik_sucursal = '".intval($_POST["sucursal"])."',
     tik_asunto_principal = 'COTIZACIÓN Nro. ".$idInsert." (Ticket creado de forma automática)' 
     WHERE tik_id=".$ticketId);
 }
