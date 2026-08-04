@@ -197,17 +197,17 @@ $html = '
 					$infoComboProductos .= "<br><b>INCLUYE:</b><ul>";
 				}
 
-				$infoComboProductos .= "<li>" . $prodCombo['prod_nombre'] . " (" . $prodCombo['copp_cantidad'] . " Unds). </li>";
+				$infoComboProductos .= "<li>" . formatearTextoHtmlPdf($prodCombo['prod_nombre']) . " (" . $prodCombo['copp_cantidad'] . " Unds). </li>";
 
 				$c++;
 			}
 
 			$infoComboProductos .= "</ul>";
 
-			$descripcionCombo = $prod['combo_nombre'].'<br>'.$infoComboDescuento.'
-				<span style="font-size: 9px; color: darkblue;">'.$prod['combo_descripcion'].'</span><br>
+			$descripcionCombo = formatearTextoHtmlPdf($prod['combo_nombre']).'<br>'.$infoComboDescuento.'
+				<span style="font-size: 9px; color: darkblue;">'.formatearTextoHtmlPdf($prod['combo_descripcion']).'</span><br>
 				<span style="font-size: 5px; color: teal;">'.$infoComboProductos.'</span><br>
-				<span style="font-size: 9px; color: darkblue;">'.$prod['czpp_observacion'].'</span>
+				<span style="font-size: 9px; color: darkblue;">'.formatearTextoHtmlPdf($prod['czpp_observacion']).'</span>
 			';
 
 			$html .= '
@@ -236,15 +236,15 @@ $html = '
 
 			$descripcionComboCorta = '';
 			if(isset($prod['prod_descripcion_corta']) && $prod['prod_descripcion_corta'] !=''){
-				$descripcionComboCorta = '<br><span style="font-size: 9px; color: #0033a0;">'.$prod['prod_descripcion_corta'].'</span>';
+				$descripcionComboCorta = '<br><span style="font-size: 9px; color: #0033a0;">'.formatearTextoHtmlPdf($prod['prod_descripcion_corta']).'</span>';
 			}
 
 			$descripcionComboObservacion = "";
 			if(isset($prod['czpp_observacion']) && $prod['czpp_observacion'] !=''){
-				$descripcionComboObservacion = '<br><span style="font-size: 9px; color: #0033a0;">'.$prod['czpp_observacion'].'</span>';
+				$descripcionComboObservacion = '<br><span style="font-size: 9px; color: #0033a0;">'.formatearTextoHtmlPdf($prod['czpp_observacion']).'</span>';
 			}
 
-			$descripcionCombo = $prod['prod_nombre'].$descripcionComboCorta.$descripcionComboObservacion;
+			$descripcionCombo = formatearTextoHtmlPdf($prod['prod_nombre']).$descripcionComboCorta.$descripcionComboObservacion;
 
 			$html .= '
 			<tr>
@@ -271,10 +271,10 @@ $html = '
 
 			$descripcionComboObservacion = '';
 			if(isset($prod['czpp_observacion']) && $prod['czpp_observacion'] !=''){
-				$descripcionComboObservacion = '<br><span style="font-size: 9px; color: #0033a0;">'.$prod['czpp_observacion'].'</span><br>';
+				$descripcionComboObservacion = '<br><span style="font-size: 9px; color: #0033a0;">'.formatearTextoHtmlPdf($prod['czpp_observacion']).'</span><br>';
 			}
 
-			$descripcionCombo = $prod['serv_nombre'].$descripcionComboObservacion;
+			$descripcionCombo = formatearTextoHtmlPdf($prod['serv_nombre']).$descripcionComboObservacion;
 
 			$html .= '
 			<tr>
@@ -313,7 +313,7 @@ $html = '
             <tr style="line-height:8px">
                 <th colspan="5" rowspan="6" align="left" width="395px" style="font-weight: bold;border: 1px solid #dee2e6;">
                    <strong>Observaciones:</strong>
-                    <span style="font-size: 11px; font-weight: normal;">'.$resultado['cotiz_observaciones'].'</span>
+                    <span style="font-size: 11px; font-weight: normal;">'.formatearTextoHtmlPdf($resultado['cotiz_observaciones']).'</span>
                 </th>
                 <th style="font-weight: bold;border: 1px solid #dee2e6;" width="80px" align="right">Subtotal:</th>
                 <td align="right" style="border: 1px solid #dee2e6;" width="80px">$'.number_format($subTotal, 0, ',', '.').'</td>

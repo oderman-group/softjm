@@ -157,17 +157,17 @@ $html = '
 		while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 			require("logica-cotizacion-items.php");
 
-			$descripcionCombo = $prod['prod_nombre'];
+			$descripcionCombo = formatearTextoHtmlPdf($prod['prod_nombre']);
 			if (!empty($prod['czpp_observacion'])) {
-				$descripcionCombo .= '<br><span style="font-size: 8px; color: #666;">Obs: '.$prod['czpp_observacion'].'</span>';
+				$descripcionCombo .= '<br><span style="font-size: 8px; color: #666;">Obs: '.formatearTextoHtmlPdf($prod['czpp_observacion']).'</span>';
 			}
 
 			// Store product details for potential separate page
 			$productosDetalles[] = array(
 				'tipo' => 'Producto',
-				'nombre' => $prod['prod_nombre'],
-				'descripcion_corta' => isset($prod['prod_descripcion_corta']) ? $prod['prod_descripcion_corta'] : '',
-				'observacion' => $prod['czpp_observacion']
+				'nombre' => formatearTextoHtmlPdf($prod['prod_nombre']),
+				'descripcion_corta' => isset($prod['prod_descripcion_corta']) ? formatearTextoHtmlPdf($prod['prod_descripcion_corta']) : '',
+				'observacion' => formatearTextoHtmlPdf($prod['czpp_observacion'])
 			);
 
 			$html .= '
@@ -192,17 +192,17 @@ $html = '
 		while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 			require("logica-cotizacion-items.php");
 
-			$descripcionCombo = $prod['combo_nombre'];
+			$descripcionCombo = formatearTextoHtmlPdf($prod['combo_nombre']);
 			if (!empty($prod['czpp_observacion'])) {
-				$descripcionCombo .= '<br><span style="font-size: 8px; color: #666;">Obs: '.$prod['czpp_observacion'].'</span>';
+				$descripcionCombo .= '<br><span style="font-size: 8px; color: #666;">Obs: '.formatearTextoHtmlPdf($prod['czpp_observacion']).'</span>';
 			}
 
 			// Store combo details for potential separate page
 			$productosDetalles[] = array(
 				'tipo' => 'Combo',
-				'nombre' => $prod['combo_nombre'],
-				'descripcion_corta' => $prod['combo_descripcion'],
-				'observacion' => $prod['czpp_observacion']
+				'nombre' => formatearTextoHtmlPdf($prod['combo_nombre']),
+				'descripcion_corta' => formatearTextoHtmlPdf($prod['combo_descripcion']),
+				'observacion' => formatearTextoHtmlPdf($prod['czpp_observacion'])
 			);
 
 			$html .= '
@@ -227,17 +227,17 @@ $html = '
 		while ($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)) {
 			require("logica-cotizacion-items.php");
 
-			$descripcionCombo = $prod['serv_nombre'];
+			$descripcionCombo = formatearTextoHtmlPdf($prod['serv_nombre']);
 			if (!empty($prod['czpp_observacion'])) {
-				$descripcionCombo .= '<br><span style="font-size: 8px; color: #666;">Obs: '.$prod['czpp_observacion'].'</span>';
+				$descripcionCombo .= '<br><span style="font-size: 8px; color: #666;">Obs: '.formatearTextoHtmlPdf($prod['czpp_observacion']).'</span>';
 			}
 
 			// Store service details for potential separate page
 			$productosDetalles[] = array(
 				'tipo' => 'Servicio',
-				'nombre' => $prod['serv_nombre'],
+				'nombre' => formatearTextoHtmlPdf($prod['serv_nombre']),
 				'descripcion_corta' => '',
-				'observacion' => $prod['czpp_observacion']
+				'observacion' => formatearTextoHtmlPdf($prod['czpp_observacion'])
 			);
 
 			$html .= '
@@ -303,7 +303,7 @@ $pdf->writeHTML($html, true, false, true, false, '');
 // Observations
 if ($resultado['cotiz_observaciones']) {
     $html = '
-    <p style="font-size: 10px; margin-bottom: 15px;"><strong>Observaciones:</strong> '.$resultado['cotiz_observaciones'].'</p>
+    <p style="font-size: 10px; margin-bottom: 15px;"><strong>Observaciones:</strong> '.formatearTextoHtmlPdf($resultado['cotiz_observaciones']).'</p>
     ';
     // Force page break before additional terms to keep them on same page
     $pdf->AddPage();

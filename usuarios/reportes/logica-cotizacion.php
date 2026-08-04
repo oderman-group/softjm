@@ -8,6 +8,22 @@ if(isset($_GET['cte'])){
 	}
 }
 
+/**
+ * Prepara texto de cotización para TCPDF: conserva saltos de línea/<br>
+ * válidos y escapa HTML inválido para que no rompa la tabla del PDF.
+ */
+function formatearTextoHtmlPdf($texto) {
+	if ($texto === null || $texto === '') {
+		return '';
+	}
+
+	$texto = (string) $texto;
+	$texto = preg_replace('/<br\s*\/?>/i', "\n", $texto);
+	$texto = htmlspecialchars($texto, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+	return nl2br($texto, false);
+}
+
 $resultado = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM cotizacion
 INNER JOIN clientes ON cli_id=cotiz_cliente
 INNER JOIN sucursales ON sucu_id=cotiz_sucursal
