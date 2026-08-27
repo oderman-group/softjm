@@ -501,7 +501,16 @@ class Cliente extends BaseDatos {
 
         if (!empty($get['buscar'])) {
             $termino = mysqli_real_escape_string($conexionBdPrincipal, $get['buscar']);
-            $where  .= " AND (cli.cli_usuario LIKE '%" . $termino . "%' OR cli.cli_nombre LIKE '%" . $termino . "%')";
+            $where  .= " AND (
+                cli.cli_usuario LIKE '%" . $termino . "%'
+                OR cli.cli_nombre LIKE '%" . $termino . "%'
+                OR cli.cli_email LIKE '%" . $termino . "%'
+                OR cli.cli_telefono LIKE '%" . $termino . "%'
+                OR cli.cli_celular LIKE '%" . $termino . "%'
+                OR cli.cli_sigla LIKE '%" . $termino . "%'
+                OR ciu.ciu_nombre LIKE '%" . $termino . "%'
+                OR dep.dep_nombre LIKE '%" . $termino . "%'
+            )";
         }
 
         $dpto = '';
