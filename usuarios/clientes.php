@@ -12,30 +12,8 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 
 <script src="js/jquery.js"></script>
 <script src="js/bootstrap.js"></script>
-<script src="js/jquery.dataTables.js"></script>
-<script src="js/dataTables.bootstrap.js"></script>
 <script src="js/custom.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script type="text/javascript">
-	$(function() {
-		var $table = $('#data-table');
-		if (!$table.length || $table.find('tbody tr.clientes-empty-row').length) {
-			return;
-		}
-
-		// Evita el alert modal de DataTables 1.9 ante filas inconsistentes.
-		if ($.fn.dataTableExt) {
-			$.fn.dataTableExt.sErrMode = 'mute';
-		}
-
-		$table.dataTable({
-			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t",
-			"bPaginate": false,
-			"bInfo": false,
-			"aaSorting": []
-		});
-	});
-</script>
 
 <?php include("includes/funciones-js.php"); ?>
 </head>
@@ -180,6 +158,24 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 							</div>
 							<div class="clientes-panel-body">
 
+								<div class="clientes-busqueda-principal">
+									<label class="clientes-busqueda-label" for="clientesBusquedaPrincipal">Buscar clientes</label>
+									<div class="clientes-busqueda-input-wrap">
+										<i class="icon-search clientes-busqueda-icon" aria-hidden="true"></i>
+										<input
+											type="search"
+											id="clientesBusquedaPrincipal"
+											name="buscar"
+											value="<?= isset($_GET['buscar']) ? htmlspecialchars($_GET['buscar']) : ''; ?>"
+											placeholder="Nombre, documento, email, teléfono, ciudad, departamento..."
+											autocomplete="off"
+											spellcheck="false"
+										>
+										<span class="clientes-busqueda-estado" id="clientesBusquedaEstado" aria-live="polite"></span>
+									</div>
+									<p class="clientes-busqueda-hint">Búsqueda en tiempo real sobre todos los registros de la cartera.</p>
+								</div>
+
 								<div class="clientes-chips-row">
 									<?php
 									$paramsTodos = array_diff_key($filtrosGetPreservados, ['categoria' => '', 'tipoDoc' => '', 'grupo' => '']);
@@ -217,7 +213,7 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 								</div>
 
 								<?php
-								$clientesFiltrosCampos = ['buscar', 'fecha_registro_inicio', 'fecha_registro_fin', 'fecha_ingreso_inicio', 'fecha_ingreso_fin'];
+								$clientesFiltrosCampos = ['fecha_registro_inicio', 'fecha_registro_fin', 'fecha_ingreso_inicio', 'fecha_ingreso_fin'];
 								$clientesFiltrosActivos = 0;
 								foreach ($clientesFiltrosCampos as $campoFiltro) {
 									if (isset($_GET[$campoFiltro]) && $_GET[$campoFiltro] !== '') {
@@ -225,19 +221,19 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 									}
 								}
 								?>
-								<div class="clientes-filtros-panel clientes-collapsible is-collapsed" data-collapsible="filtros">
-									<button type="button" class="clientes-collapsible-toggle" id="clientes-filtros-toggle" aria-expanded="false" aria-controls="clientes-filtros-body">
+								<div class="clientes-filtros-panel clientes-collapsible<?= $clientesFiltrosActivos > 0 ? '' : ' is-collapsed'; ?>" data-collapsible="filtros">
+									<button type="button" class="clientes-collapsible-toggle" id="clientes-filtros-toggle" aria-expanded="<?= $clientesFiltrosActivos > 0 ? 'true' : 'false'; ?>" aria-controls="clientes-filtros-body">
 										<span class="clientes-collapsible-heading">
-											<span class="clientes-collapsible-title">Filtros de búsqueda</span>
+											<span class="clientes-collapsible-title">Filtros avanzados</span>
 											<?php if ($clientesFiltrosActivos > 0) { ?>
 												<span class="clientes-collapsible-badge"><?= $clientesFiltrosActivos; ?> activo<?= $clientesFiltrosActivos === 1 ? '' : 's'; ?></span>
 											<?php } else { ?>
-												<span class="clientes-collapsible-summary">Buscar por nombre, documento o fechas</span>
+												<span class="clientes-collapsible-summary">Filtrar por fechas de creación o ingreso</span>
 											<?php } ?>
 										</span>
 										<i class="icon-chevron-down clientes-collapsible-icon" aria-hidden="true"></i>
 									</button>
-									<div class="clientes-collapsible-body" id="clientes-filtros-body" hidden>
+									<div class="clientes-collapsible-body" id="clientes-filtros-body"<?= $clientesFiltrosActivos > 0 ? '' : ' hidden'; ?>>
 										<form method="GET" action="">
 											<?php foreach ($filtrosGetPreservados as $clave => $valor) {
 												if (in_array($clave, ['fecha_registro_inicio', 'fecha_registro_fin', 'fecha_ingreso_inicio', 'fecha_ingreso_fin'], true)) {
@@ -247,10 +243,6 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 												<input type="hidden" name="<?= htmlspecialchars($clave); ?>" value="<?= htmlspecialchars((string) $valor); ?>">
 											<?php } ?>
 											<div class="filtros-grid">
-												<div class="filtro-item filtro-item--full">
-													<label>Buscar <?php if (!empty($_GET['buscar'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['buscar' => ''])); ?>">× quitar</a><?php } ?></label>
-													<input type="text" name="buscar" id="btn_buscar" value="<?= isset($_GET['buscar']) ? htmlspecialchars($_GET['buscar']) : ''; ?>" placeholder="Nombre o documento del cliente...">
-												</div>
 												<div class="filtro-item">
 													<label>Creación inicio <?php if (!empty($_GET['fecha_registro_inicio'])) { ?><a class="quitar" href="?<?= http_build_query(array_diff_key($_GET, ['fecha_registro_inicio' => ''])); ?>">×</a><?php } ?></label>
 													<input type="date" name="fecha_registro_inicio" value="<?= isset($_GET['fecha_registro_inicio']) ? htmlspecialchars($_GET['fecha_registro_inicio']) : ''; ?>">
@@ -269,9 +261,8 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 												</div>
 											</div>
 											<div class="clientes-filtros-acciones">
-												<button type="submit" class="clientes-btn-primary"><i class="icon-search"></i> Filtrar</button>
+												<button type="submit" class="clientes-btn-primary"><i class="icon-search"></i> Aplicar filtros</button>
 												<a href="clientes.php" class="clientes-btn-secondary">Limpiar filtros</a>
-												<button type="button" class="clientes-btn-primary" id="btnSubmitBuscar"><i class="icon-search"></i> Buscar en vivo</button>
 											</div>
 										</form>
 									</div>
@@ -279,7 +270,9 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 
 								<div class="clientes-pagination">
 									<?php include("includes/clientes-listado-filtros.php"); ?>
-									<?php include("includes/paginacion.php"); ?>
+									<div id="clientesPaginacionContenedor">
+										<?php include("includes/clientes-listado-paginacion.php"); ?>
+									</div>
 								</div>
 								<p class="clientes-leyenda">TK = Tickets · SG = Seguimientos · SC = Sucursales · CT = Contactos · FC = Facturas · RM = Remisiones</p>
 
@@ -360,34 +353,132 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 				});
 			}
 
-			var btnBuscar = document.getElementById('btnSubmitBuscar');
-			var inputBuscar = document.getElementById('btn_buscar');
-			if (btnBuscar) {
-				btnBuscar.addEventListener('click', buscar);
-			}
-			if (inputBuscar) {
-				inputBuscar.addEventListener('keydown', function (event) {
-					if (event.key === 'Enter') {
-						event.preventDefault();
-						buscar();
-					}
-				});
+			var inputBuscar = document.getElementById('clientesBusquedaPrincipal');
+			var tbody = document.getElementById('clientes_buscar');
+			var paginacionContenedor = document.getElementById('clientesPaginacionContenedor');
+			var estadoBusqueda = document.getElementById('clientesBusquedaEstado');
+			var busquedaTimer = null;
+			var busquedaRequestId = 0;
+			var paginaBusqueda = 1;
+
+			function paramsBusquedaActuales() {
+				return new URLSearchParams(window.location.search);
 			}
 
-			function buscar() {
-				var valor = document.getElementById('btn_buscar').value;
-				var tbody = document.getElementById('clientes_buscar');
-				tbody.innerHTML = '';
+			function actualizarUrlBusqueda(valor, pagina) {
+				var params = paramsBusquedaActuales();
+				var termino = (valor || '').trim();
+				if (termino) {
+					params.set('buscar', termino);
+				} else {
+					params.delete('buscar');
+				}
+				if (pagina && pagina > 1) {
+					params.set('inicio', String(pagina));
+				} else {
+					params.delete('inicio');
+				}
+				var query = params.toString();
+				var nuevaUrl = 'clientes.php' + (query ? '?' + query : '');
+				window.history.replaceState({}, '', nuevaUrl);
+			}
 
-				var params = new URLSearchParams(window.location.search);
-				params.set('buscar', valor);
-				params.set('inicio', '<?= isset($_GET["inicio"]) ? intval($_GET["inicio"]) : 1 ?>');
-				params.set('limite', '<?= intval($limite ?? ($configuracion['conf_paginacion'] ?? 50)) ?>');
+			function mostrarEstadoBusqueda(modo, total) {
+				if (!estadoBusqueda) return;
+				estadoBusqueda.className = 'clientes-busqueda-estado';
+				if (modo === 'loading') {
+					estadoBusqueda.classList.add('is-loading');
+					estadoBusqueda.textContent = 'Buscando...';
+					return;
+				}
+				if (modo === 'results') {
+					estadoBusqueda.classList.add('is-results');
+					estadoBusqueda.textContent = total === 1 ? '1 resultado' : total + ' resultados';
+					return;
+				}
+				estadoBusqueda.textContent = '';
+			}
+
+			function ejecutarBusqueda(pagina) {
+				if (!tbody) return;
+
+				paginaBusqueda = pagina || 1;
+				var valor = inputBuscar ? inputBuscar.value : '';
+				var requestId = ++busquedaRequestId;
+
+				mostrarEstadoBusqueda('loading');
+
+				var params = paramsBusquedaActuales();
+				var termino = valor.trim();
+				if (termino) {
+					params.set('buscar', termino);
+				} else {
+					params.delete('buscar');
+				}
+				if (paginaBusqueda > 1) {
+					params.set('inicio', String(paginaBusqueda));
+				} else {
+					params.delete('inicio');
+				}
+				params.set('format', 'json');
 
 				fetch('fetch-buscar-clientes.php?' + params.toString(), { method: 'GET' })
-					.then(function (response) { return response.text(); })
-					.then(function (data) { tbody.innerHTML = data; })
-					.catch(function (error) { console.error('Error:', error); });
+					.then(function (response) { return response.json(); })
+					.then(function (data) {
+						if (requestId !== busquedaRequestId) return;
+
+						tbody.innerHTML = data.html || '';
+						if (paginacionContenedor) {
+							paginacionContenedor.innerHTML = data.pagination || '';
+						}
+						mostrarEstadoBusqueda(termino ? 'results' : 'idle', data.total || 0);
+						actualizarUrlBusqueda(valor, paginaBusqueda);
+					})
+					.catch(function (error) {
+						if (requestId !== busquedaRequestId) return;
+						console.error('Error:', error);
+						if (estadoBusqueda) {
+							estadoBusqueda.className = 'clientes-busqueda-estado is-error';
+							estadoBusqueda.textContent = 'Error al buscar';
+						}
+					});
+			}
+
+			function programarBusqueda() {
+				if (busquedaTimer) clearTimeout(busquedaTimer);
+				busquedaTimer = setTimeout(function () {
+					ejecutarBusqueda(1);
+				}, 350);
+			}
+
+			if (inputBuscar) {
+				inputBuscar.addEventListener('input', programarBusqueda);
+				inputBuscar.addEventListener('search', function () {
+					if (this.value === '') {
+						ejecutarBusqueda(1);
+					}
+				});
+
+				if (inputBuscar.value.trim() !== '') {
+					var totalInicial = document.querySelector('.clientes-pagination-block[data-total]');
+					var total = totalInicial ? parseInt(totalInicial.getAttribute('data-total'), 10) : 0;
+					mostrarEstadoBusqueda('results', isNaN(total) ? 0 : total);
+				}
+			}
+
+			if (paginacionContenedor) {
+				paginacionContenedor.addEventListener('click', function (event) {
+					var link = event.target.closest('a[data-pagina]');
+					if (!link) return;
+					event.preventDefault();
+					var pagina = parseInt(link.getAttribute('data-pagina'), 10);
+					if (!pagina || pagina < 1) return;
+					ejecutarBusqueda(pagina);
+					var tabla = document.getElementById('data-table');
+					if (tabla && typeof tabla.scrollIntoView === 'function') {
+						tabla.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}
+				});
 			}
 		})();
 	</script>

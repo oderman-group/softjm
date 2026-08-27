@@ -222,6 +222,33 @@ body.drawer-open {
   margin-top: 0.25rem;
 }
 
+#drawerCrearCliente .drawer-form .field-status {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+#drawerCrearCliente .drawer-form .field-status.is-visible {
+  display: block;
+}
+
+#drawerCrearCliente .drawer-form .field-status.is-checking {
+  color: #64748b;
+}
+
+#drawerCrearCliente .drawer-form .field-status.is-ok {
+  color: #15803d;
+}
+
+#drawerCrearCliente .drawer-form .field-status.is-error {
+  color: #dc2626;
+}
+
+#drawerCrearCliente .drawer-form .field-status a {
+  color: inherit;
+  font-weight: 600;
+}
+
 #drawerCrearCliente .drawer-form .field-error {
   font-size: 0.75rem;
   color: #dc2626;
@@ -393,12 +420,33 @@ body.drawer-open {
   </div>
 
   <div class="drawer-body">
-    <p class="drawer-intro">Complete los datos básicos para registrar un cliente de forma rápida. Podrá completar el resto de la información después.</p>
+    <p class="drawer-intro">Complete los datos básicos para registrar un cliente de forma rápida. El número de documento y la ciudad son obligatorios. Podrá completar el resto de la información después.</p>
 
     <div class="drawer-alert drawer-alert-success" id="drawerClienteExito" role="status"></div>
     <div class="drawer-alert drawer-alert-error" id="drawerClienteError" role="alert"></div>
 
     <form class="drawer-form" id="formCrearClienteRapido" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cliRapidoTipoDocumento">Tipo de documento</label>
+          <div class="drawer-select-wrap">
+            <select id="cliRapidoTipoDocumento" name="tipoDocumento">
+              <option value="1"></option>
+              <option value="2">NIT</option>
+              <option value="3">Cédula</option>
+            </select>
+            <i class="fa fa-chevron-down drawer-select-icon" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="cliRapidoDocumento">Número de documento <span class="required">*</span></label>
+          <input type="text" id="cliRapidoDocumento" name="documento" autocomplete="off" inputmode="numeric">
+          <span class="field-hint">Sin dígito de verificación.</span>
+          <span class="field-status" id="statusDocumento" aria-live="polite"></span>
+          <span class="field-error" id="errorDocumento">El número de documento es obligatorio.</span>
+        </div>
+      </div>
+
       <div class="form-group">
         <label for="cliRapidoNombre">Nombre <span class="required">*</span></label>
         <input type="text" id="cliRapidoNombre" name="nombre" autocomplete="organization" style="text-transform:uppercase;" required>
@@ -422,6 +470,32 @@ body.drawer-open {
           <span class="field-hint">10 dígitos sin espacios ni puntos.</span>
           <span class="field-error" id="errorCelular">El celular debe tener 10 dígitos.</span>
         </div>
+      </div>
+
+      <div class="form-group">
+        <label for="cliRapidoCiudad">Ciudad <span class="required">*</span></label>
+        <div class="drawer-select-wrap">
+          <select id="cliRapidoCiudad" name="ciudad" required>
+            <option value="">Seleccione una ciudad...</option>
+            <?php
+            $consultaCiudades = mysqli_query(
+              $conexionBdAdmin,
+              "SELECT c.ciu_id, c.ciu_nombre, d.dep_nombre
+               FROM localidad_ciudades c
+               INNER JOIN localidad_departamentos d ON d.dep_id = c.ciu_departamento
+               ORDER BY c.ciu_nombre"
+            );
+            while ($ciudadOpt = mysqli_fetch_array($consultaCiudades, MYSQLI_BOTH)) {
+            ?>
+              <option value="<?= $ciudadOpt['ciu_id'] ?>">
+                <?= htmlspecialchars($ciudadOpt['ciu_nombre'] . ', ' . $ciudadOpt['dep_nombre']) ?>
+              </option>
+            <?php } ?>
+          </select>
+          <i class="fa fa-chevron-down drawer-select-icon" aria-hidden="true"></i>
+        </div>
+        <span class="field-hint">Define la zona y el departamento del cliente.</span>
+        <span class="field-error" id="errorCiudad">Debe seleccionar una ciudad.</span>
       </div>
 
       <div class="form-group">
@@ -511,10 +585,17 @@ document.addEventListener('DOMContentLoaded', function () {
   var referencia = document.getElementById('cliRapidoReferencia');
   var grupoEvento = document.getElementById('grupoNombreEvento');
   var nombreInput = document.getElementById('cliRapidoNombre');
+  var documentoInput = document.getElementById('cliRapidoDocumento');
+  var ciudadInput = document.getElementById('cliRapidoCiudad');
+  var statusDocumento = document.getElementById('statusDocumento');
   var notaTextarea = document.getElementById('cliRapidoNotaInterna');
   var guardando = false;
   var widgetVozCrear = null;
   var selectorTipoCrear = null;
+  var documentoEstado = 'empty';
+  var documentoVerificado = '';
+  var documentoTimer = null;
+  var documentoRequestId = 0;
 
   function setGuardando(estado) {
     guardando = estado;
@@ -587,6 +668,103 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  function resetDocumentoEstado() {
+    documentoEstado = 'empty';
+    documentoVerificado = '';
+    if (documentoTimer) {
+      clearTimeout(documentoTimer);
+      documentoTimer = null;
+    }
+    if (statusDocumento) {
+      statusDocumento.textContent = '';
+      statusDocumento.className = 'field-status';
+    }
+  }
+
+  function mostrarEstadoDocumento(tipo, mensaje) {
+    if (!statusDocumento) return;
+    statusDocumento.textContent = '';
+    statusDocumento.className = 'field-status is-visible';
+    if (tipo === 'checking') {
+      statusDocumento.classList.add('is-checking');
+      statusDocumento.textContent = mensaje || 'Verificando documento...';
+      return;
+    }
+    if (tipo === 'ok') {
+      statusDocumento.classList.add('is-ok');
+      statusDocumento.textContent = mensaje || 'Documento disponible.';
+      return;
+    }
+    if (tipo === 'error') {
+      statusDocumento.classList.add('is-error');
+      statusDocumento.textContent = mensaje || 'Documento no disponible.';
+    }
+  }
+
+  function verificarDocumento(valor, forzar) {
+    var documento = (valor || '').trim();
+    if (!documento) {
+      resetDocumentoEstado();
+      return Promise.resolve(false);
+    }
+
+    if (!forzar && documento === documentoVerificado && documentoEstado === 'available') {
+      return Promise.resolve(true);
+    }
+
+    documentoEstado = 'checking';
+    mostrarEstadoDocumento('checking');
+
+    var requestId = ++documentoRequestId;
+    var body = new URLSearchParams();
+    body.append('usuario', documento);
+    body.append('opcion', '1');
+    body.append('format', 'json');
+
+    return fetch('ajax/ajax-clientes-verificar.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      body: body.toString()
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (requestId !== documentoRequestId) return documentoEstado === 'available';
+
+        if (data.available) {
+          documentoEstado = 'available';
+          documentoVerificado = documento;
+          if (documentoInput) documentoInput.classList.remove('is-invalid');
+          mostrarEstadoDocumento('ok', data.message || 'Documento disponible.');
+          return true;
+        }
+
+        documentoEstado = 'duplicate';
+        documentoVerificado = documento;
+        if (documentoInput) documentoInput.classList.add('is-invalid');
+        var mensaje = data.message || 'Ya existe un cliente con este documento.';
+        if (data.editUrl && data.clienteNombre) {
+          mostrarEstadoDocumento('error');
+          statusDocumento.innerHTML = mensaje + ' <a href="' + data.editUrl + '">' + data.clienteNombre + '</a>';
+        } else {
+          mostrarEstadoDocumento('error', mensaje);
+        }
+        return false;
+      })
+      .catch(function () {
+        if (requestId !== documentoRequestId) return false;
+        documentoEstado = 'error';
+        mostrarEstadoDocumento('error', 'No se pudo verificar el documento. Intente nuevamente.');
+        return false;
+      });
+  }
+
+  function programarVerificacionDocumento() {
+    if (documentoTimer) clearTimeout(documentoTimer);
+    documentoTimer = setTimeout(function () {
+      verificarDocumento(documentoInput ? documentoInput.value : '', false);
+    }, 450);
+  }
+
   function resetEtiquetasVisuales() {
     form.querySelectorAll('.cliente-etiqueta-option input[type="checkbox"]').forEach(function (input) {
       input.checked = false;
@@ -610,13 +788,14 @@ document.addEventListener('DOMContentLoaded', function () {
     form.reset();
     resetEtiquetasVisuales();
     resetNotaInterna();
+    resetDocumentoEstado();
     if (grupoEvento) grupoEvento.style.display = 'none';
     overlay.classList.add('is-open');
     drawer.classList.add('is-open');
     document.body.classList.add('drawer-open');
     overlay.setAttribute('aria-hidden', 'false');
     setTimeout(function () {
-      if (nombreInput) nombreInput.focus();
+      if (documentoInput) documentoInput.focus();
     }, 350);
   }
 
@@ -645,13 +824,34 @@ document.addEventListener('DOMContentLoaded', function () {
   function validarFormulario() {
     limpiarErrores();
     var valido = true;
+    var documento = documentoInput ? documentoInput.value.trim() : '';
     var nombre = nombreInput.value.trim();
     var email = document.getElementById('cliRapidoEmail').value.trim();
     var celular = document.getElementById('cliRapidoCelular').value.trim();
+    var ciudad = ciudadInput ? ciudadInput.value.trim() : '';
+
+    if (!documento) {
+      if (documentoInput) documentoInput.classList.add('is-invalid');
+      document.getElementById('errorDocumento').classList.add('is-visible');
+      valido = false;
+    } else if (documentoEstado === 'duplicate') {
+      if (documentoInput) documentoInput.classList.add('is-invalid');
+      valido = false;
+    } else if (documentoEstado !== 'available' || documento !== documentoVerificado) {
+      if (documentoInput) documentoInput.classList.add('is-invalid');
+      mostrarEstadoDocumento('error', 'Espere la verificación del documento o corrija el valor.');
+      valido = false;
+    }
 
     if (!nombre) {
       nombreInput.classList.add('is-invalid');
       document.getElementById('errorNombre').classList.add('is-visible');
+      valido = false;
+    }
+
+    if (!ciudad) {
+      if (ciudadInput) ciudadInput.classList.add('is-invalid');
+      document.getElementById('errorCiudad').classList.add('is-visible');
       valido = false;
     }
 
@@ -676,6 +876,7 @@ document.addEventListener('DOMContentLoaded', function () {
     form.reset();
     resetEtiquetasVisuales();
     resetNotaInterna();
+    resetDocumentoEstado();
     if (grupoEvento) grupoEvento.style.display = 'none';
     mostrarFormulario(false);
 
@@ -694,6 +895,7 @@ document.addEventListener('DOMContentLoaded', function () {
       form.reset();
       resetEtiquetasVisuales();
       resetNotaInterna();
+      resetDocumentoEstado();
       if (grupoEvento) grupoEvento.style.display = 'none';
       if (nombreInput) nombreInput.focus();
     });
@@ -723,6 +925,28 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  if (documentoInput) {
+    documentoInput.addEventListener('input', function () {
+      var valor = this.value.trim();
+      if (!valor) {
+        resetDocumentoEstado();
+        return;
+      }
+      if (valor !== documentoVerificado) {
+        documentoEstado = 'pending';
+      }
+      programarVerificacionDocumento();
+    });
+
+    documentoInput.addEventListener('blur', function () {
+      if (documentoTimer) {
+        clearTimeout(documentoTimer);
+        documentoTimer = null;
+      }
+      verificarDocumento(this.value, true);
+    });
+  }
+
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
       cerrarDrawer();
@@ -731,69 +955,90 @@ document.addEventListener('DOMContentLoaded', function () {
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    if (guardando || !validarFormulario()) return;
+    if (guardando) return;
 
     ocultarAlertas();
 
-    var modoNota = selectorTipoCrear ? selectorTipoCrear.getModo() : 'texto';
+    var enviarFormulario = function () {
+      if (!validarFormulario()) return;
 
-    if (modoNota === 'voz') {
-      if (widgetVozCrear && (widgetVozCrear.estadoGrabacion === 'recording' || widgetVozCrear.estadoGrabacion === 'paused')) {
-        alertError.textContent = 'Finalice la grabación de la nota de voz antes de guardar el cliente.';
-        alertError.classList.add('is-visible');
-        return;
-      }
-    }
+      var modoNota = selectorTipoCrear ? selectorTipoCrear.getModo() : 'texto';
 
-    setGuardando(true);
-
-    var formData = new FormData(form);
-    if (modoNota === 'voz') {
-      formData.delete('notaInterna');
-    }
-
-    var guardarNotaVoz = modoNota === 'voz' &&
-      widgetVozCrear &&
-      typeof widgetVozCrear.tieneVozPendiente === 'function' &&
-      widgetVozCrear.tieneVozPendiente();
-
-    fetch('ajax/ajax-clientes-crear-rapido.php', {
-      method: 'POST',
-      body: formData
-    })
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        if (!data.success) {
-          alertError.textContent = data.message || 'No se pudo guardar el cliente.';
+      if (modoNota === 'voz') {
+        if (widgetVozCrear && (widgetVozCrear.estadoGrabacion === 'recording' || widgetVozCrear.estadoGrabacion === 'paused')) {
+          alertError.textContent = 'Finalice la grabación de la nota de voz antes de guardar el cliente.';
           alertError.classList.add('is-visible');
-          return null;
+          return;
         }
+      }
 
-        if (guardarNotaVoz) {
-          return widgetVozCrear.guardar(data.clienteId).then(function (notaOk) {
-            if (!notaOk) {
-              data.message += ' La nota de voz no pudo guardarse.';
-              data.notaGuardada = false;
-            } else {
-              data.notaGuardada = true;
-            }
-            return data;
-          });
-        }
+      setGuardando(true);
 
-        return data;
+      var formData = new FormData(form);
+      if (modoNota === 'voz') {
+        formData.delete('notaInterna');
+      }
+
+      var guardarNotaVoz = modoNota === 'voz' &&
+        widgetVozCrear &&
+        typeof widgetVozCrear.tieneVozPendiente === 'function' &&
+        widgetVozCrear.tieneVozPendiente();
+
+      fetch('ajax/ajax-clientes-crear-rapido.php', {
+        method: 'POST',
+        body: formData
       })
-      .then(function (data) {
-        if (!data) return;
-        mostrarExito(data);
-      })
-      .catch(function () {
-        alertError.textContent = 'Error de conexión. Verifique su red e intente nuevamente.';
-        alertError.classList.add('is-visible');
-      })
-      .finally(function () {
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (!data.success) {
+            alertError.textContent = data.message || 'No se pudo guardar el cliente.';
+            alertError.classList.add('is-visible');
+            return null;
+          }
+
+          if (guardarNotaVoz) {
+            return widgetVozCrear.guardar(data.clienteId).then(function (notaOk) {
+              if (!notaOk) {
+                data.message += ' La nota de voz no pudo guardarse.';
+                data.notaGuardada = false;
+              } else {
+                data.notaGuardada = true;
+              }
+              return data;
+            });
+          }
+
+          return data;
+        })
+        .then(function (data) {
+          if (!data) return;
+          mostrarExito(data);
+        })
+        .catch(function () {
+          alertError.textContent = 'Error de conexión. Verifique su red e intente nuevamente.';
+          alertError.classList.add('is-visible');
+        })
+        .finally(function () {
+          setGuardando(false);
+        });
+    };
+
+    var documento = documentoInput ? documentoInput.value.trim() : '';
+    if (documento && (documentoEstado !== 'available' || documento !== documentoVerificado)) {
+      setGuardando(true);
+      verificarDocumento(documento, true).then(function (disponible) {
         setGuardando(false);
+        if (!disponible) {
+          if (documentoInput) documentoInput.classList.add('is-invalid');
+          documentoInput && documentoInput.focus();
+          return;
+        }
+        enviarFormulario();
       });
+      return;
+    }
+
+    enviarFormulario();
   });
 });
 </script>

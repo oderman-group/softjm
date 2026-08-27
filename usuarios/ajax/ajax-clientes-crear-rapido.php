@@ -15,15 +15,42 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$nombreOriginal = trim($_POST['nombre'] ?? '');
-$nombre       = mysqli_real_escape_string($conexionBdPrincipal, strtoupper($nombreOriginal));
-$email        = trim($_POST['email'] ?? '');
-$telefono     = trim($_POST['telefono'] ?? '');
-$celular      = trim($_POST['celular'] ?? '');
-$referencia   = trim($_POST['referencia'] ?? '');
-$nombreEvento = trim($_POST['nombreEvento'] ?? '');
-$asesor       = !empty($_POST['asesor']) && is_numeric($_POST['asesor']) ? intval($_POST['asesor']) : intval($_SESSION['id']);
-$notaInterna  = trim($_POST['notaInterna'] ?? '');
+$nombreOriginal  = trim($_POST['nombre'] ?? '');
+$documento       = trim($_POST['documento'] ?? '');
+$tipoDocumento   = !empty($_POST['tipoDocumento']) && is_numeric($_POST['tipoDocumento']) ? intval($_POST['tipoDocumento']) : 1;
+$ciudad          = !empty($_POST['ciudad']) && is_numeric($_POST['ciudad']) ? intval($_POST['ciudad']) : 0;
+$email           = trim($_POST['email'] ?? '');
+$telefono        = trim($_POST['telefono'] ?? '');
+$celular         = trim($_POST['celular'] ?? '');
+$referencia      = trim($_POST['referencia'] ?? '');
+$nombreEvento    = trim($_POST['nombreEvento'] ?? '');
+$asesor          = !empty($_POST['asesor']) && is_numeric($_POST['asesor']) ? intval($_POST['asesor']) : intval($_SESSION['id']);
+$notaInterna     = trim($_POST['notaInterna'] ?? '');
+
+if ($documento === '') {
+    echo json_encode(['success' => false, 'message' => 'El número de documento es obligatorio.']);
+    exit;
+}
+
+if ($ciudad <= 0 || $ciudad === CIUDAD_DESCONOCIDA) {
+    echo json_encode(['success' => false, 'message' => 'Debe seleccionar una ciudad válida.']);
+    exit;
+}
+
+$documentoEsc = mysqli_real_escape_string($conexionBdPrincipal, $documento);
+$consultaDuplicado = mysqli_query(
+    $conexionBdPrincipal,
+    "SELECT cli_id, cli_nombre FROM clientes
+     WHERE cli_usuario='" . $documentoEsc . "' AND cli_id_empresa='" . $idEmpresa . "'"
+);
+if ($consultaDuplicado && mysqli_num_rows($consultaDuplicado) > 0) {
+    $clienteDuplicado = mysqli_fetch_array($consultaDuplicado, MYSQLI_BOTH);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Ya existe un cliente con este número de documento: ' . $clienteDuplicado['cli_nombre'] . '.',
+    ]);
+    exit;
+}
 
 if ($nombreOriginal === '') {
     echo json_encode(['success' => false, 'message' => 'El nombre es obligatorio.']);
@@ -41,17 +68,22 @@ if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 $nombre       = mysqli_real_escape_string($conexionBdPrincipal, strtoupper($nombreOriginal));
-$email        = mysqli_real_escape_string($conexionBdPrincipal, strtolower($email));$telefono     = mysqli_real_escape_string($conexionBdPrincipal, $telefono);
+$email        = mysqli_real_escape_string($conexionBdPrincipal, strtolower($email));
+$telefono     = mysqli_real_escape_string($conexionBdPrincipal, $telefono);
 $celular      = mysqli_real_escape_string($conexionBdPrincipal, $celular);
 $referencia   = mysqli_real_escape_string($conexionBdPrincipal, $referencia);
 $nombreEvento = mysqli_real_escape_string($conexionBdPrincipal, $nombreEvento);
 
-$ciudad = CIUDAD_DESCONOCIDA;
-$pais   = 'Colombia';
+$pais = 'Colombia';
 
 $consultaZona = mysqli_query($conexionBdAdmin, "SELECT * FROM localidad_ciudades WHERE ciu_id='" . $ciudad . "'");
 $zona         = mysqli_fetch_array($consultaZona, MYSQLI_BOTH);
 $zonaId       = $zona ? $zona[2] : '';
+
+if (!$zona) {
+    echo json_encode(['success' => false, 'message' => 'La ciudad seleccionada no es válida.']);
+    exit;
+}
 
 $clave1          = generarClaves();
 $clave2          = generarClaves();
@@ -70,7 +102,7 @@ mysqli_query($conexionBdPrincipal, "INSERT INTO clientes(
     '" . $email . "',
     '" . $telefono . "',
     '" . $ciudad . "',
-    '',
+    '" . $documentoEsc . "',
     '" . $clave1 . "',
     '',
     '" . $zonaId . "',
@@ -82,7 +114,7 @@ mysqli_query($conexionBdPrincipal, "INSERT INTO clientes(
     '',
     '" . $asesor . "',
     '" . $clave2 . "',
-    '1',
+    '" . $tipoDocumento . "',
     '" . $pais . "',
     '',
     '" . $idEmpresa . "',

@@ -72,6 +72,6 @@ while ($consultaDeptos && ($depto = mysqli_fetch_array($consultaDeptos, MYSQLI_A
 }
 
 $filtrosGetPreservados = array_intersect_key($_GET, array_flip([
-    'dpto', 'tipoDoc', 'categoria', 'grupo', 'pap', 'clientesNuevos',
+    'dpto', 'tipoDoc', 'categoria', 'grupo', 'pap', 'clientesNuevos', 'buscar',
     'fecha_registro_inicio', 'fecha_registro_fin', 'fecha_ingreso_inicio', 'fecha_ingreso_fin',
 ]));
