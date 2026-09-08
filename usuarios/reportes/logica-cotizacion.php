@@ -9,8 +9,10 @@ if(isset($_GET['cte'])){
 }
 
 /**
- * Prepara texto de cotización para TCPDF: conserva saltos de línea/<br>
- * válidos y escapa HTML inválido para que no rompa la tabla del PDF.
+ * Prepara texto de cotización para TCPDF.
+ * Conserva formato seguro del editor (p, br, negritas, listas, etc.),
+ * convierte párrafos a saltos compatibles con celdas de tabla y escapa
+ * el resto para que no rompa el HTML del PDF.
  */
 function formatearTextoHtmlPdf($texto) {
 	if ($texto === null || $texto === '') {
@@ -18,10 +20,31 @@ function formatearTextoHtmlPdf($texto) {
 	}
 
 	$texto = (string) $texto;
-	$texto = preg_replace('/<br\s*\/?>/i', "\n", $texto);
-	$texto = htmlspecialchars($texto, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-	return nl2br($texto, false);
+	// <p> dentro de celdas de TCPDF suele fallar; convertir a saltos.
+	$texto = preg_replace('/<\/p>\s*<p[^>]*>/i', '<br>', $texto);
+	$texto = preg_replace('/<p[^>]*>/i', '', $texto);
+	$texto = preg_replace('/<\/p>/i', '<br>', $texto);
+
+	$allowedTags = '<br><br/><strong><b><em><i><u><s><strike><ul><ol><li>';
+	$texto = strip_tags($texto, $allowedTags);
+
+	// Escapar solo el texto (no las etiquetas permitidas) sin doble-encode de &nbsp; etc.
+	$parts = preg_split('/(<[^>]+>)/', $texto, -1, PREG_SPLIT_DELIM_CAPTURE);
+	$resultado = '';
+	foreach ($parts as $part) {
+		if ($part !== '' && isset($part[0]) && $part[0] === '<' && substr($part, -1) === '>') {
+			$resultado .= $part;
+			continue;
+		}
+		$resultado .= htmlspecialchars($part, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
+	}
+
+	$resultado = preg_replace("/\r\n|\r|\n/", '<br>', $resultado);
+	$resultado = preg_replace('/(?:(?:&nbsp;|\xC2\xA0|\s)*<br\s*\/?>\s*)+$/i', '', $resultado);
+	$resultado = preg_replace('/(?:&nbsp;|\xC2\xA0|\s)+$/u', '', $resultado);
+
+	return $resultado;
 }
 
 $resultado = mysqli_fetch_array($conexionBdPrincipal->query("SELECT * FROM cotizacion
