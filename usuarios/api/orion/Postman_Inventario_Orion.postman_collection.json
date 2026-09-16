@@ -1,0 +1,158 @@
+{
+	"info": {
+		"_postman_id": "inventario-orion-001",
+		"name": "Orion API - Inventario (Ofima → Orion)",
+		"description": "Pruebas del endpoint de inventario. Requiere tener en api_configuracion una fila para inventario (ofima_orion) o usar las de clientes/productos con el mismo usuario/contraseña.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost/softjm"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "usuario",
+			"value": "usuario_orion"
+		},
+		{
+			"key": "password",
+			"value": "password_encryptad"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Login (obtener JWT)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"usuario\": \"{{usuario}}\",\n  \"password\": \"{{password}}\",\n  \"id_empresa\": 1\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/usuarios/api/orion/auth.php",
+					"host": ["{{baseUrl}}"],
+					"path": ["usuarios", "api", "orion", "auth.php"]
+				},
+				"description": "Obtiene un JWT para usar en el resto de peticiones. También puedes usar Basic Auth en cada request. Las credenciales deben existir en api_configuracion (apic_direccion = ofima_orion) para cualquier módulo (productos, clientes o inventario)."
+			}
+		},
+		{
+			"name": "2. Inventario - Un ítem (por referencia)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"description": "Pega aquí el token recibido en Login, o usa la pestaña Authorization = Basic Auth"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"referencia\": \"COD001\",\n  \"bodega_id\": 1,\n  \"existencias\": 50\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/usuarios/api/orion/inventario-recibir.php",
+					"host": ["{{baseUrl}}"],
+					"path": ["usuarios", "api", "orion", "inventario-recibir.php"]
+				},
+				"description": "Actualiza existencias por referencia de producto y bodega. Cambia 'referencia' por un código que exista en productos.prod_referencia y bodega_id por una bodega válida (bod_id) de tu empresa."
+			}
+		},
+		{
+			"name": "3. Inventario - Un ítem (por producto_id)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"producto_id\": 1,\n  \"bodega_id\": 1,\n  \"existencias\": 25\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/usuarios/api/orion/inventario-recibir.php",
+					"host": ["{{baseUrl}}"],
+					"path": ["usuarios", "api", "orion", "inventario-recibir.php"]
+				},
+				"description": "Igual pero identificando el producto por prod_id. Ajusta producto_id y bodega_id a IDs reales."
+			}
+		},
+		{
+			"name": "4. Inventario - Lote (varios ítems)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"items\": [\n    { \"referencia\": \"COD001\", \"bodega_id\": 1, \"existencias\": 50 },\n    { \"producto_id\": 2, \"bodega_id\": 1, \"existencias\": 10 }\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/usuarios/api/orion/inventario-recibir.php",
+					"host": ["{{baseUrl}}"],
+					"path": ["usuarios", "api", "orion", "inventario-recibir.php"]
+				},
+				"description": "Envía varios productos/bodegas en una sola petición."
+			}
+		},
+		{
+			"name": "5. Inventario - Basic Auth (sin JWT)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{ "key": "username", "value": "{{usuario}}" },
+						{ "key": "password", "value": "{{password}}" }
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"referencia\": \"COD001\",\n  \"bodega_id\": 1,\n  \"existencias\": 100,\n  \"id_empresa\": 1\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/usuarios/api/orion/inventario-recibir.php",
+					"host": ["{{baseUrl}}"],
+					"path": ["usuarios", "api", "orion", "inventario-recibir.php"]
+				},
+				"description": "Misma petición usando solo Basic Auth. En Body incluye id_empresa si no usas JWT (por defecto 1). Debe existir en api_configuracion una fila con apic_modulo='inventario', apic_direccion='ofima_orion' y este usuario/contraseña."
+			}
+		}
+	]
+}
