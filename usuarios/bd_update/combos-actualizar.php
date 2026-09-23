@@ -28,7 +28,9 @@
 
     if (isset($_POST["producto"])) {
         $idCombo = $_POST["id"]; // El ID del combo que estamos editando
-        $productosSeleccionadosUI = $_POST["producto"]; // Array de IDs de productos enviados desde el formulario (multi-select)
+        $productosSeleccionadosUI = array_values(array_filter($_POST["producto"], static function ($id) {
+            return $id !== '' && $id !== null;
+        })); // Array de IDs de productos enviados desde el formulario (multi-select)
 
         // Convertir el array de productos seleccionados a un conjunto (Set) para búsquedas más rápidas (opcional, pero buena práctica)
         $productosSeleccionadosSet = array_flip($productosSeleccionadosUI); // Crea un array asociativo con los valores como claves

@@ -18,7 +18,31 @@ if(Modulos::validarRol([388], $conexionBdPrincipal, $conexionBdAdmin, $datosUsua
 <!-- styles -->
 <link href="css/chosen.css" rel="stylesheet">
 <link href="../assets-login/plugins/select2/css/select2.css" rel="stylesheet" />
-<!--============ javascript ===========-->
+<style>
+select#product-select.select2-hidden-accessible {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  border: 0 !important;
+}
+#product-select + .select2-container {
+  width: 100% !important;
+  max-width: 100%;
+  display: inline-block !important;
+}
+#product-select + .select2-container .select2-selection--multiple {
+  min-height: 38px;
+}
+#product-select + .select2-container .select2-search--inline .select2-search__field {
+  width: 12em !important;
+  min-width: 12em !important;
+  margin-top: 4px;
+}
+</style><!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
 <script src="js/bootstrap.js"></script>
@@ -135,7 +159,8 @@ include("includes/js-formularios.php");
 								<div class="control-group">
 										<label class="control-label">Productos</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="span10" tabindex="2" name="producto[]" multiple id="product-select" <?=$disabled;?>>
+											<select data-placeholder="Escriba para buscar productos..." class="span10" tabindex="2" name="producto[]" multiple id="product-select" data-ajax-url="<?= htmlspecialchars(REDIRECT_ROUTE . '/usuarios/ajax/ajax-buscar-productos.php', ENT_QUOTES, 'UTF-8'); ?>" <?=$disabled;?>>
+												<option value=""></option>
 												<?php
             									$consultaProductos = $conexionBdPrincipal->query("SELECT * FROM combos_productos 
 												INNER JOIN productos ON prod_id=copp_producto AND prod_id_empresa='".$idEmpresa."'
@@ -143,11 +168,16 @@ include("includes/js-formularios.php");
 
 												while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
 												?>
-													<option selected value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
+													<option selected value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['prod_existencias'] . "]"; ?></option>
 												<?php
 													}
 												?>
 											</select>
+											<?php if ($disabled === '') { ?>
+											<span class="help-block" style="margin-top:6px;">Para agregar: haga clic y escriba el nombre o código. Para quitar: use la X del producto. Luego pulse <b>Guardar cambios</b>.</span>
+											<?php } else { ?>
+											<span class="help-block" style="margin-top:6px;color:#a94442;">No tiene permiso para editar productos del combo (página 388: Permiso editar valores combos).</span>
+											<?php } ?>
 										</div>
 								   </div>
 								
@@ -255,18 +285,22 @@ include("includes/js-formularios.php");
 							ORDER BY copp_id");
 							while($prod = mysqli_fetch_array($productos, MYSQLI_BOTH)){
 
-								$utilidadDealer = $prod['prod_descuento2'] / 100;
-								$precioDealer = $prod['prod_costo'] + ($prod['prod_costo'] * $utilidadDealer);
-								$subtotalDealer = ($precioDealer * $prod['copp_cantidad']);
-								$totalDealer +=$subtotalDealer;
+								$prodCosto = (float) $prod['prod_costo'];
+								$prodPrecio = (float) $prod['prod_precio'];
+								$coppPrecio = (float) $prod['copp_precio'];
+								$coppCantidad = (float) $prod['copp_cantidad'];
+								$utilidadDealer = ((float) $prod['prod_descuento2']) / 100;
+								$precioDealer = $prodCosto + ($prodCosto * $utilidadDealer);
+								$subtotalDealer = $precioDealer * $coppCantidad;
+								$totalDealer += $subtotalDealer;
 
 									
-								$subtotal = ($prod['prod_precio'] * $prod['copp_cantidad']);
-								$subtotalOriginal = ($prod['copp_precio'] * $prod['copp_cantidad']);
-								$total +=$subtotal;
+								$subtotal = $prodPrecio * $coppCantidad;
+								$subtotalOriginal = $coppPrecio * $coppCantidad;
+								$total += $subtotal;
 								$totalOriginal += $subtotalOriginal;
 								
-								$totalCantidad += $prod['copp_cantidad'];
+								$totalCantidad += $coppCantidad;
 
 								
 							?>
@@ -276,7 +310,7 @@ include("includes/js-formularios.php");
 									<?php if (Modulos::validarRol([305], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 										<a href="bd_delete/combo-productos-eliminar.php?get=55&idItem=<?=$prod['copp_id'];?>" onClick="if(!confirm('Desea eliminar este registro?')){return false;}"><i class="icon-trash"></i></a>
 									<?php } ?>
-									<?php if (Modulos::validarRol([418], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $prod['copp_precio'] <> $prod['prod_precio']) {?>
+									<?php if (Modulos::validarRol([418], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $coppPrecio <> $prodPrecio) {?>
 										<a href="bd_update/combo-productos-sincronizar.php?idItem=<?=$prod['copp_id'];?>&nuevoPrecio=<?=$prod['prod_precio'];?>" onClick="if(!confirm('Desea sincronizar este producto con los valores actuales?')){return false;}"><i class="icon-refresh "></i></a>
 									<?php } ?>
 									<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
@@ -286,9 +320,9 @@ include("includes/js-formularios.php");
 									<?php } ?>
 								</td>
                                 <td><input type="number" title="copp_cantidad" name="<?=$prod['copp_id'];?>" value="<?=$prod['copp_cantidad'];?>" onChange="productos(this)" style="width: 50px; text-align: center;" <?=$disabled;?> translate="no"></td>
-                                <td>$<?=number_format($prod['copp_precio'],0,",",".");?></td>
+                                <td>$<?=number_format($coppPrecio,0,",",".");?></td>
 								<td>$<?=number_format($subtotalOriginal,0,",",".");?></td>
-                                <td style="border-left: solid;">$<?=number_format($prod['prod_precio'],0,",",".");?></td>
+                                <td style="border-left: solid;">$<?=number_format($prodPrecio,0,",",".");?></td>
 								<td>$<?=number_format($subtotal,0,",",".");?></td>
 								<td style="color: darkblue; border-left: solid;">$<?=number_format($precioDealer,0,",",".");?></td>
 								<td style="color: darkblue;">$<?=number_format($subtotalDealer,0,",",".");?></td>
@@ -296,11 +330,12 @@ include("includes/js-formularios.php");
 							<?php 
 								$no ++;
 							}
-							$descuento = ($total * ($resultadoD['combo_descuento']/100));
-							$totalNeto = ($total - $descuento);
+							$descuentoCombo = (float) $resultadoD['combo_descuento'];
+							$descuento = $total * ($descuentoCombo / 100);
+							$totalNeto = $total - $descuento;
 
-							$descuentoDealer = ($totalDealer * ($resultadoD['combo_descuento']/100));
-							$totalNetoDealer = ($totalDealer - $descuentoDealer);
+							$descuentoDealer = $totalDealer * ($descuentoCombo / 100);
+							$totalNetoDealer = $totalDealer - $descuentoDealer;
 
 							//$descuentoDealer = ($total * ($resultadoD['combo_descuento_dealer']/100));
 							//$totalNetoDealer = ($total - $descuentoDealer);	
@@ -356,7 +391,78 @@ include("includes/js-formularios.php");
 		</div>
 	</div>
 	<?php include("includes/pie.php");?>
-	<script src="js/Combos.js"></script>
+	<script>
+	window.__defineBak = window.define;
+	window.define = undefined;
+	</script>
+	<script src="../assets-login/plugins/select2/js/select2.js"></script>
+	<script>
+	window.define = window.__defineBak;
+	(function ($) {
+		var $el = $("#product-select");
+		if (!$el.length) {
+			return;
+		}
+		if (typeof $.fn.select2 !== "function") {
+			console.error("Select2 no disponible en combos-editar");
+			return;
+		}
+
+		if ($el.hasClass("select2-hidden-accessible")) {
+			$el.select2("destroy");
+		}
+
+		var ajaxUrl = $el.attr("data-ajax-url") || "ajax/ajax-buscar-productos.php";
+		var opts = {
+			placeholder: "Escriba para buscar productos...",
+			multiple: true,
+			width: "100%",
+			closeOnSelect: false,
+			allowClear: true
+		};
+
+		if ($el.prop("disabled")) {
+			opts.disabled = true;
+			$el.select2(opts);
+			return;
+		}
+
+		opts.minimumInputLength = 1;
+		opts.language = {
+			inputTooShort: function () { return "Escriba al menos 1 caracter para buscar"; },
+			noResults: function () { return "Sin resultados"; },
+			searching: function () { return "Buscando..."; }
+		};
+		opts.ajax = {
+			url: ajaxUrl,
+			dataType: "json",
+			delay: 250,
+			data: function (params) {
+				return { term: params.term || "" };
+			},
+			processResults: function (data) {
+				if (!data || !$.isArray(data)) {
+					return { results: [] };
+				}
+				return {
+					results: $.map(data, function (item) {
+						return { id: String(item.id), text: item.text };
+					})
+				};
+			}
+		};
+
+		$el.select2(opts);
+
+		$el.on("select2:open", function () {
+			setTimeout(function () {
+				$(".select2-container--open .select2-search__field")
+					.css({ width: "200px", minWidth: "200px" })
+					.trigger("focus");
+			}, 0);
+		});
+	})(jQuery);
+	</script>
 </div>
 </body>
 </html>
