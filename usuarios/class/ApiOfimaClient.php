@@ -1,10 +1,14 @@
 <?php
 require_once RUTA_PROYECTO.'/conexion.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
+require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
+require_once RUTA_PROYECTO.'/usuarios/class/OfimaEndpointService.php';
 
 /**
- * Clase para consumir APIs de Ofima desde Orion
- * Maneja la comunicación HTTP con autenticación básica
+ * Cliente HTTP Orion → Ofima.
+ * Rutas: OfimaEndpointService (código).
+ * Base/credenciales: api_ofima_conexion.
+ * Habilitación: registro en api_configuracion (apic_activo).
  */
 class ApiOfimaClient {
     
@@ -17,67 +21,128 @@ class ApiOfimaClient {
     }
     
     /**
-     * Obtiene la configuración de API para un módulo y dirección específicos
+     * Resuelve URL, método y autenticación Bearer vía servicio + conexión Ofima.
      */
-    private function obtenerConfiguracion($modulo, $direccion = 'orion_ofima') {
-        $query = "SELECT * FROM api_configuracion 
-                  WHERE apic_modulo = ? 
-                  AND apic_direccion = ? 
-                  AND apic_id_empresa = ? 
-                  AND apic_activo = 1
-                  LIMIT 1";
-        
-        $stmt = $this->conexionBdPrincipal->prepare($query);
-        $stmt->bind_param("ssi", $modulo, $direccion, $this->idEmpresa);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows > 0) {
-            return $result->fetch_assoc();
+    private function resolverEnvio($modulo, $tipoOperacion) {
+        if (!ofimaIntegracionActiva($this->conexionBdPrincipal, (int) $this->idEmpresa)) {
+            return ['success' => false, 'error' => 'La integración Ofima está desactivada'];
         }
-        
-        return null;
+
+        $clave = OfimaEndpointService::claveOperacion($modulo, $tipoOperacion);
+        if (!OfimaEndpointService::obtener($clave)) {
+            return ['success' => false, 'error' => 'Endpoint Ofima no definido en el servicio: ' . $clave];
+        }
+
+        if (!OfimaEndpointService::estaHabilitado($this->conexionBdPrincipal, (int) $this->idEmpresa, $clave)) {
+            return ['success' => false, 'error' => 'Endpoint Ofima deshabilitado en el registro: ' . $clave];
+        }
+
+        $conexion = obtenerApiOfimaConexion($this->conexionBdPrincipal, (int) $this->idEmpresa);
+        if (!$conexion) {
+            return ['success' => false, 'error' => 'No hay configuración de conexión Ofima'];
+        }
+
+        $credenciales = resolverCredencialesOfima($conexion);
+        if ($credenciales['url_base'] === '') {
+            return ['success' => false, 'error' => 'URL base Ofima no configurada para el ambiente ' . $credenciales['ambiente']];
+        }
+
+        $url = OfimaEndpointService::urlAbsoluta($credenciales['url_base'], $clave);
+        if (!$url) {
+            return ['success' => false, 'error' => 'No se pudo construir la URL del endpoint ' . $clave];
+        }
+
+        $tokenResult = $this->obtenerTokenValido($conexion, $credenciales);
+        if (!$tokenResult['success']) {
+            return $tokenResult;
+        }
+
+        $meta = OfimaEndpointService::obtener($clave);
+
+        return [
+            'success' => true,
+            'url' => $url,
+            'metodo' => $meta['metodo'] ?? 'POST',
+            'token' => $tokenResult['token'],
+            'usuario' => null,
+            'password' => null,
+            'envolver_lista' => ($clave !== 'autenticacion'),
+            'clave' => $clave,
+        ];
+    }
+
+    /**
+     * Obtiene un token vigente o solicita uno nuevo (válido 1 hora según documentación Ofima).
+     */
+    private function obtenerTokenValido(array $conexion, array $credenciales) {
+        $ahora = time();
+        $expira = !empty($conexion['aoc_token_expira']) ? strtotime($conexion['aoc_token_expira']) : 0;
+
+        if (!empty($conexion['aoc_token']) && $expira > ($ahora + 60)) {
+            return ['success' => true, 'token' => $conexion['aoc_token']];
+        }
+
+        $resultado = solicitarTokenOfima(
+            $credenciales['url_base'],
+            $credenciales['usuario'],
+            $credenciales['clave']
+        );
+
+        if (!$resultado['success']) {
+            return [
+                'success' => false,
+                'error' => $resultado['error'] ?? 'No se pudo autenticar con Ofima',
+            ];
+        }
+
+        $token = $resultado['token'];
+        $expiraStr = date('Y-m-d H:i:s', $ahora + 3600);
+        $stmt = $this->conexionBdPrincipal->prepare(
+            "UPDATE api_ofima_conexion SET aoc_token = ?, aoc_token_expira = ? WHERE aoc_id_empresa = ?"
+        );
+        $stmt->bind_param('ssi', $token, $expiraStr, $this->idEmpresa);
+        $stmt->execute();
+
+        return ['success' => true, 'token' => $token];
     }
     
     /**
      * Realiza una petición HTTP a la API de Ofima
      */
-    private function realizarPeticion($url, $metodo = 'POST', $datos = null, $usuario = null, $password = null) {
+    private function realizarPeticion($url, $metodo = 'POST', $datos = null, $usuario = null, $password = null, $token = null) {
         $ch = curl_init();
         
-        // Configurar opciones básicas
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         
-        // Autenticación básica
-        if ($usuario && $password) {
-            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_USERPWD, $usuario . ":" . $password);
-        }
-        
-        // Headers
         $headers = [
             'Content-Type: application/json',
             'Accept: application/json'
         ];
+
+        if (!empty($token)) {
+            $headers[] = 'Authorization: Bearer ' . $token;
+        } elseif ($usuario && $password) {
+            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_USERPWD, $usuario . ":" . $password);
+        }
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         
-        // Método y datos
         if ($metodo === 'POST') {
             curl_setopt($ch, CURLOPT_POST, true);
-            if ($datos) {
+            if ($datos !== null) {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($datos));
             }
         } elseif ($metodo === 'PUT') {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-            if ($datos) {
+            if ($datos !== null) {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($datos));
             }
         }
         
-        // Ejecutar petición
         $respuesta = curl_exec($ch);
         $codigoHttp = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
@@ -101,11 +166,33 @@ class ApiOfimaClient {
             'respuesta_raw' => $respuesta
         ];
     }
+
+    private function enviarAOfima($modulo, $tipoOperacion, $datosOfima) {
+        $envio = $this->resolverEnvio($modulo, $tipoOperacion);
+        if (!$envio['success']) {
+            return $envio;
+        }
+
+        $payload = $datosOfima;
+        if (!empty($envio['envolver_lista'])) {
+            $esLista = is_array($datosOfima) && array_keys($datosOfima) === range(0, count($datosOfima) - 1);
+            $payload = $esLista ? $datosOfima : [$datosOfima];
+        }
+
+        return $this->realizarPeticion(
+            $envio['url'],
+            $envio['metodo'],
+            $payload,
+            $envio['usuario'],
+            $envio['password'],
+            $envio['token']
+        );
+    }
     
     /**
-     * Registra una sincronización en la base de datos
+     * Registra una sincronización en api_sincronizaciones (éxito o error).
      */
-    private function registrarSincronizacion($modulo, $direccion, $tipoOperacion, $idRegistro, $referencia, $datosEnviados, $respuesta, $estado, $codigoRespuesta = null, $mensajeError = null) {
+    public function registrarSincronizacion($modulo, $direccion, $tipoOperacion, $idRegistro, $referencia, $datosEnviados, $respuesta, $estado, $codigoRespuesta = null, $mensajeError = null) {
         $query = "INSERT INTO api_sincronizaciones (
             apis_modulo, apis_direccion, apis_tipo_operacion, apis_id_registro, 
             apis_referencia, apis_datos_enviados, apis_respuesta, apis_estado, 
@@ -113,8 +200,14 @@ class ApiOfimaClient {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)";
         
         $stmt = $this->conexionBdPrincipal->prepare($query);
-        $datosEnviadosJson = json_encode($datosEnviados);
-        $respuestaJson = json_encode($respuesta);
+        if (!$stmt) {
+            error_log('No se pudo preparar insert api_sincronizaciones: ' . $this->conexionBdPrincipal->error);
+            return 0;
+        }
+        $datosEnviadosJson = json_encode($datosEnviados, JSON_UNESCAPED_UNICODE);
+        $respuestaJson = json_encode($respuesta, JSON_UNESCAPED_UNICODE);
+        $codigoRespuesta = $codigoRespuesta === null ? 0 : (int) $codigoRespuesta;
+        $mensajeError = $mensajeError === null ? '' : (string) $mensajeError;
         
         $stmt->bind_param("sssissssisi", 
             $modulo, $direccion, $tipoOperacion, $idRegistro, $referencia,
@@ -123,54 +216,65 @@ class ApiOfimaClient {
         );
         
         $stmt->execute();
-        return $stmt->insert_id;
+        return (int) $stmt->insert_id;
     }
     
     /**
      * Sincroniza un producto a Ofima
      */
     public function sincronizarProducto($producto, $tipoOperacion = 'CREATE') {
-        $config = $this->obtenerConfiguracion('productos', 'orion_ofima');
-        
-        if (!$config) {
-            return [
-                'success' => false,
-                'error' => 'No hay configuración de API para productos'
-            ];
-        }
-        
-        // Validar datos antes de enviar (referencia y nombre ya validados en Producto; validar numéricos)
+        $datosOfima = $this->mapearCamposProducto($producto);
+        $referencia = isset($producto['prod_referencia']) ? $producto['prod_referencia'] : ($datosOfima['referencia'] ?? '');
+        $idRegistro = isset($producto['prod_id']) ? (int) $producto['prod_id'] : 0;
+
         $costo = isset($producto['prod_costo']) ? floatval($producto['prod_costo']) : null;
         $utilidad = isset($producto['prod_utilidad']) ? floatval($producto['prod_utilidad']) : null;
         if ($costo !== null && $costo < 0) {
-            return [
+            $resultado = [
                 'success' => false,
-                'error' => 'El costo del producto no puede ser negativo'
+                'error' => 'El costo del producto no puede ser negativo',
+                'codigo_http' => 400,
             ];
+            $this->registrarSincronizacion(
+                'productos', 'orion_ofima', $tipoOperacion, $idRegistro, $referencia,
+                $datosOfima, $resultado, 'error', 400, $resultado['error']
+            );
+            return $resultado;
         }
         if ($utilidad !== null && ($utilidad < 0 || $utilidad > 100)) {
-            return [
+            $resultado = [
                 'success' => false,
-                'error' => 'La utilidad debe estar entre 0 y 100'
+                'error' => 'La utilidad debe estar entre 0 y 100',
+                'codigo_http' => 400,
             ];
+            $this->registrarSincronizacion(
+                'productos', 'orion_ofima', $tipoOperacion, $idRegistro, $referencia,
+                $datosOfima, $resultado, 'error', 400, $resultado['error']
+            );
+            return $resultado;
         }
-        
-        // Mapear campos de Orion a Ofima
-        $datosOfima = $this->mapearCamposProducto($producto);
-        
-        // Realizar petición
-        $resultado = $this->realizarPeticion(
-            $config['apic_url_endpoint'],
-            $tipoOperacion === 'CREATE' ? 'POST' : 'PUT',
-            $datosOfima,
-            $config['apic_usuario'],
-            $this->desencriptarPassword($config['apic_password'])
-        );
-        
-        // Registrar sincronización
-        $referencia = isset($producto['prod_referencia']) ? $producto['prod_referencia'] : '';
-        $idRegistro = isset($producto['prod_id']) ? $producto['prod_id'] : 0;
-        
+
+        $faltantes = [];
+        foreach (['referencia', 'nombre'] as $campo) {
+            if (!isset($datosOfima[$campo]) || trim((string) $datosOfima[$campo]) === '') {
+                $faltantes[] = $campo;
+            }
+        }
+        if (!empty($faltantes)) {
+            $resultado = [
+                'success' => false,
+                'error' => 'Faltan datos requeridos para Ofima: ' . implode(', ', $faltantes),
+                'codigo_http' => 400,
+            ];
+            $this->registrarSincronizacion(
+                'productos', 'orion_ofima', $tipoOperacion, $idRegistro, $referencia,
+                $datosOfima, $resultado, 'error', 400, $resultado['error']
+            );
+            return $resultado;
+        }
+
+        $resultado = $this->enviarAOfima('productos', $tipoOperacion, $datosOfima);
+
         $this->registrarSincronizacion(
             'productos',
             'orion_ofima',
@@ -180,10 +284,10 @@ class ApiOfimaClient {
             $datosOfima,
             $resultado,
             $resultado['success'] ? 'exitoso' : 'error',
-            $resultado['codigo_http'],
+            $resultado['codigo_http'] ?? null,
             $resultado['success'] ? null : ($resultado['error'] ?? 'Error desconocido')
         );
-        
+
         return $resultado;
     }
     
@@ -191,28 +295,40 @@ class ApiOfimaClient {
      * Sincroniza un cliente a Ofima
      */
     public function sincronizarCliente($cliente, $tipoOperacion = 'CREATE') {
-        $config = $this->obtenerConfiguracion('clientes', 'orion_ofima');
-        
-        if (!$config) {
-            return [
-                'success' => false,
-                'error' => 'No hay configuración de API para clientes'
-            ];
-        }
-        
-        // Mapear campos de Orion a Ofima
         $datosOfima = $this->mapearCamposCliente($cliente);
+
+        $camposRequeridos = ['identificacion', 'nombre', 'email', 'telefono', 'direccion', 'ciudad', 'celular', 'tipodcto'];
+        $faltantes = [];
+        foreach ($camposRequeridos as $campo) {
+            if (!isset($datosOfima[$campo]) || trim((string) $datosOfima[$campo]) === '') {
+                $faltantes[] = $campo;
+            }
+        }
+        if (!empty($faltantes)) {
+            $resultado = [
+                'success' => false,
+                'error' => 'Faltan datos requeridos para Ofima: ' . implode(', ', $faltantes),
+                'codigo_http' => 400,
+            ];
+            $referencia = $datosOfima['identificacion'] ?? '';
+            $idRegistro = isset($cliente['cli_id']) ? (int) $cliente['cli_id'] : 0;
+            $this->registrarSincronizacion(
+                'clientes',
+                'orion_ofima',
+                $tipoOperacion,
+                $idRegistro,
+                $referencia,
+                $datosOfima,
+                $resultado,
+                'error',
+                400,
+                $resultado['error']
+            );
+            return $resultado;
+        }
+
+        $resultado = $this->enviarAOfima('clientes', $tipoOperacion, $datosOfima);
         
-        // Realizar petición
-        $resultado = $this->realizarPeticion(
-            $config['apic_url_endpoint'],
-            $tipoOperacion === 'CREATE' ? 'POST' : 'PUT',
-            $datosOfima,
-            $config['apic_usuario'],
-            $this->desencriptarPassword($config['apic_password'])
-        );
-        
-        // Registrar sincronización (identificador único: NIT/documento = cli_usuario)
         $referencia = isset($cliente['cli_usuario']) ? $cliente['cli_usuario'] : (isset($cliente['cli_identificacion']) ? $cliente['cli_identificacion'] : '');
         $idRegistro = isset($cliente['cli_id']) ? $cliente['cli_id'] : 0;
         
@@ -225,7 +341,7 @@ class ApiOfimaClient {
             $datosOfima,
             $resultado,
             $resultado['success'] ? 'exitoso' : 'error',
-            $resultado['codigo_http'],
+            $resultado['codigo_http'] ?? null,
             $resultado['success'] ? null : ($resultado['error'] ?? 'Error desconocido')
         );
         
@@ -241,15 +357,6 @@ class ApiOfimaClient {
      * @return array { success, error?, codigo_http?, datos? }
      */
     public function sincronizarPedido($pedido, $tipoOperacion = 'CREATE') {
-        $config = $this->obtenerConfiguracion('pedidos', 'orion_ofima');
-        
-        if (!$config) {
-            return [
-                'success' => false,
-                'error' => 'No hay configuración de API para pedidos'
-            ];
-        }
-        
         $pedidId = is_array($pedido) ? (isset($pedido['pedid_id']) ? (int) $pedido['pedid_id'] : 0) : (int) $pedido;
         if ($pedidId <= 0) {
             return ['success' => false, 'error' => 'ID de pedido inválido'];
@@ -285,13 +392,7 @@ class ApiOfimaClient {
             return ['success' => false, 'error' => $datosOfima['error']];
         }
         
-        $resultado = $this->realizarPeticion(
-            $config['apic_url_endpoint'],
-            $tipoOperacion === 'CREATE' ? 'POST' : 'PUT',
-            $datosOfima,
-            $config['apic_usuario'],
-            $this->desencriptarPassword($config['apic_password'])
-        );
+        $resultado = $this->enviarAOfima('pedidos', $tipoOperacion, $datosOfima);
         
         $this->registrarSincronizacion(
             'pedidos',
@@ -302,7 +403,7 @@ class ApiOfimaClient {
             $datosOfima,
             $resultado,
             $resultado['success'] ? 'exitoso' : 'error',
-            $resultado['codigo_http'],
+            $resultado['codigo_http'] ?? null,
             $resultado['success'] ? null : ($resultado['error'] ?? ($resultado['datos']['error'] ?? 'Error desconocido'))
         );
         
@@ -483,64 +584,173 @@ class ApiOfimaClient {
     }
     
     /**
-     * Mapea campos de producto de Orion a Ofima
+     * Mapea campos de producto de Orion a Ofima.
+     * Default: referencia, nombre, costo, utilidad, precio, ids y id_empresa.
      */
     private function mapearCamposProducto($producto) {
-        // Obtener mapeo de campos desde la base de datos
         $mapeo = $this->obtenerMapeoCampos('productos');
-        
         $datosOfima = [];
-        
-        foreach ($mapeo as $campo) {
-            $campoOrion = $campo['apim_campo_orion'];
-            $campoOfima = $campo['apim_campo_ofima'];
-            
-            if (isset($producto[$campoOrion])) {
-                $valor = $producto[$campoOrion];
-                
-                // Aplicar transformación si es necesario
-                $valor = $this->aplicarTransformacion($valor, $campo['apim_tipo_transformacion']);
-                
-                $datosOfima[$campoOfima] = $valor;
-            } elseif ($campo['apim_valor_default']) {
-                $datosOfima[$campoOfima] = $campo['apim_valor_default'];
-            }
-        }
-        
-        return $datosOfima;
-    }
-    
-    /**
-     * Mapea campos de cliente de Orion a Ofima
-     * En Orion el NIT/documento es cli_usuario; se envía como identificacion.
-     */
-    private function mapearCamposCliente($cliente) {
-        $mapeo = $this->obtenerMapeoCampos('clientes');
+
         if (!empty($mapeo)) {
-            $datosOfima = [];
             foreach ($mapeo as $campo) {
                 $campoOrion = $campo['apim_campo_orion'];
                 $campoOfima = $campo['apim_campo_ofima'];
-                if (isset($cliente[$campoOrion])) {
-                    $datosOfima[$campoOfima] = $this->aplicarTransformacion($cliente[$campoOrion], $campo['apim_tipo_transformacion']);
-                } elseif ($campo['apim_valor_default']) {
+                if (isset($producto[$campoOrion]) && $producto[$campoOrion] !== '' && $producto[$campoOrion] !== null) {
+                    $datosOfima[$campoOfima] = $this->aplicarTransformacion($producto[$campoOrion], $campo['apim_tipo_transformacion']);
+                } elseif (!empty($campo['apim_valor_default'])) {
                     $datosOfima[$campoOfima] = $campo['apim_valor_default'];
                 }
             }
-            $datosOfima['id_empresa'] = $this->idEmpresa;
-            return $datosOfima;
         }
+
+        if (empty($datosOfima)) {
+            $datosOfima = [
+                'referencia' => (string) ($producto['prod_referencia'] ?? ''),
+                'nombre' => (string) ($producto['prod_nombre'] ?? ''),
+                'costo' => isset($producto['prod_costo']) ? (float) $producto['prod_costo'] : 0,
+                'utilidad' => isset($producto['prod_utilidad']) ? (float) $producto['prod_utilidad'] : 0,
+                'categoria_id' => (int) ($producto['prod_categoria'] ?? 0),
+                'grupo_id' => (int) ($producto['prod_grupo1'] ?? 0),
+                'marca_id' => (int) ($producto['prod_marca'] ?? 0),
+                'proveedor_id' => (int) ($producto['prod_proveedor'] ?? 0),
+            ];
+            if (isset($producto['prod_precio']) && $producto['prod_precio'] !== '' && $producto['prod_precio'] !== null) {
+                $datosOfima['precio'] = (float) $producto['prod_precio'];
+            }
+        }
+
+        $datosOfima['id_empresa'] = (int) $this->idEmpresa;
+        if (!isset($datosOfima['referencia']) || $datosOfima['referencia'] === '') {
+            $datosOfima['referencia'] = (string) ($producto['prod_referencia'] ?? '');
+        }
+        if (!isset($datosOfima['nombre']) || $datosOfima['nombre'] === '') {
+            $datosOfima['nombre'] = (string) ($producto['prod_nombre'] ?? '');
+        }
+
+        unset($datosOfima['clasificacion_id']);
+        $codigoLinea = $this->codigoGrupoOfima($producto['prod_grupo1'] ?? 0);
+        $codigoSublinea = $this->codigoGrupoOfima($producto['prod_categoria'] ?? 0);
+        $datosOfima['grupo_1'] = $codigoLinea;
+        $datosOfima['grupo_id'] = $codigoLinea;
+        $datosOfima['grupo_2'] = $codigoSublinea;
+        $datosOfima['categoria_id'] = $codigoSublinea;
+        $datosOfima['grupo_3'] = $this->codigoGrupoOfima($producto['prod_grupo3'] ?? 0);
+        $datosOfima['marca_id'] = $this->codigoMarcaOfima($producto['prod_marca'] ?? 0);
+
+        $nombre = trim((string) ($datosOfima['nombre'] ?? $producto['prod_nombre'] ?? ''));
+        $corta = trim(strip_tags((string) ($producto['prod_descripcion_corta'] ?? '')));
+        $larga = trim(strip_tags((string) ($producto['prod_descripcion_larga'] ?? '')));
+        $datosOfima['descripcion_corta'] = $corta !== '' ? $corta : $nombre;
+        $datosOfima['descripcion_larga'] = $larga !== '' ? $larga : ($corta !== '' ? $corta : $nombre);
+
+        return $datosOfima;
+    }
+
+    /**
+     * Código Ofima (catp_cod_grupo) de una categoría. Se envía como texto para conservar ceros.
+     */
+    private function codigoGrupoOfima($categoriaId) {
+        $categoriaId = (int) $categoriaId;
+        if ($categoriaId <= 0) {
+            return null;
+        }
+        $stmt = $this->conexionBdPrincipal->prepare(
+            'SELECT catp_cod_grupo FROM productos_categorias WHERE catp_id = ? AND catp_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('ii', $categoriaId, $this->idEmpresa);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $codigo = trim((string) ($row['catp_cod_grupo'] ?? ''));
+        return $codigo === '' ? null : $codigo;
+    }
+
+    /**
+     * Código Ofima de la marca (mar_cod_ofima).
+     */
+    private function codigoMarcaOfima($marcaId) {
+        $marcaId = (int) $marcaId;
+        if ($marcaId <= 0) {
+            return null;
+        }
+        $stmt = $this->conexionBdPrincipal->prepare(
+            'SELECT mar_cod_ofima FROM marcas WHERE mar_id = ? AND mar_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('ii', $marcaId, $this->idEmpresa);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $codigo = trim((string) ($row['mar_cod_ofima'] ?? ''));
+        return $codigo === '' ? null : $codigo;
+    }
+    
+    /**
+     * Mapea campos de cliente de Orion a Ofima.
+     * Payload: identificacion, nombre, email, telefono, direccion, ciudad (DIAN),
+     * celular, referencia, id_empresa, tipodcto.
+     */
+    private function mapearCamposCliente($cliente) {
+        $ciudadId = isset($cliente['cli_ciudad']) ? (int) $cliente['cli_ciudad'] : 0;
+        $identificacion = (string) ($cliente['cli_usuario'] ?? $cliente['cli_identificacion'] ?? '');
+        $referencia = trim((string) ($cliente['cli_referencia'] ?? ''));
+        if ($referencia === '') {
+            $referencia = $identificacion;
+        }
+
         return [
-            'identificacion' => $cliente['cli_usuario'] ?? $cliente['cli_identificacion'] ?? '',
-            'nombre' => $cliente['cli_nombre'] ?? '',
-            'email' => $cliente['cli_email'] ?? '',
-            'telefono' => $cliente['cli_telefono'] ?? '',
-            'direccion' => $cliente['cli_direccion'] ?? '',
-            'ciudad' => $cliente['cli_ciudad'] ?? '',
-            'celular' => $cliente['cli_celular'] ?? '',
-            'referencia' => $cliente['cli_referencia'] ?? '',
-            'id_empresa' => $this->idEmpresa
+            'identificacion' => $identificacion,
+            'nombre' => (string) ($cliente['cli_nombre'] ?? ''),
+            'email' => (string) ($cliente['cli_email'] ?? ''),
+            'telefono' => (string) ($cliente['cli_telefono'] ?? ''),
+            'direccion' => (string) ($cliente['cli_direccion'] ?? ''),
+            'ciudad' => $this->obtenerCodigoDianCiudad($ciudadId),
+            'celular' => (string) ($cliente['cli_celular'] ?? ''),
+            'referencia' => $referencia,
+            'id_empresa' => (int) $this->idEmpresa,
+            'tipodcto' => $this->mapearTipoDocumentoOfima($cliente['cli_tipo_documento'] ?? null),
         ];
+    }
+
+    /**
+     * Obtiene ciu_cod_dian homologado para Ofima/DIAN.
+     */
+    private function obtenerCodigoDianCiudad($ciudadId) {
+        $ciudadId = (int) $ciudadId;
+        if ($ciudadId <= 0 || !defined('BDADMIN')) {
+            return '';
+        }
+
+        $sql = 'SELECT ciu_cod_dian FROM ' . BDADMIN . '.localidad_ciudades WHERE ciu_id = ? LIMIT 1';
+        $stmt = $this->conexionBdPrincipal->prepare($sql);
+        if (!$stmt) {
+            return '';
+        }
+        $stmt->bind_param('i', $ciudadId);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        if (!$row || empty($row['ciu_cod_dian'])) {
+            return '';
+        }
+        return (string) $row['ciu_cod_dian'];
+    }
+
+    /**
+     * Homologa tipo documento Orion → tipodcto Ofima.
+     * 2=NIT, 3=Cédula (resto por defecto C).
+     */
+    private function mapearTipoDocumentoOfima($tipoDocumento) {
+        $tipo = (int) $tipoDocumento;
+        if ($tipo === 2) {
+            return 'N';
+        }
+        if ($tipo === 3) {
+            return 'C';
+        }
+        return 'C';
     }
     
     /**

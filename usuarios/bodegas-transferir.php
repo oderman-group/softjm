@@ -4,6 +4,11 @@ include("sesion.php");
 $idPagina = 147;
 
 include("includes/verificar-paginas.php");
+include_once(RUTA_PROYECTO."/usuarios/includes/api-ofima-conexion.php");
+if (ofimaIntegracionActiva($conexionBdPrincipal, (int) $_SESSION["dataAdicional"]["id_empresa"])) {
+    echo '<script type="text/javascript">alert("Con la integración Ofima activa, las transferencias de productos solo se gestionan desde Ofima."); window.location.href="bodegas.php";</script>';
+    exit();
+}
 include("includes/head.php");
 ?>
 <!-- styles -->
@@ -62,10 +67,10 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="desde">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM bodegas",$conexion);
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM bodegas WHERE bod_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."'",$conexion);
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
-                                            	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>
+                                            	<option value="<?=$resOp[0];?>"><?=$resOp[1];?><?php if (isset($resOp['bod_habilitada']) && (int) $resOp['bod_habilitada'] === 0) { echo " (deshabilitada)"; } ?></option>
                                             <?php
 											}
 											?>
@@ -78,7 +83,7 @@ include("includes/js-formularios.php");
 										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="hasta">
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM bodegas",$conexion);
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM bodegas WHERE bod_id_empresa='".$_SESSION["dataAdicional"]["id_empresa"]."' AND bod_habilitada=1",$conexion);
 											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
 											?>
                                             	<option value="<?=$resOp[0];?>"><?=$resOp[1];?></option>

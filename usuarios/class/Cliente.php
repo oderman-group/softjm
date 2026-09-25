@@ -226,26 +226,67 @@ class Cliente extends BaseDatos {
 
     /**
      * Sincroniza un cliente con Ofima (Orion → Ofima).
-     * Se llama al crear o actualizar un cliente.
+     * Toda acción (éxito o error) queda en api_sincronizaciones.
      *
-     * @param int     $clienteId          ID del cliente.
-     * @param mysqli  $conexionBdPrincipal Conexión a la base de datos.
-     * @param int     $idEmpresa          ID de la empresa.
-     * @param string  $tipoOperacion      'CREATE' o 'UPDATE'
-     * @return array Resultado de la sincronización
+     * @return array{success:bool,message?:string,error?:string,codigo_http?:int,notificacion?:array}
      */
     public static function sincronizarConOfima($clienteId, $conexionBdPrincipal, $idEmpresa, $tipoOperacion = 'UPDATE') {
-        $query = "SELECT apic_activo FROM api_configuracion 
-                  WHERE apic_modulo = 'clientes' 
-                  AND apic_direccion = 'orion_ofima' 
-                  AND apic_id_empresa = ? 
-                  LIMIT 1";
-        $stmt = $conexionBdPrincipal->prepare($query);
-        $stmt->bind_param("i", $idEmpresa);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows === 0 || $result->fetch_assoc()['apic_activo'] != 1) {
-            return ['success' => false, 'message' => 'Sincronización desactivada'];
+        require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+        require_once RUTA_PROYECTO . '/usuarios/class/OfimaEndpointService.php';
+        require_once RUTA_PROYECTO . '/usuarios/class/ApiOfimaClient.php';
+
+        $tipoOperacion = strtoupper($tipoOperacion) === 'UPDATE' ? 'UPDATE' : 'CREATE';
+        $claveEndpoint = OfimaEndpointService::claveOperacion('clientes', $tipoOperacion);
+        $clienteId = (int) $clienteId;
+        $idEmpresa = (int) $idEmpresa;
+        $apiClient = new ApiOfimaClient($conexionBdPrincipal, $idEmpresa);
+
+        $registrar = static function (array $resultado, $cliente = null, $datosEnviados = null) use ($apiClient, $tipoOperacion, $clienteId) {
+            $referencia = '';
+            if (is_array($cliente)) {
+                $referencia = (string) ($cliente['cli_usuario'] ?? $cliente['cli_identificacion'] ?? '');
+            }
+            $apiClient->registrarSincronizacion(
+                'clientes',
+                'orion_ofima',
+                $tipoOperacion,
+                $clienteId,
+                $referencia,
+                $datosEnviados ?? ['cli_id' => $clienteId],
+                $resultado,
+                !empty($resultado['success']) ? 'exitoso' : 'error',
+                $resultado['codigo_http'] ?? null,
+                $resultado['success'] ? null : ($resultado['error'] ?? $resultado['message'] ?? 'Error desconocido')
+            );
+            return $resultado;
+        };
+
+        $conNotificacion = static function (array $resultado, $tipoForzado = null) {
+            $ok = !empty($resultado['success']);
+            $texto = $ok
+                ? 'Cliente sincronizado con Ofima correctamente.'
+                : ('Ofima: ' . ($resultado['error'] ?? $resultado['message'] ?? 'No se pudo sincronizar el cliente.'));
+            $resultado['notificacion'] = [
+                'tipo' => $tipoForzado ?? ($ok ? 'success' : 'error'),
+                'mensaje' => $texto,
+            ];
+            return $resultado;
+        };
+
+        if (!ofimaIntegracionActiva($conexionBdPrincipal, $idEmpresa)) {
+            return $conNotificacion($registrar([
+                'success' => false,
+                'message' => 'Integración Ofima desactivada',
+                'codigo_http' => 0,
+            ]), 'warning');
+        }
+
+        if (!OfimaEndpointService::estaHabilitado($conexionBdPrincipal, $idEmpresa, $claveEndpoint)) {
+            return $conNotificacion($registrar([
+                'success' => false,
+                'message' => 'Endpoint Ofima deshabilitado: ' . $claveEndpoint,
+                'codigo_http' => 0,
+            ]), 'warning');
         }
 
         $query = "SELECT * FROM clientes WHERE cli_id = ? AND cli_id_empresa = ?";
@@ -254,20 +295,25 @@ class Cliente extends BaseDatos {
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows === 0) {
-            return ['success' => false, 'error' => 'Cliente no encontrado'];
+            return $conNotificacion($registrar([
+                'success' => false,
+                'error' => 'Cliente no encontrado',
+                'codigo_http' => 404,
+            ]));
         }
         $cliente = $result->fetch_assoc();
 
         if (empty(trim($cliente['cli_usuario'] ?? '')) || empty(trim($cliente['cli_nombre'] ?? ''))) {
-            return [
+            return $conNotificacion($registrar([
                 'success' => false,
-                'error'   => 'El cliente debe tener documento (NIT) y nombre para sincronizar con Ofima'
-            ];
+                'error' => 'El cliente debe tener documento (NIT) y nombre para sincronizar con Ofima',
+                'codigo_http' => 400,
+            ], $cliente));
         }
 
-        require_once RUTA_PROYECTO . '/usuarios/class/ApiOfimaClient.php';
-        $apiClient = new ApiOfimaClient($conexionBdPrincipal, $idEmpresa);
-        return $apiClient->sincronizarCliente($cliente, $tipoOperacion);
+        // sincronizarCliente ya registra en api_sincronizaciones
+        $resultado = $apiClient->sincronizarCliente($cliente, $tipoOperacion);
+        return $conNotificacion($resultado);
     }
 
     /**

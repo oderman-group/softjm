@@ -1,0 +1,281 @@
+{
+  "info": {
+    "name": "Integración Orion Ofima",
+    "description": "Colección para probar la integración documentada en DOCUMENTACION_INTEGRACION_ORION_OFIMA_PEDIDOS.html.\n\n1. Completa las variables usuario y password.\n2. Ejecuta Login (JWT). El token se guarda solo en la variable token.\n3. Prueba clientes, productos, inventario y bodegas contra Orion.\n\nbase_orion por defecto apunta a pruebas (developer). Para producción cámbiala a https://app.orioncrm.com.co/softjm",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_orion", "value": "https://developer.orioncrm.com.co/softjm" },
+    { "key": "usuario", "value": "" },
+    { "key": "password", "value": "" },
+    { "key": "token", "value": "" },
+    { "key": "id_empresa", "value": "1" },
+    { "key": "ofima_url_clientes", "value": "https://api.ofima.com/integracion/orion/clientes" },
+    { "key": "ofima_url_productos", "value": "https://api.ofima.com/integracion/orion/productos" },
+    { "key": "ofima_url_pedidos", "value": "https://api.ofima.com/integracion/orion/pedidos" },
+    { "key": "ofima_usuario", "value": "" },
+    { "key": "ofima_password", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Ofima hacia Orion",
+      "description": "Endpoints que Orion expone. Auth: Bearer JWT obtenido en Login, o Basic Auth.",
+      "item": [
+        {
+          "name": "Login JWT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.token) {",
+                  "        pm.collectionVariables.set('token', json.token);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{usuario}}", "type": "string" },
+                { "key": "password", "value": "{{password}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{usuario}}\",\n  \"password\": \"{{password}}\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_orion}}/usuarios/api/orion/auth.php",
+            "description": "POST /softjm/usuarios/api/orion/auth.php\nBasic Auth o body JSON con usuario y password. Guarda token para el resto de peticiones."
+          }
+        },
+        {
+          "name": "Clientes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"Bogotá\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_orion}}/usuarios/api/orion/clientes-recibir.php",
+            "description": "POST /softjm/usuarios/api/orion/clientes-recibir.php. Requeridos: identificacion, nombre."
+          }
+        },
+        {
+          "name": "Productos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"referencia\": \"COD001\",\n  \"nombre\": \"Producto ejemplo\",\n  \"costo\": 10000,\n  \"utilidad\": 30,\n  \"precio\": 13000,\n  \"categoria_id\": 1,\n  \"grupo_id\": null,\n  \"marca_id\": null,\n  \"proveedor_id\": null,\n  \"descripcion_corta\": \"\",\n  \"descripcion_larga\": \"\",\n  \"descuento1\": null,\n  \"comision\": null,\n  \"costo_dolar\": null,\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_orion}}/usuarios/api/orion/productos-recibir.php",
+            "description": "POST /softjm/usuarios/api/orion/productos-recibir.php. Requeridos: referencia, nombre."
+          }
+        },
+        {
+          "name": "Inventario un item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"referencia\": \"COD001\",\n  \"bodega_id\": 1,\n  \"existencias\": 50,\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_orion}}/usuarios/api/orion/inventario-recibir.php",
+            "description": "POST /softjm/usuarios/api/orion/inventario-recibir.php. Un solo ítem."
+          }
+        },
+        {
+          "name": "Inventario lote",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_empresa\": {{id_empresa}},\n  \"items\": [\n    { \"referencia\": \"COD001\", \"bodega_id\": 1, \"existencias\": 50 },\n    { \"referencia\": \"COD002\", \"bodega_id\": 1, \"existencias\": 30 }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_orion}}/usuarios/api/orion/inventario-recibir.php",
+            "description": "POST /softjm/usuarios/api/orion/inventario-recibir.php. Varios ítems en items."
+          }
+        },
+        {
+          "name": "Bodegas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"referencia\": \"BOGOTA\",\n  \"nombre\": \"BODEGA BOGOTÁ\",\n  \"ciudad\": \"11001\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_orion}}/usuarios/api/orion/bodegas-recibir.php",
+            "description": "POST /softjm/usuarios/api/orion/bodegas-recibir.php. ciudad es el código DIAN (ciu_cod_dian). La bodega queda habilitada."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orion hacia Ofima",
+      "description": "Ejemplos de lo que Orion envía a las URLs que Ofima debe exponer. Auth: HTTP Basic.",
+      "auth": {
+        "type": "basic",
+        "basic": [
+          { "key": "username", "value": "{{ofima_usuario}}", "type": "string" },
+          { "key": "password", "value": "{{ofima_password}}", "type": "string" }
+        ]
+      },
+      "item": [
+        {
+          "name": "Clientes crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"Bogotá\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{ofima_url_clientes}}"
+          }
+        },
+        {
+          "name": "Clientes actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"Bogotá\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{ofima_url_clientes}}"
+          }
+        },
+        {
+          "name": "Productos crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"referencia\": \"COD001\",\n  \"nombre\": \"Producto ejemplo\",\n  \"costo\": 10000,\n  \"utilidad\": 30,\n  \"precio\": 13000,\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{ofima_url_productos}}"
+          }
+        },
+        {
+          "name": "Productos actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"referencia\": \"COD001\",\n  \"nombre\": \"Producto ejemplo\",\n  \"costo\": 10000,\n  \"utilidad\": 30,\n  \"precio\": 13000,\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{ofima_url_productos}}"
+          }
+        },
+        {
+          "name": "Pedidos crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numero\": \"123\",\n  \"cliente_identificacion\": \"900123456-1\",\n  \"cliente_id\": 5,\n  \"fecha\": \"2025-02-26\",\n  \"observaciones\": \"Texto opcional\",\n  \"items\": [\n    {\n      \"referencia\": \"COD001\",\n      \"producto_id\": 10,\n      \"cantidad\": 2,\n      \"valor\": 15000.00,\n      \"descuento\": 0,\n      \"impuesto\": 19\n    }\n  ],\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{ofima_url_pedidos}}"
+          }
+        },
+        {
+          "name": "Pedidos actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numero\": \"123\",\n  \"cliente_identificacion\": \"900123456-1\",\n  \"cliente_id\": 5,\n  \"fecha\": \"2025-02-26\",\n  \"observaciones\": \"Texto opcional\",\n  \"items\": [\n    {\n      \"referencia\": \"COD001\",\n      \"producto_id\": 10,\n      \"cantidad\": 2,\n      \"valor\": 15000.00,\n      \"descuento\": 0,\n      \"impuesto\": 19\n    }\n  ],\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{ofima_url_pedidos}}"
+          }
+        }
+      ]
+    }
+  ]
+}

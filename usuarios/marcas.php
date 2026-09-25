@@ -82,6 +82,7 @@ include("includes/head.php");
 								<th>No</th>
 								<th>Cod.</th>
                                 <th>Nombre</th>
+								<th>Código Ofima</th>
                                 <th></th>
 							</tr>
 							</thead>
@@ -95,6 +96,7 @@ include("includes/head.php");
 								<td><?=$no;?></td>
 								<td><?=$res['mar_id'];?></td>
                                 <td><?=$res['mar_nombre'];?></td>
+								<td><?= htmlspecialchars((string) ($res['mar_cod_ofima'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><h4>
 																	<?php if (Modulos::validarRol([35], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
                                     <a href="marcas-editar.php?id=<?=$res[0];?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>

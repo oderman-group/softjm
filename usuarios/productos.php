@@ -226,7 +226,9 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 </head>
 
 <body>
-
+	<?php if (Modulos::validarRol([37], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+		include("includes/drawer-crear-producto.php");
+	} ?>
 
 	<input type="hidden" value="<?= $tabla; ?>" name="tabla" id="tabla">
 	<input type="hidden" value="<?= $pk; ?>" name="pk" id="pk">
@@ -273,7 +275,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 											<li><a href="javascript:history.go(-1);"><i class="icon-arrow-left"></i> Regresar</a></li>
 											<li>
 												<?php if (Modulos::validarRol([37], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-													<a href="productos-agregar.php"><i class="icon-plus"></i> Agregar nuevo</a>
+													<a href="#" class="js-abrir-crear-producto" id="btnCrearProductoRapido" aria-haspopup="dialog"><i class="icon-plus"></i> Agregar nuevo</a>
 												<?php } ?>
 											</li>
 											<li>
@@ -334,7 +336,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 												<ul class="dropdown-menu">
 													<li><a href="productos.php">Todos</a></li>
 													<?php
-													$marcas = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."'");
+													$marcas = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."' AND mar_habilitada=1");
 													while ($marca = mysqli_fetch_array($marcas, MYSQLI_BOTH)) {
 													?>
 														<li><a href="productos.php?marca=<?= $marca[0]; ?>" style="color:<?= $color; ?>"><?= $marca[1]; ?></a></li>
@@ -608,7 +610,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 														<?= $res['prod_nombre']; ?>
 														<h4>
 														<?php if (Modulos::validarRol([38], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-															<a href="productos-editar.php?id=<?= $res[0]; ?>" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a>
+															<a href="#" class="js-editar-producto" data-id="<?= (int) $res[0]; ?>" title="Editar"><i class="icon-edit"></i></a>
 														<?php } ?>
 														<?php if (Modulos::validarRol([61], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && Producto::numeroProcesosComerciales($res[0], $conexionBdPrincipal) == 0 && Producto::numeroCombos($res[0], $conexionBdPrincipal) == 0) {?>
 															<a href="bd_delete/productos-eliminar.php?id=<?= $res[0]; ?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}" data-toggle="tooltip" title="Eliminar"><i class="icon-remove-sign"></i></a>

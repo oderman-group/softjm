@@ -48,6 +48,7 @@
     prod_descuento1='" . $_POST["dcto1"] . "', 
     prod_comision='" . $_POST["comision"] . "', 
     prod_marca='" . $_POST["marca"] . "', 
+    prod_grupo3='" . (int) ($_POST["grupo3"] ?? 0) . "', 
     prod_descripcion_corta='" . $conexionBdPrincipal->real_escape_string($_POST["descripcion"]) . "', 
     prod_costo_dolar='" . $_POST["costoDolar"] . "', 
     prod_referencia='" . $_POST["referencia"] . "', 
@@ -58,15 +59,33 @@
     // Recalcular prod_existencias desde productos_bodegas (origen de la verdad)
     Producto::sincronizarExistenciasConBodegas($_POST["id"], $conexionBdPrincipal);
 
-    // Sincronizar con Ofima (en segundo plano, no bloquea si falla)
+    $syncOfima = ['success' => false, 'message' => 'Sin sincronización'];
     try {
-        Producto::sincronizarConOfima($_POST["id"], $conexionBdPrincipal, $idEmpresa, 'UPDATE');
+        $syncOfima = Producto::sincronizarConOfima($_POST["id"], $conexionBdPrincipal, $idEmpresa, 'UPDATE');
     } catch (Exception $e) {
-        // Log del error pero no interrumpir el flujo
         error_log("Error al sincronizar producto con Ofima: " . $e->getMessage());
+        $syncOfima = ['success' => false, 'error' => $e->getMessage()];
     }
 
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
+
+	if (isset($_POST['ajax']) && (string) $_POST['ajax'] === '1') {
+		header('Content-Type: application/json; charset=utf-8');
+		$ofimaOk = !empty($syncOfima['success']);
+		$ofimaTipo = $syncOfima['notificacion']['tipo'] ?? ($ofimaOk ? 'success' : 'error');
+		$ofimaMensaje = $syncOfima['notificacion']['mensaje'] ?? $syncOfima['message'] ?? $syncOfima['error'] ?? null;
+		echo json_encode([
+			'success' => true,
+			'id' => (int) $_POST['id'],
+			'message' => 'Los cambios se guardaron correctamente.',
+			'ofima' => [
+				'sincronizado' => $ofimaOk,
+				'tipo' => $ofimaTipo,
+				'mensaje' => $ofimaMensaje,
+			],
+		]);
+		exit();
+	}
 
 	echo '<script type="text/javascript">window.location.href="../productos-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
 	exit();

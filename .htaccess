@@ -1,4 +1,5 @@
 RewriteEngine on
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 
 RewriteCond %{HTTP_HOST} ^softjm\.com$ [OR]
 RewriteCond %{HTTP_HOST} ^www\.softjm\.com$

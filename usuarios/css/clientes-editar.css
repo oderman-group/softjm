@@ -437,6 +437,68 @@
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
+.cliente-editar-page .cliente-field.is-invalid .cliente-field-input,
+.cliente-editar-page .cliente-field.is-invalid select,
+.cliente-editar-page .cliente-field.is-invalid input[type="text"],
+.cliente-editar-page .cliente-field.is-invalid input[type="email"],
+.cliente-editar-page .cliente-field.is-invalid input[type="password"] {
+  border-color: #dc2626 !important;
+  background: #fef2f2 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.cliente-editar-page .cliente-field.is-invalid .chzn-container-single .chzn-single,
+.cliente-editar-page .cliente-field.is-invalid .chzn-container-multi .chzn-choices,
+.cliente-editar-page .cliente-direccion-nomenclatura.is-invalid .chzn-single,
+.cliente-editar-page .cliente-direccion-nomenclatura.is-invalid input {
+  border-color: #dc2626 !important;
+  background: #fef2f2 !important;
+}
+
+.cliente-editar-page .cliente-field.is-invalid .cliente-field-label {
+  color: #b91c1c;
+}
+
+.cliente-editar-page .cliente-field-error {
+  display: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.75rem;
+  color: #b91c1c;
+  margin: 0;
+}
+
+.cliente-editar-page .cliente-field.is-invalid .cliente-field-error {
+  display: block;
+}
+
+.cliente-editar-page .cliente-form-alert-requeridos {
+  display: none;
+  margin: 0 0 1rem 0;
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.cliente-editar-page .cliente-form-alert-requeridos.is-visible {
+  display: block;
+}
+
+.cliente-editar-page .cliente-form-alert-requeridos strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.cliente-editar-page .cliente-form-alert-requeridos ul {
+  margin: 0.35rem 0 0 1.1rem;
+  padding: 0;
+}
+
+
 .cliente-editar-page .cliente-field-input[readonly] {
   background: #f1f5f9;
   color: #475569;

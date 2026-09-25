@@ -11,6 +11,10 @@ if ( !empty($_SESSION["dataAdicional"]["dominio_empresa"]) ) {
 } else {
 	$dominio = 'Dominio no encontrado';
 }
+
+require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+$ofimaActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
+$reqOfima = $ofimaActiva ? ' (*)' : '';
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <!--============ javascript ===========-->
@@ -109,10 +113,10 @@ include("includes/js-formularios.php");
                                 	<legend>Datos básicos</legend>
 									
 								<div class="control-group">
-									<label class="control-label">Tipo de documento</label>
+									<label class="control-label">Tipo de documento<?= $reqOfima ?></label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoDocumento">
-											<option value="1"></option>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoDocumento"<?= $ofimaActiva ? ' required' : '' ?>>
+											<option value=""></option>
 											<option value="2">NIT</option>
 											<option value="3">Cédula</option>
                                     	</select>
@@ -120,9 +124,9 @@ include("includes/js-formularios.php");
                                </div>	
 									
                                 <div class="control-group">
-									<label class="control-label">Documento</label>
+									<label class="control-label">Documento<?= $reqOfima ?></label>
 									<div class="controls">
-										<input type="text" class="span4" name="usuario" autocomplete="off" onChange="clientesVerificar(this)">
+										<input type="text" class="span4" name="usuario" autocomplete="off" onChange="clientesVerificar(this)"<?= $ofimaActiva ? ' required' : '' ?>>
                                         <span style="color:#F03;">Digite el Documento sin número de verificación.</span>
 									</div>
 									<span id="resp"></span>
@@ -161,23 +165,23 @@ include("includes/js-formularios.php");
 								</div>  
                                 
                                 <div class="control-group">
-									<label class="control-label">Email</label>
+									<label class="control-label">Email<?= $reqOfima ?></label>
 									<div class="controls">
-										<input type="email" class="span8" name="email" style="text-transform:lowercase;">
+										<input type="email" class="span8" name="email" style="text-transform:lowercase;"<?= $ofimaActiva ? ' required' : '' ?>>
 									</div>
 								</div>
                                 
                                 <div class="control-group">
-									<label class="control-label">Teléfono</label>
+									<label class="control-label">Teléfono<?= $reqOfima ?></label>
 									<div class="controls">
-										<input type="text" class="span4" name="telefono">
+										<input type="text" class="span4" name="telefono"<?= $ofimaActiva ? ' required' : '' ?>>
 									</div>
 								</div>
                                 
                                 <div class="control-group">
-									<label class="control-label">Celular</label>
+									<label class="control-label">Celular<?= $reqOfima ?></label>
 									<div class="controls">
-										<input type="text" class="span4" name="celular" maxlength="10">
+										<input type="text" class="span4" name="celular" maxlength="10"<?= $ofimaActiva ? ' required' : '' ?>>
                                         <span style="color:#F03;">Este valor sin puntos ni espacios. (3135912073)</span>
 									</div>
 								</div>
@@ -190,9 +194,9 @@ include("includes/js-formularios.php");
 								</div>
                                 
                                 <div class="control-group">
-									<label class="control-label">Dirección</label>
+									<label class="control-label">Dirección<?= $reqOfima ?></label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span2" tabindex="2" name="op1">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span2" tabindex="2" name="op1"<?= $ofimaActiva ? ' required' : '' ?>>
 											<option value=""></option>
                                             <option value="Calle">Calle</option>
                                             <option value="Carrera">Carrera</option>
@@ -262,10 +266,10 @@ include("includes/js-formularios.php");
                             
 								<div id="local" style="display: block;">
 									<div class="control-group">
-											<label class="control-label">Ciudad</label>
+											<label class="control-label">Ciudad<?= $reqOfima ?></label>
 											<div class="controls">
-												<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ciudad">
-													<option value="1"></option>
+												<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ciudad"<?= $ofimaActiva ? ' required' : '' ?>>
+													<option value=""></option>
 													<?php
 													$conOp = mysqli_query($conexionBdAdmin,"SELECT * FROM localidad_ciudades INNER JOIN localidad_departamentos ON dep_id=ciu_departamento ORDER BY ciu_nombre");
 													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){

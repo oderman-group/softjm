@@ -93,6 +93,8 @@
             text-decoration: none;
         }
         .btn:hover { filter: brightness(1.05); }
+        .btn + .btn { margin-left: 0.5rem; }
+        .btn-secondary { background: #198754; }
         .badge {
             display: inline-block;
             padding: 0.2em 0.5em;
@@ -114,8 +116,9 @@
 <body>
     <div class="no-print">
         <button type="button" class="btn" id="btnPdf" aria-label="Descargar PDF">Descargar PDF</button>
+        <a class="btn btn-secondary" id="btnPostman" href="orion-ofima.postman_collection.json" download="Orion-Ofima.postman_collection.json">Descargar colección Postman</a>
         <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">
-            Se abrirá la ventana de impresión; elige «Guardar como PDF» o «Microsoft Print to PDF» para generar el archivo.
+            El PDF abre la ventana de impresión. La colección de Postman incluye login, clientes, productos, inventario, bodegas y los ejemplos que Orion envía a Ofima. Importa el archivo en Postman, completa usuario y password, y ejecuta primero «Login JWT».
         </p>
     </div>
 
@@ -164,6 +167,7 @@
             <li><strong>Autenticación:</strong> HTTP Basic Auth (usuario y contraseña configurados en Orion por módulo). Ofima debe validar estas credenciales y responder 401 si son inválidas. Las credenciales que Orion utiliza para llamar a Ofima las asigna el <strong>administrador técnico del sistema</strong>; Ofima debe solicitarlas para configurar la validación en su lado.</li>
         </ul>
         <p>En todos los casos, respuesta HTTP <strong>2xx</strong> = éxito; <strong>4xx/5xx</strong> = error (Orion lo registra y no reintenta en la misma acción).</p>
+        <p>Para probar estos contratos en Postman, usa el botón <strong>Descargar colección Postman</strong> de la parte superior. La carpeta «Ofima hacia Orion» llama a los endpoints de Orion; la carpeta «Orion hacia Ofima» trae los cuerpos que Ofima debe recibir, con Basic Auth.</p>
     </div>
 
     <!-- ========== OFIMA EXPONE (Orion llama) ========== -->
@@ -345,12 +349,12 @@
         </table>
         <h4>Body JSON (referencia y nombre obligatorios):</h4>
         <pre><code>{
-  "referencia": "BOD-01",
-  "nombre": "Bodega Principal",
-  "ciudad": 1,
+  "referencia": "BOGOTA",
+  "nombre": "BODEGA BOGOTÁ",
+  "ciudad": "11001",
   "id_empresa": 1
 }</code></pre>
-        <p><code>referencia</code> = código de la bodega en Ofima (Orion la usa para identificar y sincronizar). Si la bodega ya existe por referencia, se actualiza; si no, se crea. Respuesta 200: <code>{ "success": true, "message": "Bodega sincronizada correctamente", "bodega_id": 1, "operacion": "CREATE" | "UPDATE" }</code>.</p>
+        <p><code>referencia</code> = código de la bodega en Ofima (Orion la usa para identificar y sincronizar). <code>ciudad</code> = código DIAN (<code>ciu_cod_dian</code>); Orion busca ese código en <code>localidad_ciudades</code> y guarda <code>bod_ciudad</code> con el <code>ciu_id</code> encontrado. La bodega recibida queda habilitada. Si la bodega ya existe por referencia, se actualiza; si no, se crea. Respuesta 200: <code>{ "success": true, "message": "Bodega sincronizada correctamente", "bodega_id": 1, "operacion": "CREATE" | "UPDATE" }</code>.</p>
     </div>
 
     <div class="card" id="resumen-implementacion">

@@ -4,7 +4,8 @@
  * POST /usuarios/api/orion/bodegas-recibir.php
  * Autenticación: Bearer JWT (recomendado) o Basic Auth
  *
- * Body: { "referencia": "BOD-01", "nombre": "Bodega Principal", "ciudad": 1 }
+ * Body: { "referencia": "BOD-01", "nombre": "Bodega Principal", "ciudad": "05001" }
+ * ciudad = código DIAN (ciu_cod_dian). Se busca en localidad_ciudades y se guarda bod_ciudad = ciu_id.
  * referencia = código de la bodega en Ofima (obligatorio para identificar y sincronizar).
  */
 
@@ -22,9 +23,25 @@ require_once '../../../conexion.php';
 require_once RUTA_PROYECTO . '/usuarios/class/ApiOrionService.php';
 
 $idEmpresa = null;
-$authHeader = isset($_SERVER['HTTP_AUTHORIZATION']) ? $_SERVER['HTTP_AUTHORIZATION'] : (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION']) ? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] : '');
+$authHeader = '';
+if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+} elseif (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+    $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+} elseif (function_exists('getallheaders')) {
+    $headers = getallheaders();
+    if (is_array($headers)) {
+        foreach ($headers as $nombreHeader => $valorHeader) {
+            if (strcasecmp((string) $nombreHeader, 'Authorization') === 0) {
+                $authHeader = (string) $valorHeader;
+                break;
+            }
+        }
+    }
+}
 
-if (stripos($authHeader, 'Bearer ') === 0) {
+$tokenEnviado = stripos($authHeader, 'Bearer ') === 0;
+if ($tokenEnviado) {
     $token = trim(substr($authHeader, 7));
     $payload = ApiOrionService::validarTokenJwt($token);
     if ($payload !== null) {
@@ -35,12 +52,14 @@ if (stripos($authHeader, 'Bearer ') === 0) {
 if ($idEmpresa === null) {
     $usuario = isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : null;
     $password = isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : null;
-    if (!$usuario || !$password) {
+    if ($tokenEnviado || !$usuario || !$password) {
         http_response_code(401);
         echo json_encode([
             'success' => false,
-            'message' => 'Autenticación requerida',
-            'error'   => 'Envíe Authorization: Bearer <token> o Basic Auth (usuario y contraseña)'
+            'message' => $tokenEnviado ? 'Token inválido o vencido' : 'Autenticación requerida',
+            'error'   => $tokenEnviado
+                ? 'Vuelva a ejecutar Login JWT y use ese token en Authorization: Bearer'
+                : 'Envíe Authorization: Bearer <token> o Basic Auth (usuario y contraseña)'
         ]);
         exit();
     }
@@ -104,7 +123,7 @@ try {
             'error'   => $resultado['error']
         ]);
     }
-} catch (Exception $e) {
+} catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
         'success' => false,

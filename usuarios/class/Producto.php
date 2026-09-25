@@ -285,77 +285,94 @@ class Producto extends BaseDatos {
     }
 
     /**
-     * Sincroniza un producto con Ofima
-     * Se llama automáticamente cuando se crea o actualiza un producto
-     * 
-     * @param int $productoId ID del producto a sincronizar
-     * @param mysqli $conexionBdPrincipal Conexión a la base de datos
-     * @param int $idEmpresa ID de la empresa
-     * @param string $tipoOperacion 'CREATE' o 'UPDATE'
-     * @return array Resultado de la sincronización
+     * Sincroniza un producto con Ofima (Orion -> Ofima).
+     * Toda acción (éxito o error) queda en api_sincronizaciones.
+     *
+     * @return array{success:bool,message?:string,error?:string,codigo_http?:int,notificacion?:array}
      */
     public static function sincronizarConOfima($productoId, $conexionBdPrincipal, $idEmpresa, $tipoOperacion = 'UPDATE') {
-        // Verificar si la sincronización está activa
-        $query = "SELECT apic_activo FROM api_configuracion 
-                  WHERE apic_modulo = 'productos' 
-                  AND apic_direccion = 'orion_ofima' 
-                  AND apic_id_empresa = ? 
-                  LIMIT 1";
-        
-        $stmt = $conexionBdPrincipal->prepare($query);
-        $stmt->bind_param("i", $idEmpresa);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows === 0 || $result->fetch_assoc()['apic_activo'] != 1) {
-            // Sincronización desactivada, no hacer nada
-            return [
-                'success' => false,
-                'message' => 'Sincronización desactivada'
+        require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+        require_once RUTA_PROYECTO . '/usuarios/class/OfimaEndpointService.php';
+        require_once RUTA_PROYECTO . '/usuarios/class/ApiOfimaClient.php';
+
+        $tipoOperacion = strtoupper($tipoOperacion) === 'UPDATE' ? 'UPDATE' : 'CREATE';
+        $claveEndpoint = OfimaEndpointService::claveOperacion('productos', $tipoOperacion);
+        $productoId = (int) $productoId;
+        $idEmpresa = (int) $idEmpresa;
+        $apiClient = new ApiOfimaClient($conexionBdPrincipal, $idEmpresa);
+
+        $registrar = static function (array $resultado, $producto = null, $datosEnviados = null) use ($apiClient, $tipoOperacion, $productoId) {
+            $referencia = '';
+            if (is_array($producto)) {
+                $referencia = (string) ($producto['prod_referencia'] ?? '');
+            }
+            $apiClient->registrarSincronizacion(
+                'productos',
+                'orion_ofima',
+                $tipoOperacion,
+                $productoId,
+                $referencia,
+                $datosEnviados ?? ['prod_id' => $productoId],
+                $resultado,
+                !empty($resultado['success']) ? 'exitoso' : 'error',
+                $resultado['codigo_http'] ?? null,
+                $resultado['success'] ? null : ($resultado['error'] ?? $resultado['message'] ?? 'Error desconocido')
+            );
+            return $resultado;
+        };
+
+        $conNotificacion = static function (array $resultado, $tipoForzado = null) {
+            $ok = !empty($resultado['success']);
+            $texto = $ok
+                ? 'Producto sincronizado con Ofima correctamente.'
+                : ('Ofima: ' . ($resultado['error'] ?? $resultado['message'] ?? 'No se pudo sincronizar el producto.'));
+            $resultado['notificacion'] = [
+                'tipo' => $tipoForzado ?? ($ok ? 'success' : 'error'),
+                'mensaje' => $texto,
             ];
+            return $resultado;
+        };
+
+        if (!ofimaIntegracionActiva($conexionBdPrincipal, $idEmpresa)) {
+            return $conNotificacion($registrar([
+                'success' => false,
+                'message' => 'Integración Ofima desactivada',
+                'codigo_http' => 0,
+            ]), 'warning');
         }
-        
-        // Obtener datos completos del producto
+
+        if (!OfimaEndpointService::estaHabilitado($conexionBdPrincipal, $idEmpresa, $claveEndpoint)) {
+            return $conNotificacion($registrar([
+                'success' => false,
+                'message' => 'Endpoint Ofima deshabilitado: ' . $claveEndpoint,
+                'codigo_http' => 0,
+            ]), 'warning');
+        }
+
         $query = "SELECT * FROM productos WHERE prod_id = ? AND prod_id_empresa = ?";
         $stmt = $conexionBdPrincipal->prepare($query);
         $stmt->bind_param("ii", $productoId, $idEmpresa);
         $stmt->execute();
         $result = $stmt->get_result();
-        
         if ($result->num_rows === 0) {
-            return [
+            return $conNotificacion($registrar([
                 'success' => false,
-                'error' => 'Producto no encontrado'
-            ];
+                'error' => 'Producto no encontrado',
+                'codigo_http' => 404,
+            ]));
         }
-        
         $producto = $result->fetch_assoc();
-        
-        // Validar campos mínimos antes de enviar a Ofima
+
         if (empty(trim($producto['prod_referencia'] ?? '')) || empty(trim($producto['prod_nombre'] ?? ''))) {
-            return [
+            return $conNotificacion($registrar([
                 'success' => false,
-                'error' => 'El producto debe tener referencia y nombre para sincronizar con Ofima'
-            ];
+                'error' => 'El producto debe tener código (referencia) y nombre para sincronizar con Ofima',
+                'codigo_http' => 400,
+            ], $producto));
         }
-        
-        // Incluir relaciones si existen
-        if (!empty($producto['prod_categoria'])) {
-            $queryCat = "SELECT catp_nombre FROM productos_categorias WHERE catp_id = ?";
-            $stmtCat = $conexionBdPrincipal->prepare($queryCat);
-            $stmtCat->bind_param("i", $producto['prod_categoria']);
-            $stmtCat->execute();
-            $catResult = $stmtCat->get_result();
-            if ($catResult->num_rows > 0) {
-                $producto['categoria_nombre'] = $catResult->fetch_assoc()['catp_nombre'];
-            }
-        }
-        
-        // Sincronizar con Ofima
-        require_once RUTA_PROYECTO.'/usuarios/class/ApiOfimaClient.php';
-        $apiClient = new ApiOfimaClient($conexionBdPrincipal, $idEmpresa);
-        
-        return $apiClient->sincronizarProducto($producto, $tipoOperacion);
+
+        $resultado = $apiClient->sincronizarProducto($producto, $tipoOperacion);
+        return $conNotificacion($resultado);
     }
 
 }

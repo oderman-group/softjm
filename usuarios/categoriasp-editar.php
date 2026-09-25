@@ -70,7 +70,24 @@ include("includes/js-formularios.php");
 									<div class="controls">
 										<input type="text" class="span4" name="nombre" value="<?=$resultadoD['catp_nombre'];?>">
 									</div>
-								</div>  
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Código Ofima</label>
+									<div class="controls">
+										<input type="text" class="span4" name="cod_grupo" maxlength="20" value="<?= htmlspecialchars((string) ($resultadoD['catp_cod_grupo'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
+										<span class="help-block">Código del grupo en Ofima. Dos grupos habilitados no pueden compartir el mismo código.</span>
+									</div>
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Habilitado</label>
+									<div class="controls">
+										<label class="checkbox">
+											<input type="checkbox" name="habilitada" value="1" <?php if (!isset($resultadoD['catp_habilitada']) || (int) $resultadoD['catp_habilitada'] === 1) { echo 'checked'; } ?>> El grupo está en funcionamiento
+										</label>
+									</div>
+								</div>
                               
                                 
                                

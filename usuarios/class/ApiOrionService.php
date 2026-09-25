@@ -623,7 +623,7 @@ class ApiOrionService {
 
     /**
      * Recibe y procesa una bodega desde Ofima (Ofima → Orion).
-     * Payload: referencia (código en Ofima), nombre, ciudad (id opcional).
+     * Payload: referencia (código en Ofima), nombre, ciudad (código DIAN ciu_cod_dian, opcional).
      * Requiere tabla bodegas con columna bod_referencia (ver sql/api_integracion_tablas.sql).
      *
      * @param array $datos { referencia, nombre, ciudad?, id_empresa? }
@@ -632,7 +632,15 @@ class ApiOrionService {
     public function recibirBodegaDeOfima($datos) {
         $referencia = isset($datos['referencia']) ? trim((string) $datos['referencia']) : '';
         $nombre = isset($datos['nombre']) ? trim((string) $datos['nombre']) : '';
-        $ciudad = isset($datos['ciudad']) ? (int) $datos['ciudad'] : null;
+        $codigoCiudad = isset($datos['ciudad']) ? trim((string) $datos['ciudad']) : '';
+        $ciudad = null;
+        if ($codigoCiudad !== '') {
+            $ciudad = $this->buscarCiudadIdPorCodigoDian($codigoCiudad);
+            if ($ciudad === null) {
+                $this->registrarSincronizacion('bodegas', 'ofima_orion', 'UPDATE', 0, $referencia, $datos, ['success' => false], 'error', 400, 'No se encontró la ciudad con el código DIAN indicado', 1);
+                return ['success' => false, 'error' => 'No se encontró una ciudad con ciu_cod_dian ' . $codigoCiudad];
+            }
+        }
 
         if ($nombre === '') {
             $this->registrarSincronizacion('bodegas', 'ofima_orion', 'UPDATE', 0, $referencia, $datos, ['success' => false], 'error', 400, 'El campo nombre es obligatorio', 1);
@@ -646,7 +654,10 @@ class ApiOrionService {
         $existe = $this->buscarBodegaPorReferencia($referencia);
         if ($existe) {
             $bodId = (int) $existe['bod_id'];
-            $stmt = $this->conexionBdPrincipal->prepare("UPDATE bodegas SET bod_nombre = ?, bod_ciudad = ?, bod_referencia = ? WHERE bod_id = ? AND bod_id_empresa = ?");
+            $stmt = $this->conexionBdPrincipal->prepare("UPDATE bodegas SET bod_nombre = ?, bod_ciudad = ?, bod_referencia = ?, bod_habilitada = 1 WHERE bod_id = ? AND bod_id_empresa = ?");
+            if (!$stmt) {
+                $stmt = $this->conexionBdPrincipal->prepare("UPDATE bodegas SET bod_nombre = ?, bod_ciudad = ?, bod_referencia = ? WHERE bod_id = ? AND bod_id_empresa = ?");
+            }
             if (!$stmt) {
                 $stmt = $this->conexionBdPrincipal->prepare("UPDATE bodegas SET bod_nombre = ?, bod_ciudad = ? WHERE bod_id = ? AND bod_id_empresa = ?");
                 if (!$stmt) {
@@ -657,12 +668,19 @@ class ApiOrionService {
             } else {
                 $stmt->bind_param("sisii", $nombre, $ciudad, $referencia, $bodId, $this->idEmpresa);
             }
-            $stmt->execute();
+            if (!$stmt->execute()) {
+                $errorSql = $stmt->error;
+                $this->registrarSincronizacion('bodegas', 'ofima_orion', 'UPDATE', $bodId, $referencia, $datos, ['success' => false], 'error', 500, $errorSql, 1);
+                return ['success' => false, 'error' => 'No se pudo actualizar la bodega: ' . $errorSql];
+            }
             $this->registrarSincronizacion('bodegas', 'ofima_orion', 'UPDATE', $bodId, $referencia, $datos, ['success' => true], 'exitoso', 200, null, 1);
             return ['success' => true, 'bodega_id' => $bodId, 'operacion' => 'UPDATE'];
         }
 
-        $stmt = $this->conexionBdPrincipal->prepare("INSERT INTO bodegas (bod_referencia, bod_nombre, bod_ciudad, bod_id_empresa) VALUES (?, ?, ?, ?)");
+        $stmt = $this->conexionBdPrincipal->prepare("INSERT INTO bodegas (bod_referencia, bod_nombre, bod_ciudad, bod_id_empresa, bod_habilitada) VALUES (?, ?, ?, ?, 1)");
+        if (!$stmt) {
+            $stmt = $this->conexionBdPrincipal->prepare("INSERT INTO bodegas (bod_referencia, bod_nombre, bod_ciudad, bod_id_empresa) VALUES (?, ?, ?, ?)");
+        }
         if (!$stmt) {
             $stmt = $this->conexionBdPrincipal->prepare("INSERT INTO bodegas (bod_nombre, bod_ciudad, bod_id_empresa) VALUES (?, ?, ?)");
             if (!$stmt) {
@@ -673,10 +691,42 @@ class ApiOrionService {
         } else {
             $stmt->bind_param("ssii", $referencia, $nombre, $ciudad, $this->idEmpresa);
         }
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            $errorSql = $stmt->error;
+            $this->registrarSincronizacion('bodegas', 'ofima_orion', 'CREATE', 0, $referencia, $datos, ['success' => false], 'error', 500, $errorSql, 1);
+            return ['success' => false, 'error' => 'No se pudo crear la bodega: ' . $errorSql];
+        }
         $bodId = $this->conexionBdPrincipal->insert_id;
         $this->registrarSincronizacion('bodegas', 'ofima_orion', 'CREATE', $bodId, $referencia, $datos, ['success' => true], 'exitoso', 200, null, 1);
         return ['success' => true, 'bodega_id' => $bodId, 'operacion' => 'CREATE'];
+    }
+
+    /**
+     * Resuelve ciu_id a partir del código DIAN (ciu_cod_dian) enviado por Ofima.
+     *
+     * @param string $codigoDian
+     * @return int|null
+     */
+    private function buscarCiudadIdPorCodigoDian($codigoDian) {
+        $codigoDian = trim((string) $codigoDian);
+        if ($codigoDian === '' || !defined('BDADMIN')) {
+            return null;
+        }
+
+        $codigoNormalizado = ctype_digit($codigoDian) ? str_pad($codigoDian, 5, '0', STR_PAD_LEFT) : $codigoDian;
+        $sql = 'SELECT ciu_id FROM ' . BDADMIN . '.localidad_ciudades WHERE ciu_cod_dian = ? OR ciu_cod_dian = ? LIMIT 1';
+        $stmt = $this->conexionBdPrincipal->prepare($sql);
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('ss', $codigoDian, $codigoNormalizado);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        if (!$row || empty($row['ciu_id'])) {
+            return null;
+        }
+        return (int) $row['ciu_id'];
     }
 
     private function buscarBodegaPorReferencia($referencia) {

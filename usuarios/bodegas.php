@@ -4,10 +4,21 @@ include("sesion.php");
 $idPagina = 142;
 
 include("includes/verificar-paginas.php");
+include_once(RUTA_PROYECTO."/usuarios/includes/api-ofima-conexion.php");
+$ofimaActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $_SESSION["dataAdicional"]["id_empresa"]);
 include("includes/head.php");
 ?>
 <!-- styles -->
 <link href="css/tablecloth.css" rel="stylesheet">
+<style>
+	#data-table tbody tr.bodega-deshabilitada td {
+		background-color: #ececec !important;
+		color: #9a9a9a;
+	}
+	#data-table tbody tr.bodega-deshabilitada td a {
+		color: #9a9a9a;
+	}
+</style>
 <!--============j avascript===========-->
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
@@ -99,14 +110,19 @@ include("includes/head.php");
 				<?php include("includes/notificaciones.php"); ?>
 				<p>
 					<?php
-						if (Modulos::validarRol([143], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+						if (!$ofimaActiva && Modulos::validarRol([143], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 							echo '<a href="bodegas-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a> ';
 						}
-						if (Modulos::validarRol([147], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+						if (!$ofimaActiva && Modulos::validarRol([147], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 							echo '<a href="bodegas-transferir.php" class="btn btn-success"><i class="icon-random"></i> Transferir productos</a> ';
 						}
 					?>				
 				</p>
+				<?php if ($ofimaActiva) { ?>
+				<div class="alert alert-info">
+					Con la integración Ofima activa, las bodegas y las transferencias de productos solo se gestionan desde Ofima.
+				</div>
+				<?php } ?>
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="content-widgets light-gray">
@@ -123,6 +139,7 @@ include("includes/head.php");
 											<th>Creación</th>
 											<th>Nombre</th>
 											<th>Ciudad</th>
+											<th>Estado</th>
 											<th>Productos</th>
 											<th></th>
 										</tr>
@@ -132,19 +149,28 @@ include("includes/head.php");
 										$consulta = $conexionBdPrincipal->query("SELECT * FROM ".MAINBD.".bodegas 
 										INNER JOIN ".BDADMIN.".localidad_ciudades ON ciu_id=bod_ciudad
 										INNER JOIN ".BDADMIN.".localidad_departamentos ON dep_id=ciu_departamento
-										WHERE bod_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'");
+										WHERE bod_id_empresa =  '".$_SESSION["dataAdicional"]["id_empresa"]."'
+										ORDER BY bod_habilitada DESC, bod_nombre ASC");
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
 											$consultaProductosBodegas = $conexionBdPrincipal->query("SELECT * FROM productos_bodegas 
 											WHERE prodb_bodega='".$res[0]."'");
 											$cantProd = $consultaProductosBodegas->num_rows;
+											$habilitada = !isset($res['bod_habilitada']) || (int) $res['bod_habilitada'] === 1;
 										?>
-											<tr>
+											<tr class="<?= $habilitada ? '' : 'bodega-deshabilitada'; ?>">
 												<td><?= $no; ?></td>
 												<td><?= $res['bod_id']; ?></td>
 												<td><?= $res['bod_fecha_creacion']; ?></td>
 												<td><?= $res['bod_nombre']; ?></td>
 												<td><?= $res['ciu_nombre'].", ".$res['dep_nombre']; ?></td>
+												<td>
+													<?php if ($habilitada) { ?>
+														<span class="label label-success">Habilitada</span>
+													<?php } else { ?>
+														<span class="label label-danger">Deshabilitada</span>
+													<?php } ?>
+												</td>
 												<td>
 													<a 
 														href="bodegas-productos.php?bod=<?=$res[0];?>"
@@ -156,7 +182,7 @@ include("includes/head.php");
 												<td>
 													<h4>
 													<?php if($res[0] != 1){
-														if (Modulos::validarRol([144], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+														if (!$ofimaActiva && Modulos::validarRol([144], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
 															echo '<a href="bodegas-editar.php?id='.$res[0].'" data-toggle="tooltip" title="Editar"><i class="icon-edit"></i></a> ';
 														}
 														if (Modulos::validarRol([222], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && false) {

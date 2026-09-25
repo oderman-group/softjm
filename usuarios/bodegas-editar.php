@@ -4,6 +4,11 @@ include("sesion.php");
 $idPagina = 144;
 
 include("includes/verificar-paginas.php");
+include_once(RUTA_PROYECTO."/usuarios/includes/api-ofima-conexion.php");
+if (ofimaIntegracionActiva($conexionBdPrincipal, (int) $_SESSION["dataAdicional"]["id_empresa"])) {
+    echo '<script type="text/javascript">alert("Las bodegas solo se editan desde Ofima mientras la integración esté activa."); window.location.href="bodegas.php";</script>';
+    exit();
+}
 include("includes/head.php");
 
 $consultaBodegas=$conexionBdPrincipal->query("SELECT * FROM bodegas WHERE bod_id='".$_GET["id"]."'");
@@ -85,6 +90,16 @@ include("includes/js-formularios.php");
 											}
 											?>
                                     	</select>
+                                    </div>
+                               </div>
+                                <div class="control-group">
+									<label class="control-label">Estado</label>
+									<div class="controls">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="habilitada">
+											<option value="1" <?php if (!isset($resultadoD['bod_habilitada']) || (int) $resultadoD['bod_habilitada'] === 1) { echo "selected"; } ?>>Habilitada</option>
+											<option value="0" <?php if (isset($resultadoD['bod_habilitada']) && (int) $resultadoD['bod_habilitada'] === 0) { echo "selected"; } ?>>Deshabilitada</option>
+                                    	</select>
+										<span class="help-block">Habilitada: la bodega está en funcionamiento. Deshabilitada: no se usa en transferencias ni en asignaciones nuevas.</span>
                                     </div>
                                </div>
 								<div class="form-actions">
