@@ -40,11 +40,12 @@ if ($documento === '') {
     exit;
 }
 
-if ($crearEnOfima && $tipoDocumento !== 2 && $tipoDocumento !== 3) {
-    echo json_encode(['success' => false, 'message' => 'Debe seleccionar el tipo de documento (NIT o Cédula).']);
+$tiposDocumentoValidos = [2, 3, 4, 5, 6];
+if ($crearEnOfima && !in_array($tipoDocumento, $tiposDocumentoValidos, true)) {
+    echo json_encode(['success' => false, 'message' => 'Debe seleccionar el tipo de documento.']);
     exit;
 }
-if ($tipoDocumento !== 2 && $tipoDocumento !== 3) {
+if (!in_array($tipoDocumento, $tiposDocumentoValidos, true)) {
     $tipoDocumento = 1;
 }
 

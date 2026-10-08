@@ -6,6 +6,7 @@
  *
  * ciudad = código DIAN (ciu_cod_dian, ej. "05001"). Orion lo homologa a ciu_id
  * y asigna cli_zona = ciu_departamento para que el cliente aparezca en el listado.
+ * tipodcto = C|N|NE|CE|TI → cli_tipo_documento (3|2|4|5|6).
  */
 
 header('Content-Type: application/json');

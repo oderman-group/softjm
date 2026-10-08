@@ -753,17 +753,18 @@ class ApiOfimaClient {
 
     /**
      * Homologa tipo documento Orion → tipodcto Ofima.
-     * 2=NIT, 3=Cédula (resto por defecto C).
+     * 2=N, 3=C, 4=NE, 5=CE, 6=TI (resto por defecto C).
      */
     private function mapearTipoDocumentoOfima($tipoDocumento) {
+        $mapa = [
+            2 => 'N',
+            3 => 'C',
+            4 => 'NE',
+            5 => 'CE',
+            6 => 'TI',
+        ];
         $tipo = (int) $tipoDocumento;
-        if ($tipo === 2) {
-            return 'N';
-        }
-        if ($tipo === 3) {
-            return 'C';
-        }
-        return 'C';
+        return $mapa[$tipo] ?? 'C';
     }
     
     /**

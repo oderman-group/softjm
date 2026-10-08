@@ -620,6 +620,7 @@ class ApiOrionService {
             if ($homologacion !== null) {
                 return $homologacion;
             }
+            $this->homologarTipoDocumentoCliente($datosOfima, $datosOrion);
             $clienteExistente = $this->buscarClientePorIdentificacion($datosOrion['cli_usuario']);
             if ($clienteExistente) {
                 return $this->actualizarCliente($clienteExistente['cli_id'], $datosOrion, $datosOfima);
@@ -665,6 +666,40 @@ class ApiOrionService {
     }
 
     /**
+     * Homologa tipodcto Ofima → cli_tipo_documento Orion.
+     * C=3, N=2, NE=4, CE=5, TI=6.
+     */
+    private function homologarTipoDocumentoCliente(array $datosOfima, array &$datosOrion) {
+        if (!array_key_exists('tipodcto', $datosOfima)) {
+            return;
+        }
+        $codigo = strtoupper(trim((string) $datosOfima['tipodcto']));
+        if ($codigo === '') {
+            unset($datosOrion['cli_tipo_documento']);
+            return;
+        }
+        $id = $this->mapearTipoDocumentoDeOfima($codigo);
+        if ($id !== null) {
+            $datosOrion['cli_tipo_documento'] = $id;
+        }
+    }
+
+    /**
+     * @return int|null
+     */
+    private function mapearTipoDocumentoDeOfima($codigoOfima) {
+        $mapa = [
+            'C'  => 3, // Cédula
+            'N'  => 2, // NIT
+            'NE' => 4, // NIT extranjería
+            'CE' => 5, // Cédula extranjería
+            'TI' => 6, // Tarjeta identidad
+        ];
+        $codigo = strtoupper(trim((string) $codigoOfima));
+        return $mapa[$codigo] ?? null;
+    }
+
+    /**
      * Mapea campos de Ofima a Orion para clientes
      */
     private function mapearCamposClienteDeOfima($datosOfima) {
@@ -697,6 +732,7 @@ class ApiOrionService {
                 'cli_id_empresa' => $this->idEmpresa
             ];
         }
+        // tipodcto se homologa después en homologarTipoDocumentoCliente
         return $datosOrion;
     }
 
@@ -721,10 +757,15 @@ class ApiOrionService {
             return ['success' => false, 'error' => 'Ya existe un cliente con esa identificación (NIT/documento)'];
         }
         $cliClave = bin2hex(random_bytes(8));
+        $cliTipoDocumento = isset($datos['cli_tipo_documento']) ? (int) $datos['cli_tipo_documento'] : 0;
+        if ($cliTipoDocumento <= 0) {
+            $cliTipoDocumento = 3; // Cédula por defecto si Ofima no envía tipodcto
+        }
         $campos = [
             'cli_nombre', 'cli_usuario', 'cli_email', 'cli_telefono', 'cli_direccion', 'cli_ciudad',
             'cli_celular', 'cli_referencia', 'cli_id_empresa', 'cli_categoria', 'cli_fecha_registro',
-            'cli_nivel', 'cli_clave', 'cli_forma_creacion', 'cli_integrado_ofima', 'cli_zona', 'cli_pais'
+            'cli_nivel', 'cli_clave', 'cli_forma_creacion', 'cli_integrado_ofima', 'cli_zona', 'cli_pais',
+            'cli_tipo_documento'
         ];
         // cli_ciudad = ciu_id homologado (string para permitir NULL sin coercer a 0)
         $cliCiudad = isset($datos['cli_ciudad']) && $datos['cli_ciudad'] !== null && $datos['cli_ciudad'] !== ''
@@ -748,7 +789,8 @@ class ApiOrionService {
             'API',
             1, // cli_integrado_ofima: llegó desde Ofima
             $cliZona,
-            'Colombia'  // cli_pais
+            'Colombia',  // cli_pais
+            $cliTipoDocumento
         ];
         $placeholders = implode(', ', array_fill(0, count($campos), '?'));
         $query = "INSERT INTO clientes (" . implode(', ', $campos) . ") VALUES ($placeholders)";
@@ -756,7 +798,8 @@ class ApiOrionService {
         if (!$stmt) {
             return ['success' => false, 'error' => 'Error al preparar la consulta: ' . $this->conexionBdPrincipal->error];
         }
-        $tipos = 'ssssssssiisississ';
+        // 8s + 2i + s + i + s + i + 2s + i (tipo documento)
+        $tipos = 'ssssssssiisississi';
         $stmt->bind_param($tipos, ...$valores);
         if ($stmt->execute()) {
             $clienteId = (int) $stmt->insert_id;
@@ -773,7 +816,7 @@ class ApiOrionService {
      * @param array|null $datosRecibidos Payload original recibido de Ofima (para apis_datos_enviados)
      */
     private function actualizarCliente($clienteId, $datos, $datosRecibidos = null) {
-        $camposPermitidos = ['cli_nombre', 'cli_email', 'cli_telefono', 'cli_direccion', 'cli_ciudad', 'cli_zona', 'cli_celular', 'cli_referencia'];
+        $camposPermitidos = ['cli_nombre', 'cli_email', 'cli_telefono', 'cli_direccion', 'cli_ciudad', 'cli_zona', 'cli_celular', 'cli_referencia', 'cli_tipo_documento'];
         $sets = [];
         $tipos = '';
         $params = [];

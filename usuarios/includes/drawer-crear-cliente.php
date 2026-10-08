@@ -468,6 +468,9 @@ body.drawer-open {
               <option value="">Seleccione...</option>
               <option value="2">NIT</option>
               <option value="3">Cédula</option>
+              <option value="4">NIT extranjería</option>
+              <option value="5">Cédula extranjería</option>
+              <option value="6">Tarjeta identidad</option>
             </select>
             <i class="fa fa-chevron-down drawer-select-icon" aria-hidden="true"></i>
           </div>
@@ -912,7 +915,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var syncOfima = deseaCrearEnOfima();
 
-    if (syncOfima && (tipoDocumento !== '2' && tipoDocumento !== '3')) {
+    var tiposDocValidos = { '2': 1, '3': 1, '4': 1, '5': 1, '6': 1 };
+    if (syncOfima && !tiposDocValidos[tipoDocumento]) {
       if (tipoDocumentoInput) tipoDocumentoInput.classList.add('is-invalid');
       document.getElementById('errorTipoDocumento').classList.add('is-visible');
       valido = false;

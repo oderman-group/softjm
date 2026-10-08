@@ -14,7 +14,8 @@ $negociosPerdidos = array("", "Precio", "Calidad", "Atención", "Inventario");
 $negociosGanados = array("", "Precio", "Calidad", "Atención");
 $estadoRegistros = array("Inactivo", "Activo");
 $opcionSINO = array("NO", "SI");
-$tipoDocumento = array("Desc.", "Desc.", "NIT", "Cédula");
+// 2=NIT, 3=Cédula, 4=NIT extranjería, 5=Cédula extranjería, 6=Tarjeta identidad (Ofima: N, C, NE, CE, TI)
+$tipoDocumento = array("Desc.", "Desc.", "NIT", "Cédula", "NIT extranjería", "Cédula extranjería", "Tarjeta identidad");
 
 $tipoCrud= array("", "Read", "Create", "Update", "Delete");
 
