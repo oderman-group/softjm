@@ -614,9 +614,9 @@ class ApiOrionService {
             }
             $clienteExistente = $this->buscarClientePorIdentificacion($datosOrion['cli_usuario']);
             if ($clienteExistente) {
-                return $this->actualizarCliente($clienteExistente['cli_id'], $datosOrion);
+                return $this->actualizarCliente($clienteExistente['cli_id'], $datosOrion, $datosOfima);
             }
-            return $this->crearCliente($datosOrion);
+            return $this->crearCliente($datosOrion, $datosOfima);
         } catch (Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         }
@@ -701,7 +701,11 @@ class ApiOrionService {
         return $result->num_rows > 0 ? $result->fetch_assoc() : null;
     }
 
-    private function crearCliente($datos) {
+    /**
+     * @param array $datos Datos ya mapeados a columnas Orion
+     * @param array|null $datosRecibidos Payload original recibido de Ofima (para apis_datos_enviados)
+     */
+    private function crearCliente($datos, $datosRecibidos = null) {
         if (empty(trim($datos['cli_usuario'] ?? '')) || empty(trim($datos['cli_nombre'] ?? ''))) {
             return ['success' => false, 'error' => 'Los campos identificacion (cli_usuario) y nombre son obligatorios'];
         }
@@ -749,13 +753,18 @@ class ApiOrionService {
         if ($stmt->execute()) {
             $clienteId = (int) $stmt->insert_id;
             $this->marcarClienteIntegradoOfima($clienteId);
-            $this->registrarSincronizacion('clientes', 'ofima_orion', 'CREATE', $clienteId, $datos['cli_usuario'], $datos, ['success' => true], 'exitoso', 200, null, 1);
+            $payloadLog = is_array($datosRecibidos) ? $datosRecibidos : $datos;
+            $this->registrarSincronizacion('clientes', 'ofima_orion', 'CREATE', $clienteId, $datos['cli_usuario'], $payloadLog, ['success' => true], 'exitoso', 200, null, 1);
             return ['success' => true, 'cliente_id' => $clienteId, 'operacion' => 'CREATE'];
         }
         return ['success' => false, 'error' => 'Error al insertar cliente: ' . $stmt->error];
     }
 
-    private function actualizarCliente($clienteId, $datos) {
+    /**
+     * @param array $datos Datos ya mapeados a columnas Orion
+     * @param array|null $datosRecibidos Payload original recibido de Ofima (para apis_datos_enviados)
+     */
+    private function actualizarCliente($clienteId, $datos, $datosRecibidos = null) {
         $camposPermitidos = ['cli_nombre', 'cli_email', 'cli_telefono', 'cli_direccion', 'cli_ciudad', 'cli_zona', 'cli_celular', 'cli_referencia'];
         $sets = [];
         $tipos = '';
@@ -780,7 +789,8 @@ class ApiOrionService {
         }
         // Refuerzo: asegurar flag aunque el SET anterior se omita por esquema antiguo
         $this->marcarClienteIntegradoOfima((int) $clienteId);
-        $this->registrarSincronizacion('clientes', 'ofima_orion', 'UPDATE', $clienteId, $datos['cli_usuario'] ?? '', $datos, ['success' => true], 'exitoso', 200, null, 1);
+        $payloadLog = is_array($datosRecibidos) ? $datosRecibidos : $datos;
+        $this->registrarSincronizacion('clientes', 'ofima_orion', 'UPDATE', $clienteId, $datos['cli_usuario'] ?? '', $payloadLog, ['success' => true], 'exitoso', 200, null, 1);
         return ['success' => true, 'cliente_id' => $clienteId, 'operacion' => 'UPDATE'];
     }
 

@@ -1,4 +1,4 @@
-﻿<?php 
+<?php 
 include("sesion.php");
 $idPagina = 11;
 include("includes/verificar-paginas.php");

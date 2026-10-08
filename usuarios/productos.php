@@ -32,9 +32,9 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 <script type="text/javascript">
 	$(function() {
 		if ($('#data-table').length && !$('body').hasClass('clientes-page')) {
-			$('#data-table').dataTable({
-				"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-			});
+		$('#data-table').dataTable({
+			"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
+		});
 		}
 	});
 	$(function() {
@@ -743,16 +743,16 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 				<div class="productos-encabezado">
 				<?php if (!empty($productoMasVendido['nombre_producto'])) { ?>
 				<div class="productos-hero-vendido board-widgets magenta">
-					<div class="board-widgets-head clearfix">
+							<div class="board-widgets-head clearfix">
 						<h4 class="pull-left"><i class="icon-certificate"></i> Producto más vendido este año</h4>
-					</div>
-					<div class="board-widgets-content">
+							</div>
+							<div class="board-widgets-content">
 						<span class="n-counter"><?= (int) $productoMasVendido['total_unidades_vendidas']; ?></span><span class="n-sources">Unidades</span>
-					</div>
-					<div class="board-widgets-botttom">
+							</div>
+							<div class="board-widgets-botttom">
 						<a href="#" class="js-editar-producto" data-id="<?= (int) $productoMasVendido['id_producto']; ?>"><?= htmlspecialchars($productoMasVendido['nombre_producto']); ?><i class="icon-double-angle-right"></i></a>
-					</div>
-				</div>
+							</div>
+						</div>
 				<?php } ?>
 				<div class="clientes-hero">
 					<div>
@@ -761,13 +761,13 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 					</div>
 					<div class="clientes-hero-actions">
 						<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-						<?php if (Modulos::validarRol([37], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+												<?php if (Modulos::validarRol([37], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 							<a href="#" class="btn btn-success js-abrir-crear-producto" id="btnCrearProductoRapido" aria-haspopup="dialog"><i class="icon-plus"></i> Agregar nuevo</a>
-						<?php } ?>
-						<?php if (Modulos::validarRol([21], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+													<?php } ?>
+													<?php if (Modulos::validarRol([21], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 							<a href="productos-importar.php" class="btn btn-info"><i class="icon-upload"></i> Importar</a>
-						<?php } ?>
-					</div>
+													<?php } ?>
+											</div>
 				</div>
 				</div>
 
@@ -781,7 +781,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 							<p>Busque por código o nombre y filtre el catálogo</p>
 						</div>
 						<div class="productos-filtros-buscar">
-								<?php
+													<?php
 								$vistaActual = '';
 								foreach (['web', 'pdt', 'stock', 'utilidad'] as $claveVista) {
 									if (!empty($_GET[$claveVista]) || (isset($_GET['vista']) && $_GET['vista'] === $claveVista)) {
@@ -819,37 +819,37 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 										<option value="">Todos</option>
 										<?php
 										$grupos1 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_habilitada=1 AND catp_id_empresa='".$idEmpresa."'");
-										while ($grupo1 = mysqli_fetch_array($grupos1, MYSQLI_BOTH)) {
+													while ($grupo1 = mysqli_fetch_array($grupos1, MYSQLI_BOTH)) {
 											$sel = isset($_GET['grupo1']) && (string) $_GET['grupo1'] === (string) $grupo1[0] ? ' selected' : '';
-										?>
+													?>
 											<option value="<?= (int) $grupo1[0]; ?>"<?= $sel; ?>><?= htmlspecialchars($grupo1['catp_nombre']); ?></option>
-										<?php } ?>
+													<?php } ?>
 									</select>
 								</div>
 								<div class="productos-filtro">
 									<label for="filtroGrupo2Producto"><?= $ofimaProductosActiva ? 'Sublínea' : 'Grupo 2'; ?></label>
 									<select id="filtroGrupo2Producto" class="js-filtro-buscar" name="grupo2" form="formBusquedaProductos">
 										<option value="">Todos</option>
-										<?php
+													<?php
 										$grupos2 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2 AND catp_habilitada=1 AND catp_id_empresa='".$idEmpresa."'");
-										while ($grupo2 = mysqli_fetch_array($grupos2, MYSQLI_BOTH)) {
+													while ($grupo2 = mysqli_fetch_array($grupos2, MYSQLI_BOTH)) {
 											$sel = isset($_GET['grupo2']) && (string) $_GET['grupo2'] === (string) $grupo2[0] ? ' selected' : '';
-										?>
+													?>
 											<option value="<?= (int) $grupo2[0]; ?>"<?= $sel; ?>><?= htmlspecialchars($grupo2['catp_nombre']); ?></option>
-										<?php } ?>
+													<?php } ?>
 									</select>
 								</div>
 								<div class="productos-filtro">
 									<label for="filtroMarcaProducto"><?= $ofimaProductosActiva ? 'Grupo' : 'Marca'; ?></label>
 									<select id="filtroMarcaProducto" class="js-filtro-buscar" name="marca" form="formBusquedaProductos">
 										<option value="">Todas</option>
-										<?php
+													<?php
 										$marcas = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."' AND mar_habilitada=1");
-										while ($marca = mysqli_fetch_array($marcas, MYSQLI_BOTH)) {
+													while ($marca = mysqli_fetch_array($marcas, MYSQLI_BOTH)) {
 											$sel = isset($_GET['marca']) && (string) $_GET['marca'] === (string) $marca[0] ? ' selected' : '';
-										?>
+													?>
 											<option value="<?= (int) $marca[0]; ?>"<?= $sel; ?>><?= htmlspecialchars($marca[1]); ?></option>
-										<?php } ?>
+													<?php } ?>
 									</select>
 								</div>
 								<div class="productos-filtro">
@@ -872,7 +872,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 									<?php } ?>
 									<div class="productos-mas-opciones dropdown">
 										<a href="#" class="clientes-toolbar-btn dropdown-toggle" data-toggle="dropdown">Más opciones <b class="caret"></b></a>
-										<ul class="dropdown-menu">
+												<ul class="dropdown-menu">
 											<?php if (Modulos::validarRol([152], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 												<li><a href="productos-store.php">Editar productos Store JM</a></li>
 											<?php } ?>
@@ -884,12 +884,12 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 											<?php } ?>
 											<?php if (Modulos::validarRol([208], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 												<li><a href="guardar-precios.php" onclick="return confirm('Desea guardar los precios actuales en el historial?');">Guardar precios en historial</a></li>
-											<?php } ?>
+													<?php } ?>
 										</ul>
 									</div>
 								</div>
 							</div>
-					</div>
+						</div>
 					<div class="clientes-panel-body">
 						<form id="formBusquedaProductos" action="<?= $_SERVER['PHP_SELF']; ?>" method="get" class="clientes-busqueda-principal">
 							<label class="clientes-busqueda-label" for="productosBusqueda">Buscar productos</label>
@@ -898,11 +898,11 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 								<input type="search" id="productosBusqueda" name="busqueda" value="<?= htmlspecialchars($busquedaProducto); ?>" placeholder="<?= $ofimaProductosActiva ? 'Código Ofima o nombre del producto' : 'Código o nombre del producto'; ?>" autocomplete="off">
 								<button type="submit" class="clientes-busqueda-btn">Buscar</button>
 								<input type="hidden" name="por" value="<?= (int) $porPaginaProducto; ?>">
-							</div>
+					</div>
 							<div class="productos-columnas">
 								<button type="button" class="clientes-toolbar-btn" id="btnColumnasProducto"><i class="icon-eye-open"></i> Columnas</button>
 								<div class="productos-columnas-panel" id="panelColumnasProducto"></div>
-							</div>
+				</div>
 							<p class="clientes-busqueda-hint">Escriba y pulse Enter. La búsqueda usa código y nombre.</p>
 						</form>
 

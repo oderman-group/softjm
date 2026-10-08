@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 if (empty($consulta) || !($consulta instanceof mysqli_result)) {
     echo '<tr class="productos-empty-row"><td colspan="20" class="clientes-empty">No hay productos que coincidan con los filtros aplicados.</td></tr>';
     return;

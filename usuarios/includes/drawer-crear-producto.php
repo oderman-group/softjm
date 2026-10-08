@@ -760,9 +760,21 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
 #drawerEditarProducto .drawer-aviso.is-visible { display: block; }
 #drawerEditarProducto .drawer-aviso.is-ok { background: #ecfdf5; color: #166534; border: 1px solid #86efac; }
 #drawerEditarProducto .drawer-aviso.is-error { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+#drawerEditarProducto .drawer-aviso.is-loading {
+  background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd;
+  display: flex; align-items: center; gap: .55rem;
+}
+#drawerEditarProducto .drawer-aviso.is-loading::before {
+  content: '';
+  width: 1rem; height: 1rem; border-radius: 50%;
+  border: 2px solid #93c5fd; border-top-color: #1d4ed8;
+  animation: drawerEditSpin .7s linear infinite; flex-shrink: 0;
+}
+@keyframes drawerEditSpin { to { transform: rotate(360deg); } }
 #drawerEditarProducto .drawer-btn { border: 0; border-radius: 8px; padding: .55rem 1rem; cursor: pointer; font-weight: 600; }
 #drawerEditarProducto .drawer-btn-secondary { background: #e2e8f0; color: #0f172a; }
 #drawerEditarProducto .drawer-btn-primary { background: #1d4ed8; color: #fff; }
+#drawerEditarProducto .drawer-btn-primary:disabled { opacity: .7; cursor: wait; }
 #drawerEditarProducto .drawer-btn-bodega { background: #f59e0b; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: .35rem; }
 #drawerEditarProducto select.js-select-buscar { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 </style>
@@ -1048,7 +1060,10 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
 
   function mostrarAviso(tipo, texto) {
     var aviso = document.getElementById('drawerEditarAviso');
-    aviso.className = 'drawer-aviso is-visible ' + (tipo === 'ok' ? 'is-ok' : 'is-error');
+    var clase = 'is-error';
+    if (tipo === 'ok') clase = 'is-ok';
+    else if (tipo === 'loading') clase = 'is-loading';
+    aviso.className = 'drawer-aviso is-visible ' + clase;
     aviso.textContent = texto;
     aviso.scrollIntoView({ block: 'nearest' });
   }
@@ -1092,13 +1107,17 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
   document.getElementById('btnGuardarDrawerEditar').addEventListener('click', function () {
     var error = document.getElementById('drawerEditarError');
     var boton = document.getElementById('btnGuardarDrawerEditar');
+    var textoOriginal = boton.getAttribute('data-label') || boton.textContent;
+    boton.setAttribute('data-label', textoOriginal);
     error.textContent = '';
-    document.getElementById('drawerEditarAviso').className = 'drawer-aviso';
     boton.disabled = true;
+    boton.textContent = 'Guardando...';
+    mostrarAviso('loading', 'Guardando cambios, por favor espere...');
     fetch('bd_update/productos-actualizar.php', { method: 'POST', body: new FormData(form), credentials: 'same-origin' })
       .then(function (r) { return r.json(); })
       .then(function (data) {
         boton.disabled = false;
+        boton.textContent = textoOriginal;
         if (!data || !data.success) {
           mostrarAviso('error', (data && data.message) || 'No se pudieron guardar los cambios.');
           return;
@@ -1117,6 +1136,7 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
       })
       .catch(function () {
         boton.disabled = false;
+        boton.textContent = textoOriginal;
         mostrarAviso('error', 'No se pudieron guardar los cambios. Revise la conexión e intente de nuevo.');
       });
   });
