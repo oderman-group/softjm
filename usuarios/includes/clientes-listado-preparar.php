@@ -5,6 +5,9 @@
  * Requiere: $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion, $idEmpresa
  */
 
+require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+$ofimaActivaListado = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
+
 $clienteConMasVenta = Cliente::obtenerDatosClienteConMasComprasAgnoActual($idEmpresa, $conexionBdPrincipal) ?: [
     'cantidad'         => 0,
     'factura_cliente'  => 0,

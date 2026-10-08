@@ -14,7 +14,7 @@ if ( !empty($_SESSION["dataAdicional"]["dominio_empresa"]) ) {
 
 require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
 $ofimaActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
-$reqOfima = $ofimaActiva ? ' (*)' : '';
+$reqOfima = $ofimaActiva ? ' <span class="js-req-ofima-agregar" style="display:none;color:#c00;">(*)</span>' : '';
 ?>
 <link href="css/chosen.css" rel="stylesheet">
 <!--============ javascript ===========-->
@@ -107,15 +107,28 @@ include("includes/js-formularios.php");
 							<h3> <?=$paginaActual['pag_nombre'];?></h3>
 						</div>
 						<div class="widget-container">
-							<form class="form-horizontal" method="post" action="bd_create/clientes-guardar.php">
+							<form class="form-horizontal" method="post" action="bd_create/clientes-guardar.php" id="formClienteAgregar">
                                 
                                 <fieldset class="default">
                                 	<legend>Datos básicos</legend>
+
+								<?php if ($ofimaActiva) { ?>
+								<div class="control-group">
+									<label class="control-label">Ofima</label>
+									<div class="controls">
+										<label class="checkbox">
+											<input type="checkbox" name="crearEnOfima" id="crearEnOfima" value="1">
+											Crear también en Ofima
+										</label>
+										<span class="help-block">Solo si está marcado se enviará el cliente al endpoint de creación en Ofima. Entonces serán obligatorios tipo de documento, documento, nombre, email, teléfono, celular, dirección y ciudad.</span>
+									</div>
+								</div>
+								<?php } ?>
 									
 								<div class="control-group">
 									<label class="control-label">Tipo de documento<?= $reqOfima ?></label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoDocumento"<?= $ofimaActiva ? ' required' : '' ?>>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="tipoDocumento" id="tipoDocumentoAgregar">
 											<option value=""></option>
 											<option value="2">NIT</option>
 											<option value="3">Cédula</option>
@@ -126,7 +139,7 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Documento<?= $reqOfima ?></label>
 									<div class="controls">
-										<input type="text" class="span4" name="usuario" autocomplete="off" onChange="clientesVerificar(this)"<?= $ofimaActiva ? ' required' : '' ?>>
+										<input type="text" class="span4" name="usuario" autocomplete="off" onChange="clientesVerificar(this)">
                                         <span style="color:#F03;">Digite el Documento sin número de verificación.</span>
 									</div>
 									<span id="resp"></span>
@@ -167,21 +180,21 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Email<?= $reqOfima ?></label>
 									<div class="controls">
-										<input type="email" class="span8" name="email" style="text-transform:lowercase;"<?= $ofimaActiva ? ' required' : '' ?>>
+										<input type="email" class="span8" name="email" style="text-transform:lowercase;">
 									</div>
 								</div>
                                 
                                 <div class="control-group">
 									<label class="control-label">Teléfono<?= $reqOfima ?></label>
 									<div class="controls">
-										<input type="text" class="span4" name="telefono"<?= $ofimaActiva ? ' required' : '' ?>>
+										<input type="text" class="span4" name="telefono">
 									</div>
 								</div>
                                 
                                 <div class="control-group">
 									<label class="control-label">Celular<?= $reqOfima ?></label>
 									<div class="controls">
-										<input type="text" class="span4" name="celular" maxlength="10"<?= $ofimaActiva ? ' required' : '' ?>>
+										<input type="text" class="span4" name="celular" maxlength="10">
                                         <span style="color:#F03;">Este valor sin puntos ni espacios. (3135912073)</span>
 									</div>
 								</div>
@@ -196,7 +209,7 @@ include("includes/js-formularios.php");
                                 <div class="control-group">
 									<label class="control-label">Dirección<?= $reqOfima ?></label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span2" tabindex="2" name="op1"<?= $ofimaActiva ? ' required' : '' ?>>
+										<select data-placeholder="Escoja una opción..." class="chzn-select span2" tabindex="2" name="op1">
 											<option value=""></option>
                                             <option value="Calle">Calle</option>
                                             <option value="Carrera">Carrera</option>
@@ -268,7 +281,7 @@ include("includes/js-formularios.php");
 									<div class="control-group">
 											<label class="control-label">Ciudad<?= $reqOfima ?></label>
 											<div class="controls">
-												<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ciudad"<?= $ofimaActiva ? ' required' : '' ?>>
+												<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="ciudad">
 													<option value=""></option>
 													<?php
 													$conOp = mysqli_query($conexionBdAdmin,"SELECT * FROM localidad_ciudades INNER JOIN localidad_departamentos ON dep_id=ciu_departamento ORDER BY ciu_nombre");
@@ -428,6 +441,22 @@ include("includes/js-formularios.php");
 		</div>
 	</div>
 	<?php include("includes/pie.php");?>
+	<?php if ($ofimaActiva) { ?>
+	<script>
+	(function () {
+		var check = document.getElementById('crearEnOfima');
+		if (!check) return;
+		function toggleReq() {
+			var show = check.checked;
+			document.querySelectorAll('.js-req-ofima-agregar').forEach(function (el) {
+				el.style.display = show ? 'inline' : 'none';
+			});
+		}
+		check.addEventListener('change', toggleReq);
+		toggleReq();
+	})();
+	</script>
+	<?php } ?>
 </div>
 </body>
 </html>

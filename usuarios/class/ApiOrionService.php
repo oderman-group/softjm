@@ -95,7 +95,9 @@ class ApiOrionService {
         try {
             // Mapear campos de Ofima a Orion
             $datosOrion = $this->mapearCamposProductoDeOfima($datosOfima);
-            
+            // Llegó por productos-recibir → queda marcado como integrado con Ofima
+            $datosOrion['prod_integrado_ofima'] = 1;
+
             // Verificar si el producto ya existe por referencia
             $productoExistente = $this->buscarProductoPorReferencia($datosOrion['prod_referencia']);
             
@@ -157,9 +159,7 @@ class ApiOrionService {
                 'prod_costo' => $datosOfima['costo'] ?? 0,
                 'prod_utilidad' => $datosOfima['utilidad'] ?? 0,
                 'prod_precio' => $datosOfima['precio'] ?? 0,
-                'prod_categoria' => $datosOfima['categoria_id'] ?? null,
-                'prod_grupo1' => $datosOfima['grupo_id'] ?? null,
-                'prod_marca' => $datosOfima['marca_id'] ?? null,
+                // Clasificación: se resuelve en aplicarClasificacionOfima (códigos Ofima → IDs Orion)
                 'prod_proveedor' => $datosOfima['proveedor_id'] ?? null,
                 'prod_descripcion_corta' => $datosOfima['descripcion_corta'] ?? '',
                 'prod_descripcion_larga' => $datosOfima['descripcion_larga'] ?? '',
@@ -170,6 +170,8 @@ class ApiOrionService {
             ];
         }
         
+        $this->aplicarClasificacionOfima($datosOfima, $datosOrion);
+
         // Convención utilidad: Orion almacena siempre 0-100. Ofima puede enviar 0-100 (porcentaje) o 0-1 (factor).
         if (isset($datosOrion['prod_utilidad'])) {
             $u = floatval($datosOrion['prod_utilidad']);
@@ -187,6 +189,177 @@ class ApiOrionService {
         }
         
         return $datosOrion;
+    }
+
+    /**
+     * Clasificación Ofima → Orion.
+     * Ofima envía códigos (linea/sublinea/grupo o grupo_id/categoria_id/marca_id como catp_cod_grupo / mar_cod_ofima).
+     * Orion resuelve y guarda IDs internos: prod_grupo1, prod_categoria, prod_marca, prod_grupo3.
+     * Nunca se persiste el código Ofima en esas columnas.
+     */
+    private function aplicarClasificacionOfima($datosOfima, &$datosOrion) {
+        unset($datosOrion['prod_grupo1'], $datosOrion['prod_marca'], $datosOrion['prod_grupo3'], $datosOrion['prod_categoria']);
+
+        // Línea → prod_grupo1 (catp_grupo = 1)
+        $codigoLinea = $this->primerTexto($datosOfima, ['linea', 'grupo_1', 'grupo_id']);
+        $idLinea = $this->resolverCategoriaDesdeOfima($codigoLinea, 1);
+        if ($idLinea !== null) {
+            $datosOrion['prod_grupo1'] = $idLinea;
+        }
+
+        // Sublínea → prod_categoria (catp_grupo = 2). Default 1 si no viene o no se resuelve.
+        $codigoSublinea = $this->primerTexto($datosOfima, ['sublinea', 'grupo_2', 'categoria_id']);
+        $idSublinea = $this->resolverCategoriaDesdeOfima($codigoSublinea, 2);
+        $datosOrion['prod_categoria'] = $idSublinea !== null ? $idSublinea : 1;
+
+        // Clasificación 1 → prod_grupo3 (catp_grupo = 3)
+        $codigoClasif = $this->primerTexto($datosOfima, ['clasificacion_1', 'grupo_3']);
+        $idClasif = $this->resolverCategoriaDesdeOfima($codigoClasif, 3);
+        if ($idClasif !== null) {
+            $datosOrion['prod_grupo3'] = $idClasif;
+        }
+
+        // Grupo / marca → prod_marca (mar_cod_ofima)
+        $codigoMarca = $this->primerTexto($datosOfima, ['grupo', 'marca_id']);
+        $idMarca = $this->resolverMarcaDesdeOfima($codigoMarca);
+        if ($idMarca !== null) {
+            $datosOrion['prod_marca'] = $idMarca;
+        }
+
+        if (array_key_exists('habilitado', $datosOfima) && $datosOfima['habilitado'] !== null && $datosOfima['habilitado'] !== '') {
+            $datosOrion['prod_habilitado'] = ((int) $datosOfima['habilitado']) === 1 ? 1 : 0;
+        }
+    }
+
+    private function primerTexto($datos, $claves) {
+        foreach ($claves as $clave) {
+            if (!isset($datos[$clave]) || $datos[$clave] === null) {
+                continue;
+            }
+            $texto = trim((string) $datos[$clave]);
+            if ($texto !== '') {
+                return $texto;
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Resuelve código Ofima (catp_cod_grupo) → catp_id.
+     * Si no hay código y el valor parece ID Orion puro (sin ceros a la izquierda), valida por catp_id.
+     */
+    private function resolverCategoriaDesdeOfima($codigo, $grupo) {
+        $codigo = trim((string) $codigo);
+        if ($codigo === '' || $codigo === '0') {
+            return null;
+        }
+
+        $porCodigo = $this->buscarCategoriaIdPorCodigo($codigo, $grupo);
+        if ($porCodigo !== null) {
+            return $porCodigo;
+        }
+
+        // "001" no debe caer a catp_id=1; solo IDs sin padding (ej. "12")
+        if (ctype_digit($codigo) && (string) (int) $codigo === $codigo) {
+            return $this->buscarCategoriaIdPorId((int) $codigo, $grupo);
+        }
+
+        return null;
+    }
+
+    /**
+     * Resuelve mar_cod_ofima → mar_id (o mar_id si viene ID Orion puro).
+     */
+    private function resolverMarcaDesdeOfima($codigo) {
+        $codigo = trim((string) $codigo);
+        if ($codigo === '' || $codigo === '0') {
+            return null;
+        }
+
+        $porCodigo = $this->buscarMarcaIdPorCodigo($codigo);
+        if ($porCodigo !== null) {
+            return $porCodigo;
+        }
+
+        if (ctype_digit($codigo) && (string) (int) $codigo === $codigo) {
+            return $this->buscarMarcaIdPorId((int) $codigo);
+        }
+
+        return null;
+    }
+
+    private function buscarCategoriaIdPorCodigo($codigo, $grupo) {
+        $codigo = trim((string) $codigo);
+        if ($codigo === '') {
+            return null;
+        }
+        $stmt = $this->conexionBdPrincipal->prepare(
+            'SELECT catp_id FROM productos_categorias WHERE catp_cod_grupo = ? AND catp_grupo = ? AND catp_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return null;
+        }
+        $grupo = (int) $grupo;
+        $stmt->bind_param('sii', $codigo, $grupo, $this->idEmpresa);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $row ? (int) $row['catp_id'] : null;
+    }
+
+    private function buscarCategoriaIdPorId($catpId, $grupo) {
+        $catpId = (int) $catpId;
+        $grupo = (int) $grupo;
+        if ($catpId <= 0) {
+            return null;
+        }
+        $stmt = $this->conexionBdPrincipal->prepare(
+            'SELECT catp_id FROM productos_categorias WHERE catp_id = ? AND catp_grupo = ? AND catp_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('iii', $catpId, $grupo, $this->idEmpresa);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $row ? (int) $row['catp_id'] : null;
+    }
+
+    private function buscarMarcaIdPorCodigo($codigo) {
+        $codigo = trim((string) $codigo);
+        if ($codigo === '') {
+            return null;
+        }
+        $stmt = $this->conexionBdPrincipal->prepare(
+            'SELECT mar_id FROM marcas WHERE mar_cod_ofima = ? AND mar_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('si', $codigo, $this->idEmpresa);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $row ? (int) $row['mar_id'] : null;
+    }
+
+    private function buscarMarcaIdPorId($marId) {
+        $marId = (int) $marId;
+        if ($marId <= 0) {
+            return null;
+        }
+        $stmt = $this->conexionBdPrincipal->prepare(
+            'SELECT mar_id FROM marcas WHERE mar_id = ? AND mar_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('ii', $marId, $this->idEmpresa);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $row ? (int) $row['mar_id'] : null;
     }
     
     /**
@@ -281,8 +454,9 @@ class ApiOrionService {
         $stmt->bind_param($tipos, ...$params);
         
         if ($stmt->execute()) {
-            $productoId = $stmt->insert_id;
-            
+            $productoId = (int) $stmt->insert_id;
+            $this->marcarProductoIntegradoOfima($productoId);
+
             // Crear registro en productos_bodegas por defecto
             $this->crearRegistroBodegaDefault($productoId);
             
@@ -346,6 +520,11 @@ class ApiOrionService {
             $params[] = $valor;
         }
         
+        // Al actualizar desde Ofima → Orion siempre queda marcado como integrado
+        if (!isset($datos['prod_integrado_ofima'])) {
+            $campos[] = 'prod_integrado_ofima = 1';
+        }
+
         // Agregar fecha de actualización
         $campos[] = "prod_ultima_actualizacion = NOW()";
         
@@ -368,6 +547,8 @@ class ApiOrionService {
         $stmt->bind_param($tipos, ...$params);
         
         if ($stmt->execute()) {
+            $this->marcarProductoIntegradoOfima((int) $productoId);
+
             // Registrar cambio de precio si hubo
             if (isset($datos['prod_precio']) && $productoActual['prod_precio'] != $datos['prod_precio']) {
                 $this->registrarCambioPrecio($productoId, $productoActual['prod_precio'], $datos['prod_precio']);
@@ -402,11 +583,35 @@ class ApiOrionService {
     }
 
     /**
-     * Recibe y procesa un cliente desde Ofima (Ofima → Orion)
+     * Marca prod_integrado_ofima = 1 para el producto de la empresa actual.
+     */
+    private function marcarProductoIntegradoOfima($productoId) {
+        $productoId = (int) $productoId;
+        if ($productoId <= 0) {
+            return;
+        }
+        $stmt = $this->conexionBdPrincipal->prepare(
+            'UPDATE productos SET prod_integrado_ofima = 1 WHERE prod_id = ? AND prod_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return;
+        }
+        $stmt->bind_param('ii', $productoId, $this->idEmpresa);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    /**
+     * Recibe y procesa un cliente desde Ofima (Ofima → Orion).
+     * ciudad = código DIAN (ciu_cod_dian); se homologa a ciu_id y cli_zona = ciu_departamento.
      */
     public function recibirClienteDeOfima($datosOfima) {
         try {
             $datosOrion = $this->mapearCamposClienteDeOfima($datosOfima);
+            $homologacion = $this->homologarCiudadCliente($datosOfima, $datosOrion);
+            if ($homologacion !== null) {
+                return $homologacion;
+            }
             $clienteExistente = $this->buscarClientePorIdentificacion($datosOrion['cli_usuario']);
             if ($clienteExistente) {
                 return $this->actualizarCliente($clienteExistente['cli_id'], $datosOrion);
@@ -415,6 +620,40 @@ class ApiOrionService {
         } catch (Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         }
+    }
+
+    /**
+     * Resuelve ciudad DIAN → cli_ciudad (ciu_id) y cli_zona (ciu_departamento).
+     * Solo actúa si el payload trae "ciudad"; si no, no toca esos campos (evita borrar en UPDATE).
+     * Mutates $datosOrion. Returns error array on failure, null on success.
+     */
+    private function homologarCiudadCliente(array $datosOfima, array &$datosOrion) {
+        if (!array_key_exists('ciudad', $datosOfima)) {
+            unset($datosOrion['cli_ciudad'], $datosOrion['cli_zona']);
+            return null;
+        }
+
+        $codigoCiudad = trim((string) $datosOfima['ciudad']);
+        if ($codigoCiudad === '') {
+            $datosOrion['cli_ciudad'] = null;
+            $datosOrion['cli_zona'] = '';
+            return null;
+        }
+
+        $ciudad = $this->obtenerCiudadPorCodigoDian($codigoCiudad);
+        if ($ciudad === null && ctype_digit($codigoCiudad)) {
+            $ciudad = $this->obtenerCiudadPorId((int) $codigoCiudad);
+        }
+        if ($ciudad === null) {
+            return [
+                'success' => false,
+                'error'   => 'No se encontró una ciudad con ciu_cod_dian ' . $codigoCiudad
+            ];
+        }
+
+        $datosOrion['cli_ciudad'] = (int) $ciudad['ciu_id'];
+        $datosOrion['cli_zona'] = (string) $ciudad['ciu_departamento'];
+        return null;
     }
 
     /**
@@ -473,15 +712,20 @@ class ApiOrionService {
         $campos = [
             'cli_nombre', 'cli_usuario', 'cli_email', 'cli_telefono', 'cli_direccion', 'cli_ciudad',
             'cli_celular', 'cli_referencia', 'cli_id_empresa', 'cli_categoria', 'cli_fecha_registro',
-            'cli_nivel', 'cli_clave', 'cli_forma_creacion', 'cli_zona', 'cli_pais'
+            'cli_nivel', 'cli_clave', 'cli_forma_creacion', 'cli_integrado_ofima', 'cli_zona', 'cli_pais'
         ];
+        // cli_ciudad = ciu_id homologado (string para permitir NULL sin coercer a 0)
+        $cliCiudad = isset($datos['cli_ciudad']) && $datos['cli_ciudad'] !== null && $datos['cli_ciudad'] !== ''
+            ? (string) (int) $datos['cli_ciudad']
+            : null;
+        $cliZona = isset($datos['cli_zona']) ? (string) $datos['cli_zona'] : '';
         $valores = [
             $datos['cli_nombre'] ?? '',
             $datos['cli_usuario'] ?? '',
             $datos['cli_email'] ?? '',
             $datos['cli_telefono'] ?? '',
             $datos['cli_direccion'] ?? '',
-            $datos['cli_ciudad'] ?? null,
+            $cliCiudad,
             $datos['cli_celular'] ?? '',
             $datos['cli_referencia'] ?? null,
             $this->idEmpresa,
@@ -490,7 +734,8 @@ class ApiOrionService {
             3, // nivel
             $cliClave,
             'API',
-            '',   // cli_zona
+            1, // cli_integrado_ofima: llegó desde Ofima
+            $cliZona,
             'Colombia'  // cli_pais
         ];
         $placeholders = implode(', ', array_fill(0, count($campos), '?'));
@@ -499,10 +744,11 @@ class ApiOrionService {
         if (!$stmt) {
             return ['success' => false, 'error' => 'Error al preparar la consulta: ' . $this->conexionBdPrincipal->error];
         }
-        $tipos = 'ssssssssiisissss'; // nombre..referencia(8s), id_empresa,categoria(2i), fecha(s), nivel(i), clave,forma,zona,pais(4s)
+        $tipos = 'ssssssssiisississ';
         $stmt->bind_param($tipos, ...$valores);
         if ($stmt->execute()) {
-            $clienteId = $stmt->insert_id;
+            $clienteId = (int) $stmt->insert_id;
+            $this->marcarClienteIntegradoOfima($clienteId);
             $this->registrarSincronizacion('clientes', 'ofima_orion', 'CREATE', $clienteId, $datos['cli_usuario'], $datos, ['success' => true], 'exitoso', 200, null, 1);
             return ['success' => true, 'cliente_id' => $clienteId, 'operacion' => 'CREATE'];
         }
@@ -510,7 +756,7 @@ class ApiOrionService {
     }
 
     private function actualizarCliente($clienteId, $datos) {
-        $camposPermitidos = ['cli_nombre', 'cli_email', 'cli_telefono', 'cli_direccion', 'cli_ciudad', 'cli_celular', 'cli_referencia'];
+        $camposPermitidos = ['cli_nombre', 'cli_email', 'cli_telefono', 'cli_direccion', 'cli_ciudad', 'cli_zona', 'cli_celular', 'cli_referencia'];
         $sets = [];
         $tipos = '';
         $params = [];
@@ -521,27 +767,47 @@ class ApiOrionService {
                 $params[] = $datos[$campo];
             }
         }
-        if (empty($sets)) {
-            return ['success' => true, 'cliente_id' => $clienteId, 'operacion' => 'UPDATE'];
-        }
-        $sets[] = "cli_ultima_modificacion = NOW()";
+        // Al actualizar desde Ofima → Orion siempre queda marcado como integrado
+        $sets[] = 'cli_integrado_ofima = 1';
+        $sets[] = 'cli_ultima_modificacion = NOW()';
         $tipos .= 'ii';
         $params[] = $clienteId;
         $params[] = $this->idEmpresa;
-        $query = "UPDATE clientes SET " . implode(', ', $sets) . " WHERE cli_id = ? AND cli_id_empresa = ?";
+        $query = 'UPDATE clientes SET ' . implode(', ', $sets) . ' WHERE cli_id = ? AND cli_id_empresa = ?';
         $stmt = $this->conexionBdPrincipal->prepare($query);
         if (!$stmt || !$stmt->bind_param($tipos, ...$params) || !$stmt->execute()) {
             return ['success' => false, 'error' => 'Error al actualizar cliente: ' . ($stmt ? $stmt->error : $this->conexionBdPrincipal->error)];
         }
+        // Refuerzo: asegurar flag aunque el SET anterior se omita por esquema antiguo
+        $this->marcarClienteIntegradoOfima((int) $clienteId);
         $this->registrarSincronizacion('clientes', 'ofima_orion', 'UPDATE', $clienteId, $datos['cli_usuario'] ?? '', $datos, ['success' => true], 'exitoso', 200, null, 1);
         return ['success' => true, 'cliente_id' => $clienteId, 'operacion' => 'UPDATE'];
+    }
+
+    /**
+     * Marca cli_integrado_ofima = 1 para el cliente de la empresa actual.
+     */
+    private function marcarClienteIntegradoOfima($clienteId) {
+        $clienteId = (int) $clienteId;
+        if ($clienteId <= 0) {
+            return;
+        }
+        $stmt = $this->conexionBdPrincipal->prepare(
+            'UPDATE clientes SET cli_integrado_ofima = 1 WHERE cli_id = ? AND cli_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return;
+        }
+        $stmt->bind_param('ii', $clienteId, $this->idEmpresa);
+        $stmt->execute();
+        $stmt->close();
     }
 
     /**
      * Recibe y procesa inventario (existencias por producto y bodega) desde Ofima (Ofima → Orion).
      * Inserta o actualiza productos_bodegas y recalcula prod_existencias en productos.
      *
-     * @param array $datos Un objeto con referencia o producto_id, bodega_id, existencias; o { items: [ {...}, ... ] } para lote
+     * @param array $datos Un objeto con referencia o producto_id, bodega_referencia (bod_referencia), existencias; o { items: [ {...}, ... ] } para lote
      * @return array { success, procesados?, resultados?, error? }
      */
     public function recibirInventarioDeOfima($datos) {
@@ -551,16 +817,16 @@ class ApiOrionService {
         foreach ($items as $item) {
             $referencia = isset($item['referencia']) ? trim((string) $item['referencia']) : '';
             $productoId = isset($item['producto_id']) ? (int) $item['producto_id'] : 0;
-            $bodegaId = isset($item['bodega_id']) ? (int) $item['bodega_id'] : 0;
+            $bodegaReferencia = isset($item['bodega_referencia']) ? trim((string) $item['bodega_referencia']) : '';
             $existencias = isset($item['existencias']) ? (float) $item['existencias'] : null;
 
             if ($existencias === null || $existencias < 0) {
                 $this->registrarSincronizacion('inventario', 'ofima_orion', 'UPDATE', 0, $referencia ?: (string) $productoId, $item, ['success' => false], 'error', 400, 'Campo existencias obligatorio y debe ser >= 0', 1);
                 return ['success' => false, 'error' => 'Cada ítem debe incluir existencias (número >= 0)'];
             }
-            if ($bodegaId <= 0) {
-                $this->registrarSincronizacion('inventario', 'ofima_orion', 'UPDATE', 0, $referencia ?: (string) $productoId, $item, ['success' => false], 'error', 400, 'bodega_id obligatorio', 1);
-                return ['success' => false, 'error' => 'Cada ítem debe incluir bodega_id válido'];
+            if ($bodegaReferencia === '') {
+                $this->registrarSincronizacion('inventario', 'ofima_orion', 'UPDATE', 0, $referencia ?: (string) $productoId, $item, ['success' => false], 'error', 400, 'bodega_referencia obligatorio', 1);
+                return ['success' => false, 'error' => 'Cada ítem debe incluir bodega_referencia (código bod_referencia)'];
             }
             if ($referencia === '' && $productoId <= 0) {
                 $this->registrarSincronizacion('inventario', 'ofima_orion', 'UPDATE', 0, '', $item, ['success' => false], 'error', 400, 'Se requiere referencia o producto_id', 1);
@@ -581,17 +847,19 @@ class ApiOrionService {
             }
 
             $prodId = (int) $producto['prod_id'];
-            if (!$this->bodegaPerteneceEmpresa($bodegaId)) {
+            $bodega = $this->buscarBodegaPorReferencia($bodegaReferencia);
+            if (!$bodega) {
                 $this->registrarSincronizacion('inventario', 'ofima_orion', 'UPDATE', $prodId, $producto['prod_referencia'] ?? '', $item, ['success' => false], 'error', 400, 'Bodega no válida para la empresa', 1);
-                return ['success' => false, 'error' => 'Bodega no encontrada o no pertenece a la empresa'];
+                return ['success' => false, 'error' => 'Bodega no encontrada para la referencia ' . $bodegaReferencia];
             }
+            $bodegaId = (int) $bodega['bod_id'];
 
             $existenciasInt = (int) round($existencias);
             $operacion = $this->upsertProductoBodega($prodId, $bodegaId, $existenciasInt);
             Producto::sincronizarExistenciasConBodegas($prodId, $this->conexionBdPrincipal);
 
             $this->registrarSincronizacion('inventario', 'ofima_orion', $operacion === 'CREATE' ? 'CREATE' : 'UPDATE', $prodId, $producto['prod_referencia'] ?? '', $item, ['success' => true, 'existencias' => $existenciasInt], 'exitoso', 200, null, 1);
-            $resultados[] = ['producto_id' => $prodId, 'bodega_id' => $bodegaId, 'existencias' => $existenciasInt, 'operacion' => $operacion];
+            $resultados[] = ['producto_id' => $prodId, 'bodega_referencia' => $bodegaReferencia, 'bodega_id' => $bodegaId, 'existencias' => $existenciasInt, 'operacion' => $operacion];
         }
 
         return ['success' => true, 'procesados' => count($resultados), 'resultados' => $resultados];
@@ -607,18 +875,6 @@ class ApiOrionService {
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->num_rows > 0 ? $result->fetch_assoc() : null;
-    }
-
-    /**
-     * Comprueba si la bodega existe y pertenece a la empresa
-     */
-    private function bodegaPerteneceEmpresa($bodegaId) {
-        $query = "SELECT 1 FROM bodegas WHERE bod_id = ? AND bod_id_empresa = ? LIMIT 1";
-        $stmt = $this->conexionBdPrincipal->prepare($query);
-        $stmt->bind_param("ii", $bodegaId, $this->idEmpresa);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->num_rows > 0;
     }
 
     /**
@@ -708,13 +964,21 @@ class ApiOrionService {
      * @return int|null
      */
     private function buscarCiudadIdPorCodigoDian($codigoDian) {
+        $ciudad = $this->obtenerCiudadPorCodigoDian($codigoDian);
+        return $ciudad ? (int) $ciudad['ciu_id'] : null;
+    }
+
+    /**
+     * @return array{ciu_id:int,ciu_departamento:int|string}|null
+     */
+    private function obtenerCiudadPorCodigoDian($codigoDian) {
         $codigoDian = trim((string) $codigoDian);
         if ($codigoDian === '' || !defined('BDADMIN')) {
             return null;
         }
 
         $codigoNormalizado = ctype_digit($codigoDian) ? str_pad($codigoDian, 5, '0', STR_PAD_LEFT) : $codigoDian;
-        $sql = 'SELECT ciu_id FROM ' . BDADMIN . '.localidad_ciudades WHERE ciu_cod_dian = ? OR ciu_cod_dian = ? LIMIT 1';
+        $sql = 'SELECT ciu_id, ciu_departamento FROM ' . BDADMIN . '.localidad_ciudades WHERE ciu_cod_dian = ? OR ciu_cod_dian = ? LIMIT 1';
         $stmt = $this->conexionBdPrincipal->prepare($sql);
         if (!$stmt) {
             return null;
@@ -726,7 +990,38 @@ class ApiOrionService {
         if (!$row || empty($row['ciu_id'])) {
             return null;
         }
-        return (int) $row['ciu_id'];
+        return [
+            'ciu_id' => (int) $row['ciu_id'],
+            'ciu_departamento' => $row['ciu_departamento'],
+        ];
+    }
+
+    /**
+     * Fallback si Ofima envía el ciu_id interno de Orion en lugar del código DIAN.
+     *
+     * @return array{ciu_id:int,ciu_departamento:int|string}|null
+     */
+    private function obtenerCiudadPorId($ciuId) {
+        $ciuId = (int) $ciuId;
+        if ($ciuId <= 0 || !defined('BDADMIN')) {
+            return null;
+        }
+        $sql = 'SELECT ciu_id, ciu_departamento FROM ' . BDADMIN . '.localidad_ciudades WHERE ciu_id = ? LIMIT 1';
+        $stmt = $this->conexionBdPrincipal->prepare($sql);
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('i', $ciuId);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        if (!$row || empty($row['ciu_id'])) {
+            return null;
+        }
+        return [
+            'ciu_id' => (int) $row['ciu_id'],
+            'ciu_departamento' => $row['ciu_departamento'],
+        ];
     }
 
     private function buscarBodegaPorReferencia($referencia) {

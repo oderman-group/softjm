@@ -171,6 +171,7 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 											autocomplete="off"
 											spellcheck="false"
 										>
+										<button type="button" class="clientes-busqueda-btn" id="clientesBusquedaBtn">Buscar</button>
 										<span class="clientes-busqueda-estado" id="clientesBusquedaEstado" aria-live="polite"></span>
 									</div>
 									<p class="clientes-busqueda-hint">Búsqueda en tiempo real sobre todos los registros de la cartera.</p>
@@ -451,6 +452,13 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-listado-preparar.php';
 				}, 350);
 			}
 
+			var btnBuscar = document.getElementById('clientesBusquedaBtn');
+			if (btnBuscar) {
+				btnBuscar.addEventListener('click', function () {
+					if (busquedaTimer) clearTimeout(busquedaTimer);
+					ejecutarBusqueda(1);
+				});
+			}
 			if (inputBuscar) {
 				inputBuscar.addEventListener('input', programarBusqueda);
 				inputBuscar.addEventListener('search', function () {

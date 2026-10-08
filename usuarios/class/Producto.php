@@ -372,7 +372,27 @@ class Producto extends BaseDatos {
         }
 
         $resultado = $apiClient->sincronizarProducto($producto, $tipoOperacion);
+        if (!empty($resultado['success'])) {
+            self::marcarIntegradoOfima($productoId, $conexionBdPrincipal, $idEmpresa, 1);
+        }
         return $conNotificacion($resultado);
+    }
+
+    /**
+     * Marca si el producto está integrado en Ofima (prod_integrado_ofima).
+     */
+    public static function marcarIntegradoOfima($productoId, $conexionBdPrincipal, $idEmpresa, $integrado = 1) {
+        $productoId = (int) $productoId;
+        $idEmpresa = (int) $idEmpresa;
+        $integrado = ((int) $integrado) === 1 ? 1 : 0;
+        $stmt = $conexionBdPrincipal->prepare(
+            'UPDATE productos SET prod_integrado_ofima = ? WHERE prod_id = ? AND prod_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return false;
+        }
+        $stmt->bind_param('iii', $integrado, $productoId, $idEmpresa);
+        return $stmt->execute();
     }
 
 }

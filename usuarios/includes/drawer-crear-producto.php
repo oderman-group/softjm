@@ -180,7 +180,7 @@ body.drawer-producto-open { overflow: hidden !important; }
     <button type="button" class="drawer-close" id="btnCerrarDrawerProducto" aria-label="Cerrar">&times;</button>
   </div>
   <div class="drawer-body">
-    <p class="drawer-intro">Complete los datos del producto. <?= $ofimaActivaProducto ? 'El código, el nombre, la línea, la sublínea, la clasificación y el grupo son obligatorios. Al guardar se enviará a Ofima (/Integracion/Orion/Productos/Crear).' : 'El nombre, los grupos y la marca son obligatorios.'; ?></p>
+    <p class="drawer-intro">Complete los datos del producto. <?= $ofimaActivaProducto ? 'El código Ofima, el nombre, la línea, la sublínea, la clasificación y el grupo son obligatorios. Al guardar se enviará a Ofima (/Integracion/Orion/Productos/Crear).' : 'El nombre, los grupos y la marca son obligatorios.'; ?></p>
     <div class="drawer-alert drawer-alert-success" id="drawerProductoExito" role="status"></div>
     <div class="drawer-alert drawer-alert-error" id="drawerProductoError" role="alert"></div>
     <div class="drawer-alert drawer-alert-ofima" id="drawerProductoOfima" role="status"></div>
@@ -188,10 +188,10 @@ body.drawer-producto-open { overflow: hidden !important; }
     <form class="drawer-form" id="formCrearProductoRapido" novalidate>
       <?php if ($ofimaActivaProducto) { ?>
       <div class="form-group">
-        <label for="prodRapidoReferencia">Código <span class="required">*</span></label>
+        <label for="prodRapidoReferencia">Código Ofima <span class="required">*</span></label>
         <input type="text" id="prodRapidoReferencia" name="referencia" autocomplete="off" required>
         <span class="field-status" id="statusReferenciaProducto" aria-live="polite"></span>
-        <span class="field-error" id="errorReferenciaProducto">El código es obligatorio.</span>
+        <span class="field-error" id="errorReferenciaProducto">El código Ofima es obligatorio.</span>
       </div>
       <?php } ?>
 
@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return Promise.resolve(true);
     }
     refEstado = 'checking';
-    mostrarEstadoRef('', 'Verificando código...');
+    mostrarEstadoRef('', 'Verificando código Ofima...');
     var requestId = ++refRequestId;
     var body = new FormData();
     body.append('idUnico', referencia);
@@ -487,13 +487,13 @@ document.addEventListener('DOMContentLoaded', function () {
         refEstado = 'duplicate';
         refVerificada = referencia;
         if (refInput) refInput.classList.add('is-invalid');
-        mostrarEstadoRef('error', (data && data.message) || 'Ya existe un producto con este código.');
+        mostrarEstadoRef('error', (data && data.message) || 'Ya existe un producto con este código Ofima.');
         return false;
       })
       .catch(function () {
         if (requestId !== refRequestId) return false;
         refEstado = 'error';
-        mostrarEstadoRef('error', 'No se pudo verificar el código.');
+        mostrarEstadoRef('error', 'No se pudo verificar el código Ofima.');
         return false;
       });
   }
@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', function () {
       valido = false;
     } else if (refInput && (refEstado !== 'available' || referencia !== refVerificada)) {
       if (refInput) refInput.classList.add('is-invalid');
-      mostrarEstadoRef('error', 'Espere la verificación del código o corrija el valor.');
+      mostrarEstadoRef('error', 'Espere la verificación del código Ofima o corrija el valor.');
       valido = false;
     }
 
@@ -698,7 +698,7 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
 }
 #drawerEditarProductoOverlay.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
 #drawerEditarProducto {
-  position: fixed; top: 0; right: 0; width: 50vw; max-width: 50vw; height: 100vh;
+  position: fixed; top: 0; right: 0; width: min(980px, 82vw); max-width: none; height: 100vh;
   background: #fff; z-index: 99999; display: flex; flex-direction: column;
   transform: translateX(100%); transition: transform .35s ease; box-shadow: -8px 0 32px rgba(15,23,42,.15);
 }
@@ -712,7 +712,29 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
   background: rgba(255,255,255,.15); border: 0; color: #fff; width: 36px; height: 36px; border-radius: 8px; cursor: pointer;
 }
 #drawerEditarProducto .drawer-body { flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem; }
-#drawerEditarProducto .form-group { margin-bottom: 1rem; }
+#drawerEditarProducto .drawer-seccion { margin: 0 0 1rem; padding: .9rem 1rem 1rem; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; }
+#drawerEditarProducto .drawer-seccion h3 { margin: 0 0 .75rem; font-size: .78rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #1e3a8a; }
+#drawerEditarProducto .drawer-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem 1rem; }
+#drawerEditarProducto .form-group { margin-bottom: 0; }
+#drawerEditarProducto .form-group.is-full { grid-column: 1 / -1; }
+#drawerEditarProducto #editProdFotoActual { display: none; max-width: 180px; max-height: 180px; margin: 0 0 .65rem; padding: .35rem; border: 1px solid #e2e8f0; border-radius: 8px; object-fit: contain; background: #f8fafc; }
+#drawerEditarProducto #editProdFotoActual.is-visible { display: block; }
+#drawerEditarProducto .drawer-bodega-top { margin: 0 0 1rem; }
+#drawerEditarProducto .drawer-acciones-top {
+  display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: 0 0 1rem;
+}
+#drawerEditarProducto .drawer-acciones-top .drawer-bodega-top { margin: 0; }
+#drawerEditarProducto .drawer-btn-ofima { background: #d97706; color: #fff; }
+#drawerEditarProducto .drawer-btn-ofima:disabled { opacity: .65; cursor: wait; }
+#drawerEditarProducto .drawer-pill-ofima {
+  display: inline-flex; align-items: center; gap: .35rem;
+  background: #dcfce7; color: #166534; border-radius: 8px;
+  padding: .55rem 1rem; font-weight: 600; font-size: .875rem;
+}
+@media (max-width: 800px) {
+  #drawerEditarProducto { width: 100vw; }
+  #drawerEditarProducto .drawer-form-grid { grid-template-columns: 1fr; }
+}
 #drawerEditarProducto label { display: block; font-size: .75rem; font-weight: 600; color: #334155; margin-bottom: .3rem; }
 #drawerEditarProducto input, #drawerEditarProducto select, #drawerEditarProducto textarea {
   width: 100%; box-sizing: border-box; min-height: 38px; padding: .45rem .75rem;
@@ -741,6 +763,7 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
 #drawerEditarProducto .drawer-btn { border: 0; border-radius: 8px; padding: .55rem 1rem; cursor: pointer; font-weight: 600; }
 #drawerEditarProducto .drawer-btn-secondary { background: #e2e8f0; color: #0f172a; }
 #drawerEditarProducto .drawer-btn-primary { background: #1d4ed8; color: #fff; }
+#drawerEditarProducto .drawer-btn-bodega { background: #f59e0b; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: .35rem; }
 #drawerEditarProducto select.js-select-buscar { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 </style>
 <div id="drawerEditarProductoOverlay"></div>
@@ -750,11 +773,27 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
     <button type="button" class="drawer-close" id="btnCerrarDrawerEditar" aria-label="Cerrar">&times;</button>
   </div>
   <div class="drawer-body">
+    <div class="drawer-acciones-top">
+    <?php if (Modulos::validarRol([145], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+    <a href="#" class="drawer-btn drawer-btn-bodega drawer-bodega-top js-bodegas-producto" id="btnVerBodegasProducto" data-id=""><i class="icon-pushpin"></i> Ver en bodegas</a>
+    <?php } ?>
+    <?php if (!empty($ofimaActivaProducto)) { ?>
+    <button type="button" class="drawer-btn drawer-btn-ofima drawer-bodega-top" id="btnCrearProductoOfima" style="display:none;" title="Enviar este producto a Ofima (/Integracion/Orion/Productos/Crear)">
+      <i class="icon-upload"></i> Crear en Ofima
+    </button>
+    <span class="drawer-pill-ofima drawer-bodega-top" id="badgeProductoIntegradoOfima" style="display:none;" title="Ya está integrado en Ofima">
+      <i class="icon-ok"></i> Integrado Ofima
+    </span>
+    <?php } ?>
+    </div>
     <p class="drawer-error" id="drawerEditarError"></p>
     <div class="drawer-aviso" id="drawerEditarAviso" role="status"></div>
     <form id="formEditarProducto" enctype="multipart/form-data">
       <input type="hidden" name="ajax" value="1">
       <input type="hidden" name="id" id="editProdId" value="">
+      <section class="drawer-seccion">
+        <h3>Datos del producto</h3>
+        <div class="drawer-form-grid">
       <?php if ($puedeEditarCodigo) { ?>
       <div class="form-group">
         <label for="editProdReferencia">Código</label>
@@ -767,12 +806,18 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
         <label>Existencias</label>
         <input type="text" id="editProdExistencias" readonly>
       </div>
-      <div class="form-group">
+      <div class="form-group is-full">
         <label for="editProdNombre">Nombre <span style="color:#dc2626">*</span></label>
         <input type="text" name="nombre" id="editProdNombre" required>
       </div>
-      <div class="form-group">
+        </div>
+      </section>
+      <section class="drawer-seccion">
+        <h3>Foto y descripción</h3>
+        <div class="drawer-form-grid">
+      <div class="form-group is-full">
         <label for="editProdFoto">Foto</label>
+        <img id="editProdFotoActual" alt="Foto del producto">
         <input type="file" name="foto" id="editProdFoto">
       </div>
       <div class="form-group">
@@ -783,6 +828,11 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
         <label for="editProdDescripcionLarga">Descripción larga</label>
         <textarea name="descripcionLarga" id="editProdDescripcionLarga"></textarea>
       </div>
+        </div>
+      </section>
+      <section class="drawer-seccion">
+        <h3>Clasificación</h3>
+        <div class="drawer-form-grid">
       <?php if ($exigeProveedor) { ?>
       <div class="form-group">
         <label>Proveedor</label>
@@ -832,7 +882,12 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
           <?php } ?>
         </select>
       </div>
+        </div>
+      </section>
       <?php if ($puedeEditarPrecios) { ?>
+      <section class="drawer-seccion">
+        <h3>Precios</h3>
+        <div class="drawer-form-grid">
       <div class="form-group"><label>Costo COP ($)</label><input type="text" name="costo" id="editProdCosto"></div>
       <div class="form-group"><label>Costo USD ($)</label><input type="text" name="costoDolar" id="editProdCostoDolar"></div>
       <div class="form-group"><label>Utilidad (%)</label><input type="text" name="utilidad" id="editProdUtilidad"></div>
@@ -840,6 +895,8 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
       <div class="form-group"><label>Precio lista (USD)</label><input type="text" id="editProdPrecioUsd" readonly></div>
       <div class="form-group"><label>Dcto. máximo (%)</label><input type="text" name="dcto1" id="editProdDcto"></div>
       <div class="form-group"><label>Comisión venta (%)</label><input type="text" name="comision" id="editProdComision"></div>
+        </div>
+      </section>
       <?php } else { ?>
       <input type="hidden" name="costo" id="editProdCosto">
       <input type="hidden" name="costoDolar" id="editProdCostoDolar">
@@ -949,10 +1006,24 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
         }
         var p = data.producto;
         document.getElementById('drawerEditarError').textContent = '';
+        document.getElementById('drawerEditarAviso').className = 'drawer-aviso';
         document.getElementById('editProdId').value = p.id;
+        var verBodegas = document.getElementById('btnVerBodegasProducto');
+        if (verBodegas) verBodegas.setAttribute('data-id', p.id);
+        actualizarEstadoOfimaUi(!!p.integrado_ofima);
         document.getElementById('editProdReferencia').value = p.referencia;
         document.getElementById('editProdExistencias').value = p.existencias;
         document.getElementById('editProdNombre').value = p.nombre;
+        var fotoActual = document.getElementById('editProdFotoActual');
+        if (fotoActual) {
+          if (p.foto) {
+            fotoActual.src = 'files/productos/' + encodeURIComponent(p.foto);
+            fotoActual.classList.add('is-visible');
+          } else {
+            fotoActual.removeAttribute('src');
+            fotoActual.classList.remove('is-visible');
+          }
+        }
         document.getElementById('editProdDescripcion').value = p.descripcion;
         document.getElementById('editProdDescripcionLarga').value = p.descripcion_larga;
         asegurarOpcion(document.getElementById('editProdProveedor'), p.proveedor);
@@ -981,6 +1052,43 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
     aviso.textContent = texto;
     aviso.scrollIntoView({ block: 'nearest' });
   }
+  function actualizarEstadoOfimaUi(integrado) {
+    var btnOfima = document.getElementById('btnCrearProductoOfima');
+    var badgeOfima = document.getElementById('badgeProductoIntegradoOfima');
+    if (btnOfima) btnOfima.style.display = integrado ? 'none' : 'inline-flex';
+    if (badgeOfima) badgeOfima.style.display = integrado ? 'inline-flex' : 'none';
+  }
+  var btnCrearOfima = document.getElementById('btnCrearProductoOfima');
+  if (btnCrearOfima) {
+    btnCrearOfima.addEventListener('click', function () {
+      var id = document.getElementById('editProdId').value;
+      if (!id) {
+        mostrarAviso('error', 'No hay producto cargado.');
+        return;
+      }
+      if (!confirm('¿Crear este producto en Ofima?')) {
+        return;
+      }
+      btnCrearOfima.disabled = true;
+      var fd = new FormData();
+      fd.append('id', id);
+      fetch('ajax/ajax-producto-crear-ofima.php', { method: 'POST', body: fd, credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          btnCrearOfima.disabled = false;
+          var ok = !!(data && data.success);
+          var msg = (data && (data.message || (data.ofima && data.ofima.mensaje))) || 'Resultado Ofima';
+          mostrarAviso(ok ? 'ok' : 'error', msg);
+          if (ok || (data && data.integrado_ofima)) {
+            actualizarEstadoOfimaUi(true);
+          }
+        })
+        .catch(function () {
+          btnCrearOfima.disabled = false;
+          mostrarAviso('error', 'No se pudo crear el producto en Ofima. Revise la conexión.');
+        });
+    });
+  }
   document.getElementById('btnGuardarDrawerEditar').addEventListener('click', function () {
     var error = document.getElementById('drawerEditarError');
     var boton = document.getElementById('btnGuardarDrawerEditar');
@@ -1001,6 +1109,9 @@ $puedeEditarPrecios = Modulos::validarRol([399], $conexionBdPrincipal, $conexion
           texto += ' ' + data.ofima.mensaje;
         } else if (data.ofima && data.ofima.sincronizado && data.ofima.mensaje) {
           texto += ' ' + data.ofima.mensaje;
+        }
+        if (data.ofima && data.ofima.sincronizado) {
+          actualizarEstadoOfimaUi(true);
         }
         mostrarAviso(ofimaFallo ? 'error' : 'ok', texto);
       })

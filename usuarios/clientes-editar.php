@@ -89,6 +89,20 @@ include("includes/js-formularios.php");
 						<?php if (Modulos::validarRol([368], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 				<a href="enviar_correos/clientes-enviar-credenciales.php?id=<?=$clienteId;?>" class="btn btn-info" onClick="if(!confirm('Desea ejecutar esta accion?')){return false;}"><i class="icon-envelope"></i> Enviar credenciales</a>
 						<?php } ?>
+						<?php
+						$integradoOfima = (int) ($resultadoD['cli_integrado_ofima'] ?? 0) === 1;
+						if (!empty($ofimaActiva) && !$integradoOfima) {
+						?>
+				<a href="bd_create/clientes-crear-ofima.php?id=<?= (int) $clienteId; ?>"
+				   class="btn btn-warning"
+				   onClick="if(!confirm('¿Crear este cliente en Ofima?')){return false;}">
+					<i class="icon-upload"></i> Crear en Ofima
+				</a>
+						<?php } elseif (!empty($ofimaActiva) && $integradoOfima) { ?>
+				<span class="btn btn-success disabled" style="pointer-events:none;opacity:0.85;" title="Ya está integrado en Ofima">
+					<i class="icon-ok"></i> Integrado Ofima
+				</span>
+						<?php } ?>
 			</div>
 
             <?php include("includes/notificaciones.php");?>

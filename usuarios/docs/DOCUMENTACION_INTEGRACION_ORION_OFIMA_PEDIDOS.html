@@ -188,12 +188,12 @@
   "email": "contacto@ejemplo.com",
   "telefono": "6011234567",
   "direccion": "Calle 123",
-  "ciudad": "Bogotá",
+  "ciudad": "05001",
   "celular": "3001234567",
   "referencia": "",
   "id_empresa": 1
 }</code></pre>
-        <p><code>identificacion</code> = NIT/documento del cliente en Orion (clave para identificar). <code>id_empresa</code> = ID de empresa en Orion. El mapeo puede personalizarse en Orion con <code>api_mapeo_campos</code> (módulo clientes).</p>
+        <p><code>identificacion</code> = NIT/documento del cliente en Orion (clave para identificar). <code>ciudad</code> = <strong>código DIAN</strong> (<code>ciu_cod_dian</code>, ej. <code>05001</code> Medellín, <code>11001</code> Bogotá) — <strong>no</strong> el nombre de la ciudad. Orion convierte su <code>ciu_id</code> interno a ese código antes de enviar. <code>id_empresa</code> = ID de empresa en Orion. El mapeo puede personalizarse en Orion con <code>api_mapeo_campos</code> (módulo clientes).</p>
 
         <h3 class="flow-badge flow-orion-ofima">3.2 Productos</h3>
         <table>
@@ -201,7 +201,45 @@
             <tr><th>URL</th><td>La que Ofima asigne (ej. <code>https://api.ofima.com/integracion/orion/productos</code>).</td></tr>
             <tr><th>Auth</th><td>HTTP Basic Auth</td></tr>
         </table>
-        <p>Orion envía los campos según la tabla <code>api_mapeo_campos</code> (módulo productos). Si no hay mapeo configurado, no se envía payload por defecto; conviene acordar con Orion los nombres de campo. Típicamente: <code>referencia</code>, <code>nombre</code>, <code>costo</code>, <code>utilidad</code> (0–100), <code>precio</code>, <code>categoria_id</code>, <code>grupo_id</code>, <code>marca_id</code>, <code>proveedor_id</code>, <code>descripcion_corta</code>, <code>descripcion_larga</code>, <code>id_empresa</code>. Validaciones en Orion: costo ≥ 0, utilidad entre 0 y 100, precio ≥ 0 si se envía.</p>
+        <h4>Payload (cuerpo JSON) – Orion envía a Productos/Crear (homologación en Orion):</h4>
+        <p>El tercero <strong>no modifica su endpoint</strong>. Orion, al sincronizar hacia Ofima, envía el body con los nombres que Ofima ya conoce y, en paralelo, los campos homologados con el <strong>código Ofima</strong> (no el id interno de Orion).</p>
+        <pre><code>[
+  {
+    "referencia": "60",
+    "nombre": "Prueba",
+    "costo": 0,
+    "utilidad": 30,
+    "precio": 100,
+    "categoria_id": "010",
+    "grupo_id": "001",
+    "marca_id": "MAR01",
+    "grupo": "MAR01",
+    "proveedor_id": 0,
+    "descripcion_corta": "Prueba",
+    "descripcion_larga": "Prueba",
+    "descuento1": 0,
+    "comision": 0,
+    "costo_dolar": 0,
+    "id_empresa": 1,
+    "grupo_1": "001",
+    "linea": "001",
+    "grupo_2": "010",
+    "sublinea": "010",
+    "grupo_3": "034",
+    "clasificacion_1": "034",
+    "habilitado": 1
+  }
+]</code></pre>
+        <h4>Tabla de homologación (Orion → Ofima)</h4>
+        <table>
+            <tr><th>Dato en Orion</th><th>Campo(s) que recibe Ofima</th><th>Origen del código</th></tr>
+            <tr><td>Línea (<code>prod_grupo1</code>)</td><td><code>grupo_1</code>, <code>grupo_id</code>, <code>linea</code></td><td><code>productos_categorias.catp_cod_grupo</code> (grupo 1). Sin código: <code>grupo_1</code>/<code>linea</code> = <code>"0"</code>, <code>grupo_id</code> = <code>""</code>.</td></tr>
+            <tr><td>Sublínea (<code>prod_categoria</code>)</td><td><code>grupo_2</code>, <code>categoria_id</code>, <code>sublinea</code></td><td><code>catp_cod_grupo</code> (grupo 2). Sin código: <code>"0"</code>.</td></tr>
+            <tr><td>Marca / grupo (<code>prod_marca</code>)</td><td><code>marca_id</code>, <code>grupo</code></td><td><code>marcas.mar_cod_ofima</code>. Sin código: <code>"0"</code>.</td></tr>
+            <tr><td>Clasificación 1 (<code>prod_grupo3</code>)</td><td><code>grupo_3</code>, <code>clasificacion_1</code></td><td><code>catp_cod_grupo</code> (grupo 3). Sin código: <code>"0"</code>.</td></tr>
+            <tr><td>Habilitado (<code>prod_habilitado</code>)</td><td><code>habilitado</code></td><td><code>1</code> o <code>0</code>.</td></tr>
+        </table>
+        <p>Orion envía a la vez los campos “viejos” y los homologados con el mismo valor de código, para que Ofima pueda leer cualquiera sin cambiar su API. Validaciones en Orion antes de enviar: costo ≥ 0, utilidad 0–100, precio ≥ 0 si se envía.</p>
 
         <h3 class="flow-badge flow-orion-ofima">3.3 Pedidos</h3>
         <table>
@@ -285,12 +323,17 @@
   "email": "contacto@ejemplo.com",
   "telefono": "6011234567",
   "direccion": "Calle 123",
-  "ciudad": "Bogotá",
+  "ciudad": "05001",
   "celular": "3001234567",
   "referencia": "",
   "id_empresa": 1
 }</code></pre>
-        <p>Orion identifica al cliente por <code>identificacion</code> (NIT/documento). Si existe, actualiza; si no, crea. Respuesta 200: <code>{ "success": true, "message": "Cliente sincronizado correctamente", "cliente_id": 5, "identificacion": "900123456-1", "operacion": "CREATE" | "UPDATE" }</code>.</p>
+        <table>
+            <tr><th>Campo</th><th>Descripción</th></tr>
+            <tr><td><code>identificacion</code></td><td>NIT/documento (clave para crear o actualizar).</td></tr>
+            <tr><td><code>ciudad</code></td><td><strong>Código DIAN</strong> (<code>ciu_cod_dian</code>), ej. <code>05001</code>, <code>11001</code>. <strong>No enviar el nombre</strong> (incorrecto: <code>"Bogotá"</code>; correcto: <code>"11001"</code>). Orion lo homologa a <code>ciu_id</code> y asigna <code>cli_zona</code> = <code>ciu_departamento</code>.</td></tr>
+        </table>
+        <p>Orion identifica al cliente por <code>identificacion</code>. Si existe, actualiza; si no, crea. Respuesta 200: <code>{ "success": true, "message": "Cliente sincronizado correctamente", "cliente_id": 5, "identificacion": "900123456-1", "operacion": "CREATE" | "UPDATE" }</code>.</p>
 
         <h3 class="flow-badge flow-ofima-orion">4.3 Productos (Ofima → Orion)</h3>
         <table>
@@ -298,25 +341,38 @@
             <tr><th>URL</th><td class="endpoint-path">/softjm/usuarios/api/orion/productos-recibir.php</td></tr>
             <tr><th>Auth</th><td>Bearer JWT o Basic Auth</td></tr>
         </table>
-        <h4>Body JSON (campos requeridos: referencia, nombre):</h4>
+        <h4>Body JSON (contrato estable — el tercero no modifica su endpoint):</h4>
         <pre><code>{
   "referencia": "COD001",
   "nombre": "Producto ejemplo",
   "costo": 10000,
   "utilidad": 30,
   "precio": 13000,
-  "categoria_id": 1,
-  "grupo_id": null,
-  "marca_id": null,
+  "linea": "001",
+  "sublinea": "010",
+  "grupo": "MAR01",
+  "clasificacion_1": "034",
+  "grupo_id": "001",
+  "categoria_id": "010",
+  "marca_id": "MAR01",
   "proveedor_id": null,
   "descripcion_corta": "",
   "descripcion_larga": "",
   "descuento1": null,
   "comision": null,
   "costo_dolar": null,
+  "habilitado": 1,
   "id_empresa": 1
 }</code></pre>
-        <p><code>utilidad</code>: 0–100 (porcentaje) o 0–1 (factor decimal); Orion normaliza a 0–100. Si no se envía <code>precio</code> pero sí <code>costo</code> y <code>utilidad</code>, Orion calcula el precio. Validaciones: costo ≥ 0, utilidad 0–100, precio ≥ 0. Orion identifica por <code>referencia</code>; si existe actualiza, si no crea. Respuesta 200: <code>{ "success": true, "message": "Producto sincronizado correctamente", "producto_id": 10, "referencia": "COD001", "operacion": "CREATE" | "UPDATE" }</code>.</p>
+        <table>
+            <tr><th>Campo</th><th>Columna Orion</th><th>Qué enviar</th></tr>
+            <tr><td><code>referencia</code>, <code>nombre</code></td><td><code>prod_referencia</code>, <code>prod_nombre</code></td><td>Obligatorios. Clave de CREATE/UPDATE por referencia.</td></tr>
+            <tr><td><code>linea</code> / <code>grupo_1</code> / <code>grupo_id</code></td><td><code>prod_grupo1</code></td><td>Código Ofima (<code>catp_cod_grupo</code> grupo 1). Orion busca y guarda el <code>catp_id</code> interno. No se guarda el código.</td></tr>
+            <tr><td><code>sublinea</code> / <code>grupo_2</code> / <code>categoria_id</code></td><td><code>prod_categoria</code></td><td>Código Ofima (grupo 2 → <code>catp_id</code>). Si falta o no existe → <code>1</code>.</td></tr>
+            <tr><td><code>grupo</code> / <code>marca_id</code></td><td><code>prod_marca</code></td><td>Código Ofima (<code>mar_cod_ofima</code> → <code>mar_id</code>).</td></tr>
+            <tr><td><code>clasificacion_1</code> / <code>grupo_3</code></td><td><code>prod_grupo3</code></td><td>Código Ofima (grupo 3 → <code>catp_id</code>).</td></tr>
+        </table>
+        <p>Al <strong>recibir</strong>, Orion homologa códigos Ofima (<code>linea</code>/<code>sublinea</code>/<code>grupo</code>/<code>clasificacion_1</code> o equivalentes en <code>grupo_id</code>/<code>categoria_id</code>/<code>marca_id</code>) a IDs internos (<code>catp_id</code>/<code>mar_id</code>) y los guarda en <code>prod_grupo1</code>, <code>prod_categoria</code>, <code>prod_marca</code>, <code>prod_grupo3</code>. Nunca persiste el código Ofima en esas columnas. Al <strong>enviar</strong> a Ofima (sección 3.2) hace el camino inverso (ID → código). <code>utilidad</code>: 0–100 o 0–1. Orion identifica por <code>referencia</code>. Respuesta 200: <code>{ "success": true, "message": "Producto sincronizado correctamente", "producto_id": 10, "referencia": "COD001", "operacion": "CREATE" | "UPDATE" }</code>.</p>
 
         <h3 class="flow-badge flow-ofima-orion">4.4 Inventario (Ofima → Orion)</h3>
         <table>
@@ -328,18 +384,18 @@
         <h4>Un solo ítem:</h4>
         <pre><code>{
   "referencia": "COD001",
-  "bodega_id": 1,
+  "bodega_referencia": "BOGOTA",
   "existencias": 50
 }</code></pre>
-        <p>O por <code>producto_id</code> de Orion: <code>{ "producto_id": 123, "bodega_id": 1, "existencias": 50 }</code>.</p>
+        <p>O por <code>producto_id</code> de Orion: <code>{ "producto_id": 123, "bodega_referencia": "BOGOTA", "existencias": 50 }</code>.</p>
         <h4>Lote (varios ítems):</h4>
         <pre><code>{
   "items": [
-    { "referencia": "COD001", "bodega_id": 1, "existencias": 50 },
-    { "referencia": "COD002", "bodega_id": 1, "existencias": 30 }
+    { "referencia": "COD001", "bodega_referencia": "BOGOTA", "existencias": 50 },
+    { "referencia": "COD002", "bodega_referencia": "BOGOTA", "existencias": 30 }
   ]
 }</code></pre>
-        <p>Requerido por ítem: <code>referencia</code> <strong>o</strong> <code>producto_id</code>, <code>bodega_id</code>, <code>existencias</code> (número ≥ 0). La bodega debe existir en Orion y pertenecer a la empresa. Respuesta 200: <code>{ "success": true, "message": "Inventario sincronizado correctamente", "procesados": 2, "resultados": [ { "producto_id": 10, "bodega_id": 1, "existencias": 50, "operacion": "UPDATE" }, ... ] }</code>.</p>
+        <p>Requerido por ítem: <code>referencia</code> <strong>o</strong> <code>producto_id</code>, <code>bodega_referencia</code> (columna <code>bod_referencia</code>), <code>existencias</code> (número ≥ 0). Orion busca la bodega por ese código y la empresa. Respuesta 200: <code>{ "success": true, "message": "Inventario sincronizado correctamente", "procesados": 2, "resultados": [ { "producto_id": 10, "bodega_referencia": "BOGOTA", "bodega_id": 1, "existencias": 50, "operacion": "UPDATE" }, ... ] }</code>.</p>
 
         <h3 class="flow-badge flow-ofima-orion">4.5 Bodegas (Ofima → Orion)</h3>
         <table>
@@ -362,10 +418,11 @@
         <ol>
             <li><strong>Exponer 3 URLs</strong> que Orion llamará (clientes, productos, pedidos), aceptando POST y PUT, con HTTP Basic Auth y cuerpo JSON. Responder 2xx en éxito.</li>
             <li><strong>Para enviar datos a Orion:</strong> obtener JWT con POST a <code>auth.php</code> (Basic o JSON usuario/password); luego usar <code>Authorization: Bearer &lt;token&gt;</code> en clientes, productos, inventario y bodegas.</li>
-            <li><strong>Clientes:</strong> Ofima puede enviar a Orion con identificacion + nombre; Orion crea/actualiza por NIT.</li>
-            <li><strong>Productos:</strong> Ofima puede enviar referencia + nombre y opcionales (costo, utilidad, precio, etc.); Orion crea/actualiza por referencia.</li>
-            <li><strong>Inventario:</strong> Ofima envía referencia (o producto_id), bodega_id y existencias; un objeto o array en <code>items</code> para lote.</li>
-            <li><strong>Bodegas:</strong> Ofima envía referencia y nombre (y opcionalmente ciudad) para crear/actualizar bodegas en Orion. Las bodegas deben existir en Orion antes de enviar inventario por <code>bodega_id</code>.</li>
+            <li><strong>Clientes:</strong> Ofima envía a Orion <code>identificacion</code> + <code>nombre</code> (y demás campos). <code>ciudad</code> debe ser el <strong>código DIAN</strong> (ej. <code>05001</code>), no el nombre de la ciudad. Orion crea/actualiza por NIT y homologa la ciudad a <code>ciu_id</code>.</li>
+            <li><strong>Productos (Ofima → Orion):</strong> Ofima envía códigos (<code>linea</code>/<code>sublinea</code>/<code>grupo</code> o <code>grupo_id</code>/<code>categoria_id</code>/<code>marca_id</code>); Orion los resuelve a IDs internos. Default categoría = 1 si no hay sublínea válida.</li>
+            <li><strong>Productos (Orion → Ofima):</strong> Orion homologa y envía códigos Ofima en <code>linea</code>/<code>sublinea</code>/<code>grupo</code>/<code>clasificacion_1</code>/<code>habilitado</code> junto a los campos que Ofima ya usa.</li>
+            <li><strong>Inventario:</strong> Ofima envía referencia (o producto_id), bodega_referencia (bod_referencia) y existencias; un objeto o array en <code>items</code> para lote.</li>
+            <li><strong>Bodegas:</strong> Ofima envía referencia y nombre (y opcionalmente ciudad) para crear/actualizar bodegas en Orion. Las bodegas deben existir en Orion, con bod_referencia, antes de enviar inventario.</li>
         </ol>
     </div>
 

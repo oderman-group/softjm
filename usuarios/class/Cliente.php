@@ -313,7 +313,27 @@ class Cliente extends BaseDatos {
 
         // sincronizarCliente ya registra en api_sincronizaciones
         $resultado = $apiClient->sincronizarCliente($cliente, $tipoOperacion);
+        if (!empty($resultado['success'])) {
+            self::marcarIntegradoOfima($clienteId, $conexionBdPrincipal, $idEmpresa, 1);
+        }
         return $conNotificacion($resultado);
+    }
+
+    /**
+     * Marca si el cliente está integrado en Ofima (cli_integrado_ofima).
+     */
+    public static function marcarIntegradoOfima($clienteId, $conexionBdPrincipal, $idEmpresa, $integrado = 1) {
+        $clienteId = (int) $clienteId;
+        $idEmpresa = (int) $idEmpresa;
+        $integrado = ((int) $integrado) === 1 ? 1 : 0;
+        $stmt = $conexionBdPrincipal->prepare(
+            'UPDATE clientes SET cli_integrado_ofima = ? WHERE cli_id = ? AND cli_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return false;
+        }
+        $stmt->bind_param('iii', $integrado, $clienteId, $idEmpresa);
+        return $stmt->execute();
     }
 
     /**
@@ -608,6 +628,7 @@ class Cliente extends BaseDatos {
                 cli.cli_telefono,
                 cli.cli_celular,
                 cli.cli_email,
+                cli.cli_integrado_ofima,
                 ciu.ciu_nombre,
                 dep.dep_nombre,
                 dep.dep_indicativo

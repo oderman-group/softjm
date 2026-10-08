@@ -6,6 +6,11 @@
  */
 
 require_once RUTA_PROYECTO . '/usuarios/class/Etiqueta.php';
+require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+
+if (!isset($ofimaActivaListado)) {
+    $ofimaActivaListado = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
+}
 
 if (!isset($inicio)) {
     $paginaListado = isset($_GET['inicio']) && is_numeric($_GET['inicio']) ? intval($_GET['inicio']) : 1;

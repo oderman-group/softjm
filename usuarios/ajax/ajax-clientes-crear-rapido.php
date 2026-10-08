@@ -30,13 +30,17 @@ $notaInterna     = trim($_POST['notaInterna'] ?? '');
 
 require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
 $ofimaActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
+$crearEnOfima = $ofimaActiva && (
+    !empty($_POST['crearEnOfima'])
+    && ($_POST['crearEnOfima'] === '1' || $_POST['crearEnOfima'] === 'on' || $_POST['crearEnOfima'] === 'true')
+);
 
 if ($documento === '') {
     echo json_encode(['success' => false, 'message' => 'El número de documento es obligatorio.']);
     exit;
 }
 
-if ($ofimaActiva && $tipoDocumento !== 2 && $tipoDocumento !== 3) {
+if ($crearEnOfima && $tipoDocumento !== 2 && $tipoDocumento !== 3) {
     echo json_encode(['success' => false, 'message' => 'Debe seleccionar el tipo de documento (NIT o Cédula).']);
     exit;
 }
@@ -69,7 +73,7 @@ if ($nombreOriginal === '') {
     exit;
 }
 
-if ($ofimaActiva) {
+if ($crearEnOfima) {
     if ($email === '') {
         echo json_encode(['success' => false, 'message' => 'El email es obligatorio para sincronizar con Ofima.']);
         exit;
@@ -219,21 +223,20 @@ if ($notaInterna !== '') {
     }
 }
 
-try {
-    require_once RUTA_PROYECTO . '/usuarios/class/Cliente.php';
-    $syncOfima = Cliente::sincronizarConOfima($idInsertU, $conexionBdPrincipal, $idEmpresa, 'CREATE');
-} catch (Exception $e) {
-    error_log('Error al sincronizar cliente con Ofima: ' . $e->getMessage());
-    $syncOfima = ['success' => false, 'error' => $e->getMessage()];
+$syncOfima = null;
+if ($crearEnOfima) {
+    try {
+        require_once RUTA_PROYECTO . '/usuarios/class/Cliente.php';
+        $syncOfima = Cliente::sincronizarConOfima($idInsertU, $conexionBdPrincipal, $idEmpresa, 'CREATE');
+    } catch (Exception $e) {
+        error_log('Error al sincronizar cliente con Ofima: ' . $e->getMessage());
+        $syncOfima = ['success' => false, 'error' => $e->getMessage()];
+    }
 }
 
-echo json_encode([
-    'success'   => true,
-    'message'   => 'Cliente creado correctamente.' . $advertenciaNota,
-    'clienteId' => $idInsertU,
-    'editUrl'   => 'clientes-editar.php?id=' . $idInsertU . '&msg=1',
-    'notaGuardada' => $notaGuardada,
-    'ofima' => [
+$ofimaPayload = null;
+if ($crearEnOfima && is_array($syncOfima)) {
+    $ofimaPayload = [
         'sincronizado' => !empty($syncOfima['success']),
         'mensaje' => $syncOfima['notificacion']['mensaje']
             ?? $syncOfima['message']
@@ -242,5 +245,14 @@ echo json_encode([
         'tipo' => $syncOfima['notificacion']['tipo']
             ?? (!empty($syncOfima['success']) ? 'success' : 'error'),
         'codigo_http' => $syncOfima['codigo_http'] ?? null,
-    ],
+    ];
+}
+
+echo json_encode([
+    'success'   => true,
+    'message'   => 'Cliente creado correctamente.' . $advertenciaNota,
+    'clienteId' => $idInsertU,
+    'editUrl'   => 'clientes-editar.php?id=' . $idInsertU . '&msg=1',
+    'notaGuardada' => $notaGuardada,
+    'ofima' => $ofimaPayload,
 ]);

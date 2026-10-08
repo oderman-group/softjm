@@ -609,9 +609,6 @@ class ApiOfimaClient {
                 'nombre' => (string) ($producto['prod_nombre'] ?? ''),
                 'costo' => isset($producto['prod_costo']) ? (float) $producto['prod_costo'] : 0,
                 'utilidad' => isset($producto['prod_utilidad']) ? (float) $producto['prod_utilidad'] : 0,
-                'categoria_id' => (int) ($producto['prod_categoria'] ?? 0),
-                'grupo_id' => (int) ($producto['prod_grupo1'] ?? 0),
-                'marca_id' => (int) ($producto['prod_marca'] ?? 0),
                 'proveedor_id' => (int) ($producto['prod_proveedor'] ?? 0),
             ];
             if (isset($producto['prod_precio']) && $producto['prod_precio'] !== '' && $producto['prod_precio'] !== null) {
@@ -630,12 +627,28 @@ class ApiOfimaClient {
         unset($datosOfima['clasificacion_id']);
         $codigoLinea = $this->codigoGrupoOfima($producto['prod_grupo1'] ?? 0);
         $codigoSublinea = $this->codigoGrupoOfima($producto['prod_categoria'] ?? 0);
-        $datosOfima['grupo_1'] = $codigoLinea;
-        $datosOfima['grupo_id'] = $codigoLinea;
-        $datosOfima['grupo_2'] = $codigoSublinea;
-        $datosOfima['categoria_id'] = $codigoSublinea;
-        $datosOfima['grupo_3'] = $this->codigoGrupoOfima($producto['prod_grupo3'] ?? 0);
-        $datosOfima['marca_id'] = $this->codigoMarcaOfima($producto['prod_marca'] ?? 0);
+        $codigoClasificacion = $this->codigoGrupoOfima($producto['prod_grupo3'] ?? 0);
+        $codigoGrupo = $this->codigoMarcaOfima($producto['prod_marca'] ?? 0);
+        $datosOfima['grupo_1'] = $codigoLinea !== null ? $codigoLinea : '0';
+        $datosOfima['grupo_id'] = $codigoLinea !== null ? $codigoLinea : '';
+        $datosOfima['linea'] = $datosOfima['grupo_1'];
+        $datosOfima['grupo_2'] = $codigoSublinea !== null ? $codigoSublinea : '0';
+        $datosOfima['categoria_id'] = $codigoSublinea !== null ? $codigoSublinea : '0';
+        $datosOfima['sublinea'] = $datosOfima['grupo_2'];
+        $datosOfima['grupo_3'] = $codigoClasificacion !== null ? $codigoClasificacion : '0';
+        $datosOfima['clasificacion_1'] = $datosOfima['grupo_3'];
+        $datosOfima['marca_id'] = $codigoGrupo !== null ? $codigoGrupo : '0';
+        $datosOfima['grupo'] = $datosOfima['marca_id'];
+        $datosOfima['habilitado'] = ((int) ($producto['prod_habilitado'] ?? 1)) === 1 ? 1 : 0;
+        $datosOfima['descuento1'] = isset($producto['prod_descuento1']) ? (float) $producto['prod_descuento1'] : 0;
+        $datosOfima['comision'] = isset($producto['prod_comision']) ? (float) $producto['prod_comision'] : 0;
+        $datosOfima['costo_dolar'] = isset($producto['prod_costo_dolar']) ? (float) $producto['prod_costo_dolar'] : 0;
+        if (!isset($datosOfima['proveedor_id'])) {
+            $datosOfima['proveedor_id'] = (int) ($producto['prod_proveedor'] ?? 0);
+        }
+        if (!isset($datosOfima['precio'])) {
+            $datosOfima['precio'] = isset($producto['prod_precio']) ? (float) $producto['prod_precio'] : 0;
+        }
 
         $nombre = trim((string) ($datosOfima['nombre'] ?? $producto['prod_nombre'] ?? ''));
         $corta = trim(strip_tags((string) ($producto['prod_descripcion_corta'] ?? '')));

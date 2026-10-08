@@ -4,7 +4,7 @@ require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
 $listaEtiquetasCliente = Etiqueta::listarPorModulo(Etiqueta::MODULO_CLIENTE, $idEmpresa, $conexionBdPrincipal);
 $etiquetasClienteSeleccionadas = [];
 $ofimaActivaDrawer = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
-$reqOfima = $ofimaActivaDrawer ? ' <span class="required">*</span>' : '';
+$reqOfima = ' <span class="required js-req-ofima" hidden>*</span>';
 ?>
 <style>
 #drawerCrearClienteOverlay {
@@ -370,6 +370,26 @@ body.drawer-open {
 #drawerCrearCliente .drawer-alert-ofima {
   margin-top: 0.75rem;
 }
+#drawerCrearCliente .drawer-ofima-check {
+  margin: 0.75rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+#drawerCrearCliente .drawer-ofima-check label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+}
+#drawerCrearCliente .drawer-ofima-check input[type="checkbox"] {
+  margin: 0;
+  width: 0.875rem;
+  height: 0.875rem;
+}
 
 #drawerCrearCliente .drawer-success-actions {
   display: flex;
@@ -433,7 +453,7 @@ body.drawer-open {
   </div>
 
   <div class="drawer-body">
-    <p class="drawer-intro">Complete los datos básicos para registrar un cliente de forma rápida.<?php if ($ofimaActivaDrawer) { ?> Con Ofima activo son obligatorios: tipo y número de documento, nombre, email, teléfono, celular, dirección y ciudad.<?php } else { ?> El número de documento y la ciudad son obligatorios. Podrá completar el resto de la información después.<?php } ?></p>
+    <p class="drawer-intro">Complete los datos básicos para registrar un cliente de forma rápida. El número de documento y la ciudad son obligatorios. Podrá completar el resto de la información después.</p>
 
     <div class="drawer-alert drawer-alert-success" id="drawerClienteExito" role="status"></div>
     <div class="drawer-alert drawer-alert-error" id="drawerClienteError" role="alert"></div>
@@ -444,7 +464,7 @@ body.drawer-open {
         <div class="form-group">
           <label for="cliRapidoTipoDocumento">Tipo de documento<?= $reqOfima ?></label>
           <div class="drawer-select-wrap">
-            <select id="cliRapidoTipoDocumento" name="tipoDocumento"<?= $ofimaActivaDrawer ? ' required' : '' ?>>
+            <select id="cliRapidoTipoDocumento" name="tipoDocumento">
               <option value="">Seleccione...</option>
               <option value="2">NIT</option>
               <option value="3">Cédula</option>
@@ -470,19 +490,19 @@ body.drawer-open {
 
       <div class="form-group">
         <label for="cliRapidoEmail">Email<?= $reqOfima ?></label>
-        <input type="email" id="cliRapidoEmail" name="email" autocomplete="email" style="text-transform:lowercase;"<?= $ofimaActivaDrawer ? ' required' : '' ?>>
+        <input type="email" id="cliRapidoEmail" name="email" autocomplete="email" style="text-transform:lowercase;">
         <span class="field-error" id="errorEmail">Ingrese un email válido.</span>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label for="cliRapidoTelefono">Teléfono<?= $reqOfima ?></label>
-          <input type="tel" id="cliRapidoTelefono" name="telefono" autocomplete="tel"<?= $ofimaActivaDrawer ? ' required' : '' ?>>
+          <input type="tel" id="cliRapidoTelefono" name="telefono" autocomplete="tel">
           <span class="field-error" id="errorTelefono">El teléfono es obligatorio.</span>
         </div>
         <div class="form-group">
           <label for="cliRapidoCelular">Celular<?= $reqOfima ?></label>
-          <input type="tel" id="cliRapidoCelular" name="celular" maxlength="10" inputmode="numeric" pattern="[0-9]{10}"<?= $ofimaActivaDrawer ? ' required' : '' ?>>
+          <input type="tel" id="cliRapidoCelular" name="celular" maxlength="10" inputmode="numeric" pattern="[0-9]{10}">
           <span class="field-hint">10 dígitos sin espacios ni puntos.</span>
           <span class="field-error" id="errorCelular">El celular debe tener 10 dígitos.</span>
         </div>
@@ -516,7 +536,7 @@ body.drawer-open {
 
       <div class="form-group">
         <label for="cliRapidoDireccion">Dirección<?= $reqOfima ?></label>
-        <input type="text" id="cliRapidoDireccion" name="direccion" autocomplete="street-address" style="text-transform:uppercase;" placeholder="Ej. CRA 84 47 EE 15 34"<?= $ofimaActivaDrawer ? ' required' : '' ?>>
+        <input type="text" id="cliRapidoDireccion" name="direccion" autocomplete="street-address" style="text-transform:uppercase;" placeholder="Ej. CRA 84 47 EE 15 34">
         <span class="field-error" id="errorDireccion">La dirección es obligatoria.</span>
       </div>
 
@@ -579,6 +599,15 @@ body.drawer-open {
           <?php $vozRootId = 'notasVozCrearCliente'; $vozEmbebido = true; include __DIR__ . '/cliente-notas-voz-bloque.php'; ?>
         </div>
       </div>
+
+      <?php if ($ofimaActivaDrawer) { ?>
+      <div class="form-group drawer-ofima-check">
+        <label for="cliRapidoCrearEnOfima">
+          <input type="checkbox" id="cliRapidoCrearEnOfima" name="crearEnOfima" value="1">
+          Crear también en Ofima
+        </label>
+      </div>
+      <?php } ?>
     </form>
   </div>
 
@@ -614,6 +643,23 @@ document.addEventListener('DOMContentLoaded', function () {
   var telefonoInput = document.getElementById('cliRapidoTelefono');
   var direccionInput = document.getElementById('cliRapidoDireccion');
   var ofimaActiva = <?= $ofimaActivaDrawer ? 'true' : 'false' ?>;
+  var crearEnOfimaCheck = document.getElementById('cliRapidoCrearEnOfima');
+
+  function deseaCrearEnOfima() {
+    return ofimaActiva && crearEnOfimaCheck && crearEnOfimaCheck.checked;
+  }
+
+  function actualizarRequisitosOfimaUi() {
+    var activo = deseaCrearEnOfima();
+    document.querySelectorAll('#formCrearClienteRapido .js-req-ofima').forEach(function (el) {
+      el.hidden = !activo;
+    });
+  }
+
+  if (crearEnOfimaCheck) {
+    crearEnOfimaCheck.addEventListener('change', actualizarRequisitosOfimaUi);
+    actualizarRequisitosOfimaUi();
+  }
   var statusDocumento = document.getElementById('statusDocumento');
   var notaTextarea = document.getElementById('cliRapidoNotaInterna');
   var guardando = false;
@@ -864,7 +910,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var tipoDocumento = tipoDocumentoInput ? tipoDocumentoInput.value.trim() : '';
     var ciudad = ciudadInput ? ciudadInput.value.trim() : '';
 
-    if (ofimaActiva && (tipoDocumento !== '2' && tipoDocumento !== '3')) {
+    var syncOfima = deseaCrearEnOfima();
+
+    if (syncOfima && (tipoDocumento !== '2' && tipoDocumento !== '3')) {
       if (tipoDocumentoInput) tipoDocumentoInput.classList.add('is-invalid');
       document.getElementById('errorTipoDocumento').classList.add('is-visible');
       valido = false;
@@ -895,7 +943,7 @@ document.addEventListener('DOMContentLoaded', function () {
       valido = false;
     }
 
-    if (ofimaActiva && !email) {
+    if (syncOfima && !email) {
       document.getElementById('cliRapidoEmail').classList.add('is-invalid');
       document.getElementById('errorEmail').textContent = 'El email es obligatorio.';
       document.getElementById('errorEmail').classList.add('is-visible');
@@ -907,19 +955,19 @@ document.addEventListener('DOMContentLoaded', function () {
       valido = false;
     }
 
-    if (ofimaActiva && !telefono) {
+    if (syncOfima && !telefono) {
       if (telefonoInput) telefonoInput.classList.add('is-invalid');
       document.getElementById('errorTelefono').classList.add('is-visible');
       valido = false;
     }
 
-    if (ofimaActiva && !direccion) {
+    if (syncOfima && !direccion) {
       if (direccionInput) direccionInput.classList.add('is-invalid');
       document.getElementById('errorDireccion').classList.add('is-visible');
       valido = false;
     }
 
-    if (ofimaActiva && !celular) {
+    if (syncOfima && !celular) {
       document.getElementById('cliRapidoCelular').classList.add('is-invalid');
       document.getElementById('errorCelular').textContent = 'El celular es obligatorio (10 dígitos).';
       document.getElementById('errorCelular').classList.add('is-visible');
@@ -941,6 +989,9 @@ document.addEventListener('DOMContentLoaded', function () {
     resetEtiquetasVisuales();
     resetNotaInterna();
     resetDocumentoEstado();
+    if (typeof actualizarRequisitosOfimaUi === 'function') {
+      actualizarRequisitosOfimaUi();
+    }
     if (grupoEvento) grupoEvento.style.display = 'none';
     mostrarFormulario(false);
 

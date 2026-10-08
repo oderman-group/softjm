@@ -72,6 +72,16 @@ foreach ($filasClientes as $res) {
             <strong><?= htmlspecialchars($res['cli_nombre'] ?? ''); ?></strong>
             <div class="clientes-cliente-meta">
                 <span class="clientes-pill <?= $pillCategoria; ?>"><?= $categ; ?></span>
+                <?php
+                if (!empty($ofimaActivaListado)) {
+                    $integradoOfimaListado = (int) ($res['cli_integrado_ofima'] ?? 0) === 1;
+                    if ($integradoOfimaListado) {
+                        echo ' <span class="clientes-pill is-success" title="Integrado con Ofima">Ofima</span>';
+                    } else {
+                        echo ' <span class="clientes-pill is-neutral" title="No integrado con Ofima">Sin Ofima</span>';
+                    }
+                }
+                ?>
                 &nbsp;·&nbsp;
                 <b>Creado:</b> <?= htmlspecialchars(substr($res['cli_fecha_registro'] ?? '', 0, 16)); ?>
                 <br>

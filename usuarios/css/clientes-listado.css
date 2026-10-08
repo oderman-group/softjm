@@ -416,10 +416,30 @@
   pointer-events: none;
 }
 
+.clientes-busqueda-btn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 28px;
+  margin: 0;
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: 7px;
+  background: #047857;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 28px;
+  cursor: pointer;
+}
+
+.clientes-busqueda-btn:hover { background: #065f46; }
+
 .clientes-busqueda-principal input[type="search"] {
   width: 100%;
   min-height: 46px;
-  padding: 0.65rem 7rem 0.65rem 2.35rem;
+  padding: 0.65rem 8.5rem 0.65rem 2.35rem;
   border: 1px solid #cbd5e1;
   border-radius: 10px;
   font-size: 0.9375rem;
@@ -436,7 +456,7 @@
 
 .clientes-busqueda-estado {
   position: absolute;
-  right: 0.85rem;
+  right: 5.4rem;
   font-size: 0.75rem;
   font-weight: 600;
   color: #64748b;

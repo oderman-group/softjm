@@ -5,11 +5,12 @@
  * Autenticación: Bearer JWT (recomendado) o Basic Auth
  *
  * Body (un ítem):
- *   { "referencia": "COD001", "bodega_id": 1, "existencias": 50 }
- *   o { "producto_id": 123, "bodega_id": 1, "existencias": 50 }
+ *   { "referencia": "COD001", "bodega_referencia": "BOGOTA", "existencias": 50 }
+ *   o { "producto_id": 123, "bodega_referencia": "BOGOTA", "existencias": 50 }
  *
  * Body (lote):
- *   { "items": [ { "referencia": "COD001", "bodega_id": 1, "existencias": 50 }, ... ] }
+ *   { "items": [ { "referencia": "COD001", "bodega_referencia": "BOGOTA", "existencias": 50 }, ... ] }
+ * bodega_referencia = bod_referencia de la bodega en Orion.
  */
 
 header('Content-Type: application/json');
@@ -71,7 +72,7 @@ if (!$primerItem || (!isset($primerItem['referencia']) && !isset($primerItem['pr
     echo json_encode([
         'success' => false,
         'message' => 'Campos requeridos faltantes',
-        'error'   => 'Envíe un objeto con referencia o producto_id, bodega_id y existencias; o un array en "items"'
+        'error'   => 'Envíe un objeto con referencia o producto_id, bodega_referencia y existencias; o un array en "items"'
     ]);
     exit();
 }

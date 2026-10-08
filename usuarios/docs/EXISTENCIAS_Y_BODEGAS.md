@@ -90,7 +90,7 @@ Para que Orion conozca las bodegas que Ofima crea o modifica:
 - **Requisito en BD:** la tabla `bodegas` debe tener la columna `bod_referencia` (script en `sql/api_bodegas_bod_referencia.sql`).
 - Cuando Ofima crea o actualiza una bodega, llama a este endpoint y Orion inserta o actualiza por `bod_referencia` + empresa.
 
-Así, el inventario que Ofima envía por `inventario-recibir.php` puede usar `bodega_id` de Orion (los mismos IDs si se crearon antes por este endpoint, o creados manualmente con la misma referencia).
+Así, el inventario que Ofima envía por `inventario-recibir.php` identifica la bodega con `bodega_referencia` (`bod_referencia`), el mismo código con el que se creó o actualizó la bodega.
 
 ---
 

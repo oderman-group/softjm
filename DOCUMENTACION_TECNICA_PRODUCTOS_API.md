@@ -194,30 +194,35 @@ AND prod_id_empresa = 1;
 
 ## 5. Formato de Datos para API
 
-### 5.1 Estructura JSON para Crear/Actualizar Producto
+### 5.1 Estructura JSON para Crear/Actualizar Producto (Ofima → Orion)
+
+Contrato estable. El tercero **no modifica su endpoint**; envía IDs Orion:
 
 ```json
 {
-    "referencia": "REF-12345",
-    "nombre": "Producto Ejemplo",
-    "descripcion_corta": "Descripción breve del producto",
-    "descripcion_larga": "Descripción detallada del producto",
-    "categoria_id": 1,
-    "grupo1_id": 2,
-    "marca_id": 3,
-    "proveedor_id": 4,
-    "costo": 100000.00,
-    "costo_dolar": 25.50,
-    "utilidad": 30.00,
-    "precio": 142857.14,
-    "descuento1": 10.00,
-    "descuento2": 15.00,
-    "descuento_web": 5.00,
-    "comision": 5.00,
-    "visible": 1,
-    "id_empresa": 1
+  "referencia": "COD001",
+  "nombre": "Producto ejemplo",
+  "costo": 10000,
+  "utilidad": 30,
+  "precio": 13000,
+  "categoria_id": 1,
+  "grupo_id": null,
+  "marca_id": null,
+  "proveedor_id": null,
+  "descripcion_corta": "",
+  "descripcion_larga": "",
+  "descuento1": null,
+  "comision": null,
+  "costo_dolar": null,
+  "id_empresa": 1
 }
 ```
+
+- `categoria_id` → `prod_categoria` (default `1` si falta)
+- `grupo_id` → `prod_grupo1` (opcional)
+- `marca_id` → `prod_marca` (opcional)
+
+Las homologaciones (`linea`, `sublinea`, `grupo`, `clasificacion_1`, `habilitado`) las aplica Orion al **enviar** hacia Ofima, no en este body de recepción.
 
 ### 5.2 Estructura JSON de Respuesta
 
@@ -325,19 +330,42 @@ Si se envía `Authorization: Bearer <token>` válido y no expirado, se usa el `i
 |------------------|--------|-------------|-------------|
 | `referencia`     | string | Sí          | Código único del producto (identificador para CREATE/UPDATE) |
 | `nombre`         | string | Sí          | Nombre del producto |
-| `id_empresa`     | int    | Recomendado | ID de empresa en Orion (default: 1 si se omite) |
+| `id_empresa`     | int    | Recomendado | ID de empresa en Orion (default: 1 si se omite; con Bearer viene del token) |
 | `costo`          | number | No          | Costo (≥ 0) |
 | `utilidad`       | number | No          | Ver convención abajo (0–100 o 0–1) |
 | `precio`         | number | No          | Precio de lista (≥ 0). Si se omite y hay costo y utilidad, Orion lo calcula |
-| `categoria_id`   | int    | No          | ID categoría en Orion |
-| `grupo_id`       | int    | No          | ID grupo en Orion |
-| `marca_id`       | int    | No          | ID marca en Orion |
+| `categoria_id`   | int    | No          | ID categoría Orion → `prod_categoria`. Default `1`. |
+| `grupo_id`       | int\|null | No       | ID línea Orion → `prod_grupo1`. Opcional. |
+| `marca_id`       | int\|null | No       | ID marca Orion → `prod_marca`. Opcional. |
 | `proveedor_id`   | int    | No          | ID proveedor en Orion |
 | `descripcion_corta` | string | No       | Descripción corta |
 | `descripcion_larga` | string | No       | Descripción larga |
 | `descuento1`     | number | No          | Descuento 1 (%) |
 | `comision`       | number | No          | Comisión (%) |
 | `costo_dolar`    | number | No          | Costo en dólares |
+
+**Contrato de recepción:** el tercero mantiene este body (no cambia su endpoint). Las homologaciones por código Ofima (`linea`, `sublinea`, `grupo`, `clasificacion_1`, `habilitado`) las hace Orion al sincronizar **hacia** Ofima.
+
+Ejemplo:
+```json
+{
+  "referencia": "COD001",
+  "nombre": "Producto ejemplo",
+  "costo": 10000,
+  "utilidad": 30,
+  "precio": 13000,
+  "categoria_id": 1,
+  "grupo_id": null,
+  "marca_id": null,
+  "proveedor_id": null,
+  "descripcion_corta": "",
+  "descripcion_larga": "",
+  "descuento1": null,
+  "comision": null,
+  "costo_dolar": null,
+  "id_empresa": 1
+}
+```
 
 **Convención de utilidad:** Orion almacena siempre el porcentaje en escala 0–100 (ej. 30.5 = 30,5%). Ofima puede enviar:
 - **0–100** (porcentaje): ej. `30.5` → Orion guarda 30.5.
