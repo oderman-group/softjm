@@ -77,16 +77,17 @@ class CotizacionesEditar {
 
             $valorConDcto = $valorTotal - $dcto;
 
-            $totalIva += ($valorConDcto * ($prod['czpp_impuesto'] / 100));
+            $totalIva += ($valorConDcto * (self::toFloat($prod['czpp_impuesto']) / 100));
 
             $subtotal += $valorTotal;
-            $totalCantidad += $prod['czpp_cantidad'];
+            $totalCantidad += self::toFloat($prod['czpp_cantidad']);
 
-            $utilidadDealer = $prod['prod_descuento2'] / 100;
-            $precioDealer = !empty($prod['prod_costo']) ? $prod['prod_costo'] + ($prod['prod_costo'] * $utilidadDealer) : 0;
+            $utilidadDealer = self::toFloat($prod['prod_descuento2']) / 100;
+            $costoProductoRaw = self::toFloat($prod['prod_costo']);
+            $precioDealer = $costoProductoRaw > 0 ? $costoProductoRaw + ($costoProductoRaw * $utilidadDealer) : 0;
 
             $valorCotizado = self::toFloat($prod['czpp_valor']);
-            $costoProducto = self::toFloat($prod['prod_costo']);
+            $costoProducto = $costoProductoRaw;
             $valorUtilidadProducto = $valorCotizado - $costoProducto;
             $sumaUtilidad += $valorUtilidadProducto;
 
@@ -186,12 +187,12 @@ class CotizacionesEditar {
 
             $valorConDcto = $valorTotal - $dcto;
 
-            $totalIva += ($valorConDcto * ($prod['czpp_impuesto']/100));
+            $totalIva += ($valorConDcto * (self::toFloat($prod['czpp_impuesto']) / 100));
 
             $subtotal +=$valorTotal;
             
             
-            $totalCantidad += $prod['czpp_cantidad'];
+            $totalCantidad += self::toFloat($prod['czpp_cantidad']);
 
             $consultaPreciosCombos=$conexionBdPrincipal->query("SELECT SUM(copp_cantidad*prod_precio) FROM combos_productos
             INNER JOIN productos ON prod_id=copp_producto
@@ -210,12 +211,13 @@ class CotizacionesEditar {
             $totalDealer = 0;
             while($pdCombo = mysqli_fetch_array($productosDelCombo, MYSQLI_BOTH)){
 
-                $sumaCostosProductosCombos += $pdCombo['prod_costo'];
+                $costoComboProducto = self::toFloat($pdCombo['prod_costo']);
+                $sumaCostosProductosCombos += $costoComboProducto;
 
-                $utilidadDealer = !empty($pdCombo['prod_descuento2']) ? $pdCombo['prod_descuento2'] / 100 : 0;
-                $precioDealer = !empty($pdCombo['prod_costo']) ? $pdCombo['prod_costo'] + ($pdCombo['prod_costo'] * $utilidadDealer) : 0;
-                $subtotalDealer = ($precioDealer * $pdCombo['copp_cantidad']);
-                $totalDealer +=$subtotalDealer;
+                $utilidadDealer = self::toFloat($pdCombo['prod_descuento2']) / 100;
+                $precioDealer = $costoComboProducto > 0 ? $costoComboProducto + ($costoComboProducto * $utilidadDealer) : 0;
+                $subtotalDealer = ($precioDealer * self::toFloat($pdCombo['copp_cantidad']));
+                $totalDealer += $subtotalDealer;
 
             }
 
@@ -335,11 +337,11 @@ class CotizacionesEditar {
 
             $valorConDcto = $valorTotal - $dcto;
 
-            $totalIva += ($valorConDcto * ($prod['czpp_impuesto']/100));
+            $totalIva += ($valorConDcto * (self::toFloat($prod['czpp_impuesto'])/100));
 
             $subtotal +=$valorTotal;	
 
-            $totalCantidad += $prod['czpp_cantidad'];
+            $totalCantidad += self::toFloat($prod['czpp_cantidad']);
 
             $htmlTabla .= '<tr class="servicio">';
             $htmlTabla .= '<td>' . $no . '</td>';

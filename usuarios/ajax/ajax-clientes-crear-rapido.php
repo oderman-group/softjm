@@ -17,19 +17,35 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $nombreOriginal  = trim($_POST['nombre'] ?? '');
 $documento       = trim($_POST['documento'] ?? '');
-$tipoDocumento   = !empty($_POST['tipoDocumento']) && is_numeric($_POST['tipoDocumento']) ? intval($_POST['tipoDocumento']) : 1;
+$tipoDocumento   = !empty($_POST['tipoDocumento']) && is_numeric($_POST['tipoDocumento']) ? intval($_POST['tipoDocumento']) : 0;
 $ciudad          = !empty($_POST['ciudad']) && is_numeric($_POST['ciudad']) ? intval($_POST['ciudad']) : 0;
 $email           = trim($_POST['email'] ?? '');
 $telefono        = trim($_POST['telefono'] ?? '');
 $celular         = trim($_POST['celular'] ?? '');
+$direccion       = trim($_POST['direccion'] ?? '');
 $referencia      = trim($_POST['referencia'] ?? '');
 $nombreEvento    = trim($_POST['nombreEvento'] ?? '');
 $asesor          = !empty($_POST['asesor']) && is_numeric($_POST['asesor']) ? intval($_POST['asesor']) : intval($_SESSION['id']);
 $notaInterna     = trim($_POST['notaInterna'] ?? '');
 
+require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+$ofimaActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
+$crearEnOfima = $ofimaActiva && (
+    !empty($_POST['crearEnOfima'])
+    && ($_POST['crearEnOfima'] === '1' || $_POST['crearEnOfima'] === 'on' || $_POST['crearEnOfima'] === 'true')
+);
+
 if ($documento === '') {
     echo json_encode(['success' => false, 'message' => 'El número de documento es obligatorio.']);
     exit;
+}
+
+if ($crearEnOfima && $tipoDocumento !== 2 && $tipoDocumento !== 3) {
+    echo json_encode(['success' => false, 'message' => 'Debe seleccionar el tipo de documento (NIT o Cédula).']);
+    exit;
+}
+if ($tipoDocumento !== 2 && $tipoDocumento !== 3) {
+    $tipoDocumento = 1;
 }
 
 if ($ciudad <= 0 || $ciudad === CIUDAD_DESCONOCIDA) {
@@ -57,6 +73,25 @@ if ($nombreOriginal === '') {
     exit;
 }
 
+if ($crearEnOfima) {
+    if ($email === '') {
+        echo json_encode(['success' => false, 'message' => 'El email es obligatorio para sincronizar con Ofima.']);
+        exit;
+    }
+    if ($telefono === '') {
+        echo json_encode(['success' => false, 'message' => 'El teléfono es obligatorio para sincronizar con Ofima.']);
+        exit;
+    }
+    if ($direccion === '') {
+        echo json_encode(['success' => false, 'message' => 'La dirección es obligatoria para sincronizar con Ofima.']);
+        exit;
+    }
+    if ($celular === '') {
+        echo json_encode(['success' => false, 'message' => 'El celular es obligatorio para sincronizar con Ofima.']);
+        exit;
+    }
+}
+
 if ($celular !== '' && !preg_match('/^\d{10}$/', $celular)) {
     echo json_encode(['success' => false, 'message' => 'El celular debe tener 10 dígitos sin espacios ni puntos.']);
     exit;
@@ -71,6 +106,7 @@ $nombre       = mysqli_real_escape_string($conexionBdPrincipal, strtoupper($nomb
 $email        = mysqli_real_escape_string($conexionBdPrincipal, strtolower($email));
 $telefono     = mysqli_real_escape_string($conexionBdPrincipal, $telefono);
 $celular      = mysqli_real_escape_string($conexionBdPrincipal, $celular);
+$direccion    = mysqli_real_escape_string($conexionBdPrincipal, strtoupper($direccion));
 $referencia   = mysqli_real_escape_string($conexionBdPrincipal, $referencia);
 $nombreEvento = mysqli_real_escape_string($conexionBdPrincipal, $nombreEvento);
 
@@ -104,7 +140,7 @@ mysqli_query($conexionBdPrincipal, "INSERT INTO clientes(
     '" . $ciudad . "',
     '" . $documentoEsc . "',
     '" . $clave1 . "',
-    '',
+    '" . $direccion . "',
     '" . $zonaId . "',
     now(),
     NULL,
@@ -136,7 +172,7 @@ mysqli_query($conexionBdPrincipal, "INSERT INTO sucursales(
 ) VALUES (
     '" . $idInsertU . "',
     '" . $ciudad . "',
-    '',
+    '" . $direccion . "',
     '" . $telefono . "',
     '" . $celular . "',
     '',
@@ -187,11 +223,29 @@ if ($notaInterna !== '') {
     }
 }
 
-try {
-    require_once RUTA_PROYECTO . '/usuarios/class/Cliente.php';
-    Cliente::sincronizarConOfima($idInsertU, $conexionBdPrincipal, $idEmpresa, 'CREATE');
-} catch (Exception $e) {
-    error_log('Error al sincronizar cliente con Ofima: ' . $e->getMessage());
+$syncOfima = null;
+if ($crearEnOfima) {
+    try {
+        require_once RUTA_PROYECTO . '/usuarios/class/Cliente.php';
+        $syncOfima = Cliente::sincronizarConOfima($idInsertU, $conexionBdPrincipal, $idEmpresa, 'CREATE');
+    } catch (Exception $e) {
+        error_log('Error al sincronizar cliente con Ofima: ' . $e->getMessage());
+        $syncOfima = ['success' => false, 'error' => $e->getMessage()];
+    }
+}
+
+$ofimaPayload = null;
+if ($crearEnOfima && is_array($syncOfima)) {
+    $ofimaPayload = [
+        'sincronizado' => !empty($syncOfima['success']),
+        'mensaje' => $syncOfima['notificacion']['mensaje']
+            ?? $syncOfima['message']
+            ?? $syncOfima['error']
+            ?? null,
+        'tipo' => $syncOfima['notificacion']['tipo']
+            ?? (!empty($syncOfima['success']) ? 'success' : 'error'),
+        'codigo_http' => $syncOfima['codigo_http'] ?? null,
+    ];
 }
 
 echo json_encode([
@@ -200,4 +254,5 @@ echo json_encode([
     'clienteId' => $idInsertU,
     'editUrl'   => 'clientes-editar.php?id=' . $idInsertU . '&msg=1',
     'notaGuardada' => $notaGuardada,
+    'ofima' => $ofimaPayload,
 ]);

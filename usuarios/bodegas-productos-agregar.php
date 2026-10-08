@@ -202,7 +202,7 @@ include("includes/head.php");
                                             <select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="bodega" required>
                                                 <option value=""></option>
                                                 <?php
-                                                $conOp = $conexionBdPrincipal->query("SELECT * FROM bodegas WHERE bod_id_empresa='".$idEmpresa."'", $conexion);
+                                                $conOp = $conexionBdPrincipal->query("SELECT * FROM bodegas WHERE bod_id_empresa='".$idEmpresa."' AND bod_habilitada=1", $conexion);
                                                 while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
                                                 ?>
                                                     <option value="<?= $resOp[0]; ?>" <?php if(isset($_GET["bod"])){if($resOp[0] == $_GET["bod"]){echo "selected";}} ?> ><?= $resOp[1]; ?></option>

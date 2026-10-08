@@ -8,5 +8,11 @@
         
 	include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
-    echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
+	if (!empty($_GET['ajax'])) {
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(['success' => true]);
+		exit();
+	}
+
+	echo '<script type="text/javascript">window.location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
     exit();

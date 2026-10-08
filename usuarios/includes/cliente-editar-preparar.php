@@ -28,6 +28,10 @@ foreach ($resultadoD as $campo => $valor) {
 
 $diplayNombreEvento = ($resultadoD['cli_referencia'] == 4) ? 'block' : 'none';
 
+require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+$ofimaActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
+$reqOfima = $ofimaActiva ? ' (*)' : '';
+
 $evolucionComercial = Cliente::obtenerEvolucionComercial($clienteId, $idEmpresa, $conexionBdPrincipal);
 
 require_once RUTA_PROYECTO . '/usuarios/class/ClienteNotaInterna.php';

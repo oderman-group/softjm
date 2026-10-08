@@ -74,9 +74,27 @@ include("includes/js-formularios.php");
 											<option value="1"></option>
 											<option value="1">Grupo 1</option>
 											<option value="2">Grupo 2</option>
+											<option value="3">Grupo 3</option>
                                     	</select>
                                     </div>
                                </div>
+
+                                <div class="control-group">
+									<label class="control-label">Código Ofima</label>
+									<div class="controls">
+										<input type="text" class="span4" name="cod_grupo" maxlength="20">
+										<span class="help-block">Código del grupo en Ofima. Dos grupos habilitados no pueden compartir el mismo código.</span>
+									</div>
+								</div>
+
+                                <div class="control-group">
+									<label class="control-label">Habilitado</label>
+									<div class="controls">
+										<label class="checkbox">
+											<input type="checkbox" name="habilitada" value="1" checked> El grupo está en funcionamiento
+										</label>
+									</div>
+								</div>
                                    
  
 								<div class="form-actions">

@@ -61,12 +61,27 @@ if($_POST["opcion"]==2){
 }
 
 if($_POST["opcion"]==3){
-	$consulta=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_referencia='".trim($_POST["idUnico"])."'");
+	$consulta=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_referencia='".trim($_POST["idUnico"])."' AND prod_id_empresa='".$idEmpresa."'");
 	$datos = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+	$quiereJson = isset($_POST['format']) && $_POST['format'] === 'json';
 	if(isset($datos[0])){
+		if ($quiereJson) {
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode([
+				'available' => false,
+				'message' => 'Ya existe un registro con esta referencia: ' . $datos['prod_nombre'],
+				'productoId' => (int) $datos[0],
+			]);
+			exit();
+		}
 		echo "<span style='font-family:arial; text-align:center; color:red;'>Ya existe un registro con esta Referencia: <b><a href='productos-editar.php?id=".$datos[0]."'>".$datos['prod_nombre']."</a></b></div>";
 		exit();
 	}else{
+		if ($quiereJson) {
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(['available' => true, 'message' => 'REFERENCIA disponible, puedes continuar.']);
+			exit();
+		}
 		echo "<span style='font-family:arial; text-align:center; color:blue;'>REFERENCIA disponible, puedes continuar.</div>";
 		exit();
 	}

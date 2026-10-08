@@ -1,7 +1,10 @@
 <?php
 require_once RUTA_PROYECTO . '/usuarios/class/Etiqueta.php';
+require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
 $listaEtiquetasCliente = Etiqueta::listarPorModulo(Etiqueta::MODULO_CLIENTE, $idEmpresa, $conexionBdPrincipal);
 $etiquetasClienteSeleccionadas = [];
+$ofimaActivaDrawer = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
+$reqOfima = ' <span class="required js-req-ofima" hidden>*</span>';
 ?>
 <style>
 #drawerCrearClienteOverlay {
@@ -358,6 +361,36 @@ body.drawer-open {
   border: 1px solid #fecaca;
 }
 
+#drawerCrearCliente .drawer-alert-warning {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+#drawerCrearCliente .drawer-alert-ofima {
+  margin-top: 0.75rem;
+}
+#drawerCrearCliente .drawer-ofima-check {
+  margin: 0.75rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+#drawerCrearCliente .drawer-ofima-check label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+}
+#drawerCrearCliente .drawer-ofima-check input[type="checkbox"] {
+  margin: 0;
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
 #drawerCrearCliente .drawer-success-actions {
   display: flex;
   gap: 0.75rem;
@@ -424,19 +457,21 @@ body.drawer-open {
 
     <div class="drawer-alert drawer-alert-success" id="drawerClienteExito" role="status"></div>
     <div class="drawer-alert drawer-alert-error" id="drawerClienteError" role="alert"></div>
+    <div class="drawer-alert drawer-alert-ofima" id="drawerClienteOfima" role="status"></div>
 
     <form class="drawer-form" id="formCrearClienteRapido" novalidate>
       <div class="form-row">
         <div class="form-group">
-          <label for="cliRapidoTipoDocumento">Tipo de documento</label>
+          <label for="cliRapidoTipoDocumento">Tipo de documento<?= $reqOfima ?></label>
           <div class="drawer-select-wrap">
             <select id="cliRapidoTipoDocumento" name="tipoDocumento">
-              <option value="1"></option>
+              <option value="">Seleccione...</option>
               <option value="2">NIT</option>
               <option value="3">Cédula</option>
             </select>
             <i class="fa fa-chevron-down drawer-select-icon" aria-hidden="true"></i>
           </div>
+          <span class="field-error" id="errorTipoDocumento">Debe seleccionar el tipo de documento.</span>
         </div>
         <div class="form-group">
           <label for="cliRapidoDocumento">Número de documento <span class="required">*</span></label>
@@ -454,18 +489,19 @@ body.drawer-open {
       </div>
 
       <div class="form-group">
-        <label for="cliRapidoEmail">Email</label>
+        <label for="cliRapidoEmail">Email<?= $reqOfima ?></label>
         <input type="email" id="cliRapidoEmail" name="email" autocomplete="email" style="text-transform:lowercase;">
         <span class="field-error" id="errorEmail">Ingrese un email válido.</span>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="cliRapidoTelefono">Teléfono</label>
+          <label for="cliRapidoTelefono">Teléfono<?= $reqOfima ?></label>
           <input type="tel" id="cliRapidoTelefono" name="telefono" autocomplete="tel">
+          <span class="field-error" id="errorTelefono">El teléfono es obligatorio.</span>
         </div>
         <div class="form-group">
-          <label for="cliRapidoCelular">Celular</label>
+          <label for="cliRapidoCelular">Celular<?= $reqOfima ?></label>
           <input type="tel" id="cliRapidoCelular" name="celular" maxlength="10" inputmode="numeric" pattern="[0-9]{10}">
           <span class="field-hint">10 dígitos sin espacios ni puntos.</span>
           <span class="field-error" id="errorCelular">El celular debe tener 10 dígitos.</span>
@@ -496,6 +532,12 @@ body.drawer-open {
         </div>
         <span class="field-hint">Define la zona y el departamento del cliente.</span>
         <span class="field-error" id="errorCiudad">Debe seleccionar una ciudad.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="cliRapidoDireccion">Dirección<?= $reqOfima ?></label>
+        <input type="text" id="cliRapidoDireccion" name="direccion" autocomplete="street-address" style="text-transform:uppercase;" placeholder="Ej. CRA 84 47 EE 15 34">
+        <span class="field-error" id="errorDireccion">La dirección es obligatoria.</span>
       </div>
 
       <div class="form-group">
@@ -557,6 +599,15 @@ body.drawer-open {
           <?php $vozRootId = 'notasVozCrearCliente'; $vozEmbebido = true; include __DIR__ . '/cliente-notas-voz-bloque.php'; ?>
         </div>
       </div>
+
+      <?php if ($ofimaActivaDrawer) { ?>
+      <div class="form-group drawer-ofima-check">
+        <label for="cliRapidoCrearEnOfima">
+          <input type="checkbox" id="cliRapidoCrearEnOfima" name="crearEnOfima" value="1">
+          Crear también en Ofima
+        </label>
+      </div>
+      <?php } ?>
     </form>
   </div>
 
@@ -581,12 +632,34 @@ document.addEventListener('DOMContentLoaded', function () {
   var btnGuardar = document.getElementById('btnGuardarClienteRapido');
   var alertExito = document.getElementById('drawerClienteExito');
   var alertError = document.getElementById('drawerClienteError');
+  var alertOfima = document.getElementById('drawerClienteOfima');
   var drawerIntro = drawer ? drawer.querySelector('.drawer-intro') : null;
   var referencia = document.getElementById('cliRapidoReferencia');
   var grupoEvento = document.getElementById('grupoNombreEvento');
   var nombreInput = document.getElementById('cliRapidoNombre');
   var documentoInput = document.getElementById('cliRapidoDocumento');
   var ciudadInput = document.getElementById('cliRapidoCiudad');
+  var tipoDocumentoInput = document.getElementById('cliRapidoTipoDocumento');
+  var telefonoInput = document.getElementById('cliRapidoTelefono');
+  var direccionInput = document.getElementById('cliRapidoDireccion');
+  var ofimaActiva = <?= $ofimaActivaDrawer ? 'true' : 'false' ?>;
+  var crearEnOfimaCheck = document.getElementById('cliRapidoCrearEnOfima');
+
+  function deseaCrearEnOfima() {
+    return ofimaActiva && crearEnOfimaCheck && crearEnOfimaCheck.checked;
+  }
+
+  function actualizarRequisitosOfimaUi() {
+    var activo = deseaCrearEnOfima();
+    document.querySelectorAll('#formCrearClienteRapido .js-req-ofima').forEach(function (el) {
+      el.hidden = !activo;
+    });
+  }
+
+  if (crearEnOfimaCheck) {
+    crearEnOfimaCheck.addEventListener('change', actualizarRequisitosOfimaUi);
+    actualizarRequisitosOfimaUi();
+  }
   var statusDocumento = document.getElementById('statusDocumento');
   var notaTextarea = document.getElementById('cliRapidoNotaInterna');
   var guardando = false;
@@ -655,6 +728,10 @@ document.addEventListener('DOMContentLoaded', function () {
   function ocultarAlertas() {
     alertExito.classList.remove('is-visible');
     alertError.classList.remove('is-visible');
+    if (alertOfima) {
+      alertOfima.classList.remove('is-visible', 'drawer-alert-success', 'drawer-alert-error', 'drawer-alert-warning');
+      alertOfima.innerHTML = '';
+    }
     alertExito.innerHTML = '';
     alertError.textContent = '';
   }
@@ -828,7 +905,18 @@ document.addEventListener('DOMContentLoaded', function () {
     var nombre = nombreInput.value.trim();
     var email = document.getElementById('cliRapidoEmail').value.trim();
     var celular = document.getElementById('cliRapidoCelular').value.trim();
+    var telefono = telefonoInput ? telefonoInput.value.trim() : '';
+    var direccion = direccionInput ? direccionInput.value.trim() : '';
+    var tipoDocumento = tipoDocumentoInput ? tipoDocumentoInput.value.trim() : '';
     var ciudad = ciudadInput ? ciudadInput.value.trim() : '';
+
+    var syncOfima = deseaCrearEnOfima();
+
+    if (syncOfima && (tipoDocumento !== '2' && tipoDocumento !== '3')) {
+      if (tipoDocumentoInput) tipoDocumentoInput.classList.add('is-invalid');
+      document.getElementById('errorTipoDocumento').classList.add('is-visible');
+      valido = false;
+    }
 
     if (!documento) {
       if (documentoInput) documentoInput.classList.add('is-invalid');
@@ -855,14 +943,38 @@ document.addEventListener('DOMContentLoaded', function () {
       valido = false;
     }
 
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (syncOfima && !email) {
       document.getElementById('cliRapidoEmail').classList.add('is-invalid');
+      document.getElementById('errorEmail').textContent = 'El email es obligatorio.';
+      document.getElementById('errorEmail').classList.add('is-visible');
+      valido = false;
+    } else if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('cliRapidoEmail').classList.add('is-invalid');
+      document.getElementById('errorEmail').textContent = 'Ingrese un email válido.';
       document.getElementById('errorEmail').classList.add('is-visible');
       valido = false;
     }
 
-    if (celular && !/^\d{10}$/.test(celular)) {
+    if (syncOfima && !telefono) {
+      if (telefonoInput) telefonoInput.classList.add('is-invalid');
+      document.getElementById('errorTelefono').classList.add('is-visible');
+      valido = false;
+    }
+
+    if (syncOfima && !direccion) {
+      if (direccionInput) direccionInput.classList.add('is-invalid');
+      document.getElementById('errorDireccion').classList.add('is-visible');
+      valido = false;
+    }
+
+    if (syncOfima && !celular) {
       document.getElementById('cliRapidoCelular').classList.add('is-invalid');
+      document.getElementById('errorCelular').textContent = 'El celular es obligatorio (10 dígitos).';
+      document.getElementById('errorCelular').classList.add('is-visible');
+      valido = false;
+    } else if (celular && !/^\d{10}$/.test(celular)) {
+      document.getElementById('cliRapidoCelular').classList.add('is-invalid');
+      document.getElementById('errorCelular').textContent = 'El celular debe tener 10 dígitos.';
       document.getElementById('errorCelular').classList.add('is-visible');
       valido = false;
     }
@@ -877,6 +989,9 @@ document.addEventListener('DOMContentLoaded', function () {
     resetEtiquetasVisuales();
     resetNotaInterna();
     resetDocumentoEstado();
+    if (typeof actualizarRequisitosOfimaUi === 'function') {
+      actualizarRequisitosOfimaUi();
+    }
     if (grupoEvento) grupoEvento.style.display = 'none';
     mostrarFormulario(false);
 
@@ -888,6 +1003,20 @@ document.addEventListener('DOMContentLoaded', function () {
         '<a href="' + data.editUrl + '">Ver y completar cliente</a>' +
         '<button type="button" id="btnCrearOtroCliente">Crear otro</button>' +
       '</div>';
+
+    if (alertOfima) {
+      alertOfima.classList.remove('is-visible', 'drawer-alert-success', 'drawer-alert-error', 'drawer-alert-warning');
+      alertOfima.innerHTML = '';
+      if (data.ofima && data.ofima.mensaje) {
+        var tipoOfima = data.ofima.tipo || (data.ofima.sincronizado ? 'success' : 'error');
+        var claseOfima = 'drawer-alert-error';
+        if (tipoOfima === 'success') claseOfima = 'drawer-alert-success';
+        else if (tipoOfima === 'warning') claseOfima = 'drawer-alert-warning';
+        alertOfima.classList.add(claseOfima, 'is-visible');
+        alertOfima.innerHTML = '<strong>Ofima!</strong> ' + data.ofima.mensaje;
+      }
+    }
+
     document.getElementById('btnCrearOtroCliente').addEventListener('click', function () {
       ocultarAlertas();
       mostrarFormulario(true);

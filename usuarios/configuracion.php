@@ -3,10 +3,86 @@ include("sesion.php");
 $idPagina = 42;
 
 include("includes/verificar-paginas.php");
+include("includes/api-ofima-conexion.php");
+include_once(RUTA_PROYECTO . "/usuarios/class/OfimaEndpointService.php");
 include("includes/head.php");
 
 $consulta = $conexionBdPrincipal->query("SELECT * FROM configuracion WHERE conf_id_empresa = '".$_SESSION["dataAdicional"]["id_empresa"]."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
+
+$idEmpresaConfig = (int) $_SESSION["dataAdicional"]["id_empresa"];
+$ofimaConexion = obtenerApiOfimaConexion($conexionBdPrincipal, $idEmpresaConfig);
+$ofimaAmbiente = $ofimaConexion['aoc_ambiente'] ?? 'pruebas';
+$ofimaUrlPruebas = $ofimaConexion['aoc_url_pruebas'] ?? 'http://20.119.237.168:34593';
+$ofimaUrlProduccion = $ofimaConexion['aoc_url_produccion'] ?? '';
+$ofimaUsuarioPruebas = $ofimaConexion['aoc_usuario_pruebas'] ?? '';
+$ofimaUsuarioProduccion = $ofimaConexion['aoc_usuario_produccion'] ?? '';
+$ofimaActivo = isset($ofimaConexion['aoc_activo']) ? (int) $ofimaConexion['aoc_activo'] : 1;
+$ofimaTokenExpira = $ofimaConexion['aoc_token_expira'] ?? null;
+$ofimaTieneToken = !empty($ofimaConexion['aoc_token']);
+$ofimaUrlActiva = $ofimaAmbiente === 'produccion' ? $ofimaUrlProduccion : $ofimaUrlPruebas;
+
+// Rutas desde el servicio; estado (habilitado) desde el registro BD
+$endpointsOrionOfima = OfimaEndpointService::listarConEstado($conexionBdPrincipal, $idEmpresaConfig);
+
+function agruparEndpointsPorModulo(array $endpoints): array
+{
+    $grupos = [];
+    foreach ($endpoints as $ep) {
+        $modulo = (string) ($ep['grupo'] ?? $ep['apic_modulo']);
+        $grupo = preg_replace('/_actualizar$/', '', $modulo);
+        if ($grupo === '') {
+            $grupo = $modulo;
+        }
+        if (!isset($grupos[$grupo])) {
+            $grupos[$grupo] = [];
+        }
+        $grupos[$grupo][] = $ep;
+    }
+    ksort($grupos);
+    return $grupos;
+}
+
+function renderTablaEndpointsApi(array $endpoints, string $tituloVacio, string $urlBaseActiva = ''): void
+{
+    if (empty($endpoints)) {
+        echo '<p class="help-text">' . htmlspecialchars($tituloVacio) . '</p>';
+        return;
+    }
+
+    $grupos = agruparEndpointsPorModulo($endpoints);
+    foreach ($grupos as $nombreModulo => $eps) {
+        $habilitados = count(array_filter($eps, static function ($e) {
+            return (int) $e['apic_activo'] === 1;
+        }));
+        echo '<div class="endpoint-modulo-group">';
+        echo '<div class="endpoint-modulo-header">';
+        echo '<strong><i class="fa-solid fa-cube"></i> ' . htmlspecialchars(ucfirst($nombreModulo)) . '</strong>';
+        echo '<span class="endpoints-pill">' . (int) $habilitados . '/' . count($eps) . ' habilitados</span>';
+        echo '</div>';
+        echo '<div class="endpoints-table-wrap"><table class="endpoints-table">';
+        echo '<thead><tr><th>Operación / módulo</th><th>Ruta guardada</th><th>URL con base activa</th><th>Estado</th><th>Actualizado</th></tr></thead><tbody>';
+        foreach ($eps as $ep) {
+            $activo = (int) $ep['apic_activo'] === 1;
+            $badge = $activo
+                ? '<span class="endpoint-badge endpoint-badge-on"><i class="fa-solid fa-check"></i> Habilitado</span>'
+                : '<span class="endpoint-badge endpoint-badge-off"><i class="fa-solid fa-ban"></i> Deshabilitado</span>';
+            $filaClass = $activo ? 'endpoint-row-on' : 'endpoint-row-off';
+            $ruta = normalizarRutaEndpointOrionOfima((string) $ep['apic_url_endpoint']);
+            $urlCompleta = ($urlBaseActiva !== '')
+                ? resolverUrlEndpointOfima($urlBaseActiva, $ruta)
+                : $ruta;
+            echo '<tr class="' . $filaClass . '">';
+            echo '<td><strong>' . htmlspecialchars($ep['apic_modulo']) . '</strong></td>';
+            echo '<td class="endpoint-url"><code>' . htmlspecialchars($ruta) . '</code></td>';
+            echo '<td class="endpoint-url"><code title="Se arma con la URL base del ambiente activo">' . htmlspecialchars($urlCompleta) . '</code></td>';
+            echo '<td>' . $badge . '</td>';
+            echo '<td>' . htmlspecialchars($ep['apic_fecha_actualizacion'] ?: '—') . '</td>';
+            echo '</tr>';
+        }
+        echo '</tbody></table></div></div>';
+    }
+}
 ?>
 
 <!-- Font Awesome para iconos modernos -->
@@ -160,6 +236,156 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
     transition: all 0.3s ease;
     background: white;
     box-sizing: border-box;
+    color: #333;
+}
+
+.form-group select {
+    height: auto !important;
+    min-height: 52px;
+    line-height: 1.4 !important;
+    -webkit-appearance: menulist;
+    -moz-appearance: menulist;
+    appearance: menulist;
+    cursor: pointer;
+}
+
+/* ========== TABLA ENDPOINTS API ========== */
+.endpoints-table-wrap {
+    overflow-x: auto;
+    margin-top: 10px;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.endpoints-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: #fff;
+}
+
+.endpoints-table th {
+    background: #f8f9fa;
+    text-align: left;
+    padding: 12px 14px;
+    color: #495057;
+    font-weight: 700;
+    border-bottom: 1px solid #e9ecef;
+    white-space: nowrap;
+}
+
+.endpoints-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f1f3f5;
+    vertical-align: top;
+    color: #333;
+}
+
+.endpoints-table tr:last-child td {
+    border-bottom: none;
+}
+
+.endpoint-url code {
+    display: inline-block;
+    max-width: 520px;
+    word-break: break-all;
+    white-space: normal;
+    background: #f1f3f5;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #212529;
+}
+
+.endpoint-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.endpoint-badge-on {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.endpoint-badge-off {
+    background: #fdecea;
+    color: #c62828;
+}
+
+.endpoint-row-off {
+    opacity: 0.65;
+}
+
+.endpoints-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.endpoints-pill {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: #495057;
+    font-weight: 600;
+}
+
+.ofima-endpoints-subtabs {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0 18px;
+    flex-wrap: wrap;
+}
+
+.ofima-endpoints-subtab {
+    border: 1px solid #e0e0e0;
+    background: #f8f9fa;
+    color: #555;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ofima-endpoints-subtab:hover {
+    background: #eef1f6;
+}
+
+.ofima-endpoints-subtab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border-color: transparent;
+}
+
+.ofima-endpoints-panel {
+    display: none;
+}
+
+.ofima-endpoints-panel.active {
+    display: block;
+}
+
+.endpoint-modulo-group {
+    margin-bottom: 18px;
+}
+
+.endpoint-modulo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+    color: #333;
 }
 
 .form-group input:focus,
@@ -555,6 +781,10 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
                 <button class="tab-button" data-tab="sistema">
                     <i class="fa-solid fa-sliders-h"></i>
                     Sistema
+                </button>
+                <button class="tab-button" data-tab="ofima">
+                    <i class="fa-solid fa-plug"></i>
+                    Ofima
                 </button>
             </div>
 
@@ -997,8 +1227,146 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
                 </div>
             </div>
 
+            <!-- Tab: Integración Ofima -->
+            <div class="tab-content" id="ofima">
+                <div class="form-section">
+                    <h3><i class="fa-solid fa-plug"></i> Integración con Ofima</h3>
+                    <p class="help-text" style="margin-bottom: 20px;">
+                        Configura la conexión Orion → Ofima (API Pience). Al elegir <strong>Pruebas</strong> o <strong>Producción</strong>
+                        se usan el enlace y las credenciales de ese ambiente. El token dura 1 hora.
+                    </p>
+
+                    <div class="form-group">
+                        <label for="ofima_activo">Integración activa</label>
+                        <select id="ofima_activo" name="ofima_activo" data-ofima="1" onchange="actualizarResumenOfima()">
+                            <option value="1" <?= (int)$ofimaActivo === 1 ? 'selected' : ''; ?>>SÍ</option>
+                            <option value="0" <?= (int)$ofimaActivo === 0 ? 'selected' : ''; ?>>NO</option>
+                        </select>
+                        <div class="help-text" id="ofima_resumen_activo">
+                            Selección actual: <strong><?= (int)$ofimaActivo === 1 ? 'SÍ' : 'NO'; ?></strong>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ofima_ambiente">Ambiente activo</label>
+                        <select id="ofima_ambiente" name="ofima_ambiente" data-ofima="1" onchange="actualizarVistaAmbienteOfima()">
+                            <option value="pruebas" <?= $ofimaAmbiente === 'pruebas' ? 'selected' : ''; ?>>Pruebas</option>
+                            <option value="produccion" <?= $ofimaAmbiente === 'produccion' ? 'selected' : ''; ?>>Producción</option>
+                        </select>
+                        <div class="help-text" id="ofima_resumen_ambiente">
+                            Selección actual: <strong><?= $ofimaAmbiente === 'produccion' ? 'Producción' : 'Pruebas'; ?></strong>
+                            — Si eliges pruebas se usa el link y usuario de pruebas; si producción, los de producción.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>URL activa actual</label>
+                        <input type="text" id="ofima_url_activa" value="<?= htmlspecialchars($ofimaUrlActiva); ?>" readonly style="background:#f1f3f5;">
+                    </div>
+
+                    <?php if ($ofimaTieneToken): ?>
+                    <div class="form-group success">
+                        <label>Estado del token</label>
+                        <div class="help-text" style="color:#2e7d32;">
+                            <i class="fa-solid fa-check-circle"></i>
+                            Token almacenado<?= $ofimaTokenExpira ? ' · Expira: ' . htmlspecialchars($ofimaTokenExpira) : ''; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="form-section" id="ofima-seccion-pruebas" style="<?= $ofimaAmbiente === 'pruebas' ? '' : 'display:none;'; ?>">
+                    <h3><i class="fa-solid fa-flask"></i> Credenciales de Pruebas</h3>
+
+                    <div class="form-group">
+                        <label for="ofima_url_pruebas">URL base de pruebas</label>
+                        <input type="url" id="ofima_url_pruebas" name="ofima_url_pruebas" data-ofima="1"
+                               value="<?= htmlspecialchars($ofimaUrlPruebas); ?>"
+                               placeholder="http://20.119.237.168:34593"
+                               oninput="actualizarVistaAmbienteOfima()">
+                        <div class="help-text">Ejemplo: http://20.119.237.168:34593 — Auth: /Api/Autenticacion/Validar</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ofima_usuario_pruebas">Usuario de pruebas</label>
+                        <input type="text" id="ofima_usuario_pruebas" name="ofima_usuario_pruebas" data-ofima="1"
+                               value="<?= htmlspecialchars($ofimaUsuarioPruebas); ?>" autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ofima_clave_pruebas">Clave de pruebas</label>
+                        <input type="password" id="ofima_clave_pruebas" name="ofima_clave_pruebas" data-ofima="1"
+                               value="" placeholder="<?= $ofimaConexion && !empty($ofimaConexion['aoc_clave_pruebas']) ? '•••••••• (dejar vacío para no cambiar)' : ''; ?>" autocomplete="new-password">
+                    </div>
+                </div>
+
+                <div class="form-section" id="ofima-seccion-produccion" style="<?= $ofimaAmbiente === 'produccion' ? '' : 'display:none;'; ?>">
+                    <h3><i class="fa-solid fa-industry"></i> Credenciales de Producción</h3>
+
+                    <div class="form-group">
+                        <label for="ofima_url_produccion">URL base de producción</label>
+                        <input type="url" id="ofima_url_produccion" name="ofima_url_produccion" data-ofima="1"
+                               value="<?= htmlspecialchars($ofimaUrlProduccion); ?>"
+                               placeholder="https://api-ofima-produccion.ejemplo.com"
+                               oninput="actualizarVistaAmbienteOfima()">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ofima_usuario_produccion">Usuario de producción</label>
+                        <input type="text" id="ofima_usuario_produccion" name="ofima_usuario_produccion" data-ofima="1"
+                               value="<?= htmlspecialchars($ofimaUsuarioProduccion); ?>" autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ofima_clave_produccion">Clave de producción</label>
+                        <input type="password" id="ofima_clave_produccion" name="ofima_clave_produccion" data-ofima="1"
+                               value="" placeholder="<?= $ofimaConexion && !empty($ofimaConexion['aoc_clave_produccion']) ? '•••••••• (dejar vacío para no cambiar)' : ''; ?>" autocomplete="new-password">
+                    </div>
+                </div>
+
+                <?php
+                $countOrionOfimaOn = count(array_filter($endpointsOrionOfima, static function ($e) { return (int)$e['apic_activo'] === 1; }));
+                ?>
+                <div class="form-section" id="ofima-seccion-endpoints">
+                    <h3><i class="fa-solid fa-route"></i> Endpoints Orion → Ofima</h3>
+                    <p class="help-text" style="margin-bottom: 12px;">
+                        Las <strong>rutas</strong> las define el servicio <code>OfimaEndpointService</code> (código).
+                        La BD solo registra y habilita/deshabilita. La URL base (pruebas/producción) sale de la conexión Ofima.
+                    </p>
+                    <div class="endpoints-summary">
+                        <span class="endpoints-pill">
+                            <?= (int)$countOrionOfimaOn; ?>/<?= count($endpointsOrionOfima); ?> habilitados
+                        </span>
+                        <?php if ($ofimaUrlActiva !== ''): ?>
+                        <span class="endpoints-pill">
+                            Base activa: <?= htmlspecialchars($ofimaUrlActiva); ?>
+                        </span>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php renderTablaEndpointsApi($endpointsOrionOfima, 'No hay endpoints Orion → Ofima registrados.', $ofimaUrlActiva); ?>
+                </div>
+
+                <div class="action-buttons" style="margin-top: 10px; padding: 0 0 20px;">
+                    <?php if (Modulos::validarRol([265], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)): ?>
+                    <button type="button" class="btn-modern btn-save" id="btnGuardarOfima" onclick="guardarConfigOfima()"
+                            style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: #fff;">
+                        <i class="fa-solid fa-save"></i>
+                        Guardar Ofima
+                    </button>
+                    <button type="button" class="btn-modern" id="btnValidarOfima" onclick="validarConexionOfima()"
+                            style="background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%); color: #fff;">
+                        <i class="fa-solid fa-key"></i>
+                        Validar conexión / Generar token
+                    </button>
+                    <?php endif; ?>
+                </div>
+
+                <div id="ofimaResultado" style="display:none; margin: 0 25px 25px; padding: 15px; border-radius: 10px;"></div>
+            </div>
+
             <!-- Botones de Acción -->
-            <div class="action-buttons">
+            <div class="action-buttons" id="botonesConfigGeneral">
                 <?php if(Modulos::validarRol([265], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)): ?>
                 <button type="button" class="btn-modern btn-save" onclick="guardarConfiguracion()">
                     <i class="fa-solid fa-save"></i>
@@ -1029,9 +1397,13 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
         inicializarColorPickers();
         inicializarValidaciones();
         guardarConfiguracionOriginal();
+        actualizarVistaAmbienteOfima();
         
-        // Detectar cambios en tiempo real
+        // Detectar cambios en tiempo real (excluye campos Ofima: tiene su propio guardado)
         document.querySelectorAll('input, select, textarea').forEach(elemento => {
+            if (elemento.hasAttribute('data-ofima')) {
+                return;
+            }
             elemento.addEventListener('input', marcarCambios);
             elemento.addEventListener('change', marcarCambios);
         });
@@ -1053,7 +1425,179 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
                 // Agregar clase active al seleccionado
                 button.classList.add('active');
                 document.getElementById(tabId).classList.add('active');
+
+                const botonesGeneral = document.getElementById('botonesConfigGeneral');
+                if (botonesGeneral) {
+                    botonesGeneral.style.display = tabId === 'ofima' ? 'none' : '';
+                }
+                if (tabId === 'ofima') {
+                    actualizarVistaAmbienteOfima();
+                }
             });
+        });
+    }
+
+    // ========== INTEGRACIÓN OFIMA ==========
+    function actualizarResumenOfima() {
+        const activo = document.getElementById('ofima_activo');
+        const ambiente = document.getElementById('ofima_ambiente');
+        const resumenActivo = document.getElementById('ofima_resumen_activo');
+        const resumenAmbiente = document.getElementById('ofima_resumen_ambiente');
+
+        if (activo && resumenActivo) {
+            resumenActivo.innerHTML = 'Selección actual: <strong>' + (activo.value === '1' ? 'SÍ' : 'NO') + '</strong>';
+        }
+        if (ambiente && resumenAmbiente) {
+            const texto = ambiente.value === 'produccion' ? 'Producción' : 'Pruebas';
+            resumenAmbiente.innerHTML = 'Selección actual: <strong>' + texto + '</strong>' +
+                ' — Si eliges pruebas se usa el link y usuario de pruebas; si producción, los de producción.';
+        }
+    }
+
+    function actualizarVistaAmbienteOfima() {
+        const ambiente = document.getElementById('ofima_ambiente')?.value || 'pruebas';
+        const urlPruebas = document.getElementById('ofima_url_pruebas')?.value || '';
+        const urlProduccion = document.getElementById('ofima_url_produccion')?.value || '';
+        const urlActiva = document.getElementById('ofima_url_activa');
+        if (urlActiva) {
+            urlActiva.value = ambiente === 'produccion' ? urlProduccion : urlPruebas;
+        }
+
+        const seccionPruebas = document.getElementById('ofima-seccion-pruebas');
+        const seccionProduccion = document.getElementById('ofima-seccion-produccion');
+        if (seccionPruebas) {
+            seccionPruebas.style.display = ambiente === 'pruebas' ? '' : 'none';
+        }
+        if (seccionProduccion) {
+            seccionProduccion.style.display = ambiente === 'produccion' ? '' : 'none';
+        }
+        actualizarResumenOfima();
+    }
+
+    function mostrarResultadoOfima(mensaje, tipo) {
+        const caja = document.getElementById('ofimaResultado');
+        if (!caja) return;
+        caja.style.display = 'block';
+        caja.style.background = tipo === 'success' ? '#e8f5e8' : '#fdecea';
+        caja.style.borderLeft = tipo === 'success' ? '4px solid #4caf50' : '4px solid #e53935';
+        caja.style.color = tipo === 'success' ? '#2e7d32' : '#c62828';
+        caja.innerHTML = mensaje;
+    }
+
+    function guardarConfigOfima() {
+        const btn = document.getElementById('btnGuardarOfima');
+        if (btn) {
+            btn.classList.add('loading');
+            btn.disabled = true;
+        }
+
+        const formData = new FormData();
+        formData.append('ambiente', document.getElementById('ofima_ambiente').value);
+        formData.append('activo', document.getElementById('ofima_activo').value);
+        formData.append('url_pruebas', document.getElementById('ofima_url_pruebas').value.trim());
+        formData.append('url_produccion', document.getElementById('ofima_url_produccion').value.trim());
+        formData.append('usuario_pruebas', document.getElementById('ofima_usuario_pruebas').value.trim());
+        formData.append('usuario_produccion', document.getElementById('ofima_usuario_produccion').value.trim());
+        formData.append('clave_pruebas', document.getElementById('ofima_clave_pruebas').value);
+        formData.append('clave_produccion', document.getElementById('ofima_clave_produccion').value);
+
+        fetch('ajax/ajax-ofima-config-guardar.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                mostrarResultadoOfima('<i class="fa-solid fa-check-circle"></i> ' + data.message +
+                    (data.url_activa ? '<br><small>URL activa: ' + data.url_activa + '</small>' : ''), 'success');
+                mostrarNotificacion(data.message, 'success');
+                document.getElementById('ofima_clave_pruebas').value = '';
+                document.getElementById('ofima_clave_produccion').value = '';
+                actualizarVistaAmbienteOfima();
+            } else {
+                mostrarResultadoOfima('<i class="fa-solid fa-triangle-exclamation"></i> ' + (data.error || 'Error al guardar'), 'error');
+                mostrarNotificacion(data.error || 'Error al guardar Ofima', 'error');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            mostrarResultadoOfima('Error de conexión al guardar', 'error');
+            mostrarNotificacion('Error de conexión', 'error');
+        })
+        .finally(() => {
+            if (btn) {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        });
+    }
+
+    function validarConexionOfima() {
+        const ambiente = document.getElementById('ofima_ambiente').value;
+        const urlBase = ambiente === 'produccion'
+            ? document.getElementById('ofima_url_produccion').value.trim()
+            : document.getElementById('ofima_url_pruebas').value.trim();
+        const usuario = ambiente === 'produccion'
+            ? document.getElementById('ofima_usuario_produccion').value.trim()
+            : document.getElementById('ofima_usuario_pruebas').value.trim();
+        const clave = ambiente === 'produccion'
+            ? document.getElementById('ofima_clave_produccion').value
+            : document.getElementById('ofima_clave_pruebas').value;
+
+        if (!urlBase) {
+            mostrarResultadoOfima('Indica la URL del ambiente seleccionado', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('btnValidarOfima');
+        if (btn) {
+            btn.classList.add('loading');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Validando...';
+        }
+
+        const formData = new FormData();
+        formData.append('ambiente', ambiente);
+        formData.append('url_base', urlBase);
+        formData.append('usuario', usuario);
+        formData.append('clave', clave);
+
+        fetch('ajax/ajax-ofima-validar-conexion.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                mostrarResultadoOfima(
+                    '<i class="fa-solid fa-key"></i> <strong>' + data.message + '</strong><br>' +
+                    '<small>Ambiente: ' + data.ambiente +
+                    (data.token_preview ? ' · Token: ' + data.token_preview : '') +
+                    (data.token_expira ? ' · Expira: ' + data.token_expira : '') +
+                    '</small>',
+                    'success'
+                );
+                mostrarNotificacion('Token Ofima generado', 'success');
+            } else {
+                mostrarResultadoOfima(
+                    '<i class="fa-solid fa-triangle-exclamation"></i> ' + (data.error || 'Validación fallida') +
+                    (data.url ? '<br><small>URL: ' + data.url + '</small>' : ''),
+                    'error'
+                );
+                mostrarNotificacion(data.error || 'No se pudo validar Ofima', 'error');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            mostrarResultadoOfima('Error de conexión al validar', 'error');
+            mostrarNotificacion('Error de conexión', 'error');
+        })
+        .finally(() => {
+            if (btn) {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-key"></i> Validar conexión / Generar token';
+            }
         });
     }
 
@@ -1253,7 +1797,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
     function marcarCambios() {
         cambiosPendientes = true;
-        const saveButton = document.querySelector('.btn-save');
+        const saveButton = document.querySelector('#botonesConfigGeneral .btn-save');
         if (saveButton) {
             saveButton.innerHTML = '<i class="fa-solid fa-save"></i> Guardar Cambios *';
             saveButton.style.background = 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)';
@@ -1267,7 +1811,7 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
             return;
         }
 
-        const saveButton = document.querySelector('.btn-save');
+        const saveButton = document.querySelector('#botonesConfigGeneral .btn-save');
         if (saveButton) {
             saveButton.classList.add('loading');
             saveButton.disabled = true;
@@ -1275,8 +1819,11 @@ $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 
         const formData = new FormData();
         
-        // Agregar todos los campos del formulario
+        // Agregar todos los campos del formulario (excluye Ofima: tiene su propio guardado)
         document.querySelectorAll('input, select, textarea').forEach(input => {
+            if (input.hasAttribute('data-ofima')) {
+                return;
+            }
             if (input.type === 'file') {
                 if (input.files.length > 0) {
                     formData.append(input.name, input.files[0]);

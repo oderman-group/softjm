@@ -4,6 +4,8 @@ include("sesion.php");
 $idPagina = 34;
 
 include("includes/verificar-paginas.php");
+include_once(RUTA_PROYECTO."/usuarios/includes/api-ofima-conexion.php");
+$ofimaActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $_SESSION["dataAdicional"]["id_empresa"]);
 include("includes/head.php");
 ?>
 <!-- styles -->
@@ -61,7 +63,21 @@ include("includes/js-formularios.php");
 									<div class="controls">
 										<input type="text" class="span4" name="nombre">
 									</div>
-								</div>  
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Código Ofima <?php if ($ofimaActiva) { ?><span class="text-error">*</span><?php } ?></label>
+									<div class="controls">
+										<input type="text" class="span4" name="cod_ofima" maxlength="50" <?php if ($ofimaActiva) { echo 'required'; } ?>>
+									</div>
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Habilitada</label>
+									<div class="controls">
+										<label><input type="checkbox" name="habilitada" value="1" checked> La marca está en funcionamiento</label>
+									</div>
+								</div>
                                    
  
 								<div class="form-actions">

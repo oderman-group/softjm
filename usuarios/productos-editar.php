@@ -299,7 +299,7 @@ $precioListaUSD = productosPrecioListaUSD($prodUtilidad, $resultadoD['prod_costo
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="grupo1" required>
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_id_empresa='".$idEmpresa."'");
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=1 AND catp_id_empresa='".$idEmpresa."' AND (catp_habilitada=1 OR catp_id='".(int) $resultadoD['prod_grupo1']."')");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['prod_grupo1'] == $resOp[0]) {
@@ -321,7 +321,7 @@ $precioListaUSD = productosPrecioListaUSD($prodUtilidad, $resultadoD['prod_costo
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="categoria" required>
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2 AND catp_id_empresa='".$idEmpresa."' AND catp_id_empresa='".$idEmpresa."'");
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=2 AND catp_id_empresa='".$idEmpresa."' AND (catp_habilitada=1 OR catp_id='".(int) $resultadoD['prod_categoria']."')");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['prod_categoria'] == $resOp[0]) {
@@ -343,7 +343,7 @@ $precioListaUSD = productosPrecioListaUSD($prodUtilidad, $resultadoD['prod_costo
 											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="marca" required>
 												<option value=""></option>
 												<?php
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."'");
+												$conOp = $conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id_empresa='".$idEmpresa."' AND (mar_habilitada=1 OR mar_id='".(int) $resultadoD['prod_marca']."')");
 												while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
 												?>
 													<option value="<?= $resOp[0]; ?>" <?php if ($resultadoD['prod_marca'] == $resOp[0]) {

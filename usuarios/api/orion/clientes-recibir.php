@@ -3,6 +3,9 @@
  * Endpoint API para recibir clientes desde Ofima (Ofima → Orion)
  * POST /usuarios/api/orion/clientes-recibir.php
  * Autenticación: Bearer JWT (recomendado) o Basic Auth
+ *
+ * ciudad = código DIAN (ciu_cod_dian, ej. "05001"). Orion lo homologa a ciu_id
+ * y asigna cli_zona = ciu_departamento para que el cliente aparezca en el listado.
  */
 
 header('Content-Type: application/json');

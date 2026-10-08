@@ -34,6 +34,47 @@ $clave2 = generarClaves();
 
 $direccion = $_POST["op1"] . " " . $_POST["op2"] . " " . $_POST["op3"] . " # " . $_POST["op4"] . " " . $_POST["op5"] . " - " . $_POST["op6"] . " - " . $_POST["op7"];
 
+require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+$ofimaActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
+$crearEnOfima = $ofimaActiva && (
+    !empty($_POST['crearEnOfima'])
+    && ($_POST['crearEnOfima'] === '1' || $_POST['crearEnOfima'] === 'on' || $_POST['crearEnOfima'] === 'true')
+);
+
+if ($crearEnOfima) {
+    $tipoDoc = isset($_POST['tipoDocumento']) ? (int) $_POST['tipoDocumento'] : 0;
+    $faltantes = [];
+    if ($tipoDoc !== 2 && $tipoDoc !== 3) {
+        $faltantes[] = 'tipo de documento';
+    }
+    if (trim($_POST['usuario'] ?? '') === '') {
+        $faltantes[] = 'documento';
+    }
+    if (trim($_POST['nombre'] ?? '') === '') {
+        $faltantes[] = 'nombre';
+    }
+    if (trim($_POST['email'] ?? '') === '') {
+        $faltantes[] = 'email';
+    }
+    if (trim($_POST['telefono'] ?? '') === '') {
+        $faltantes[] = 'teléfono';
+    }
+    if (trim($_POST['celular'] ?? '') === '') {
+        $faltantes[] = 'celular';
+    }
+    if (trim($direccion) === '' || preg_match('/^\s*#\s*-\s*-\s*$/', trim($direccion))) {
+        $faltantes[] = 'dirección';
+    }
+    if (empty($_POST['ciudad'])) {
+        $faltantes[] = 'ciudad';
+    }
+    if (!empty($faltantes)) {
+        echo "<div style='font-family:arial; text-align:center'>Faltan datos requeridos para Ofima: " . htmlspecialchars(implode(', ', $faltantes)) . ".<br><br>
+        <a href='javascript:history.go(-1);'>[Página anterior]</a></div>";
+        exit();
+    }
+}
+
 $clienteInsitucional = 0;
 
 if ($_POST["clienteInstitucional"] == 1) {
@@ -64,13 +105,26 @@ if ($_POST["contactoP"] == 1) {
     mysqli_query($conexionBdPrincipal,"INSERT INTO contactos(cont_nombre, cont_telefono, cont_email, cont_cliente_principal, cont_celular, cont_telefonos)VALUES('" . $_POST["nombre"] . "', '" . $_POST["telefono"] . "', '" . $_POST["email"] . "', '" . $idInsertU . "', '" . $_POST["celular"] . "','" . $_POST["telefonos"] . "')");
 }
 
-// Sincronizar con Ofima (Orion → Ofima)
-try {
-    require_once RUTA_PROYECTO . '/usuarios/class/Cliente.php';
-    Cliente::sincronizarConOfima($idInsertU, $conexionBdPrincipal, $idEmpresa, 'CREATE');
-} catch (Exception $e) {
-    error_log('Error al sincronizar cliente con Ofima: ' . $e->getMessage());
+// Sincronizar con Ofima solo si el usuario marcó "Crear en Ofima"
+$ofimaQuery = '';
+if ($crearEnOfima) {
+    try {
+        require_once RUTA_PROYECTO . '/usuarios/class/Cliente.php';
+        $syncOfima = Cliente::sincronizarConOfima($idInsertU, $conexionBdPrincipal, $idEmpresa, 'CREATE');
+        $tipoNotif = $syncOfima['notificacion']['tipo'] ?? (!empty($syncOfima['success']) ? 'success' : 'error');
+        $msgNotif = $syncOfima['notificacion']['mensaje'] ?? ($syncOfima['error'] ?? $syncOfima['message'] ?? 'Resultado Ofima');
+        if ($tipoNotif === 'success') {
+            $ofimaQuery = '&ofima=ok&ofima_msg=' . urlencode($msgNotif);
+        } elseif ($tipoNotif === 'warning') {
+            $ofimaQuery = '&ofima=omitido&ofima_msg=' . urlencode($msgNotif);
+        } else {
+            $ofimaQuery = '&ofima=error&ofima_msg=' . urlencode($msgNotif);
+        }
+    } catch (Exception $e) {
+        error_log('Error al sincronizar cliente con Ofima: ' . $e->getMessage());
+        $ofimaQuery = '&ofima=error&ofima_msg=' . urlencode('Ofima: ' . $e->getMessage());
+    }
 }
 
-echo '<script type="text/javascript">window.location.href="../clientes-editar.php?id=' . $idInsertU . '&msg=1";</script>';
+echo '<script type="text/javascript">window.location.href="../clientes-editar.php?id=' . $idInsertU . '&msg=1' . $ofimaQuery . '";</script>';
 exit();

@@ -5,7 +5,7 @@
 
     include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
-    $consultaProductos=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_referencia='".trim($_POST["referencia"])."'");
+    $consultaProductos=$conexionBdPrincipal->query("SELECT * FROM productos WHERE prod_referencia='".trim($_POST["referencia"])."' AND prod_id_empresa='".$idEmpresa."'");
 	$datos = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH);
 
 	$conexionBdPrincipal->query("INSERT INTO productos(prod_nombre, prod_categoria, prod_grupo1, prod_marca, prod_referencia, prod_proveedor, prod_id_empresa)VALUES('" . htmlspecialchars($_POST["nombre"], ENT_QUOTES) . "','" . $_POST["categoria"] . "','" . $_POST["grupo1"] . "','" . $_POST["marca"] . "','" . $_POST["referencia"] . "','" . $_POST["proveedor"] ."', '".$_SESSION["dataAdicional"]["id_empresa"]."')");
@@ -19,16 +19,25 @@
         }
     }
 
-    // Sincronizar con Ofima (en segundo plano, no bloquea si falla)
+    $ofimaQuery = '';
     try {
         require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
-        Producto::sincronizarConOfima($idInsertU, $conexionBdPrincipal, $_SESSION["dataAdicional"]["id_empresa"], 'CREATE');
+        $syncOfima = Producto::sincronizarConOfima($idInsertU, $conexionBdPrincipal, $_SESSION["dataAdicional"]["id_empresa"], 'CREATE');
+        $tipoNotif = $syncOfima['notificacion']['tipo'] ?? (!empty($syncOfima['success']) ? 'success' : 'error');
+        $msgNotif = $syncOfima['notificacion']['mensaje'] ?? ($syncOfima['error'] ?? $syncOfima['message'] ?? 'Resultado Ofima');
+        if ($tipoNotif === 'success') {
+            $ofimaQuery = '&ofima=ok&ofima_msg=' . urlencode($msgNotif);
+        } elseif ($tipoNotif === 'warning') {
+            $ofimaQuery = '&ofima=omitido&ofima_msg=' . urlencode($msgNotif);
+        } else {
+            $ofimaQuery = '&ofima=error&ofima_msg=' . urlencode($msgNotif);
+        }
     } catch (Exception $e) {
-        // Log del error pero no interrumpir el flujo
         error_log("Error al sincronizar producto con Ofima: " . $e->getMessage());
+        $ofimaQuery = '&ofima=error&ofima_msg=' . urlencode('Ofima: ' . $e->getMessage());
     }
 
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
-	echo '<script type="text/javascript">window.location.href="../productos-editar.php?id=' . $idInsertU . '&msg=1";</script>';
+	echo '<script type="text/javascript">window.location.href="../productos-editar.php?id=' . $idInsertU . '&msg=1' . $ofimaQuery . '";</script>';
 	exit();

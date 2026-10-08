@@ -49,6 +49,41 @@ $direccion = strtoupper(Cliente::construirDireccionNomenclatura([
     'op7' => $_POST['op7'] ?? '',
 ]));
 
+require_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+if (ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa)) {
+    $tipoDoc = isset($_POST['tipoDocumento']) ? (int) $_POST['tipoDocumento'] : 0;
+    $faltantes = [];
+    if ($tipoDoc !== 2 && $tipoDoc !== 3) {
+        $faltantes[] = 'tipo de documento';
+    }
+    if (trim($_POST['usuarioCliente'] ?? '') === '') {
+        $faltantes[] = 'documento';
+    }
+    if (trim($_POST['nombre'] ?? '') === '') {
+        $faltantes[] = 'nombre';
+    }
+    if (trim($_POST['email'] ?? '') === '') {
+        $faltantes[] = 'email';
+    }
+    if (trim($_POST['telefono'] ?? '') === '') {
+        $faltantes[] = 'teléfono';
+    }
+    if (trim($_POST['celular'] ?? '') === '') {
+        $faltantes[] = 'celular';
+    }
+    if (trim($direccion) === '') {
+        $faltantes[] = 'dirección';
+    }
+    if (empty($_POST['ciudad'])) {
+        $faltantes[] = 'ciudad';
+    }
+    if (!empty($faltantes)) {
+        echo "<div style='font-family:arial; text-align:center'>Faltan datos requeridos para Ofima: " . htmlspecialchars(implode(', ', $faltantes)) . ".<br><br>
+        <a href='javascript:history.go(-1);'>[Página anterior]</a></div>";
+        exit();
+    }
+}
+
 $conexionBdPrincipal->query("UPDATE clientes SET
 cli_nombre='" . $_POST["nombre"] . "', 
 cli_referencia='" . $_POST["referencia"] . "', 
@@ -110,13 +145,24 @@ Etiqueta::sincronizarAsignaciones(
 );
 
 // Sincronizar con Ofima (Orion → Ofima)
+$ofimaQuery = '';
 try {
-    Cliente::sincronizarConOfima($_POST["id"], $conexionBdPrincipal, $idEmpresa, 'UPDATE');
+    $syncOfima = Cliente::sincronizarConOfima($_POST["id"], $conexionBdPrincipal, $idEmpresa, 'UPDATE');
+    $tipoNotif = $syncOfima['notificacion']['tipo'] ?? (!empty($syncOfima['success']) ? 'success' : 'error');
+    $msgNotif = $syncOfima['notificacion']['mensaje'] ?? ($syncOfima['error'] ?? $syncOfima['message'] ?? 'Resultado Ofima');
+    if ($tipoNotif === 'success') {
+        $ofimaQuery = '&ofima=ok&ofima_msg=' . urlencode($msgNotif);
+    } elseif ($tipoNotif === 'warning') {
+        $ofimaQuery = '&ofima=omitido&ofima_msg=' . urlencode($msgNotif);
+    } else {
+        $ofimaQuery = '&ofima=error&ofima_msg=' . urlencode($msgNotif);
+    }
 } catch (Exception $e) {
     error_log('Error al sincronizar cliente con Ofima: ' . $e->getMessage());
+    $ofimaQuery = '&ofima=error&ofima_msg=' . urlencode('Ofima: ' . $e->getMessage());
 }
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
-echo '<script type="text/javascript">window.location.href="../clientes-editar.php?id=' . $_POST["id"] . '&msg=2";</script>';
+echo '<script type="text/javascript">window.location.href="../clientes-editar.php?id=' . $_POST["id"] . '&msg=2' . $ofimaQuery . '";</script>';
 exit();

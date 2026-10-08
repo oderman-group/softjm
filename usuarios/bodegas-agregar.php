@@ -4,6 +4,11 @@ include("sesion.php");
 $idPagina = 143;
 
 include("includes/verificar-paginas.php");
+include_once(RUTA_PROYECTO."/usuarios/includes/api-ofima-conexion.php");
+if (ofimaIntegracionActiva($conexionBdPrincipal, (int) $_SESSION["dataAdicional"]["id_empresa"])) {
+    echo '<script type="text/javascript">alert("Las bodegas solo se crean desde Ofima mientras la integración esté activa."); window.location.href="bodegas.php";</script>';
+    exit();
+}
 include("includes/head.php");
 ?>
 <!-- styles -->
@@ -73,6 +78,15 @@ include("includes/js-formularios.php");
                                             <?php
 											}
 											?>
+                                    	</select>
+                                    </div>
+                               </div>
+                                <div class="control-group">
+									<label class="control-label">Estado</label>
+									<div class="controls">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span4" tabindex="2" name="habilitada">
+											<option value="1" selected>Habilitada</option>
+											<option value="0">Deshabilitada</option>
                                     	</select>
                                     </div>
                                </div>

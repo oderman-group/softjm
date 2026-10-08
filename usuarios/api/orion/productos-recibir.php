@@ -1,7 +1,9 @@
 <?php
 /**
- * Endpoint API para recibir productos desde Ofima
- * POST /api/orion/productos-recibir.php
+ * Endpoint API para recibir productos desde Ofima (Ofima → Orion)
+ * POST /usuarios/api/orion/productos-recibir.php
+ *
+ * Al crear o actualizar, marca prod_integrado_ofima = 1.
  */
 
 header('Content-Type: application/json');
@@ -100,6 +102,17 @@ if (isset($datos['precio']) && (floatval($datos['precio']) < 0)) {
 }
 
 try {
+    // Contrato Ofima → Orion (estable): IDs Orion. El tercero no modifica su endpoint.
+    if (!array_key_exists('categoria_id', $datos) || $datos['categoria_id'] === null || $datos['categoria_id'] === '') {
+        $datos['categoria_id'] = 1;
+    }
+    if (!array_key_exists('grupo_id', $datos)) {
+        $datos['grupo_id'] = null;
+    }
+    if (!array_key_exists('marca_id', $datos)) {
+        $datos['marca_id'] = null;
+    }
+
     if ($idEmpresa === null) {
         $idEmpresa = (int) ($datos['id_empresa'] ?? 1);
         $apiService = new ApiOrionService($conexionBdPrincipal, $idEmpresa);

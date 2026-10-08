@@ -124,6 +124,40 @@ if(isset($_GET["msg"])){
 
 <?php }?>
 
+
+<?php
+// Resultado sincronización Ofima (clientes, productos, etc.)
+if (isset($_GET["ofima"])) {
+    $ofimaEstado = $_GET["ofima"];
+    $ofimaMsg = isset($_GET["ofima_msg"]) ? htmlspecialchars(urldecode($_GET["ofima_msg"]), ENT_QUOTES, 'UTF-8') : '';
+    if ($ofimaEstado === 'ok') {
+        ?>
+        <div class="alert alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <i class="icon-exclamation-sign"></i>
+            <strong>Ofima!</strong> <?= $ofimaMsg !== '' ? $ofimaMsg : 'Sincronización con Ofima exitosa.'; ?>
+        </div>
+        <?php
+    } elseif ($ofimaEstado === 'error') {
+        ?>
+        <div class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <i class="icon-exclamation-sign"></i>
+            <strong>Ofima!</strong> <?= $ofimaMsg !== '' ? $ofimaMsg : 'No se pudo sincronizar con Ofima. Revise api_sincronizaciones.'; ?>
+        </div>
+        <?php
+    } elseif ($ofimaEstado === 'omitido') {
+        ?>
+        <div class="alert alert-info">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <i class="icon-exclamation-sign"></i>
+            <strong>Ofima!</strong> <?= $ofimaMsg !== '' ? $ofimaMsg : 'Sincronización Ofima omitida.'; ?>
+        </div>
+        <?php
+    }
+}
+?>
+
 <?php
 if(isset($_GET["error"])){
 ?>

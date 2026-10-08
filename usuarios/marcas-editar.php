@@ -4,6 +4,8 @@ include("sesion.php");
 $idPagina = 35;
 
 include("includes/verificar-paginas.php");
+include_once(RUTA_PROYECTO."/usuarios/includes/api-ofima-conexion.php");
+$ofimaActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $_SESSION["dataAdicional"]["id_empresa"]);
 include("includes/head.php");
 $consulta=$conexionBdPrincipal->query("SELECT * FROM marcas WHERE mar_id='".$_GET["id"]."' AND mar_id_empresa='".$idEmpresa."'");
 $resultadoD = mysqli_fetch_array($consulta, MYSQLI_BOTH);
@@ -69,7 +71,21 @@ include("includes/js-formularios.php");
 									<div class="controls">
 										<input type="text" class="span4" name="nombre" value="<?=$resultadoD['mar_nombre'];?>">
 									</div>
-								</div>  
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Código Ofima <?php if ($ofimaActiva) { ?><span class="text-error">*</span><?php } ?></label>
+									<div class="controls">
+										<input type="text" class="span4" name="cod_ofima" maxlength="50" value="<?= htmlspecialchars((string) ($resultadoD['mar_cod_ofima'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" <?php if ($ofimaActiva) { echo 'required'; } ?>>
+									</div>
+								</div>
+
+								<div class="control-group">
+									<label class="control-label">Habilitada</label>
+									<div class="controls">
+										<label><input type="checkbox" name="habilitada" value="1" <?php if (!isset($resultadoD['mar_habilitada']) || (int) $resultadoD['mar_habilitada'] === 1) { echo 'checked'; } ?>> La marca está en funcionamiento</label>
+									</div>
+								</div>
 
                                
 								<div class="form-actions">
