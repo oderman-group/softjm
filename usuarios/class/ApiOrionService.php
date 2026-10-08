@@ -103,10 +103,10 @@ class ApiOrionService {
             
             if ($productoExistente) {
                 // Actualizar producto existente
-                return $this->actualizarProducto($productoExistente['prod_id'], $datosOrion);
+                return $this->actualizarProducto($productoExistente['prod_id'], $datosOrion, $datosOfima);
             } else {
                 // Crear nuevo producto
-                return $this->crearProducto($datosOrion);
+                return $this->crearProducto($datosOrion, $datosOfima);
             }
             
         } catch (Exception $e) {
@@ -402,9 +402,12 @@ class ApiOrionService {
     }
     
     /**
-     * Crea un nuevo producto
+     * Crea un nuevo producto.
+     *
+     * @param array $datos Datos ya mapeados a columnas Orion
+     * @param array|null $datosRecibidos Payload original de Ofima (para apis_datos_enviados)
      */
-    private function crearProducto($datos) {
+    private function crearProducto($datos, $datosRecibidos = null) {
         // Validar campos requeridos
         if (empty(trim($datos['prod_referencia'] ?? '')) || empty(trim($datos['prod_nombre'] ?? ''))) {
             return [
@@ -460,6 +463,7 @@ class ApiOrionService {
             // Crear registro en productos_bodegas por defecto
             $this->crearRegistroBodegaDefault($productoId);
             
+            $payloadLog = is_array($datosRecibidos) ? $datosRecibidos : $datos;
             // Registrar sincronización
             $this->registrarSincronizacion(
                 'productos',
@@ -467,7 +471,7 @@ class ApiOrionService {
                 'CREATE',
                 $productoId,
                 $datos['prod_referencia'],
-                $datos,
+                $payloadLog,
                 ['success' => true],
                 'exitoso',
                 200,
@@ -489,9 +493,12 @@ class ApiOrionService {
     }
     
     /**
-     * Actualiza un producto existente
+     * Actualiza un producto existente.
+     *
+     * @param array $datos Datos ya mapeados a columnas Orion
+     * @param array|null $datosRecibidos Payload original de Ofima (para apis_datos_enviados)
      */
-    private function actualizarProducto($productoId, $datos) {
+    private function actualizarProducto($productoId, $datos, $datosRecibidos = null) {
         $validacion = $this->validarDatosProducto($datos);
         if ($validacion !== null) {
             return $validacion;
@@ -554,6 +561,7 @@ class ApiOrionService {
                 $this->registrarCambioPrecio($productoId, $productoActual['prod_precio'], $datos['prod_precio']);
             }
             
+            $payloadLog = is_array($datosRecibidos) ? $datosRecibidos : $datos;
             // Registrar sincronización
             $this->registrarSincronizacion(
                 'productos',
@@ -561,7 +569,7 @@ class ApiOrionService {
                 'UPDATE',
                 $productoId,
                 $datos['prod_referencia'] ?? '',
-                $datos,
+                $payloadLog,
                 ['success' => true],
                 'exitoso',
                 200,
