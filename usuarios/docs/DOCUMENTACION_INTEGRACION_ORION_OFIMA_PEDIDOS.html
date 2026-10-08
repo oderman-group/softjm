@@ -319,6 +319,7 @@
         <h4>Body JSON (campos requeridos: identificacion, nombre):</h4>
         <pre><code>{
   "identificacion": "900123456-1",
+  "tipodcto": "N",
   "nombre": "Cliente Ejemplo S.A.S",
   "email": "contacto@ejemplo.com",
   "telefono": "6011234567",
@@ -331,6 +332,7 @@
         <table>
             <tr><th>Campo</th><th>Descripción</th></tr>
             <tr><td><code>identificacion</code></td><td>NIT/documento (clave para crear o actualizar).</td></tr>
+            <tr><td><code>tipodcto</code></td><td>Tipo de documento Ofima → Orion: <code>C</code>=Cédula (3), <code>N</code>=NIT (2), <code>NE</code>=NIT extranjería (4), <code>CE</code>=Cédula extranjería (5), <code>TI</code>=Tarjeta identidad (6). Se guarda en <code>cli_tipo_documento</code>.</td></tr>
             <tr><td><code>ciudad</code></td><td><strong>Código DIAN</strong> (<code>ciu_cod_dian</code>), ej. <code>05001</code>, <code>11001</code>. <strong>No enviar el nombre</strong> (incorrecto: <code>"Bogotá"</code>; correcto: <code>"11001"</code>). Orion lo homologa a <code>ciu_id</code> y asigna <code>cli_zona</code> = <code>ciu_departamento</code>.</td></tr>
         </table>
         <p>Orion identifica al cliente por <code>identificacion</code>. Si existe, actualiza; si no, crea. Respuesta 200: <code>{ "success": true, "message": "Cliente sincronizado correctamente", "cliente_id": 5, "identificacion": "900123456-1", "operacion": "CREATE" | "UPDATE" }</code>.</p>

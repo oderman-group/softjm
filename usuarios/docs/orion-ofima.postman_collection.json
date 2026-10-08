@@ -75,7 +75,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"05001\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"tipodcto\": \"N\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"05001\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{base_orion}}/usuarios/api/orion/clientes-recibir.php",
@@ -189,7 +189,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"05001\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"tipodcto\": \"N\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"05001\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{ofima_url_clientes}}",
@@ -206,7 +206,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"05001\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"tipodcto\": \"N\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"05001\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{ofima_url_clientes}}",

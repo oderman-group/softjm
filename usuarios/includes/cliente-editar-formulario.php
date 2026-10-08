@@ -49,8 +49,11 @@
           <option value=""></option>
           <option value="2" <?php if ($resultadoD['cli_tipo_documento'] == 2) echo 'selected'; ?>>NIT</option>
           <option value="3" <?php if ($resultadoD['cli_tipo_documento'] == 3) echo 'selected'; ?>>Cédula</option>
+          <option value="4" <?php if ($resultadoD['cli_tipo_documento'] == 4) echo 'selected'; ?>>NIT extranjería</option>
+          <option value="5" <?php if ($resultadoD['cli_tipo_documento'] == 5) echo 'selected'; ?>>Cédula extranjería</option>
+          <option value="6" <?php if ($resultadoD['cli_tipo_documento'] == 6) echo 'selected'; ?>>Tarjeta identidad</option>
         </select>
-        <span class="cliente-field-error">Seleccione NIT o Cédula.</span>
+        <span class="cliente-field-error">Seleccione el tipo de documento.</span>
       </div>
       <div class="cliente-field" data-required-field="<?= $ofimaActiva ? 'usuarioCliente' : '' ?>">
         <label class="cliente-field-label">Documento<?= $reqOfima ?></label>

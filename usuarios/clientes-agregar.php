@@ -132,6 +132,9 @@ include("includes/js-formularios.php");
 											<option value=""></option>
 											<option value="2">NIT</option>
 											<option value="3">Cédula</option>
+											<option value="4">NIT extranjería</option>
+											<option value="5">Cédula extranjería</option>
+											<option value="6">Tarjeta identidad</option>
                                     	</select>
                                     </div>
                                </div>	
