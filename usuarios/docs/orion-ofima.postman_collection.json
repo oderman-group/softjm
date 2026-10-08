@@ -75,11 +75,11 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"Bogotá\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"05001\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{base_orion}}/usuarios/api/orion/clientes-recibir.php",
-            "description": "POST /softjm/usuarios/api/orion/clientes-recibir.php. Requeridos: identificacion, nombre."
+            "description": "POST /softjm/usuarios/api/orion/clientes-recibir.php. Requeridos: identificacion, nombre. ciudad = código DIAN (ciu_cod_dian, ej. 05001 o 11001). NO enviar el nombre de la ciudad (ej. Bogotá). Orion homologa a ciu_id y cli_zona."
           }
         },
         {
@@ -96,11 +96,11 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"referencia\": \"COD001\",\n  \"nombre\": \"Producto ejemplo\",\n  \"costo\": 10000,\n  \"utilidad\": 30,\n  \"precio\": 13000,\n  \"categoria_id\": 1,\n  \"grupo_id\": null,\n  \"marca_id\": null,\n  \"proveedor_id\": null,\n  \"descripcion_corta\": \"\",\n  \"descripcion_larga\": \"\",\n  \"descuento1\": null,\n  \"comision\": null,\n  \"costo_dolar\": null,\n  \"id_empresa\": {{id_empresa}}\n}",
+              "raw": "{\n  \"referencia\": \"COD001\",\n  \"nombre\": \"Producto ejemplo\",\n  \"costo\": 10000,\n  \"utilidad\": 30,\n  \"precio\": 13000,\n  \"linea\": \"001\",\n  \"sublinea\": \"010\",\n  \"grupo\": \"MAR01\",\n  \"clasificacion_1\": \"034\",\n  \"grupo_id\": \"001\",\n  \"categoria_id\": \"010\",\n  \"marca_id\": \"MAR01\",\n  \"proveedor_id\": null,\n  \"descripcion_corta\": \"\",\n  \"descripcion_larga\": \"\",\n  \"descuento1\": null,\n  \"comision\": null,\n  \"costo_dolar\": null,\n  \"habilitado\": 1,\n  \"id_empresa\": {{id_empresa}}\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{base_orion}}/usuarios/api/orion/productos-recibir.php",
-            "description": "POST /softjm/usuarios/api/orion/productos-recibir.php. Requeridos: referencia, nombre."
+            "description": "Ofima→Orion. linea/sublinea/grupo (o grupo_id/categoria_id/marca_id) = códigos Ofima; Orion los resuelve a catp_id/mar_id y guarda IDs internos en prod_grupo1/prod_categoria/prod_marca. No persiste el código."
           }
         },
         {
@@ -117,7 +117,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"referencia\": \"COD001\",\n  \"bodega_id\": 1,\n  \"existencias\": 50,\n  \"id_empresa\": {{id_empresa}}\n}",
+              "raw": "{\n  \"referencia\": \"COD001\",\n  \"bodega_referencia\": \"BOGOTA\",\n  \"existencias\": 50,\n  \"id_empresa\": {{id_empresa}}\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{base_orion}}/usuarios/api/orion/inventario-recibir.php",
@@ -138,7 +138,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id_empresa\": {{id_empresa}},\n  \"items\": [\n    { \"referencia\": \"COD001\", \"bodega_id\": 1, \"existencias\": 50 },\n    { \"referencia\": \"COD002\", \"bodega_id\": 1, \"existencias\": 30 }\n  ]\n}",
+              "raw": "{\n  \"id_empresa\": {{id_empresa}},\n  \"items\": [\n    { \"referencia\": \"COD001\", \"bodega_referencia\": \"BOGOTA\", \"existencias\": 50 },\n    { \"referencia\": \"COD002\", \"bodega_referencia\": \"BOGOTA\", \"existencias\": 30 }\n  ]\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{base_orion}}/usuarios/api/orion/inventario-recibir.php",
@@ -189,10 +189,11 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"Bogotá\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"05001\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
               "options": { "raw": { "language": "json" } }
             },
-            "url": "{{ofima_url_clientes}}"
+            "url": "{{ofima_url_clientes}}",
+            "description": "Orion → Ofima. ciudad = código DIAN (ciu_cod_dian, ej. 05001), NO el nombre de la ciudad."
           }
         },
         {
@@ -205,10 +206,11 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"Bogotá\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "raw": "{\n  \"identificacion\": \"900123456-1\",\n  \"nombre\": \"Cliente Ejemplo S.A.S\",\n  \"email\": \"contacto@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"05001\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
               "options": { "raw": { "language": "json" } }
             },
-            "url": "{{ofima_url_clientes}}"
+            "url": "{{ofima_url_clientes}}",
+            "description": "Orion → Ofima. ciudad = código DIAN (ciu_cod_dian, ej. 05001), NO el nombre de la ciudad."
           }
         },
         {
@@ -221,7 +223,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"referencia\": \"COD001\",\n  \"nombre\": \"Producto ejemplo\",\n  \"costo\": 10000,\n  \"utilidad\": 30,\n  \"precio\": 13000,\n  \"id_empresa\": {{id_empresa}}\n}",
+              "raw": "[\n  {\n    \"referencia\": \"60\",\n    \"nombre\": \"Prueba\",\n    \"costo\": 0,\n    \"utilidad\": 30,\n    \"precio\": 100,\n    \"categoria_id\": \"010\",\n    \"grupo_id\": \"001\",\n    \"marca_id\": \"MAR01\",\n    \"grupo\": \"MAR01\",\n    \"proveedor_id\": 0,\n    \"descripcion_corta\": \"Prueba\",\n    \"descripcion_larga\": \"Prueba\",\n    \"descuento1\": 0,\n    \"comision\": 0,\n    \"costo_dolar\": 0,\n    \"id_empresa\": {{id_empresa}},\n    \"grupo_1\": \"001\",\n    \"linea\": \"001\",\n    \"grupo_2\": \"010\",\n    \"sublinea\": \"010\",\n    \"grupo_3\": \"034\",\n    \"clasificacion_1\": \"034\",\n    \"habilitado\": 1\n  }\n]",
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{ofima_url_productos}}"
@@ -237,7 +239,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"referencia\": \"COD001\",\n  \"nombre\": \"Producto ejemplo\",\n  \"costo\": 10000,\n  \"utilidad\": 30,\n  \"precio\": 13000,\n  \"id_empresa\": {{id_empresa}}\n}",
+              "raw": "[\n  {\n    \"referencia\": \"60\",\n    \"nombre\": \"Prueba\",\n    \"costo\": 0,\n    \"utilidad\": 30,\n    \"precio\": 100,\n    \"categoria_id\": \"010\",\n    \"grupo_id\": \"001\",\n    \"marca_id\": \"MAR01\",\n    \"grupo\": \"MAR01\",\n    \"proveedor_id\": 0,\n    \"descripcion_corta\": \"Prueba\",\n    \"descripcion_larga\": \"Prueba\",\n    \"descuento1\": 0,\n    \"comision\": 0,\n    \"costo_dolar\": 0,\n    \"id_empresa\": {{id_empresa}},\n    \"grupo_1\": \"001\",\n    \"linea\": \"001\",\n    \"grupo_2\": \"010\",\n    \"sublinea\": \"010\",\n    \"grupo_3\": \"034\",\n    \"clasificacion_1\": \"034\",\n    \"habilitado\": 1\n  }\n]",
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{ofima_url_productos}}"

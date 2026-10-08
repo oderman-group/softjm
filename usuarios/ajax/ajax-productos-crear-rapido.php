@@ -27,7 +27,7 @@ $replicar   = isset($_POST['replicar']) && (int) $_POST['replicar'] === 1 ? 1 : 
 
 $ofimaActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
 if ($ofimaActiva && $referencia === '') {
-    echo json_encode(['success' => false, 'message' => 'El código (referencia) es obligatorio.']);
+    echo json_encode(['success' => false, 'message' => 'El código Ofima es obligatorio.']);
     exit;
 }
 if (!$ofimaActiva && $referencia === '') {

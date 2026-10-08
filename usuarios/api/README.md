@@ -94,22 +94,34 @@ o
 Authorization: Basic base64(usuario:password)
 ```
 
-**Body (JSON):**
+**Body (JSON) — contrato Ofima → Orion (el tercero no modifica su endpoint):**
 ```json
 {
-    "referencia": "REF-12345",
-    "nombre": "Producto desde Ofima",
-    "costo": 100000.00,
-    "utilidad": 30.00,
-    "precio": 142857.14,
-    "categoria_id": 1,
-    "marca_id": 3,
-    "proveedor_id": 4,
-    "descripcion_corta": "Descripción breve",
-    "descripcion_larga": "Descripción detallada",
-    "id_empresa": 1
+  "referencia": "COD001",
+  "nombre": "Producto ejemplo",
+  "costo": 10000,
+  "utilidad": 30,
+  "precio": 13000,
+  "categoria_id": 1,
+  "grupo_id": null,
+  "marca_id": null,
+  "proveedor_id": null,
+  "descripcion_corta": "",
+  "descripcion_larga": "",
+  "descuento1": null,
+  "comision": null,
+  "costo_dolar": null,
+  "id_empresa": 1
 }
 ```
+
+| Campo | Columna Orion | Notas |
+|-------|---------------|-------|
+| `categoria_id` | `prod_categoria` | ID Orion. Si falta → `1`. |
+| `grupo_id` | `prod_grupo1` | ID Orion. Opcional (`null`). |
+| `marca_id` | `prod_marca` | ID Orion. Opcional (`null`). |
+
+Las homologaciones por código Ofima (`linea`, `sublinea`, `grupo`, `clasificacion_1`, `habilitado`) las aplica **Orion al enviar** a Ofima (sentido Orion → Ofima). El body de recepción no cambia.
 
 **Respuesta Exitosa (200):**
 ```json
@@ -117,7 +129,7 @@ Authorization: Basic base64(usuario:password)
     "success": true,
     "message": "Producto sincronizado correctamente",
     "producto_id": 123,
-    "referencia": "REF-12345",
+    "referencia": "COD001",
     "operacion": "CREATE"
 }
 ```

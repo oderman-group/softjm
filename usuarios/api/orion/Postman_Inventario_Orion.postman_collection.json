@@ -63,14 +63,14 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"referencia\": \"COD001\",\n  \"bodega_id\": 1,\n  \"existencias\": 50\n}"
+					"raw": "{\n  \"referencia\": \"COD001\",\n  \"bodega_referencia\": \"BOGOTA\",\n  \"existencias\": 50\n}"
 				},
 				"url": {
 					"raw": "{{baseUrl}}/usuarios/api/orion/inventario-recibir.php",
 					"host": ["{{baseUrl}}"],
 					"path": ["usuarios", "api", "orion", "inventario-recibir.php"]
 				},
-				"description": "Actualiza existencias por referencia de producto y bodega. Cambia 'referencia' por un código que exista en productos.prod_referencia y bodega_id por una bodega válida (bod_id) de tu empresa."
+				"description": "Actualiza existencias por referencia de producto y bodega. Cambia 'referencia' por un código que exista en productos.prod_referencia y bodega_referencia por el código bod_referencia de la bodega."
 			}
 		},
 		{
@@ -89,14 +89,14 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"producto_id\": 1,\n  \"bodega_id\": 1,\n  \"existencias\": 25\n}"
+					"raw": "{\n  \"producto_id\": 1,\n  \"bodega_referencia\": \"BOGOTA\",\n  \"existencias\": 25\n}"
 				},
 				"url": {
 					"raw": "{{baseUrl}}/usuarios/api/orion/inventario-recibir.php",
 					"host": ["{{baseUrl}}"],
 					"path": ["usuarios", "api", "orion", "inventario-recibir.php"]
 				},
-				"description": "Igual pero identificando el producto por prod_id. Ajusta producto_id y bodega_id a IDs reales."
+				"description": "Igual pero identificando el producto por prod_id. Ajusta producto_id y bodega_referencia (bod_referencia) a valores reales."
 			}
 		},
 		{
@@ -115,7 +115,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"items\": [\n    { \"referencia\": \"COD001\", \"bodega_id\": 1, \"existencias\": 50 },\n    { \"producto_id\": 2, \"bodega_id\": 1, \"existencias\": 10 }\n  ]\n}"
+					"raw": "{\n  \"items\": [\n    { \"referencia\": \"COD001\", \"bodega_referencia\": \"BOGOTA\", \"existencias\": 50 },\n    { \"producto_id\": 2, \"bodega_referencia\": \"BOGOTA\", \"existencias\": 10 }\n  ]\n}"
 				},
 				"url": {
 					"raw": "{{baseUrl}}/usuarios/api/orion/inventario-recibir.php",
@@ -144,7 +144,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"referencia\": \"COD001\",\n  \"bodega_id\": 1,\n  \"existencias\": 100,\n  \"id_empresa\": 1\n}"
+					"raw": "{\n  \"referencia\": \"COD001\",\n  \"bodega_referencia\": \"BOGOTA\",\n  \"existencias\": 100,\n  \"id_empresa\": 1\n}"
 				},
 				"url": {
 					"raw": "{{baseUrl}}/usuarios/api/orion/inventario-recibir.php",

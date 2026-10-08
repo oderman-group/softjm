@@ -28,6 +28,7 @@ echo json_encode([
         'referencia' => (string) ($producto['prod_referencia'] ?? ''),
         'existencias' => (string) ($producto['prod_existencias'] ?? ''),
         'nombre' => (string) ($producto['prod_nombre'] ?? ''),
+        'foto' => basename((string) ($producto['prod_foto'] ?? '')),
         'descripcion' => (string) ($producto['prod_descripcion_corta'] ?? ''),
         'descripcion_larga' => (string) ($producto['prod_descripcion_larga'] ?? ''),
         'proveedor' => (int) ($producto['prod_proveedor'] ?? 0),
@@ -42,5 +43,6 @@ echo json_encode([
         'precio_usd' => number_format((float) productosPrecioListaUSD($utilidad, $producto['prod_costo_dolar']), 0, ',', '.'),
         'dcto1' => (string) ($producto['prod_descuento1'] ?? ''),
         'comision' => (string) ($producto['prod_comision'] ?? ''),
+        'integrado_ofima' => (int) ($producto['prod_integrado_ofima'] ?? 0) === 1 ? 1 : 0,
     ],
 ]);

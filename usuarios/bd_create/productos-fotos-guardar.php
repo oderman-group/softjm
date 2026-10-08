@@ -14,5 +14,11 @@
 
     include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
+	if (!empty($_POST['ajax'])) {
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(['success' => true]);
+		exit();
+	}
+
 	echo '<script type="text/javascript">window.location.href="../productos-galeria.php?id=' . $_POST["id"] . '";</script>';
 	exit();

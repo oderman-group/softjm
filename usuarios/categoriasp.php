@@ -95,6 +95,25 @@ include("includes/head.php");
 		transition: background .15s ease, color .15s ease, box-shadow .15s ease;
 	}
 	.categorias-filtro input { position: absolute; opacity: 0; pointer-events: none; }
+	@media (max-width: 768px) {
+		.categorias-tabs {
+			flex-wrap: nowrap;
+			justify-content: flex-start;
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+		.categorias-tabs-botones,
+		.categorias-filtro {
+			flex: 0 0 auto;
+			flex-wrap: nowrap;
+		}
+		.categorias-tab,
+		.categorias-filtro label { white-space: nowrap; }
+		.categorias-pane .widget-container {
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+	}
 	.categorias-filtro label:has(input:checked) {
 		background: #0f172a;
 		color: #fff;
@@ -164,6 +183,102 @@ include("includes/head.php");
 		margin: 1.5rem 0.5rem;
 		color: #64748b;
 		text-align: center;
+	}
+	.categorias-pane tr.cat-fuera-pagina { display: none !important; }
+	.categorias-pane .categorias-busqueda {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin: 0 0 0.45rem;
+		padding: 0.4rem 0.75rem;
+	}
+	.categorias-pane .categorias-busqueda .clientes-busqueda-label {
+		margin: 0;
+		line-height: 1;
+		white-space: nowrap;
+	}
+	.categorias-pane .categorias-busqueda .clientes-busqueda-input-wrap { flex: 1; margin: 0; }
+	.categorias-pane .categorias-busqueda .clientes-busqueda-icon {
+		top: 50%;
+		left: 0.7rem;
+		transform: translateY(-50%);
+		line-height: 1;
+	}
+	.categorias-pane .categorias-busqueda input[type="search"] {
+		height: 36px;
+		min-height: 36px;
+		margin: 0;
+		padding: 0 5.2rem 0 2.15rem;
+		line-height: 36px;
+		font-size: 0.875rem;
+	}
+	.categorias-pane .productos-paginacion {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem 1rem;
+		margin-top: 0.75rem;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.8125rem;
+		line-height: 1;
+		color: #475569;
+		background: #f8fafc;
+		border: 1px solid #e2e8f0;
+		border-radius: 10px;
+	}
+	.categorias-pane .productos-paginacion-grupo,
+	.categorias-pane .productos-paginacion form {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin: 0;
+	}
+	.categorias-pane .productos-paginacion label { margin: 0; line-height: 34px; }
+	.categorias-pane .productos-paginacion select,
+	.categorias-pane .productos-paginacion input[type="number"],
+	.categorias-pane .productos-paginacion button,
+	.categorias-pane .productos-paginacion a,
+	.categorias-pane .productos-paginacion .es-actual {
+		box-sizing: border-box;
+		height: 34px;
+		min-height: 34px;
+		margin: 0;
+		padding: 0 0.7rem;
+		border-radius: 8px;
+		font-size: 0.8125rem;
+		line-height: 32px;
+	}
+	.categorias-pane .productos-paginacion select,
+	.categorias-pane .productos-paginacion input[type="number"] {
+		border: 1px solid #cbd5e1;
+		background: #fff;
+		color: #0f172a;
+	}
+	.categorias-pane .productos-paginacion input[type="number"] { width: 4.2rem; text-align: center; }
+	.categorias-pane .productos-paginacion a,
+	.categorias-pane .productos-paginacion .es-actual,
+	.categorias-pane .productos-paginacion .es-puntos {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 34px;
+		border: 1px solid #cbd5e1;
+		background: #fff;
+		color: #334155;
+		text-decoration: none;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.categorias-pane .productos-paginacion a:hover { background: #e2e8f0; color: #0f172a; }
+	.categorias-pane .productos-paginacion .es-actual { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
+	.categorias-pane .productos-paginacion .es-puntos { border: 0; background: transparent; min-width: 1.2rem; height: auto; }
+	.categorias-pane .productos-paginacion button {
+		border: 0;
+		background: #1d4ed8;
+		color: #fff;
+		font-weight: 600;
+		cursor: pointer;
 	}
 </style>
 <!--============j avascript===========-->
@@ -481,12 +596,12 @@ include("includes/head.php");
 		<input type="hidden" name="id" id="drawerRegistroId" value="">
 		<p class="drawer-intro" id="drawerGrupoIntro">Completa los datos para agregarlo al listado.</p>
 		<div class="campo">
-			<label for="drawerNombre">Nombre <span class="req">*</span></label>
-			<input type="text" name="nombre" id="drawerNombre" required placeholder="Nombre">
+			<label for="drawerCodigo"><?= $ofimaActiva ? 'Código Ofima' : 'Código'; ?><?php if ($ofimaActiva) { ?> <span class="req">*</span><?php } ?></label>
+			<input type="text" name="cod_grupo" id="drawerCodigo" maxlength="20" placeholder="<?= $ofimaActiva ? 'Código Ofima' : 'Código'; ?>" <?php if ($ofimaActiva) { echo 'required'; } ?>>
 		</div>
 		<div class="campo">
-			<label for="drawerCodigo">Código<?php if ($ofimaActiva) { ?> <span class="req">*</span><?php } ?></label>
-			<input type="text" name="cod_grupo" id="drawerCodigo" maxlength="20" placeholder="Código" <?php if ($ofimaActiva) { echo 'required'; } ?>>
+			<label for="drawerNombre">Nombre <span class="req">*</span></label>
+			<input type="text" name="nombre" id="drawerNombre" required placeholder="Nombre">
 		</div>
 		<div id="drawerHabilitadoWrap">
 			<label class="campo-check"><input type="checkbox" name="habilitada" value="1" checked> Habilitado</label>
@@ -503,8 +618,115 @@ include("includes/head.php");
 		var modo = $('input[name="filtroHab"]:checked').val();
 		$('body').toggleClass('ver-habilitados', modo === 'habilitados' || modo === 'todos');
 		$('body').toggleClass('ver-no-habilitados', modo === 'deshabilitados' || modo === 'todos');
+		$('.categorias-pane table.clientes-table').each(function () {
+			if (this._catPagina) {
+				this._catPagina.pagina = 1;
+				pintarPaginaCategoria(this);
+			}
+		});
 	}
 	$('input[name="filtroHab"]').on('change', filtrarHabilitados);
+	function filaPasaFiltroCategoria(tr) {
+		var verH = document.body.classList.contains('ver-habilitados');
+		var verN = document.body.classList.contains('ver-no-habilitados');
+		if (tr.classList.contains('categoria-habilitada') && !verH) { return false; }
+		if (tr.classList.contains('categoria-deshabilitada') && !verN) { return false; }
+		return true;
+	}
+	function pintarPaginaCategoria(tabla) {
+		var estado = tabla._catPagina;
+		var texto = (estado.busqueda || '').toLowerCase();
+		var filas = Array.prototype.filter.call(tabla.tBodies[0].rows, function (tr) {
+			if (!filaPasaFiltroCategoria(tr)) { return false; }
+			if (!texto) { return true; }
+			var celdas = tr.cells;
+			var codigo = celdas[1] ? celdas[1].textContent : '';
+			var nombre = celdas[2] ? celdas[2].textContent : '';
+			return (codigo + ' ' + nombre).toLowerCase().indexOf(texto) !== -1;
+		});
+		var por = estado.por;
+		var paginas = Math.max(1, Math.ceil(filas.length / por));
+		if (estado.pagina > paginas) { estado.pagina = paginas; }
+		if (estado.pagina < 1) { estado.pagina = 1; }
+		var inicio = (estado.pagina - 1) * por;
+		var fin = inicio + por;
+		Array.prototype.forEach.call(tabla.tBodies[0].rows, function (tr) {
+			tr.classList.add('cat-fuera-pagina');
+		});
+		filas.forEach(function (tr, indice) {
+			if (indice >= inicio && indice < fin) {
+				tr.classList.remove('cat-fuera-pagina');
+			}
+		});
+		var desde = filas.length ? inicio + 1 : 0;
+		var hasta = Math.min(fin, filas.length);
+		estado.rango.textContent = desde + '–' + hasta + ' de ' + filas.length;
+		estado.ir.max = paginas;
+		estado.ir.value = estado.pagina;
+		var html = '';
+		if (estado.pagina > 1) { html += '<a data-pagina="' + (estado.pagina - 1) + '">Anterior</a>'; }
+		for (var i = 1; i <= paginas; i++) {
+			var mostrar = i === 1 || i === paginas || (i >= estado.pagina - 2 && i <= estado.pagina + 2);
+			var puntos = (i === 2 && estado.pagina > 4) || (i === paginas - 1 && estado.pagina < paginas - 3);
+			if (mostrar && i === estado.pagina) { html += '<span class="es-actual">' + i + '</span>'; }
+			else if (mostrar) { html += '<a data-pagina="' + i + '">' + i + '</a>'; }
+			else if (puntos) { html += '<span class="es-puntos">…</span>'; }
+		}
+		if (estado.pagina < paginas) { html += '<a data-pagina="' + (estado.pagina + 1) + '">Siguiente</a>'; }
+		estado.numeros.innerHTML = html;
+	}
+	function montarListadoCategoria(raiz) {
+		$(raiz).find('table.clientes-table').each(function () {
+			if (this._catPagina) { return; }
+			var tabla = this;
+			var busqueda = document.createElement('form');
+			busqueda.className = 'clientes-busqueda-principal categorias-busqueda';
+			busqueda.innerHTML = '<label class="clientes-busqueda-label">Buscar</label><div class="clientes-busqueda-input-wrap"><i class="icon-search clientes-busqueda-icon" aria-hidden="true"></i><input type="search" placeholder="Código o nombre" autocomplete="off"><button type="submit" class="clientes-busqueda-btn">Buscar</button></div>';
+			tabla.parentNode.insertBefore(busqueda, tabla);
+			var barra = document.createElement('div');
+			barra.className = 'productos-paginacion';
+			barra.innerHTML = '<div class="productos-paginacion-grupo"><span class="cat-rango"></span><label>Ver</label><select class="cat-por"><option>10</option><option>25</option><option>50</option><option>100</option><option>200</option></select></div><div class="productos-paginacion-grupo cat-numeros"></div><form class="productos-paginacion-grupo cat-ir"><label>Ir a</label><input type="number" min="1" value="1"><button type="submit">Ir</button></form>';
+			tabla.parentNode.insertBefore(barra, tabla.nextSibling);
+			tabla._catPagina = {
+				pagina: 1,
+				por: 10,
+				busqueda: '',
+				rango: barra.querySelector('.cat-rango'),
+				numeros: barra.querySelector('.cat-numeros'),
+				ir: barra.querySelector('.cat-ir input')
+			};
+			busqueda.addEventListener('submit', function (e) {
+				e.preventDefault();
+				tabla._catPagina.busqueda = busqueda.querySelector('input').value.trim();
+				tabla._catPagina.pagina = 1;
+				pintarPaginaCategoria(tabla);
+			});
+			busqueda.querySelector('input').addEventListener('input', function () {
+				tabla._catPagina.busqueda = this.value.trim();
+				tabla._catPagina.pagina = 1;
+				pintarPaginaCategoria(tabla);
+			});
+			barra.querySelector('.cat-por').addEventListener('change', function () {
+				tabla._catPagina.por = parseInt(this.value, 10) || 10;
+				tabla._catPagina.pagina = 1;
+				pintarPaginaCategoria(tabla);
+			});
+			barra.querySelector('.cat-numeros').addEventListener('click', function (e) {
+				var enlace = e.target.closest('a[data-pagina]');
+				if (!enlace) { return; }
+				e.preventDefault();
+				tabla._catPagina.pagina = parseInt(enlace.getAttribute('data-pagina'), 10);
+				pintarPaginaCategoria(tabla);
+			});
+			barra.querySelector('.cat-ir').addEventListener('submit', function (e) {
+				e.preventDefault();
+				tabla._catPagina.pagina = parseInt(tabla._catPagina.ir.value, 10) || 1;
+				pintarPaginaCategoria(tabla);
+			});
+			pintarPaginaCategoria(tabla);
+		});
+	}
+	montarListadoCategoria(document.getElementById('tab-g1'));
 	var tabsCargadas = { g1: true };
 	function mostrarTab(tab) {
 		$('.categorias-tab').removeClass('is-active');
@@ -519,6 +741,7 @@ include("includes/head.php");
 		$.get('ajax/ajax-categorias-tab.php', { tab: tab }, function (html) {
 			$pane.html(html);
 			tabsCargadas[tab] = true;
+			montarListadoCategoria($pane);
 		}).fail(function () {
 			$pane.html('<p class="categorias-vacio">No se pudo cargar este listado.</p>');
 		});
