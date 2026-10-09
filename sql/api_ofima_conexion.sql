@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS api_ofima_conexion (
     aoc_token TEXT NULL,
     aoc_token_expira DATETIME NULL,
     aoc_activo TINYINT(1) NOT NULL DEFAULT 1,
+    aoc_bloquear_pedidos TINYINT(1) NOT NULL DEFAULT 0,
     aoc_fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     aoc_fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (aoc_id),

@@ -6,6 +6,8 @@ include("includes/verificar-paginas.php");
 include("includes/head.php");
 
 require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
+require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
+$ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
 ?>
 <!-- styles -->
 
@@ -106,6 +108,12 @@ require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
 							}
 						?>
 						<div class="widget-container">
+							<?php if (!empty($ofimaPedidosBloqueados)) { ?>
+							<div class="alert alert-info" style="margin:10px;">
+								<?= htmlspecialchars(ofimaMensajePedidosBloqueados(), ENT_QUOTES, 'UTF-8'); ?>
+								Solo puede consultar y generar PDF.
+							</div>
+							<?php } ?>
                             <div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
                                 <h4 align="center">-Busqueda general y paginación-</h4>
                                 <p> 
@@ -212,7 +220,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
 											<li><a href="#pedidos-editar.php?id=<?=$res[0];?>#productos"> Editar</a></li>
 											
 											<li><a href="bd_delete/pedidos-anular.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea anular el registro?')){return false;}">Anular</a></li>-->
-											<?php if (Modulos::validarRol([372], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+											<?php if (empty($ofimaPedidosBloqueados) && Modulos::validarRol([372], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
 											<li><a href="bd_delete/pedidos-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
 											<?php } ?>
 											<?php }?>
@@ -221,7 +229,7 @@ require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
 											<li><a href="reportes/formato-pedido-1_pdf.php?id=<?=$res[0];?>" target="_blank">Generar PDF</a></li>
 											<?php } ?>
 
-											<?php if($generoRemision[0]=="" && Modulos::validarRol([374], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
+											<?php if(empty($ofimaPedidosBloqueados) && $generoRemision[0]=="" && Modulos::validarRol([374], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
 											
 												<li><a href="bd_create/pedidos-generar-remision-v2.php?id=<?=$res[0];?>" onClick="if(!confirm('Esta acción descontará existencias de los productos asociados. Desea generar remisión de este pedido?')){return false;}">Generar remisión</a></li>
 

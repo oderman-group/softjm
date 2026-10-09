@@ -3,6 +3,8 @@ require_once("../sesion.php");
 $idPagina = 374;
 
 require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
+require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
+ofimaAbortarSiPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
 
 $conexionBdPrincipal->begin_transaction();
 

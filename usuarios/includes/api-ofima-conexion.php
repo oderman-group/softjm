@@ -18,6 +18,7 @@ function asegurarTablaApiOfimaConexion(mysqli $conexion): void
         aoc_token TEXT NULL,
         aoc_token_expira DATETIME NULL,
         aoc_activo TINYINT(1) NOT NULL DEFAULT 1,
+        aoc_bloquear_pedidos TINYINT(1) NOT NULL DEFAULT 0,
         aoc_fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         aoc_fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (aoc_id),
@@ -25,6 +26,19 @@ function asegurarTablaApiOfimaConexion(mysqli $conexion): void
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
     $conexion->query($sql);
+    asegurarColumnaApiOfimaConexion($conexion, 'aoc_bloquear_pedidos', "TINYINT(1) NOT NULL DEFAULT 0 AFTER aoc_activo");
+}
+
+/**
+ * Añade una columna a api_ofima_conexion si aún no existe.
+ */
+function asegurarColumnaApiOfimaConexion(mysqli $conexion, string $columna, string $definicion): void
+{
+    $columnaEsc = $conexion->real_escape_string($columna);
+    $check = $conexion->query("SHOW COLUMNS FROM api_ofima_conexion LIKE '{$columnaEsc}'");
+    if ($check && $check->num_rows === 0) {
+        $conexion->query("ALTER TABLE api_ofima_conexion ADD COLUMN {$columnaEsc} {$definicion}");
+    }
 }
 
 /**
@@ -42,6 +56,43 @@ function ofimaIntegracionActiva(mysqli $conexion, int $idEmpresa): bool
     }
 
     return (int) ($config['aoc_activo'] ?? 0) === 1;
+}
+
+/**
+ * True si la integración Ofima está activa y además está marcado bloquear pedidos.
+ * En ese caso Orion no debe permitir generar/actualizar/anular/eliminar pedidos ni remisiones desde pedido.
+ */
+function ofimaPedidosBloqueados(mysqli $conexion, int $idEmpresa): bool
+{
+    if ($idEmpresa <= 0 || !ofimaIntegracionActiva($conexion, $idEmpresa)) {
+        return false;
+    }
+
+    $config = obtenerApiOfimaConexion($conexion, $idEmpresa);
+    return (int) ($config['aoc_bloquear_pedidos'] ?? 0) === 1;
+}
+
+/**
+ * Mensaje estándar cuando los movimientos de pedidos están bloqueados por Ofima.
+ */
+function ofimaMensajePedidosBloqueados(): string
+{
+    return 'Los movimientos de pedidos están bloqueados: la integración Ofima está activa y la opción "Bloquear pedidos en Orion" está habilitada.';
+}
+
+/**
+ * Detiene la ejecución con mensaje si los pedidos están bloqueados por Ofima.
+ */
+function ofimaAbortarSiPedidosBloqueados(mysqli $conexion, int $idEmpresa): void
+{
+    if (!ofimaPedidosBloqueados($conexion, $idEmpresa)) {
+        return;
+    }
+
+    echo "<span style='font-family:arial; text-align:center; color:red;'>"
+        . htmlspecialchars(ofimaMensajePedidosBloqueados(), ENT_QUOTES, 'UTF-8')
+        . "</span>";
+    exit();
 }
 
 /**

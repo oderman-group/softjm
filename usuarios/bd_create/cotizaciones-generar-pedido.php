@@ -5,7 +5,8 @@ $idPagina = 263;
 include(RUTA_PROYECTO."/usuarios/includes/verificar-paginas.php");
 
 require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
-
+require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
+ofimaAbortarSiPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
 
 $esPrecotizacion = Cotizacion::esPrecotizacion($_GET["id"], $idEmpresa);
 
