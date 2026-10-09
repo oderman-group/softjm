@@ -591,6 +591,7 @@ include("includes/js-formularios.php");
 																			<?php } ?>		
 																			<?php //el codigo 46 no se encontro en el archivo sql ?> 
 																			<?php if (
+																				empty($ofimaPedidosBloqueados) &&
 																				!$yaGeneroPedido &&
 																				Modulos::validarRol([381], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
 																				!empty($res['cotiz_ticket']) &&

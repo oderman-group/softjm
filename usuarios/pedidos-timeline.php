@@ -5,6 +5,8 @@ $idPagina = 237;
 
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
+$ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
 
 $consulta=mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos 
 WHERE pedid_id='".$_GET["id"]."'");
@@ -273,6 +275,12 @@ LinkedIn
 	<div class="main-wrapper">
 		<div class="container-fluid">
             <?php include("includes/notificaciones.php");?>
+			<?php if (!empty($ofimaPedidosBloqueados)) { ?>
+			<div class="alert alert-info">
+				<?= htmlspecialchars(ofimaMensajePedidosBloqueados(), ENT_QUOTES, 'UTF-8'); ?>
+				Solo consulta del timeline.
+			</div>
+			<?php } ?>
 			<div class="row-fluid">
 				<div class="span4">
 					
@@ -295,7 +303,7 @@ LinkedIn
 								<div class="control-group">
 									<label class="control-label">Fecha Documento</label>
 									<div class="controls">
-										<input type="date" class="span12" name="fecha" value="<?=$resultadoD['pedid_fecha_propuesta'];?>">
+										<input type="date" class="span12" name="fecha" value="<?=$resultadoD['pedid_fecha_propuesta'];?>" <?= !empty($ofimaPedidosBloqueados) ? 'disabled' : ''; ?>>
 									</div>
 								</div>
                                 
@@ -303,7 +311,7 @@ LinkedIn
                                 <div class="control-group">
 									<label class="control-label">Estado Actual</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span12" tabindex="2" name="estado">
+										<select data-placeholder="Escoja una opción..." class="chzn-select span12" tabindex="2" name="estado" <?= !empty($ofimaPedidosBloqueados) ? 'disabled' : ''; ?>>
 											<option value=""></option>
 											<option value="<?= PEDID_ESTADO_PREPARACION ?>" <?php if($resultadoD['pedid_estado']==PEDID_ESTADO_PREPARACION){echo "selected";}?>>En preparación</option>
 											<option value="<?= PEDID_ESTADO_CAMINO ?>" <?php if($resultadoD['pedid_estado']==PEDID_ESTADO_CAMINO){echo "selected";}?>>En camino</option>
@@ -315,25 +323,28 @@ LinkedIn
 								<div class="control-group">
 									<label class="control-label">Empresa de envío</label>
 									<div class="controls">
-										<input type="text" class="span12" name="empresaEnvio" value="<?=$resultadoD['pedid_empresa_envio'];?>">
+										<input type="text" class="span12" name="empresaEnvio" value="<?=$resultadoD['pedid_empresa_envio'];?>" <?= !empty($ofimaPedidosBloqueados) ? 'disabled' : ''; ?>>
 									</div>
 								</div>
 							
 								<div class="control-group">
 									<label class="control-label">Código de seguimiento</label>
 									<div class="controls">
-										<input type="text" class="span12" name="codigoSeguimiento" value="<?=$resultadoD['pedid_codigo_seguimiento'];?>">
+										<input type="text" class="span12" name="codigoSeguimiento" value="<?=$resultadoD['pedid_codigo_seguimiento'];?>" <?= !empty($ofimaPedidosBloqueados) ? 'disabled' : ''; ?>>
 									</div>
 								</div>
                                
+								<?php if (empty($ofimaPedidosBloqueados)) { ?>
 								<div class="form-actions">
 									<button type="submit" class="btn btn-info"><i class="icon-save"></i> Guardar cambios</button>
 								</div>
+								<?php } ?>
 							</form>	
 	
 						</div>
 					</div>
 					
+					<?php if (empty($ofimaPedidosBloqueados)) { ?>
 					<div class="content-widgets gray">
 						<div class="widget-head bondi-blue">
 							<h3> Añadir Novedades</h3>
@@ -385,6 +396,7 @@ LinkedIn
 	
 						</div>
 					</div>
+					<?php } ?>
 					
 					
 				</div>

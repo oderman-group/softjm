@@ -18,6 +18,7 @@ $ofimaUrlProduccion = $ofimaConexion['aoc_url_produccion'] ?? '';
 $ofimaUsuarioPruebas = $ofimaConexion['aoc_usuario_pruebas'] ?? '';
 $ofimaUsuarioProduccion = $ofimaConexion['aoc_usuario_produccion'] ?? '';
 $ofimaActivo = isset($ofimaConexion['aoc_activo']) ? (int) $ofimaConexion['aoc_activo'] : 1;
+$ofimaBloquearPedidos = isset($ofimaConexion['aoc_bloquear_pedidos']) ? (int) $ofimaConexion['aoc_bloquear_pedidos'] : 0;
 $ofimaTokenExpira = $ofimaConexion['aoc_token_expira'] ?? null;
 $ofimaTieneToken = !empty($ofimaConexion['aoc_token']);
 $ofimaUrlActiva = $ofimaAmbiente === 'produccion' ? $ofimaUrlProduccion : $ofimaUrlPruebas;
@@ -1248,6 +1249,21 @@ function renderTablaEndpointsApi(array $endpoints, string $tituloVacio, string $
                     </div>
 
                     <div class="form-group">
+                        <label for="ofima_bloquear_pedidos" style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
+                            <input type="checkbox" id="ofima_bloquear_pedidos" name="ofima_bloquear_pedidos" value="1" data-ofima="1"
+                                   <?= (int)$ofimaBloquearPedidos === 1 ? 'checked' : ''; ?>
+                                   style="margin-top:4px; width:auto;">
+                            <span>
+                                Bloquear pedidos en Orion
+                                <span class="help-text" style="display:block; margin-top:4px;">
+                                    Si la integración está activa y este check también, no se podrán generar, actualizar, anular ni eliminar pedidos,
+                                    ni generar remisiones desde un pedido. Solo consulta/visualización.
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
                         <label for="ofima_ambiente">Ambiente activo</label>
                         <select id="ofima_ambiente" name="ofima_ambiente" data-ofima="1" onchange="actualizarVistaAmbienteOfima()">
                             <option value="pruebas" <?= $ofimaAmbiente === 'pruebas' ? 'selected' : ''; ?>>Pruebas</option>
@@ -1492,8 +1508,10 @@ function renderTablaEndpointsApi(array $endpoints, string $tituloVacio, string $
         }
 
         const formData = new FormData();
+        const bloquearPedidos = document.getElementById('ofima_bloquear_pedidos');
         formData.append('ambiente', document.getElementById('ofima_ambiente').value);
         formData.append('activo', document.getElementById('ofima_activo').value);
+        formData.append('bloquear_pedidos', bloquearPedidos && bloquearPedidos.checked ? '1' : '0');
         formData.append('url_pruebas', document.getElementById('ofima_url_pruebas').value.trim());
         formData.append('url_produccion', document.getElementById('ofima_url_produccion').value.trim());
         formData.append('usuario_pruebas', document.getElementById('ofima_usuario_pruebas').value.trim());

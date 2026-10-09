@@ -94,7 +94,13 @@
                                 <li><a href="sql.php?get=46&id=<?=$res['cotiz_id'];?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
                                 <?php } ?>		
                                 <?php //el codigo 46 no se encontro en el archivo sql ?> 
-                                <?php if (
+                                <?php
+                                if (!isset($ofimaPedidosBloqueados)) {
+                                    require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
+                                    $ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
+                                }
+                                if (
+                                    empty($ofimaPedidosBloqueados) &&
                                     Modulos::validarRol([381], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
                                     !empty($res['cotiz_ticket']) &&
                                     $res['cotiz_es_precotizacion'] != 1

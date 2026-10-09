@@ -4,6 +4,8 @@ include("sesion.php");
 $idPagina = 77;
 include("includes/verificar-paginas.php");
 include("includes/head.php");
+require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
+$ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
 ?>
 <!-- styles -->
 <link href="css/tablecloth.css" rel="stylesheet">
@@ -337,6 +339,7 @@ include("includes/head.php");
 												<td><?=!empty($vendedor['usr_nombre']) ? strtoupper($vendedor['usr_nombre']) : ""; ?></td>
 												<td>
 													<?php if(
+														empty($ofimaPedidosBloqueados) &&
 														$IdGeneroPedido == '' &&
 														Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
 														!empty($res['cotiz_ticket']) &&
@@ -364,6 +367,7 @@ include("includes/head.php");
 																<?php } ?>
 
 																<?php if(
+																	empty($ofimaPedidosBloqueados) &&
 																	$IdGeneroPedido == '' &&
 																	Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
 																	!empty($res['cotiz_ticket']) &&

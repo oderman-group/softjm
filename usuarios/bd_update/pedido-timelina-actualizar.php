@@ -1,5 +1,7 @@
 <?php
 require_once("../sesion.php");
+require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
+ofimaAbortarSiPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
 
 $pedidId = isset($_POST["id"]) ? (int) $_POST["id"] : 0;
 mysqli_query($conexionBdPrincipal,"UPDATE pedidos SET pedid_fecha_propuesta='" . $_POST["fecha"] . "', pedid_estado='" . $_POST["estado"] . "', pedid_empresa_envio='" . $_POST["empresaEnvio"] . "', pedid_codigo_seguimiento='" . $_POST["codigoSeguimiento"] . "' WHERE pedid_id='" . $pedidId . "'");

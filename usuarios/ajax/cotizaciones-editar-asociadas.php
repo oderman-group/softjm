@@ -1,5 +1,7 @@
 <?php
 include("../sesion.php");
+require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
+$ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
 
 $idPagina = 79;
 
@@ -128,6 +130,7 @@ ob_start();
                                 <?php } ?>		
                                 <?php //el codigo 46 no se encontro en el archivo sql ?> 
                                 <?php if (
+                                    empty($ofimaPedidosBloqueados) &&
                                     Modulos::validarRol([381], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
                                     !empty($res['cotiz_ticket']) &&
                                     $res['cotiz_es_precotizacion'] != 1

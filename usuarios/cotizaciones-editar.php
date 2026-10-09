@@ -4,6 +4,8 @@ include("sesion.php");
 $idPagina = 79;
 
 include("includes/verificar-paginas.php");
+require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
+$ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
 
 // ========================================
 // CONSULTA PRINCIPAL OPTIMIZADA
@@ -615,7 +617,14 @@ include("includes/js-formularios.php");
 				<?php } ?>
 				
 				<?php
-				if(
+				if (!empty($ofimaPedidosBloqueados) && $resultadoD['cotiz_vendida'] != 1 && $resultadoD['cotiz_es_precotizacion'] != 1) {
+				?>
+					<div class="alert alert-info">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+						<?= htmlspecialchars(ofimaMensajePedidosBloqueados(), ENT_QUOTES, 'UTF-8'); ?>
+					</div>
+				<?php
+				} else if(
 					$resultadoD['cotiz_vendida'] != 1 && 
 					Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
 					!empty($ticketAsociado) && 
