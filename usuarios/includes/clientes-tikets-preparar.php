@@ -30,9 +30,19 @@ $ticketsPermisos = [
     'agregarTicket'     => Modulos::validarRol([89], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion),
 ];
 
+$usuarioIdTickets = intval($_SESSION['id']);
+$zonasUsuarioTickets = $ticketsPermisos['restringirZona']
+    ? Ticket::obtenerIdsZonasUsuario($conexionBdPrincipal, $usuarioIdTickets)
+    : null;
+
 $kpisTickets = Ticket::obtenerKpisComercialesResumen(
     $conexionBdPrincipal,
-    $clienteIdPagina > 0 ? $clienteIdPagina : null
+    $clienteIdPagina > 0 ? $clienteIdPagina : null,
+    $usuarioIdTickets,
+    $ticketsPermisos['verTodos'],
+    $ticketsPermisos['restringirZona'],
+    $zonasUsuarioTickets,
+    (int) $idEmpresa
 );
 $totalTicketsComerciales = $kpisTickets['total'];
 $ticketsComercialesEfectivos = $kpisTickets['efectivos'];
@@ -47,16 +57,16 @@ $porcentajeNoEfectivo = $totalTicketsComerciales > 0
 $ticketsWhere = Ticket::construirWhereListado(
     $_GET,
     $conexionBdPrincipal,
-    $ticketsPermisos['excluirCiudad1122']
+    $ticketsPermisos['excluirCiudad1122'],
+    (int) $idEmpresa
 );
-
-$usuarioIdTickets = intval($_SESSION['id']);
 
 $SQLCount = Ticket::sqlConteoListado(
     $ticketsWhere,
     $usuarioIdTickets,
     $ticketsPermisos['verTodos'],
-    $ticketsPermisos['restringirZona']
+    $ticketsPermisos['restringirZona'],
+    $zonasUsuarioTickets
 );
 
 $usuariosFiltroTickets = [];
@@ -72,7 +82,8 @@ while ($consultaUsuariosFiltro && ($usuarioFiltro = mysqli_fetch_array($consulta
 }
 
 $ticketsAnioActual = intval(date('Y'));
-$ticketsAnalytics = Ticket::obtenerEstadisticasAnuales(
+// Una sola consulta para el encabezado; los gráficos se cargan por AJAX al expandir.
+$ticketsResumenAnual = Ticket::obtenerResumenAnualRapido(
     $conexionBdPrincipal,
     $ticketsAnioActual,
     $usuarioIdTickets,
@@ -80,7 +91,20 @@ $ticketsAnalytics = Ticket::obtenerEstadisticasAnuales(
     $ticketsPermisos['restringirZona'],
     $clienteIdPagina > 0 ? $clienteIdPagina : null,
     $ticketsPermisos['excluirCiudad1122'],
-    $opcionesEtapa
+    (int) $idEmpresa,
+    $zonasUsuarioTickets
 );
 
-$ticketsResumenAnual = $ticketsAnalytics['resumen'] ?? [];
+$ticketsAnalytics = [
+    'anio'             => $ticketsAnioActual,
+    'es_vista_cliente' => $clienteIdPagina > 0,
+    'resumen'          => $ticketsResumenAnual,
+    'lazy'             => true,
+    'por_mes'          => array_fill(0, 12, 0),
+    'por_etapa'        => [],
+    'por_estado'       => [],
+    'por_tipo'         => [],
+    'por_prioridad'    => [],
+    'por_responsable'  => [],
+    'top_clientes'     => [],
+];

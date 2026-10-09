@@ -10,6 +10,7 @@
   }
 
   var chartsReady = false;
+  var loadingAnalytics = false;
   var meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
   var palette = ['#2563eb', '#059669', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#db2777', '#65a30d'];
   var chartDefaults = {
@@ -96,7 +97,7 @@
     });
   }
 
-  function initTicketsAnalyticsCharts() {
+  function renderChartsFromData() {
     if (chartsReady) {
       resizeAnalyticsCharts();
       return;
@@ -119,6 +120,79 @@
       var clientes = mapChartData(data.top_clientes);
       createBarChart('chartTicketsClientes', clientes.labels, clientes.values, true);
     }
+  }
+
+  function buildAnalyticsUrl() {
+    var params = new URLSearchParams();
+    params.set('anio', String(data.anio || new Date().getFullYear()));
+    var cteMatch = window.location.search.match(/[?&]cte=(\d+)/);
+    if (cteMatch) {
+      params.set('cte', cteMatch[1]);
+    }
+    return 'ajax/ajax-clientes-tikets-analytics.php?' + params.toString();
+  }
+
+  function setAnalyticsLoading(isLoading) {
+    var section = document.getElementById('ticketsAnalytics');
+    if (!section) return;
+    var body = section.querySelector('.tickets-collapsible-body');
+    if (!body) return;
+    var existing = body.querySelector('.tickets-analytics-loading');
+    if (isLoading && !existing) {
+      var tip = document.createElement('p');
+      tip.className = 'tickets-analytics-loading';
+      tip.style.cssText = 'margin:0 0 12px;color:#64748b;font-size:13px;';
+      tip.textContent = 'Cargando indicadores…';
+      body.insertBefore(tip, body.firstChild);
+    } else if (!isLoading && existing) {
+      existing.remove();
+    }
+  }
+
+  function initTicketsAnalyticsCharts() {
+    if (chartsReady) {
+      resizeAnalyticsCharts();
+      return;
+    }
+
+    if (!data.lazy) {
+      renderChartsFromData();
+      return;
+    }
+
+    if (loadingAnalytics) {
+      return;
+    }
+
+    loadingAnalytics = true;
+    setAnalyticsLoading(true);
+
+    fetch(buildAnalyticsUrl(), { credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (payload) {
+        if (!payload || !payload.success || !payload.analytics) {
+          throw new Error((payload && payload.message) || 'No se pudieron cargar los indicadores');
+        }
+        data = payload.analytics;
+        dataEl.textContent = JSON.stringify(data);
+        renderChartsFromData();
+      })
+      .catch(function () {
+        setAnalyticsLoading(false);
+        var section = document.getElementById('ticketsAnalytics');
+        var body = section ? section.querySelector('.tickets-collapsible-body') : null;
+        if (body && !body.querySelector('.tickets-analytics-error')) {
+          var err = document.createElement('p');
+          err.className = 'tickets-analytics-error';
+          err.style.cssText = 'margin:0 0 12px;color:#b91c1c;font-size:13px;';
+          err.textContent = 'No se pudieron cargar los gráficos. Intenta de nuevo.';
+          body.insertBefore(err, body.firstChild);
+        }
+      })
+      .finally(function () {
+        loadingAnalytics = false;
+        setAnalyticsLoading(false);
+      });
   }
 
   window.initTicketsAnalyticsCharts = initTicketsAnalyticsCharts;

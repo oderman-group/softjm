@@ -164,11 +164,56 @@ class Ticket extends BaseDatos {
     /**
      * KPIs comerciales en una sola consulta (opcionalmente filtrados por cliente).
      */
-    public static function obtenerKpisComercialesResumen($conexionBdPrincipal, ?int $clienteId = null): array {
-        $filtroCliente = '';
-        if ($clienteId !== null && $clienteId > 0) {
-            $filtroCliente = " AND ct.tik_cliente = '" . intval($clienteId) . "'";
+    /**
+     * Zonas asignadas al usuario (para filtrar sin subconsulta correlacionada).
+     *
+     * @return int[]
+     */
+    public static function obtenerIdsZonasUsuario($conexionBdPrincipal, int $usuarioId): array
+    {
+        $zonas = [];
+        $usuarioId = intval($usuarioId);
+        if ($usuarioId <= 0) {
+            return $zonas;
         }
+
+        $consulta = mysqli_query(
+            $conexionBdPrincipal,
+            "SELECT zpu_zona FROM " . MAINBD . ".zonas_usuarios WHERE zpu_usuario='" . $usuarioId . "'"
+        );
+        while ($consulta && ($fila = mysqli_fetch_assoc($consulta))) {
+            $zonaId = intval($fila['zpu_zona'] ?? 0);
+            if ($zonaId > 0) {
+                $zonas[] = $zonaId;
+            }
+        }
+
+        return array_values(array_unique($zonas));
+    }
+
+    public static function obtenerKpisComercialesResumen(
+        $conexionBdPrincipal,
+        ?int $clienteId = null,
+        int $usuarioId = 0,
+        bool $verTodosLosTickets = true,
+        bool $restringirPorZona = false,
+        ?array $zonasUsuario = null,
+        int $idEmpresa = 0
+    ): array {
+        $where = '';
+        if ($clienteId !== null && $clienteId > 0) {
+            $where .= " AND ct.tik_cliente = '" . intval($clienteId) . "'";
+        }
+        if ($idEmpresa > 0) {
+            $where .= " AND cli.cli_id_empresa = '" . intval($idEmpresa) . "'";
+        }
+        $where = self::appendFiltrosPermisosWhere(
+            $where,
+            $usuarioId,
+            $verTodosLosTickets,
+            $restringirPorZona,
+            $zonasUsuario
+        );
 
         $sql = "SELECT
             SUM(CASE
@@ -195,9 +240,10 @@ class Ticket extends BaseDatos {
                  AND ct.tik_tipo_negocio = 1
                 THEN 1 ELSE 0 END) AS no_efectivos
             FROM " . self::$schema . "." . self::$tableName . " ct
+            INNER JOIN " . MAINBD . ".clientes cli ON cli.cli_id = ct.tik_cliente
             LEFT JOIN " . MAINBD . ".cotizacion c
                 ON c.cotiz_id = ct.tik_id_cotizacion
-            WHERE 1=1" . $filtroCliente;
+            WHERE 1=1" . $where;
 
         $datos = mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, $sql)) ?: [];
 
@@ -211,7 +257,12 @@ class Ticket extends BaseDatos {
     /**
      * Construye condiciones WHERE para el listado de tickets.
      */
-    public static function construirWhereListado(array $get, $conexionBdPrincipal, bool $excluirCiudad1122): string {
+    public static function construirWhereListado(
+        array $get,
+        $conexionBdPrincipal,
+        bool $excluirCiudad1122,
+        int $idEmpresa = 0
+    ): string {
         $where = '';
 
         if (!empty($get['busqueda'])) {
@@ -247,6 +298,9 @@ class Ticket extends BaseDatos {
         if ($excluirCiudad1122) {
             $where .= " AND cli.cli_ciudad != '1122'";
         }
+        if ($idEmpresa > 0) {
+            $where .= " AND cli.cli_id_empresa='" . intval($idEmpresa) . "'";
+        }
 
         return $where;
     }
@@ -263,17 +317,23 @@ class Ticket extends BaseDatos {
         string $where,
         int $usuarioId,
         bool $verTodosLosTickets,
-        bool $restringirPorZona
+        bool $restringirPorZona,
+        ?array $zonasUsuario = null
     ): string {
         if (!$verTodosLosTickets) {
             $where .= " AND ct.tik_usuario_responsable='" . intval($usuarioId) . "'";
         }
         if ($restringirPorZona) {
-            $where .= " AND cli.cli_zona IN (
-                SELECT zpu_zona
-                FROM " . MAINBD . ".zonas_usuarios
-                WHERE zpu_usuario='" . intval($usuarioId) . "'
-            )";
+            $zonas = $zonasUsuario;
+            if ($zonas === null) {
+                $zonas = [];
+            }
+            $zonas = array_values(array_filter(array_map('intval', $zonas)));
+            if (empty($zonas)) {
+                $where .= " AND 1=0";
+            } else {
+                $where .= " AND cli.cli_zona IN (" . implode(',', $zonas) . ")";
+            }
         }
 
         return $where;
@@ -282,7 +342,8 @@ class Ticket extends BaseDatos {
     private static function construirWhereAnual(
         int $anio,
         ?int $clienteId,
-        bool $excluirCiudad1122
+        bool $excluirCiudad1122,
+        int $idEmpresa = 0
     ): string {
         $anio = intval($anio);
         $where = " AND ct.tik_fecha_creacion >= '" . $anio . "-01-01 00:00:00'";
@@ -294,8 +355,60 @@ class Ticket extends BaseDatos {
         if ($excluirCiudad1122) {
             $where .= " AND cli.cli_ciudad != '1122'";
         }
+        if ($idEmpresa > 0) {
+            $where .= " AND cli.cli_id_empresa='" . intval($idEmpresa) . "'";
+        }
 
         return $where;
+    }
+
+    /**
+     * Resumen rápido del año (una sola consulta) para el encabezado de KPIs.
+     */
+    public static function obtenerResumenAnualRapido(
+        $conexionBdPrincipal,
+        int $anio,
+        int $usuarioId,
+        bool $verTodosLosTickets,
+        bool $restringirPorZona,
+        ?int $clienteId,
+        bool $excluirCiudad1122,
+        int $idEmpresa = 0,
+        ?array $zonasUsuario = null
+    ): array {
+        $where = self::construirWhereAnual($anio, $clienteId, $excluirCiudad1122, $idEmpresa);
+        $where = self::appendFiltrosPermisosWhere(
+            $where,
+            $usuarioId,
+            $verTodosLosTickets,
+            $restringirPorZona,
+            $zonasUsuario
+        );
+
+        $resumen = mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, "
+            SELECT
+                COUNT(*) AS total,
+                SUM(CASE WHEN ct.tik_estado = 1 THEN 1 ELSE 0 END) AS abiertos,
+                SUM(CASE WHEN ct.tik_estado = 2 THEN 1 ELSE 0 END) AS cerrados,
+                SUM(CASE WHEN ct.tik_id_cotizacion IS NOT NULL AND ct.tik_id_cotizacion != '' AND ct.tik_id_cotizacion != '0' THEN 1 ELSE 0 END) AS con_cotizacion,
+                SUM(CASE WHEN ct.tik_etapa = 5 THEN 1 ELSE 0 END) AS ganados,
+                SUM(CASE WHEN ct.tik_etapa = 6 THEN 1 ELSE 0 END) AS perdidos
+            FROM " . self::$schema . "." . self::$tableName . " ct
+            " . self::sqlJoinsListado() . "
+            WHERE 1=1 " . $where)) ?: [];
+
+        $cerrados = intval($resumen['cerrados'] ?? 0);
+        $ganados = intval($resumen['ganados'] ?? 0);
+
+        return [
+            'total'          => intval($resumen['total'] ?? 0),
+            'abiertos'       => intval($resumen['abiertos'] ?? 0),
+            'cerrados'       => $cerrados,
+            'con_cotizacion' => intval($resumen['con_cotizacion'] ?? 0),
+            'ganados'        => $ganados,
+            'perdidos'       => intval($resumen['perdidos'] ?? 0),
+            'tasa_ganados'   => $cerrados > 0 ? round(($ganados / $cerrados) * 100, 1) : 0,
+        ];
     }
 
     /**
@@ -309,10 +422,18 @@ class Ticket extends BaseDatos {
         bool $restringirPorZona,
         ?int $clienteId,
         bool $excluirCiudad1122,
-        array $opcionesEtapa
+        array $opcionesEtapa,
+        int $idEmpresa = 0,
+        ?array $zonasUsuario = null
     ): array {
-        $where = self::construirWhereAnual($anio, $clienteId, $excluirCiudad1122);
-        $where = self::appendFiltrosPermisosWhere($where, $usuarioId, $verTodosLosTickets, $restringirPorZona);
+        $where = self::construirWhereAnual($anio, $clienteId, $excluirCiudad1122, $idEmpresa);
+        $where = self::appendFiltrosPermisosWhere(
+            $where,
+            $usuarioId,
+            $verTodosLosTickets,
+            $restringirPorZona,
+            $zonasUsuario
+        );
         $from = " FROM " . self::$schema . "." . self::$tableName . " ct " . self::sqlJoinsListado() . " WHERE 1=1 " . $where;
 
         $resumen = mysqli_fetch_assoc(mysqli_query($conexionBdPrincipal, "
@@ -444,13 +565,15 @@ class Ticket extends BaseDatos {
         string $whereExtra,
         int $usuarioId,
         bool $verTodosLosTickets,
-        bool $restringirPorZona
+        bool $restringirPorZona,
+        ?array $zonasUsuario = null
     ): string {
         $where = self::appendFiltrosPermisosWhere(
             $whereExtra,
             $usuarioId,
             $verTodosLosTickets,
-            $restringirPorZona
+            $restringirPorZona,
+            $zonasUsuario
         );
 
         return "SELECT COUNT(*)
@@ -465,13 +588,15 @@ class Ticket extends BaseDatos {
         bool $verTodosLosTickets,
         bool $restringirPorZona,
         int $inicio,
-        int $limite
+        int $limite,
+        ?array $zonasUsuario = null
     ): string {
         $where = self::appendFiltrosPermisosWhere(
             $whereExtra,
             $usuarioId,
             $verTodosLosTickets,
-            $restringirPorZona
+            $restringirPorZona,
+            $zonasUsuario
         );
 
         $inicio = max(0, intval($inicio));

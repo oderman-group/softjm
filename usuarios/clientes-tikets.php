@@ -244,7 +244,8 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-tikets-preparar.php';
                                             $ticketsPermisos['verTodos'],
                                             $ticketsPermisos['restringirZona'],
                                             intval($inicio),
-                                            intval($limite)
+                                            intval($limite),
+                                            $zonasUsuarioTickets
                                         )
                                     );
                                     $filasTickets = [];
