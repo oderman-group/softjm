@@ -97,7 +97,53 @@
     });
   }
 
+  function applyKpiCards() {
+    var resumen = data.resumen || {};
+    var kpis = data.kpis_comerciales || {};
+    var totalComercial = Number(kpis.total || 0);
+    var efectivos = Number(kpis.efectivos || 0);
+    var noEfectivos = Number(kpis.no_efectivos || 0);
+    var pctEfectivo = totalComercial > 0 ? Math.round((efectivos / totalComercial) * 1000) / 10 : 0;
+    var pctNoEfectivo = totalComercial > 0 ? Math.round((noEfectivos / totalComercial) * 1000) / 10 : 0;
+
+    var summary = document.getElementById('ticketsKpiSummary');
+    if (summary) {
+      summary.textContent = Number(resumen.total || 0) + ' tickets · '
+        + Number(resumen.abiertos || 0) + ' abiertos · '
+        + pctEfectivo + '% efectividad';
+    }
+
+    var map = {
+      total: Number(resumen.total || 0),
+      abiertos: Number(resumen.abiertos || 0),
+      cotizacion: Number(resumen.con_cotizacion || 0),
+      efectividad: pctEfectivo + '%',
+      no_efectivos_pct: pctNoEfectivo + '%'
+    };
+    Object.keys(map).forEach(function (key) {
+      var el = document.querySelector('[data-kpi="' + key + '"]');
+      if (el) el.textContent = String(map[key]);
+    });
+
+    var hintEfect = document.querySelector('[data-kpi-hint="efectividad"]');
+    if (hintEfect) {
+      hintEfect.textContent = efectivos + ' ganados de ' + totalComercial + ' cerrados';
+    }
+    var hintNo = document.querySelector('[data-kpi-hint="no_efectivos"]');
+    if (hintNo) {
+      hintNo.textContent = noEfectivos + ' tickets perdidos';
+    }
+
+    var analyticsSummary = document.querySelector('#ticketsAnalytics .tickets-collapsible-summary');
+    if (analyticsSummary) {
+      analyticsSummary.textContent = Number(resumen.total || 0) + ' tickets · '
+        + Number(resumen.abiertos || 0) + ' abiertos · '
+        + Number(resumen.tasa_ganados || 0) + '% tasa ganados';
+    }
+  }
+
   function renderChartsFromData() {
+    applyKpiCards();
     if (chartsReady) {
       resizeAnalyticsCharts();
       return;
@@ -151,6 +197,7 @@
 
   function initTicketsAnalyticsCharts() {
     if (chartsReady) {
+      applyKpiCards();
       resizeAnalyticsCharts();
       return;
     }

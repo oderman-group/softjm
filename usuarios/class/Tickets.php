@@ -619,17 +619,43 @@ class Ticket extends BaseDatos {
                 cli.cli_email,
                 cli.cli_zona,
                 usr.usr_nombre,
-                suc.sucu_nombre,
-                (
-                    SELECT COUNT(cs.cseg_id)
-                    FROM " . MAINBD . ".cliente_seguimiento cs
-                    WHERE cs.cseg_tiket = ct.tik_id
-                ) AS num_seguimientos
+                suc.sucu_nombre
             FROM " . self::$schema . "." . self::$tableName . " ct
             " . self::sqlJoinsListado() . "
             WHERE 1=1 " . $where . "
             ORDER BY ct.tik_id DESC
             LIMIT " . $inicio . ", " . $limite;
+    }
+
+    /**
+     * Conteos de seguimientos para un lote de tickets (una consulta).
+     *
+     * @param int[] $ticketIds
+     * @return array<int,int>
+     */
+    public static function contarSeguimientosBatch($conexionBdPrincipal, array $ticketIds): array
+    {
+        $ticketIds = array_values(array_filter(array_map('intval', $ticketIds)));
+        $mapa = [];
+        foreach ($ticketIds as $idTicket) {
+            $mapa[$idTicket] = 0;
+        }
+        if (empty($ticketIds)) {
+            return $mapa;
+        }
+
+        $consulta = mysqli_query(
+            $conexionBdPrincipal,
+            "SELECT cseg_tiket, COUNT(*) AS total
+             FROM " . MAINBD . ".cliente_seguimiento
+             WHERE cseg_tiket IN (" . implode(',', $ticketIds) . ")
+             GROUP BY cseg_tiket"
+        );
+        while ($consulta && ($fila = mysqli_fetch_assoc($consulta))) {
+            $mapa[intval($fila['cseg_tiket'])] = intval($fila['total']);
+        }
+
+        return $mapa;
     }
 
 }

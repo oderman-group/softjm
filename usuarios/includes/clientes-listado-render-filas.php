@@ -105,25 +105,25 @@ foreach ($filasClientes as $res) {
             }
             ?>
             <div class="clientes-actions-cell" style="margin-top:0.5rem;">
-                <?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+                <?php if (!empty($listadoAccionesPermisos['editar'])) { ?>
                     <a href="clientes-editar.php?id=<?= $clienteId ?>" data-toggle="tooltip" title="Editar" target="_blank"><i class="icon-edit"></i></a>
                 <?php } ?>
-                <?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+                <?php if (!empty($listadoAccionesPermisos['sucursales'])) { ?>
                     <a href="clientes-sucursales.php?cte=<?= $clienteId ?>&emg=1" data-toggle="tooltip" title="Sucursales" target="new"><i class="icon-home"></i></a>
                 <?php } ?>
-                <?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+                <?php if (!empty($listadoAccionesPermisos['contactos'])) { ?>
                     <a href="clientes-contactos.php?cte=<?= $clienteId ?>&emg=1" data-toggle="tooltip" title="Contactos" target="new"><i class="icon-group"></i></a>
                 <?php } ?>
-                <?php if (Modulos::validarRol([88], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+                <?php if (!empty($listadoAccionesPermisos['tickets'])) { ?>
                     <a href="clientes-tikets.php?cte=<?= $clienteId ?>&emg=1" data-toggle="tooltip" title="Tickets de seguimiento" target="new"><i class="icon-list-ol"></i></a>
                 <?php } ?>
-                <?php if (Modulos::validarRol([12], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+                <?php if (!empty($listadoAccionesPermisos['seguimiento'])) { ?>
                     <a href="clientes-seguimiento.php?cte=<?= $clienteId ?>&emg=1" data-toggle="tooltip" title="Seguimiento de clientes" target="new"><i class="icon-list-alt"></i></a>
                 <?php } ?>
-                <?php if (Modulos::validarRol([259], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+                <?php if (!empty($listadoAccionesPermisos['facturas'])) { ?>
                     <a href="facturas.php?cte=<?= $clienteId ?>&emg=1" data-toggle="tooltip" title="Facturación" target="new"><i class="icon-money"></i></a>
                 <?php } ?>
-                <?php if (Modulos::validarRol([110], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+                <?php if (!empty($listadoAccionesPermisos['portafolios'])) { ?>
                     <a href="enviar-portafolios.php?cte=<?= $clienteId ?>" data-toggle="tooltip" title="Enviar portafolios" target="_blank"><i class="icon-list-ul"></i></a>
                 <?php } ?>
                 <a href="#"
@@ -135,16 +135,16 @@ foreach ($filasClientes as $res) {
             </div>
         </td>
         <?php
-        $valoresClientes = [
-            ['url' => 'clientes-tikets.php?cte=' . $clienteId, 'id' => 88, 'numero' => $numeros[0]],
-            ['url' => 'clientes-seguimiento.php?cte=' . $clienteId, 'id' => 88, 'numero' => $numeros[1]],
-            ['url' => 'clientes-sucursales.php?cte=' . $clienteId, 'id' => 88, 'numero' => $numeros[2]],
-            ['url' => 'clientes-contactos.php?cte=' . $clienteId, 'id' => 88, 'numero' => $numeros[3]],
-            ['url' => 'facturacion.php?cte=' . $clienteId, 'id' => 88, 'numero' => $numeros[4]],
-            ['url' => '../v2.0/usuarios/empresa/lab-remisiones.php?cte=' . $clienteId, 'id' => 88, 'numero' => $numeros[5]],
-        ];
-        foreach ($valoresClientes as $pagina) {
-            if (Modulos::validarRol([$pagina['id']], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+        if (!empty($listadoAccionesPermisos['columnaContadores'])) {
+            $valoresClientes = [
+                ['url' => 'clientes-tikets.php?cte=' . $clienteId, 'numero' => $numeros[0]],
+                ['url' => 'clientes-seguimiento.php?cte=' . $clienteId, 'numero' => $numeros[1]],
+                ['url' => 'clientes-sucursales.php?cte=' . $clienteId, 'numero' => $numeros[2]],
+                ['url' => 'clientes-contactos.php?cte=' . $clienteId, 'numero' => $numeros[3]],
+                ['url' => 'facturacion.php?cte=' . $clienteId, 'numero' => $numeros[4]],
+                ['url' => '../v2.0/usuarios/empresa/lab-remisiones.php?cte=' . $clienteId, 'numero' => $numeros[5]],
+            ];
+            foreach ($valoresClientes as $pagina) {
                 $countClass = $pagina['numero'] == 0 ? ' is-empty' : '';
                 ?>
                 <td class="col-count<?= $countClass ?>">

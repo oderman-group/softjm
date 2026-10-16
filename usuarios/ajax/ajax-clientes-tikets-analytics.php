@@ -46,7 +46,19 @@ $analytics = Ticket::obtenerEstadisticasAnuales(
     (int) $idEmpresa,
     $zonasUsuario
 );
+
+$kpisComerciales = Ticket::obtenerKpisComercialesResumen(
+    $conexionBdPrincipal,
+    $clienteId > 0 ? $clienteId : null,
+    $usuarioId,
+    $verTodos,
+    $restringirZona,
+    $zonasUsuario,
+    (int) $idEmpresa
+);
+
 $analytics['lazy'] = false;
+$analytics['kpis_comerciales'] = $kpisComerciales;
 
 echo json_encode([
     'success' => true,

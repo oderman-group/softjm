@@ -176,19 +176,28 @@ $ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $id
 									$filtro .= " AND cotiz_fecha_propuesta <= '" . $_GET["fecha_fin"] . " 23:59:59'";
 								}
 
+								$usuarioIdCotiz = intval($_SESSION["id"] ?? 0);
+								if ($datosUsuarioActual['usr_tipo'] != ADMIN) {
+									$filtro .= " AND cli_zona IN (
+										SELECT zpu_zona FROM zonas_usuarios WHERE zpu_usuario='" . $usuarioIdCotiz . "'
+									)";
+								}
+								if (!Modulos::validarRol([395], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+									$filtro .= " AND (cotiz_creador='" . $usuarioIdCotiz . "' OR cotiz_vendedor='" . $usuarioIdCotiz . "')";
+								}
+
+								$filtroEmpresa = " AND cotiz_id_empresa='" . intval($idEmpresa) . "'";
+
 								//Consulta de contar registros Solo para paginación
 								if (isset($_GET["cte"]) and $_GET["cte"] != "") {
-									$SQL = "SELECT cotiz_id FROM cotizacion
-								INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='" . $_GET["cte"] . "'
-								ORDER BY cotiz_id DESC
-								";
+									$SQLCount = "SELECT COUNT(*) FROM cotizacion
+								INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='" . intval($_GET["cte"]) . "'
+								WHERE 1=1" . $filtroEmpresa . $filtro;
 								} else {
-									$SQL = "SELECT cotiz_id FROM cotizacion
+									$SQLCount = "SELECT COUNT(*) FROM cotizacion
 								INNER JOIN clientes ON cli_id=cotiz_cliente
 								INNER JOIN usuarios ON usr_id=cotiz_creador
-								WHERE cotiz_id=cotiz_id $filtro
-								ORDER BY cotiz_id DESC
-								";
+								WHERE 1=1" . $filtroEmpresa . $filtro;
 								}
 								?>
 
@@ -229,8 +238,8 @@ $ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $id
 										if (isset($_GET["cte"]) and $_GET["cte"] != "") {
 											$consulta = $conexionBdPrincipal->query("SELECT cotiz_id, cotiz_fecha_propuesta, cotiz_creador, cotiz_vendedor, cotiz_vendida, cotiz_ticket, cli_id, cli_nombre, cli_zona, cotiz_es_precotizacion
 												FROM cotizacion
-								INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='" . $_GET["cte"] . "'
-								WHERE cotiz_id_empresa='".$idEmpresa."'
+								INNER JOIN clientes ON cli_id=cotiz_cliente AND cli_id='" . intval($_GET["cte"]) . "'
+								WHERE 1=1" . $filtroEmpresa . $filtro . "
 								ORDER BY cotiz_id DESC
 								LIMIT $inicio, $limite
 								");
@@ -241,24 +250,13 @@ $ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $id
 												FROM cotizacion
 								INNER JOIN clientes ON cli_id=cotiz_cliente
 								INNER JOIN usuarios ON usr_id=cotiz_creador
-								WHERE cotiz_id=cotiz_id AND cotiz_id_empresa='".$idEmpresa."' $filtro
+								WHERE 1=1" . $filtroEmpresa . $filtro . "
 								ORDER BY cotiz_id DESC
 								LIMIT $inicio, $limite
 								");
 										}
 										$no = 1;
 										while ($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)) {
-
-											if ($datosUsuarioActual['usr_tipo'] != ADMIN) {
-												$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
-												WHERE zpu_usuario='" . $_SESSION["id"] . "' AND zpu_zona='" . $res['cli_zona'] . "'");
-												$numZ = $consultaNumZ->num_rows;
-												if ($numZ == 0) continue;
-											}
-
-											if (!Modulos::validarRol([395], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) and $res['cotiz_creador'] != $_SESSION["id"] and $res['cotiz_vendedor'] != $_SESSION["id"]) {
-												continue;
-											}
 
 											$consultaVendedor=$conexionBdPrincipal->query("SELECT usr_id, usr_nombre FROM usuarios 
 											WHERE usr_id='" . $res['cotiz_vendedor'] . "' AND usr_id_empresa='".$idEmpresa."'");

@@ -801,7 +801,11 @@ class Cliente extends BaseDatos {
         return $where;
     }
 
-    private static function appendFiltrosVisibilidadAnalyticsWhere(
+    /**
+     * Limita el listado a la zona del usuario o a los clientes que tiene asignados.
+     * Aplica cuando el rol no incluye la página 383 (ver todos los clientes).
+     */
+    public static function appendFiltrosVisibilidadAnalyticsWhere(
         string $where,
         int $usuarioId,
         bool $restringirPorZona

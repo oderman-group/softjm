@@ -3,6 +3,8 @@
 /**
  * Prepara datos del listado de tickets (filtros, paginación, filas).
  * Requiere: $conexionBdPrincipal, $datosUsuarioActual, $configuracion, $idEmpresa
+ *
+ * KPIs/analytics se cargan bajo demanda (AJAX) para evitar timeout en roles comerciales.
  */
 
 $clienteIdPagina = !empty($_GET['cte']) && is_numeric($_GET['cte']) ? intval($_GET['cte']) : 0;
@@ -35,24 +37,12 @@ $zonasUsuarioTickets = $ticketsPermisos['restringirZona']
     ? Ticket::obtenerIdsZonasUsuario($conexionBdPrincipal, $usuarioIdTickets)
     : null;
 
-$kpisTickets = Ticket::obtenerKpisComercialesResumen(
-    $conexionBdPrincipal,
-    $clienteIdPagina > 0 ? $clienteIdPagina : null,
-    $usuarioIdTickets,
-    $ticketsPermisos['verTodos'],
-    $ticketsPermisos['restringirZona'],
-    $zonasUsuarioTickets,
-    (int) $idEmpresa
-);
-$totalTicketsComerciales = $kpisTickets['total'];
-$ticketsComercialesEfectivos = $kpisTickets['efectivos'];
-$ticketsComercialesNoEfectivos = $kpisTickets['no_efectivos'];
-$porcentajeEfectivo = $totalTicketsComerciales > 0
-    ? round(($ticketsComercialesEfectivos / $totalTicketsComerciales) * 100, 1)
-    : 0;
-$porcentajeNoEfectivo = $totalTicketsComerciales > 0
-    ? round(($ticketsComercialesNoEfectivos / $totalTicketsComerciales) * 100, 1)
-    : 0;
+// Placeholders: los números reales se rellenan al expandir indicadores (AJAX).
+$totalTicketsComerciales = 0;
+$ticketsComercialesEfectivos = 0;
+$ticketsComercialesNoEfectivos = 0;
+$porcentajeEfectivo = 0;
+$porcentajeNoEfectivo = 0;
 
 $ticketsWhere = Ticket::construirWhereListado(
     $_GET,
@@ -82,24 +72,26 @@ while ($consultaUsuariosFiltro && ($usuarioFiltro = mysqli_fetch_array($consulta
 }
 
 $ticketsAnioActual = intval(date('Y'));
-// Una sola consulta para el encabezado; los gráficos se cargan por AJAX al expandir.
-$ticketsResumenAnual = Ticket::obtenerResumenAnualRapido(
-    $conexionBdPrincipal,
-    $ticketsAnioActual,
-    $usuarioIdTickets,
-    $ticketsPermisos['verTodos'],
-    $ticketsPermisos['restringirZona'],
-    $clienteIdPagina > 0 ? $clienteIdPagina : null,
-    $ticketsPermisos['excluirCiudad1122'],
-    (int) $idEmpresa,
-    $zonasUsuarioTickets
-);
+$ticketsResumenAnual = [
+    'total'          => 0,
+    'abiertos'       => 0,
+    'cerrados'       => 0,
+    'con_cotizacion' => 0,
+    'ganados'        => 0,
+    'perdidos'       => 0,
+    'tasa_ganados'   => 0,
+];
 
 $ticketsAnalytics = [
     'anio'             => $ticketsAnioActual,
     'es_vista_cliente' => $clienteIdPagina > 0,
     'resumen'          => $ticketsResumenAnual,
     'lazy'             => true,
+    'kpis_comerciales' => [
+        'total'        => 0,
+        'efectivos'    => 0,
+        'no_efectivos' => 0,
+    ],
     'por_mes'          => array_fill(0, 12, 0),
     'por_etapa'        => [],
     'por_estado'       => [],
