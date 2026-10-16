@@ -75,38 +75,38 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-tikets-preparar.php';
 					<button type="button" class="tickets-collapsible-toggle" id="tickets-kpi-toggle" aria-expanded="false" aria-controls="tickets-kpi-body">
 						<span class="tickets-collapsible-heading">
 							<span class="tickets-collapsible-title">Indicadores comerciales</span>
-							<span class="tickets-collapsible-summary">
-								<?= $ticketsKpiTotal; ?> tickets · <?= $ticketsKpiAbiertos; ?> abiertos · <?= $porcentajeEfectivo; ?>% efectividad
+							<span class="tickets-collapsible-summary" id="ticketsKpiSummary">
+								Cargará al expandir · <?= $ticketsAnioActual; ?>
 							</span>
 						</span>
 						<i class="icon-chevron-down tickets-collapsible-icon" aria-hidden="true"></i>
 					</button>
 					<div class="tickets-collapsible-body" id="tickets-kpi-body" hidden>
-						<div class="tickets-kpi-grid">
+						<div class="tickets-kpi-grid" id="ticketsKpiGrid">
 							<div class="tickets-kpi-card is-primary">
 								<div class="tickets-kpi-label">Tickets <?= $ticketsAnioActual; ?></div>
-								<div class="tickets-kpi-value"><?= $ticketsKpiTotal; ?></div>
+								<div class="tickets-kpi-value" data-kpi="total">—</div>
 								<div class="tickets-kpi-hint">Creados en el año en curso</div>
 							</div>
 							<div class="tickets-kpi-card is-warning">
 								<div class="tickets-kpi-label">Abiertos</div>
-								<div class="tickets-kpi-value"><?= $ticketsKpiAbiertos; ?></div>
+								<div class="tickets-kpi-value" data-kpi="abiertos">—</div>
 								<div class="tickets-kpi-hint">Requieren gestión activa</div>
 							</div>
 							<div class="tickets-kpi-card is-info">
 								<div class="tickets-kpi-label">Con cotización</div>
-								<div class="tickets-kpi-value"><?= $ticketsKpiCotizacion; ?></div>
+								<div class="tickets-kpi-value" data-kpi="cotizacion">—</div>
 								<div class="tickets-kpi-hint">Oportunidades con propuesta</div>
 							</div>
 							<div class="tickets-kpi-card is-success">
 								<div class="tickets-kpi-label">Efectividad comercial</div>
-								<div class="tickets-kpi-value"><?= $porcentajeEfectivo; ?>%</div>
-								<div class="tickets-kpi-hint"><?= $ticketsComercialesEfectivos; ?> ganados de <?= $totalTicketsComerciales; ?> cerrados</div>
+								<div class="tickets-kpi-value" data-kpi="efectividad">—</div>
+								<div class="tickets-kpi-hint" data-kpi-hint="efectividad">Se calcula al expandir</div>
 							</div>
 							<div class="tickets-kpi-card is-danger">
 								<div class="tickets-kpi-label">No efectivos</div>
-								<div class="tickets-kpi-value"><?= $porcentajeNoEfectivo; ?>%</div>
-								<div class="tickets-kpi-hint"><?= $ticketsComercialesNoEfectivos; ?> tickets perdidos</div>
+								<div class="tickets-kpi-value" data-kpi="no_efectivos_pct">—</div>
+								<div class="tickets-kpi-hint" data-kpi-hint="no_efectivos">Se calcula al expandir</div>
 							</div>
 						</div>
 					</div>
@@ -244,13 +244,23 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-tikets-preparar.php';
                                             $ticketsPermisos['verTodos'],
                                             $ticketsPermisos['restringirZona'],
                                             intval($inicio),
-                                            intval($limite)
+                                            intval($limite),
+                                            $zonasUsuarioTickets
                                         )
                                     );
                                     $filasTickets = [];
                                     while ($consultaTickets && ($filaTicket = mysqli_fetch_array($consultaTickets, MYSQLI_ASSOC))) {
                                         $filasTickets[] = $filaTicket;
                                     }
+                                    $idsTicketsPagina = array_map(static function ($fila) {
+                                        return intval($fila['tik_id'] ?? 0);
+                                    }, $filasTickets);
+                                    $seguimientosPorTicket = Ticket::contarSeguimientosBatch($conexionBdPrincipal, $idsTicketsPagina);
+                                    foreach ($filasTickets as &$filaTicketRef) {
+                                        $idTk = intval($filaTicketRef['tik_id'] ?? 0);
+                                        $filaTicketRef['num_seguimientos'] = $seguimientosPorTicket[$idTk] ?? 0;
+                                    }
+                                    unset($filaTicketRef);
                                     include __DIR__ . '/includes/clientes-tikets-render-filas.php';
                                     ?>
 								</tbody>
@@ -282,7 +292,8 @@ require_once RUTA_PROYECTO . '/usuarios/includes/clientes-tikets-preparar.php';
 			toggle.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
 			if (willExpand) {
 				body.removeAttribute('hidden');
-				if (section.id === 'ticketsAnalytics' && typeof window.initTicketsAnalyticsCharts === 'function') {
+				var needsData = section.getAttribute('data-collapsible') === 'kpi' || section.id === 'ticketsAnalytics';
+				if (needsData && typeof window.initTicketsAnalyticsCharts === 'function') {
 					window.initTicketsAnalyticsCharts();
 				}
 			} else {

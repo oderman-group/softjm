@@ -59,3 +59,15 @@ $etiquetasPorCliente = Etiqueta::listarPorEntidades(
 );
 
 $contadoresPorCliente = Cliente::contadoresRelacionadosBatch($idsClientesPagina, $conexionBdPrincipal);
+
+// Permisos de acciones del listado (una sola vez por request; evita validarRol por fila).
+$listadoAccionesPermisos = [
+    'editar'            => Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion),
+    'sucursales'        => Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion),
+    'contactos'         => Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion),
+    'tickets'           => Modulos::validarRol([88], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion),
+    'seguimiento'       => Modulos::validarRol([12], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion),
+    'facturas'          => Modulos::validarRol([259], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion),
+    'portafolios'       => Modulos::validarRol([110], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion),
+    'columnaContadores' => Modulos::validarRol([88], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion),
+];

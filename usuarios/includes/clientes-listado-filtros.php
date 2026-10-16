@@ -20,6 +20,22 @@ $listadoFiltros = Cliente::prepararFiltrosListado(
     $excluirCiudadDesconocida
 );
 
+$restringirPorZona = !Modulos::validarRol(
+    [383],
+    $conexionBdPrincipal,
+    $conexionBdAdmin,
+    $datosUsuarioActual,
+    $configuracion
+);
+
+if ($restringirPorZona) {
+    $listadoFiltros['where'] = Cliente::appendFiltrosVisibilidadAnalyticsWhere(
+        $listadoFiltros['where'],
+        intval($_SESSION['id'] ?? 0),
+        true
+    );
+}
+
 $SQLCount = Cliente::sqlConteoListado($listadoFiltros['join_extra'], $listadoFiltros['where']);
 $dpto     = $listadoFiltros['dpto'];
 $tipoDoc  = $listadoFiltros['tipo_doc'];
