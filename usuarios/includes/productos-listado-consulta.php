@@ -48,7 +48,7 @@ $filtro = '';
 										}
 										if(isset($_GET["stock"])){
 											if (is_numeric($_GET["stock"])) {
-												$filtro .= " AND prod_existencias<=0";
+												$filtro .= " AND " . Producto::sqlSumaExistenciasHabilitadas('productos.prod_id') . " <= 0";
 											}
 										}
 										if(isset($_GET["nodctomax"])){
@@ -82,7 +82,7 @@ $filtro = '';
 											return 'productos.php?' . http_build_query($params);
 										};
 
-										$consulta = $conexionBdPrincipal->query("SELECT * FROM productos 
+										$consulta = $conexionBdPrincipal->query("SELECT *, " . Producto::sqlSumaExistenciasHabilitadas('productos.prod_id') . " AS prod_existencias FROM productos 
 										LEFT JOIN productos_categorias ON catp_id=prod_categoria 
 										LEFT JOIN (
 											SELECT catp_id AS G2ID, catp_nombre AS G2NAME FROM productos_categorias

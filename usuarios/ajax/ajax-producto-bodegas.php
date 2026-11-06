@@ -27,6 +27,7 @@ $consulta = $conexionBdPrincipal->query("SELECT prodb_id, prodb_existencias, pro
 	INNER JOIN bodegas ON bod_id=prodb_bodega
 	LEFT JOIN usuarios ON usr_id=prodb_usuario_actualizacion
 	WHERE prodb_producto='" . $id . "' AND prod_id_empresa='" . (int) $idEmpresa . "' AND bod_id_empresa='" . (int) $idEmpresa . "'
+		AND (bod_habilitada IS NULL OR bod_habilitada = 1)
 	ORDER BY bod_nombre");
 while ($consulta && ($bod = mysqli_fetch_assoc($consulta))) {
     $bodegas[] = [

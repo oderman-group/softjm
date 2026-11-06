@@ -54,16 +54,30 @@ class Producto extends BaseDatos {
     }
 
     /**
+     * Suma de existencias del producto en bodegas habilitadas.
+     * Una bodega sin estado definido se trata como habilitada.
+     */
+    public static function sqlSumaExistenciasHabilitadas(string $expresionProductoId): string {
+        return "(SELECT COALESCE(SUM(pb.prodb_existencias), 0)
+            FROM productos_bodegas pb
+            INNER JOIN bodegas b ON b.bod_id = pb.prodb_bodega
+            WHERE pb.prodb_producto = " . $expresionProductoId . "
+              AND (b.bod_habilitada IS NULL OR b.bod_habilitada = 1))";
+    }
+
+    /**
      * 
      */
     public static function sincronizarExistenciasConBodegas($idProducto, $conexionBdPrincipal) {
-        $consultaExistencia = $conexionBdPrincipal->query("SELECT SUM(prodb_existencias) as totalExistenciasProducto 
-        FROM productos_bodegas 
-        WHERE prodb_producto='".$idProducto."'");
+        $idProducto = (int) $idProducto;
+        $consultaExistencia = $conexionBdPrincipal->query(
+            "SELECT " . self::sqlSumaExistenciasHabilitadas((string) $idProducto) . " AS totalExistenciasProducto"
+        );
         $exis = mysqli_fetch_array($consultaExistencia, MYSQLI_BOTH);
+        $total = (int) ($exis['totalExistenciasProducto'] ?? 0);
 
-        $conexionBdPrincipal->query("UPDATE productos SET prod_existencias='".$exis['totalExistenciasProducto']."', prod_ultima_actualizacion=now() 
-        WHERE prod_id='".$idProducto."'");
+        $conexionBdPrincipal->query("UPDATE productos SET prod_existencias='" . $total . "', prod_ultima_actualizacion=now() 
+        WHERE prod_id='" . $idProducto . "'");
     }
 
     // Función auxiliar para registrar errores (ajusta la ruta de tu log)
@@ -101,9 +115,11 @@ class Producto extends BaseDatos {
 
         try {
             // 2. Sumar las existencias totales de todas las bodegas para el producto
-            $sqlTotalStock = "SELECT SUM(prodb_existencias) AS total_existencias
-                            FROM productos_bodegas
-                            WHERE prodb_producto = ?";
+            $sqlTotalStock = "SELECT COALESCE(SUM(pb.prodb_existencias), 0) AS total_existencias
+                            FROM productos_bodegas pb
+                            INNER JOIN bodegas b ON b.bod_id = pb.prodb_bodega
+                            WHERE pb.prodb_producto = ?
+                              AND (b.bod_habilitada IS NULL OR b.bod_habilitada = 1)";
             $stmtTotalStock = $conexionBdPrincipal->prepare($sqlTotalStock);
 
             if ($stmtTotalStock === false) {
@@ -130,10 +146,12 @@ class Producto extends BaseDatos {
             // 4. Obtener las existencias de cada bodega para el producto, ordenadas para el descuento
             // Se puede ordenar por prodb_id o por prodb_bodega, o por alguna prioridad si la tienes.
             // Aquí se ordena por prodb_id ascendente (generalmente el más antiguo o de menor ID)
-            $sqlGetBodegaStock = "SELECT prodb_id, prodb_existencias, prodb_bodega
-                                FROM productos_bodegas
-                                WHERE prodb_producto = ? AND prodb_existencias > 0
-                                ORDER BY prodb_id ASC"; // O ORDER BY prodb_bodega_prioridad ASC, prodb_existencias DESC
+            $sqlGetBodegaStock = "SELECT pb.prodb_id, pb.prodb_existencias, pb.prodb_bodega
+                                FROM productos_bodegas pb
+                                INNER JOIN bodegas b ON b.bod_id = pb.prodb_bodega
+                                WHERE pb.prodb_producto = ? AND pb.prodb_existencias > 0
+                                  AND (b.bod_habilitada IS NULL OR b.bod_habilitada = 1)
+                                ORDER BY pb.prodb_id ASC";
 
             $stmtGetBodega = $conexionBdPrincipal->prepare($sqlGetBodegaStock);
 
