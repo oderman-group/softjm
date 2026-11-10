@@ -868,7 +868,8 @@ class ApiOrionService {
      * Recibe y procesa inventario (existencias por producto y bodega) desde Ofima (Ofima → Orion).
      * Inserta o actualiza productos_bodegas y recalcula prod_existencias en productos.
      *
-     * @param array $datos Un objeto con referencia o producto_id, bodega_referencia (bod_referencia), existencias; o { items: [ {...}, ... ] } para lote
+     * @param array $datos Un objeto con referencia o producto_id, existencias y opcionalmente bodega_referencia; o { items: [ {...}, ... ] } para lote.
+     *                       Sin bodega_referencia: resuelve bodega habilitada con bod_tienda_web=1 (preferencia: con stock del producto).
      * @return array { success, procesados?, resultados?, error? }
      */
     public function recibirInventarioDeOfima($datos) {
@@ -876,19 +877,30 @@ class ApiOrionService {
         $resultados = [];
 
         foreach ($items as $item) {
+            if (!is_array($item)) {
+                return ['success' => false, 'error' => 'Cada ítem del inventario debe ser un objeto JSON'];
+            }
             $referencia = isset($item['referencia']) ? trim((string) $item['referencia']) : '';
             $productoId = isset($item['producto_id']) ? (int) $item['producto_id'] : 0;
-            $bodegaReferencia = isset($item['bodega_referencia']) ? trim((string) $item['bodega_referencia']) : '';
-            $existencias = isset($item['existencias']) ? (float) $item['existencias'] : null;
-
-            if ($existencias === null || $existencias < 0) {
+            $bodegaReferencia = isset($item['bodega_referencia'])
+                ? trim((string) $item['bodega_referencia'])
+                : (isset($item['bodega']) ? trim((string) $item['bodega']) : '');
+            // Acepta existencias / existencia / stock / cantidad (0 es válido).
+            $existenciasRaw = null;
+            foreach (['existencias', 'existencia', 'stock', 'cantidad'] as $claveExistencia) {
+                if (array_key_exists($claveExistencia, $item) && $item[$claveExistencia] !== null && $item[$claveExistencia] !== '') {
+                    $existenciasRaw = $item[$claveExistencia];
+                    break;
+                }
+            }
+            if ($existenciasRaw === null || !is_numeric($existenciasRaw) || (float) $existenciasRaw < 0) {
                 $this->registrarSincronizacion('inventario', 'ofima_orion', 'UPDATE', 0, $referencia ?: (string) $productoId, $item, ['success' => false], 'error', 400, 'Campo existencias obligatorio y debe ser >= 0', 1);
-                return ['success' => false, 'error' => 'Cada ítem debe incluir existencias (número >= 0)'];
+                return [
+                    'success' => false,
+                    'error' => 'Cada ítem debe incluir existencias (número >= 0). Ejemplo: {"referencia":"COD001","existencias":50} (bodega_referencia opcional; si falta usa tienda web)',
+                ];
             }
-            if ($bodegaReferencia === '') {
-                $this->registrarSincronizacion('inventario', 'ofima_orion', 'UPDATE', 0, $referencia ?: (string) $productoId, $item, ['success' => false], 'error', 400, 'bodega_referencia obligatorio', 1);
-                return ['success' => false, 'error' => 'Cada ítem debe incluir bodega_referencia (código bod_referencia)'];
-            }
+            $existencias = (float) $existenciasRaw;
             if ($referencia === '' && $productoId <= 0) {
                 $this->registrarSincronizacion('inventario', 'ofima_orion', 'UPDATE', 0, '', $item, ['success' => false], 'error', 400, 'Se requiere referencia o producto_id', 1);
                 return ['success' => false, 'error' => 'Cada ítem debe incluir referencia (código del producto) o producto_id'];
@@ -908,19 +920,33 @@ class ApiOrionService {
             }
 
             $prodId = (int) $producto['prod_id'];
-            $bodega = $this->buscarBodegaPorReferencia($bodegaReferencia);
+            // Si no envían bodega: usar bodega marcada tienda web (preferir la que tenga existencias del producto).
+            $bodega = $bodegaReferencia !== ''
+                ? $this->buscarBodegaPorReferencia($bodegaReferencia)
+                : $this->buscarBodegaTiendaWebConDisponibilidad($prodId);
             if (!$bodega) {
-                $this->registrarSincronizacion('inventario', 'ofima_orion', 'UPDATE', $prodId, $producto['prod_referencia'] ?? '', $item, ['success' => false], 'error', 400, 'Bodega no válida para la empresa', 1);
-                return ['success' => false, 'error' => 'Bodega no encontrada para la referencia ' . $bodegaReferencia];
+                $msgBodega = $bodegaReferencia !== ''
+                    ? ('Bodega no encontrada para la referencia ' . $bodegaReferencia)
+                    : 'No hay bodega habilitada marcada como tienda web (bod_tienda_web=1) para asignar existencias';
+                $this->registrarSincronizacion('inventario', 'ofima_orion', 'UPDATE', $prodId, $producto['prod_referencia'] ?? '', $item, ['success' => false], 'error', 400, $msgBodega, 1);
+                return ['success' => false, 'error' => $msgBodega];
             }
             $bodegaId = (int) $bodega['bod_id'];
+            $bodegaReferenciaResuelta = (string) ($bodega['bod_referencia'] ?? $bodegaReferencia);
 
             $existenciasInt = (int) round($existencias);
             $operacion = $this->upsertProductoBodega($prodId, $bodegaId, $existenciasInt);
             Producto::sincronizarExistenciasConBodegas($prodId, $this->conexionBdPrincipal);
 
             $this->registrarSincronizacion('inventario', 'ofima_orion', $operacion === 'CREATE' ? 'CREATE' : 'UPDATE', $prodId, $producto['prod_referencia'] ?? '', $item, ['success' => true, 'existencias' => $existenciasInt], 'exitoso', 200, null, 1);
-            $resultados[] = ['producto_id' => $prodId, 'bodega_referencia' => $bodegaReferencia, 'bodega_id' => $bodegaId, 'existencias' => $existenciasInt, 'operacion' => $operacion];
+            $resultados[] = [
+                'producto_id' => $prodId,
+                'bodega_referencia' => $bodegaReferenciaResuelta,
+                'bodega_id' => $bodegaId,
+                'existencias' => $existenciasInt,
+                'operacion' => $operacion,
+                'bodega_tienda_web' => (int) ($bodega['bod_tienda_web'] ?? 0) === 1,
+            ];
         }
 
         return ['success' => true, 'procesados' => count($resultados), 'resultados' => $resultados];
@@ -1094,6 +1120,55 @@ class ApiOrionService {
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->num_rows > 0 ? $result->fetch_assoc() : null;
+    }
+
+    /**
+     * Bodega habilitada con bod_tienda_web=1.
+     * Preferencia: la que ya tiene existencias del producto (mayor stock), luego menor bod_id.
+     */
+    private function buscarBodegaTiendaWebConDisponibilidad(int $productoId = 0): ?array
+    {
+        if ($productoId > 0) {
+            $stmt = $this->conexionBdPrincipal->prepare(
+                "SELECT b.*
+                 FROM bodegas b
+                 LEFT JOIN productos_bodegas pb
+                        ON pb.prodb_bodega = b.bod_id
+                       AND pb.prodb_producto = ?
+                 WHERE b.bod_id_empresa = ?
+                   AND b.bod_tienda_web = 1
+                   AND (b.bod_habilitada = 1 OR b.bod_habilitada IS NULL)
+                 ORDER BY COALESCE(pb.prodb_existencias, 0) DESC, b.bod_id ASC
+                 LIMIT 1"
+            );
+            if ($stmt) {
+                $stmt->bind_param('ii', $productoId, $this->idEmpresa);
+                $stmt->execute();
+                $row = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+                if ($row) {
+                    return $row;
+                }
+            }
+        }
+
+        $stmt = $this->conexionBdPrincipal->prepare(
+            "SELECT *
+             FROM bodegas
+             WHERE bod_id_empresa = ?
+               AND bod_tienda_web = 1
+               AND (bod_habilitada = 1 OR bod_habilitada IS NULL)
+             ORDER BY bod_id ASC
+             LIMIT 1"
+        );
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('i', $this->idEmpresa);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $row ?: null;
     }
 
     /**

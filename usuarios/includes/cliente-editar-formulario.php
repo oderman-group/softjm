@@ -304,7 +304,7 @@
 
     if (ofimaActiva) {
       var tipoDoc = valorCampo(form.tipoDocumento);
-      registrar('[data-required-field="tipoDocumento"]', tipoDoc === '2' || tipoDoc === '3', 'Seleccione NIT o Cédula.', 'Tipo de documento');
+      registrar('[data-required-field="tipoDocumento"]', tipoDoc !== '', 'Seleccione el tipo de documento.', 'Tipo de documento');
       registrar('[data-required-field="usuarioCliente"]', valorCampo(form.usuarioCliente) !== '', 'El documento es obligatorio.', 'Documento');
       registrar('[data-required-field="email"]', valorCampo(form.email) !== '', 'El email es obligatorio.', 'Email');
       if (valorCampo(form.email) !== '' && form.email && typeof form.email.checkValidity === 'function' && !form.email.checkValidity()) {

@@ -99,6 +99,42 @@ include("includes/head.php");
 		background: #fff;
 		color: #047857;
 	}
+	.bodega-tienda-web-group {
+		display: inline-flex;
+		align-items: stretch;
+		border: 1px solid #cbd5e1;
+		border-radius: 8px;
+		overflow: hidden;
+		background: #fff;
+		vertical-align: middle;
+	}
+	.bodega-tienda-web-group button {
+		border: 0;
+		margin: 0;
+		padding: 0.28rem 0.65rem;
+		font-size: 0.68rem;
+		font-weight: 700;
+		line-height: 1.2;
+		cursor: pointer;
+		background: #fff;
+		color: #64748b;
+		font-family: inherit;
+	}
+	.bodega-tienda-web-group button + button {
+		border-left: 1px solid #cbd5e1;
+	}
+	.bodega-tienda-web-group button.is-active.is-si {
+		background: #047857;
+		color: #fff;
+	}
+	.bodega-tienda-web-group button.is-active.is-no {
+		background: #334155;
+		color: #fff;
+	}
+	.bodega-tienda-web-group.is-busy {
+		opacity: 0.6;
+		pointer-events: none;
+	}
 </style>
 <!--============j avascript===========-->
 <script src="js/jquery.js"></script>
@@ -232,6 +268,7 @@ include("includes/head.php");
 											<th>Creación</th>
 											<th>Nombre</th>
 											<th>Ciudad</th>
+											<th>Tienda web</th>
 											<th>Productos</th>
 											<th></th>
 										</tr>
@@ -257,6 +294,20 @@ include("includes/head.php");
 												<td><?= $res['bod_fecha_creacion']; ?></td>
 												<td><?= $res['bod_nombre']; ?></td>
 												<td><?= $res['ciu_nombre'].", ".$res['dep_nombre']; ?></td>
+												<td>
+													<?php
+													$esTiendaWeb = isset($res['bod_tienda_web']) && (int) $res['bod_tienda_web'] === 1;
+													$puedeMarcarTiendaWeb = Modulos::validarRol([144], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
+													if ($puedeMarcarTiendaWeb) {
+													?>
+													<div class="bodega-tienda-web-group" data-bodega-id="<?= (int) $res['bod_id']; ?>" role="group" aria-label="Tienda web">
+														<button type="button" class="is-si<?= $esTiendaWeb ? ' is-active' : ''; ?>" data-valor="1" title="Marcar como tienda web">SI</button>
+														<button type="button" class="is-no<?= !$esTiendaWeb ? ' is-active' : ''; ?>" data-valor="0" title="No es tienda web">NO</button>
+													</div>
+													<?php } else { ?>
+														<?= $esTiendaWeb ? 'SI' : 'NO'; ?>
+													<?php } ?>
+												</td>
 												<td>
 													<a 
 														href="bodegas-productos.php?bod=<?=$res[0];?>"
@@ -299,6 +350,95 @@ include("includes/head.php");
 			var modo = $('input[name="filtroHabBodega"]:checked').val();
 			$('body').toggleClass('ver-habilitados', modo === 'habilitados' || modo === 'todos');
 			$('body').toggleClass('ver-no-habilitados', modo === 'deshabilitados' || modo === 'todos');
+		});
+
+		function bodegasToastOffsetY() {
+			var nav = document.querySelector('.navbar .navbar-inner') || document.querySelector('.navbar-inner') || document.querySelector('.navbar');
+			if (!nav) return 96;
+			return Math.max(88, Math.round(nav.getBoundingClientRect().bottom + 12));
+		}
+		function bodegasToast(texto, tipo) {
+			tipo = tipo || 'info';
+			var colores = { success: '#047857', error: '#b91c1c', warning: '#b45309', info: '#334155' };
+			var color = colores[tipo] || colores.info;
+			var duracion = tipo === 'success' ? 7000 : (tipo === 'error' ? 5500 : 4200);
+			if (typeof Toastify === 'function') {
+				Toastify({
+					text: String(texto || ''),
+					duration: duracion,
+					gravity: 'top',
+					position: 'right',
+					close: true,
+					stopOnFocus: true,
+					backgroundColor: color,
+					offset: { x: 16, y: bodegasToastOffsetY() },
+					style: {
+						background: color,
+						color: '#fff',
+						borderRadius: '10px',
+						boxShadow: '0 12px 30px rgba(15, 23, 42, 0.25)',
+						fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif",
+						fontSize: '0.875rem',
+						fontWeight: '600',
+						maxWidth: '420px',
+						padding: '12px 16px',
+						zIndex: 10060
+					}
+				}).showToast();
+				return;
+			}
+			alert(String(texto || ''));
+		}
+
+		function pintarTiendaWebGroup(group, valor) {
+			var botones = group.querySelectorAll('button[data-valor]');
+			for (var i = 0; i < botones.length; i++) {
+				var btn = botones[i];
+				var activo = String(btn.getAttribute('data-valor')) === String(valor);
+				btn.classList.toggle('is-active', activo);
+			}
+		}
+
+		document.addEventListener('click', function (e) {
+			var btn = e.target.closest ? e.target.closest('.bodega-tienda-web-group button[data-valor]') : null;
+			if (!btn) return;
+			var group = btn.closest('.bodega-tienda-web-group');
+			if (!group || group.classList.contains('is-busy')) return;
+			var id = parseInt(group.getAttribute('data-bodega-id'), 10) || 0;
+			var valor = parseInt(btn.getAttribute('data-valor'), 10) === 1 ? 1 : 0;
+			var actual = group.querySelector('button.is-active');
+			var valorActual = actual ? (parseInt(actual.getAttribute('data-valor'), 10) === 1 ? 1 : 0) : -1;
+			if (!id || valor === valorActual) return;
+
+			group.classList.add('is-busy');
+			pintarTiendaWebGroup(group, valor);
+
+			var body = new URLSearchParams();
+			body.set('id', String(id));
+			body.set('tienda_web', String(valor));
+
+			fetch('ajax/ajax-bodegas-tienda-web.php', {
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+				body: body.toString()
+			})
+				.then(function (r) { return r.json(); })
+				.then(function (data) {
+					group.classList.remove('is-busy');
+					if (!data || !data.success) {
+						pintarTiendaWebGroup(group, valorActual);
+						bodegasToast((data && data.message) ? data.message : 'No se pudo actualizar tienda web.', 'error');
+						return;
+					}
+					pintarTiendaWebGroup(group, data.tienda_web === 1 ? 1 : 0);
+					bodegasToast(data.message || 'Tienda web actualizada.', 'success');
+				})
+				.catch(function () {
+					group.classList.remove('is-busy');
+					pintarTiendaWebGroup(group, valorActual);
+					bodegasToast('Error de red al actualizar tienda web.', 'error');
+				});
 		});
 	</script>
 </body>

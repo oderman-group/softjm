@@ -44,7 +44,7 @@ $crearEnOfima = $ofimaActiva && (
 if ($crearEnOfima) {
     $tipoDoc = isset($_POST['tipoDocumento']) ? (int) $_POST['tipoDocumento'] : 0;
     $faltantes = [];
-    if ($tipoDoc !== 2 && $tipoDoc !== 3) {
+    if ($tipoDoc <= 0) {
         $faltantes[] = 'tipo de documento';
     }
     if (trim($_POST['usuario'] ?? '') === '') {

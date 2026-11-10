@@ -15,6 +15,101 @@ function cotizacionProductoCampoActualizable(string $campo): string
 	return $campo;
 }
 
+/**
+ * Aplica Visible web en Orion + sync JM.
+ * $nuevoEstado: 1=SI, 0=NO (estado destino explícito).
+ *
+ * @return array{ok:bool, code:string, message:string, estado:?int}
+ */
+function aplicarVisibleWebProducto(
+	mysqli $conexionBdPrincipal,
+	?mysqli $jm,
+	array $datos,
+	int $nuevoEstado
+): array {
+	$productoId = (int) ($datos['prod_id'] ?? 0);
+	if ($productoId <= 0) {
+		return ['ok' => false, 'code' => 'not_found', 'message' => 'Producto no encontrado', 'estado' => null];
+	}
+
+	$nuevoEstado = $nuevoEstado === 1 ? 1 : 0;
+	$habilitado = (int) ($datos['prod_habilitado'] ?? 0) === 1;
+
+	if ($nuevoEstado === 1 && !$habilitado) {
+		return [
+			'ok' => false,
+			'code' => 'not_habilitado',
+			'message' => 'Solo productos habilitados pueden marcarse Visible web (SI)',
+			'estado' => (int) ($datos['prod_visible_web'] ?? 0),
+		];
+	}
+
+	mysqli_query(
+		$conexionBdPrincipal,
+		"UPDATE productos SET prod_visible_web='" . $nuevoEstado . "' WHERE prod_id='" . $productoId . "' LIMIT 1"
+	);
+
+	if (!$jm) {
+		return [
+			'ok' => true,
+			'code' => 'orion_ok_jm_fail',
+			'message' => 'VIS. WEB actualizado a ' . ($nuevoEstado === 1 ? 'SI' : 'NO') . ' en Orion. No hay conexión con la tienda JM.',
+			'estado' => $nuevoEstado,
+		];
+	}
+
+	require_once RUTA_PROYECTO . '/usuarios/class/JmWebProductosSync.php';
+
+	$payload = [
+		'prod_id' => $productoId,
+		'prod_nombre' => (string) ($datos['prod_nombre'] ?? ''),
+		'prod_referencia' => (string) ($datos['prod_referencia'] ?? ''),
+		'prod_precio' => $datos['prod_precio'] ?? 0,
+		'prod_descuento_web' => $datos['prod_descuento_web'] ?? 0,
+		'prod_descripcion_corta' => (string) ($datos['prod_descripcion_corta'] ?? ''),
+		'prod_descripcion_larga' => (string) ($datos['prod_descripcion_larga'] ?? ''),
+		'prod_marca' => (int) ($datos['prod_marca'] ?? 0),
+		'mar_nombre' => (string) ($datos['mar_nombre'] ?? ''),
+	];
+
+	try {
+		$resultadoSync = JmWebProductosSync::sincronizarDesdeOrion($jm, $payload, $nuevoEstado === 1);
+		if (empty($resultadoSync['success'])) {
+			return [
+				'ok' => true,
+				'code' => 'orion_ok_jm_error',
+				'message' => 'VIS. WEB en Orion a ' . ($nuevoEstado === 1 ? 'SI' : 'NO') . ', pero falló la sync JM: ' . (string) ($resultadoSync['message'] ?? 'error'),
+				'estado' => $nuevoEstado,
+			];
+		}
+		$accionJm = (string) ($resultadoSync['action'] ?? '');
+		if ($nuevoEstado === 1) {
+			$detalleAccion = $accionJm === 'insert'
+				? 'creado y publicado en la tienda JM'
+				: ($accionJm === 'update' ? 'actualizado en la tienda JM' : 'sincronizado con la tienda JM');
+			$mensaje = 'VIS. WEB: SI. Producto ' . $detalleAccion . '.';
+		} else {
+			$mensaje = $accionJm === 'noop'
+				? 'VIS. WEB: NO. El producto no estaba en la tienda JM.'
+				: 'VIS. WEB: NO. Producto ocultado en la tienda JM.';
+		}
+		return [
+			'ok' => true,
+			'code' => $nuevoEstado === 1 ? 'published' : 'hidden',
+			'message' => $mensaje,
+			'estado' => $nuevoEstado,
+			'jm_action' => $accionJm,
+		];
+	} catch (Throwable $e) {
+		return [
+			'ok' => true,
+			'code' => 'orion_ok_jm_exception',
+			'message' => 'VIS. WEB en Orion a ' . ($nuevoEstado === 1 ? 'SI' : 'NO') . ', pero hubo un error en JM: ' . $e->getMessage(),
+			'estado' => $nuevoEstado,
+		];
+	}
+}
+
 //EDITAR PRODUCTOS
 if ($_POST["proceso"] == 1) {
 
@@ -393,14 +488,145 @@ if($_POST["proceso"]==9){
 	
 	//echo '<script type="text/javascript">location.reload();</script>';
 }
-//PRODUCTOS VISIBLES WEB
-if($_POST["proceso"]==10){
-	$datos = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'"), MYSQLI_BOTH);
-	$estado = 0;
-	if($datos['prod_visible_web']=='0') $estado = 1;
-	
-	mysqli_query($conexionBdPrincipal,"UPDATE productos SET prod_visible_web='".$estado."' WHERE prod_id='".$_POST["producto"]."'");
-	
+//PRODUCTOS VISIBLES WEB → sync tienda JM (solo habilitados pueden pasar a SI)
+if ($_POST["proceso"] == 10) {
+	header('Content-Type: application/json; charset=utf-8');
+	$productoId = (int) ($_POST["producto"] ?? 0);
+	$consultaVisWeb = mysqli_query(
+		$conexionBdPrincipal,
+		"SELECT p.*, m.mar_nombre
+		 FROM productos p
+		 LEFT JOIN marcas m ON m.mar_id = p.prod_marca AND m.mar_id_empresa = p.prod_id_empresa
+		 WHERE p.prod_id = '" . $productoId . "'
+		 LIMIT 1"
+	);
+	$datos = $consultaVisWeb ? mysqli_fetch_array($consultaVisWeb, MYSQLI_ASSOC) : null;
+
+	if (!$datos || $productoId <= 0) {
+		echo json_encode([
+			'success' => false,
+			'code' => 'not_found',
+			'message' => 'No se encontró el producto para cambiar VIS. WEB.',
+			'estado' => null,
+			'tipo' => 'error',
+		], JSON_UNESCAPED_UNICODE);
+		exit;
+	}
+
+	$estadoActual = (int) ($datos['prod_visible_web'] ?? 0);
+	$nuevoEstado = $estadoActual === 0 ? 1 : 0;
+
+	require_once RUTA_PROYECTO . '/usuarios/includes/jm-web-conexion.php';
+	$jm = obtenerConexionJmWeb();
+	$resultado = aplicarVisibleWebProducto($conexionBdPrincipal, $jm, $datos, $nuevoEstado);
+	$code = (string) ($resultado['code'] ?? '');
+	$tipo = 'success';
+	if ($code === 'not_habilitado' || $code === 'not_found') {
+		$tipo = 'error';
+	} elseif (strpos($code, 'jm') !== false) {
+		$tipo = 'warning';
+	} elseif ($nuevoEstado !== 1) {
+		$tipo = 'info';
+	}
+
+	echo json_encode([
+		'success' => !empty($resultado['ok']),
+		'code' => $code,
+		'message' => (string) ($resultado['message'] ?? 'VIS. WEB actualizado.'),
+		'estado' => $resultado['estado'] ?? null,
+		'tipo' => $tipo,
+		'jm_action' => (string) ($resultado['jm_action'] ?? ''),
+	], JSON_UNESCAPED_UNICODE);
+	exit;
+}
+
+// VISIBLE WEB MASIVO (estado destino explícito: 1=SI, 0=NO)
+if ((string) ($_POST['proceso'] ?? '') === '12') {
+	header('Content-Type: application/json; charset=utf-8');
+
+	$estadoDestino = isset($_POST['estado']) ? (int) $_POST['estado'] : -1;
+	$idsRaw = $_POST['productos'] ?? [];
+	if (!is_array($idsRaw)) {
+		$idsRaw = preg_split('/\s*,\s*/', (string) $idsRaw) ?: [];
+	}
+	$ids = array_values(array_unique(array_filter(array_map('intval', $idsRaw), static function ($id) {
+		return $id > 0;
+	})));
+
+	if ($estadoDestino !== 0 && $estadoDestino !== 1) {
+		echo json_encode(['success' => false, 'message' => 'Estado inválido'], JSON_UNESCAPED_UNICODE);
+		exit;
+	}
+	if (empty($ids)) {
+		echo json_encode(['success' => false, 'message' => 'No hay productos seleccionados'], JSON_UNESCAPED_UNICODE);
+		exit;
+	}
+	if (count($ids) > 100) {
+		echo json_encode(['success' => false, 'message' => 'Máximo 100 productos por lote'], JSON_UNESCAPED_UNICODE);
+		exit;
+	}
+
+	require_once RUTA_PROYECTO . '/usuarios/includes/jm-web-conexion.php';
+	$jm = obtenerConexionJmWeb();
+
+	$idsSql = implode(',', $ids);
+	$mapa = [];
+	$consultaLote = mysqli_query(
+		$conexionBdPrincipal,
+		"SELECT p.*, m.mar_nombre
+		 FROM productos p
+		 LEFT JOIN marcas m ON m.mar_id = p.prod_marca AND m.mar_id_empresa = p.prod_id_empresa
+		 WHERE p.prod_id IN (" . $idsSql . ")"
+	);
+	while ($consultaLote && ($fila = mysqli_fetch_array($consultaLote, MYSQLI_ASSOC))) {
+		$mapa[(int) $fila['prod_id']] = $fila;
+	}
+
+	$ok = 0;
+	$omitidos = 0;
+	$errores = 0;
+	$detalle = [];
+
+	foreach ($ids as $productoId) {
+		if (empty($mapa[$productoId])) {
+			$errores++;
+			$detalle[] = ['id' => $productoId, 'ok' => false, 'code' => 'not_found', 'estado' => null];
+			continue;
+		}
+		$datos = $mapa[$productoId];
+		$estadoActual = (int) ($datos['prod_visible_web'] ?? 0);
+		if ($estadoActual === $estadoDestino) {
+			$omitidos++;
+			$detalle[] = ['id' => $productoId, 'ok' => true, 'code' => 'unchanged', 'estado' => $estadoActual];
+			continue;
+		}
+		$resultado = aplicarVisibleWebProducto($conexionBdPrincipal, $jm, $datos, $estadoDestino);
+		if (($resultado['code'] ?? '') === 'not_habilitado') {
+			$omitidos++;
+		} elseif (!empty($resultado['ok'])) {
+			$ok++;
+		} else {
+			$errores++;
+		}
+		$detalle[] = [
+			'id' => $productoId,
+			'ok' => !empty($resultado['ok']),
+			'code' => (string) ($resultado['code'] ?? ''),
+			'estado' => $resultado['estado'] ?? null,
+			'message' => (string) ($resultado['message'] ?? ''),
+		];
+	}
+
+	echo json_encode([
+		'success' => true,
+		'estado' => $estadoDestino,
+		'ok' => $ok,
+		'omitidos' => $omitidos,
+		'errores' => $errores,
+		'detalle' => $detalle,
+		'jm_conectado' => $jm instanceof mysqli,
+	], JSON_UNESCAPED_UNICODE);
+	exit;
 }
 
 //DESCUENTO DE COMBOS DE LA COTIZACIÓN
@@ -440,6 +666,6 @@ if($_POST["proceso"]==12){
 if ($_POST["proceso"] != 2) {
 	echo '<div class="alert alert-success">
 			<button type="button" class="close" data-dismiss="alert">&times;</button>
-			<i class="icon-exclamation-sign"></i><strong>Exito!</strong> Los cambios ya se guardaron y todo está bien.
+			<strong>Éxito:</strong> Los cambios se guardaron correctamente.
 		</div>';
 }

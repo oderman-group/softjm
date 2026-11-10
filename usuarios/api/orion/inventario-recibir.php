@@ -7,10 +7,12 @@
  * Body (un ítem):
  *   { "referencia": "COD001", "bodega_referencia": "BOGOTA", "existencias": 50 }
  *   o { "producto_id": 123, "bodega_referencia": "BOGOTA", "existencias": 50 }
+ *   o { "referencia": "COD001", "existencias": 50 }  → bodega = tienda web (bod_tienda_web=1)
  *
  * Body (lote):
  *   { "items": [ { "referencia": "COD001", "bodega_referencia": "BOGOTA", "existencias": 50 }, ... ] }
  * bodega_referencia = bod_referencia de la bodega en Orion.
+ * Si no se envía, Orion busca una bodega habilitada marcada como tienda web (preferencia: con existencias del producto).
  */
 
 header('Content-Type: application/json');
