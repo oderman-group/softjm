@@ -282,7 +282,7 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 			el.title = String(estadoOptimistic);
 		}
 
-		productosToast('Actualizando VIS. WEB…', 'info');
+		productosToast('Actualizando visible en la web…', 'info');
 
 		$.ajax({
 			type: 'POST',
@@ -295,7 +295,7 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 			},
 			success: function (data) {
 				if (!data) {
-					productosToast('No se pudo actualizar VIS. WEB.', 'error');
+					productosToast('No se pudo actualizar la visibilidad en la web.', 'error');
 					if (el) {
 						el.innerHTML = valorActual === 1 ? 'SI' : 'NO';
 						el.title = String(valorActual);
@@ -309,14 +309,14 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 					el.innerHTML = estadoFinal === 1 ? 'SI' : 'NO';
 					el.title = String(estadoFinal);
 				}
-				productosToast(data.message || 'VIS. WEB actualizado.', data.tipo || (data.success ? 'success' : 'error'));
+				productosToast(data.message || 'Visible en la web actualizado.', data.tipo || (data.success ? 'success' : 'error'));
 			},
 			error: function () {
 				if (el) {
 					el.innerHTML = valorActual === 1 ? 'SI' : 'NO';
 					el.title = String(valorActual);
 				}
-				productosToast('Error de red al actualizar VIS. WEB.', 'error');
+				productosToast('Error de red al actualizar la visibilidad en la web.', 'error');
 			}
 		});
 	}
@@ -733,9 +733,15 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 	.clientes-table tr.is-selected {
 		background: rgba(16, 185, 129, 0.08);
 	}
-	.clientes-page .clientes-table th[data-col="web"] {
-		min-width: 92px;
+	.clientes-page .clientes-table th[data-col="web"],
+	.clientes-page .clientes-table td[data-col="web"],
+	.clientes-page .clientes-table td.col-web {
+		width: 104px;
+		min-width: 104px;
+		max-width: 104px;
+		box-sizing: border-box;
 		vertical-align: middle;
+		overflow: hidden;
 	}
 	.productos-web-head {
 		display: flex;
@@ -743,16 +749,21 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 		align-items: stretch;
 		gap: 0.25rem;
 		line-height: 1.15;
+		width: 100%;
+		max-width: 104px;
+		box-sizing: border-box;
 	}
 	.productos-web-head-label {
 		font-size: 0.6875rem;
 		font-weight: 700;
 		letter-spacing: 0.03em;
+		white-space: nowrap;
 	}
 	.productos-web-bulk-select {
 		display: none;
 		width: 100%;
-		min-width: 72px;
+		max-width: 100%;
+		min-width: 0;
 		height: 26px;
 		border: 1px solid #059669;
 		border-radius: 6px;
@@ -1237,7 +1248,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 												<th data-col="web">
 													<div class="productos-web-head">
 														<span class="productos-web-head-label">VIS. WEB</span>
-														<select id="prodWebBulkSelect" class="productos-web-bulk-select" title="Cambiar VIS. WEB de los seleccionados" aria-label="Cambiar VIS. WEB de los seleccionados">
+														<select id="prodWebBulkSelect" class="productos-web-bulk-select" title="Cambiar visible en la web de los seleccionados" aria-label="Cambiar visible en la web de los seleccionados">
 															<option value="">Estado…</option>
 															<option value="1">SI</option>
 															<option value="0">NO</option>
@@ -1838,8 +1849,8 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 				if (barraCount) barraCount.textContent = String(n);
 				if (barraMsg) {
 					barraMsg.textContent = n === 1
-						? '¿Marcar VIS. WEB como ' + etiqueta + ' en el producto seleccionado?'
-						: '¿Marcar VIS. WEB como ' + etiqueta + ' en los ' + n + ' seleccionados?';
+						? '¿Marcar visible en la web como ' + etiqueta + ' en el producto seleccionado?'
+						: '¿Marcar visible en la web como ' + etiqueta + ' en los ' + n + ' seleccionados?';
 				}
 				if (barraHint) {
 					barraHint.textContent = estadoDestino === 1
@@ -1849,7 +1860,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 				if (btnAceptar) {
 					btnAceptar.classList.toggle('is-si', estadoDestino === 1);
 					btnAceptar.classList.toggle('is-no', estadoDestino !== 1);
-					btnAceptar.textContent = 'Marcar VIS. WEB ' + etiqueta;
+					btnAceptar.textContent = 'Marcar visible en la web ' + etiqueta;
 				}
 				if (barra) {
 					barra.classList.add('is-open');
@@ -1873,7 +1884,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 					cerrarBarraConfirmacion();
 				}
 				selectEstado.title = lista.length > 0
-					? ('Cambiar VIS. WEB de ' + lista.length + ' seleccionado(s)')
+					? ('Cambiar visible en la web de ' + lista.length + ' seleccionado(s)')
 					: 'Seleccione productos y elija SI o NO';
 			}
 			window.productosBulkRefresh = refrescar;
@@ -1907,7 +1918,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 				if (enviando) return;
 				var ids = seleccionados().map(function (c) { return c.value; });
 				if (!ids.length) {
-					toast('Seleccione uno o más productos antes de cambiar VIS. WEB.', 'warning');
+					toast('Seleccione uno o más productos antes de cambiar la visibilidad en la web.', 'warning');
 					selectEstado.value = '';
 					cerrarBarraConfirmacion();
 					return;
@@ -1916,7 +1927,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 				selectEstado.disabled = true;
 				if (btnAceptar) btnAceptar.disabled = true;
 				if (btnCancelar) btnCancelar.disabled = true;
-				toast('Actualizando VIS. WEB de ' + ids.length + ' producto(s)…', 'info');
+				toast('Actualizando visible en la web de ' + ids.length + ' producto(s)…', 'info');
 				var body = new URLSearchParams();
 				body.set('proceso', '12');
 				body.set('estado', String(estadoDestino));
@@ -1935,12 +1946,12 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 						selectEstado.value = '';
 						cerrarBarraConfirmacion();
 						if (!data || !data.success) {
-							toast((data && data.message) ? data.message : 'No se pudo actualizar el lote VIS. WEB.', 'error');
+							toast((data && data.message) ? data.message : 'No se pudo actualizar el lote de visible en la web.', 'error');
 							return;
 						}
 						aplicarEstadoUi(data.detalle || []);
 						var etiqueta = parseInt(estadoDestino, 10) === 1 ? 'SI' : 'NO';
-						var msg = 'Lote VIS. WEB → ' + etiqueta + ': ' + (data.ok || 0) + ' actualizado(s)';
+						var msg = 'Lote visible en la web → ' + etiqueta + ': ' + (data.ok || 0) + ' actualizado(s)';
 						if (data.omitidos) msg += ', ' + data.omitidos + ' omitido(s)';
 						if (data.errores) msg += ', ' + data.errores + ' con error';
 						if (!data.jm_conectado) msg += '. Sin conexión JM';
@@ -1954,7 +1965,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 						selectEstado.disabled = false;
 						selectEstado.value = '';
 						cerrarBarraConfirmacion();
-						toast('Error de red al actualizar el lote VIS. WEB.', 'error');
+						toast('Error de red al actualizar el lote de visible en la web.', 'error');
 					});
 			}
 
@@ -1992,7 +2003,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 				if (!n) {
 					selectEstado.value = '';
 					cerrarBarraConfirmacion();
-					toast('Seleccione uno o más productos antes de cambiar VIS. WEB.', 'warning');
+					toast('Seleccione uno o más productos antes de cambiar la visibilidad en la web.', 'warning');
 					return;
 				}
 				if (!barra) {
