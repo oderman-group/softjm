@@ -39,7 +39,7 @@ function aplicarVisibleWebProducto(
 		return [
 			'ok' => false,
 			'code' => 'not_habilitado',
-			'message' => 'Solo productos habilitados pueden marcarse Visible web (SI)',
+			'message' => 'Solo productos habilitados pueden marcarse como visibles en la web (SI)',
 			'estado' => (int) ($datos['prod_visible_web'] ?? 0),
 		];
 	}
@@ -53,7 +53,7 @@ function aplicarVisibleWebProducto(
 		return [
 			'ok' => true,
 			'code' => 'orion_ok_jm_fail',
-			'message' => 'VIS. WEB actualizado a ' . ($nuevoEstado === 1 ? 'SI' : 'NO') . ' en Orion. No hay conexión con la tienda JM.',
+			'message' => 'Visible en la web actualizado a ' . ($nuevoEstado === 1 ? 'SI' : 'NO') . ' en Orion. No hay conexión con la tienda JM.',
 			'estado' => $nuevoEstado,
 		];
 	}
@@ -78,7 +78,7 @@ function aplicarVisibleWebProducto(
 			return [
 				'ok' => true,
 				'code' => 'orion_ok_jm_error',
-				'message' => 'VIS. WEB en Orion a ' . ($nuevoEstado === 1 ? 'SI' : 'NO') . ', pero falló la sync JM: ' . (string) ($resultadoSync['message'] ?? 'error'),
+				'message' => 'Visible en la web en Orion a ' . ($nuevoEstado === 1 ? 'SI' : 'NO') . ', pero falló la sync JM: ' . (string) ($resultadoSync['message'] ?? 'error'),
 				'estado' => $nuevoEstado,
 			];
 		}
@@ -87,11 +87,11 @@ function aplicarVisibleWebProducto(
 			$detalleAccion = $accionJm === 'insert'
 				? 'creado y publicado en la tienda JM'
 				: ($accionJm === 'update' ? 'actualizado en la tienda JM' : 'sincronizado con la tienda JM');
-			$mensaje = 'VIS. WEB: SI. Producto ' . $detalleAccion . '.';
+			$mensaje = 'Visible en la web: SI. Producto ' . $detalleAccion . '.';
 		} else {
 			$mensaje = $accionJm === 'noop'
-				? 'VIS. WEB: NO. El producto no estaba en la tienda JM.'
-				: 'VIS. WEB: NO. Producto ocultado en la tienda JM.';
+				? 'Visible en la web: NO. El producto no estaba en la tienda JM.'
+				: 'Visible en la web: NO. Producto ocultado en la tienda JM.';
 		}
 		return [
 			'ok' => true,
@@ -104,7 +104,7 @@ function aplicarVisibleWebProducto(
 		return [
 			'ok' => true,
 			'code' => 'orion_ok_jm_exception',
-			'message' => 'VIS. WEB en Orion a ' . ($nuevoEstado === 1 ? 'SI' : 'NO') . ', pero hubo un error en JM: ' . $e->getMessage(),
+			'message' => 'Visible en la web en Orion a ' . ($nuevoEstado === 1 ? 'SI' : 'NO') . ', pero hubo un error en JM: ' . $e->getMessage(),
 			'estado' => $nuevoEstado,
 		];
 	}
@@ -506,7 +506,7 @@ if ($_POST["proceso"] == 10) {
 		echo json_encode([
 			'success' => false,
 			'code' => 'not_found',
-			'message' => 'No se encontró el producto para cambiar VIS. WEB.',
+			'message' => 'No se encontró el producto para cambiar la visibilidad en la web.',
 			'estado' => null,
 			'tipo' => 'error',
 		], JSON_UNESCAPED_UNICODE);
@@ -532,7 +532,7 @@ if ($_POST["proceso"] == 10) {
 	echo json_encode([
 		'success' => !empty($resultado['ok']),
 		'code' => $code,
-		'message' => (string) ($resultado['message'] ?? 'VIS. WEB actualizado.'),
+		'message' => (string) ($resultado['message'] ?? 'Visible en la web actualizado.'),
 		'estado' => $resultado['estado'] ?? null,
 		'tipo' => $tipo,
 		'jm_action' => (string) ($resultado['jm_action'] ?? ''),

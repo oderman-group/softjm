@@ -76,7 +76,7 @@ if ($consulta->num_rows === 0) {
 														</a>
 													</td>
 
-													<td>
+													<td data-col="web" class="col-web">
 														<a 
 															href="javascript:void(0);" 
 															onClick="visweb(this)" 
