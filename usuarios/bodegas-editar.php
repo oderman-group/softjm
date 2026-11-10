@@ -6,7 +6,7 @@ $idPagina = 144;
 include("includes/verificar-paginas.php");
 include_once(RUTA_PROYECTO."/usuarios/includes/api-ofima-conexion.php");
 if (ofimaIntegracionActiva($conexionBdPrincipal, (int) $_SESSION["dataAdicional"]["id_empresa"])) {
-    echo '<script type="text/javascript">alert("Las bodegas solo se editan desde Ofima mientras la integración esté activa."); window.location.href="bodegas.php";</script>';
+    echo '<script type="text/javascript">alert("Las bodegas solo se editan desde Ofima mientras la integración esté activa. Puede marcar Tienda web desde el listado."); window.location.href="bodegas.php";</script>';
     exit();
 }
 include("includes/head.php");
@@ -32,7 +32,6 @@ $resultadoD = mysqli_fetch_array($consultaBodegas, MYSQLI_BOTH);
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <?php 
-//Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
 ?>
 <?php include("includes/funciones-js.php");?>

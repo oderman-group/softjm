@@ -3,9 +3,10 @@ $filtro = '';
 										if (!empty($_GET['vista']) && in_array($_GET['vista'], ['web', 'pdt', 'stock', 'utilidad'], true) && empty($_GET[$_GET['vista']])) {
 											$_GET[$_GET['vista']] = 1;
 										}
-										if (isset($_GET['habilitado']) && ($_GET['habilitado'] === '0' || $_GET['habilitado'] === '1')) {
-											$filtro .= " AND prod_habilitado='" . (int) $_GET['habilitado'] . "'";
-										}
+										// Filtro inicial: habilitados. Sin GET o valor inválido → solo prod_habilitado=1.
+										$filtroHabilitado = (isset($_GET['habilitado']) && (string) $_GET['habilitado'] === '0') ? 0 : 1;
+										$filtro .= " AND prod_habilitado='" . $filtroHabilitado . "'";
+										$_GET['habilitado'] = (string) $filtroHabilitado;
 										if(isset($_GET["grupo1"])){
 											if (is_numeric($_GET["grupo1"])) {
 												$filtro .= " AND prod_grupo1='" . $_GET["grupo1"] . "'";

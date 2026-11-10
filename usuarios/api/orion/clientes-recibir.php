@@ -1,8 +1,11 @@
 <?php
 /**
- * Endpoint API para recibir clientes desde Ofima (Ofima → Orion)
+ * Endpoint API para recibir clientes (Ofima → Orion o Tienda/CMS → Orion).
  * POST /usuarios/api/orion/clientes-recibir.php
  * Autenticación: Bearer JWT (recomendado) o Basic Auth
+ *
+ * Sin "origen" (o origen=ofima): solo upsert en Orion (comportamiento histórico Ofima→Orion).
+ * Con origen=tienda_web|cms: upsert en Orion y luego push a Ofima (Crear/Actualizar).
  *
  * ciudad = código DIAN (ciu_cod_dian, ej. "05001"). Orion lo homologa a ciu_id
  * y asigna cli_zona = ciu_departamento para que el cliente aparezca en el listado.
@@ -90,23 +93,73 @@ try {
 
     $resultado = $apiService->recibirClienteDeOfima($datos);
 
-    if ($resultado['success']) {
-        http_response_code(200);
-        echo json_encode([
-            'success'    => true,
-            'message'    => 'Cliente sincronizado correctamente',
-            'cliente_id' => $resultado['cliente_id'],
-            'identificacion' => $datos['identificacion'],
-            'operacion'  => $resultado['operacion']
-        ]);
-    } else {
+    if (!$resultado['success']) {
         http_response_code(400);
         echo json_encode([
             'success' => false,
             'message' => 'Error al procesar el cliente',
-            'error'   => $resultado['error']
+            'error'   => $resultado['error'] ?? 'Error desconocido'
         ]);
+        exit();
     }
+
+    $respuesta = [
+        'success'        => true,
+        'message'        => 'Cliente sincronizado correctamente',
+        'cliente_id'     => $resultado['cliente_id'],
+        'identificacion' => $datos['identificacion'],
+        'operacion'      => $resultado['operacion'],
+    ];
+
+    // Solo tienda/CMS dispara push Orion → Ofima (anti-bucle Ofima→Orion).
+    if (ApiOrionService::esOrigenTiendaWeb($datos)) {
+        $clienteId = (int) $resultado['cliente_id'];
+        $operacionOrion = strtoupper((string) ($resultado['operacion'] ?? 'CREATE'));
+        $tipoOfima = 'CREATE';
+
+        if ($operacionOrion === 'UPDATE') {
+            $stmtFlag = $conexionBdPrincipal->prepare(
+                'SELECT cli_integrado_ofima FROM clientes WHERE cli_id = ? AND cli_id_empresa = ? LIMIT 1'
+            );
+            $integrado = 0;
+            if ($stmtFlag) {
+                $stmtFlag->bind_param('ii', $clienteId, $idEmpresa);
+                $stmtFlag->execute();
+                $rowFlag = $stmtFlag->get_result()->fetch_assoc();
+                $stmtFlag->close();
+                $integrado = (int) ($rowFlag['cli_integrado_ofima'] ?? 0);
+            }
+            $tipoOfima = $integrado === 1 ? 'UPDATE' : 'CREATE';
+        }
+
+        $syncOfima = Cliente::sincronizarConOfima($clienteId, $conexionBdPrincipal, $idEmpresa, $tipoOfima);
+        if (!empty($syncOfima['success'])) {
+            // sincronizarConOfima ya marca integrado=1; reforzar por claridad.
+            Cliente::marcarIntegradoOfima($clienteId, $conexionBdPrincipal, $idEmpresa, 1);
+            $respuesta['message'] = 'Cliente sincronizado en Orion y Ofima';
+            $respuesta['ofima'] = [
+                'success'   => true,
+                'operacion' => $tipoOfima,
+                'message'   => (string) ($syncOfima['message'] ?? $syncOfima['notificacion']['mensaje'] ?? 'OK'),
+                'error'     => null,
+                'integrado_ofima' => 1,
+            ];
+        } else {
+            // Error Ofima: dejar pendiente (integrado=0) para reintento posterior.
+            Cliente::marcarIntegradoOfima($clienteId, $conexionBdPrincipal, $idEmpresa, 0);
+            $respuesta['message'] = 'Cliente guardado en Orion; sync Ofima pendiente o con error';
+            $respuesta['ofima'] = [
+                'success'   => false,
+                'operacion' => $tipoOfima,
+                'message'   => (string) ($syncOfima['message'] ?? $syncOfima['notificacion']['mensaje'] ?? ''),
+                'error'     => (string) ($syncOfima['error'] ?? $syncOfima['message'] ?? 'No se pudo sincronizar con Ofima'),
+                'integrado_ofima' => 0,
+            ];
+        }
+    }
+
+    http_response_code(200);
+    echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([

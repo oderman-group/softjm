@@ -79,7 +79,49 @@
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{base_orion}}/usuarios/api/orion/clientes-recibir.php",
-            "description": "POST /softjm/usuarios/api/orion/clientes-recibir.php. Requeridos: identificacion, nombre. ciudad = código DIAN (ciu_cod_dian, ej. 05001 o 11001). NO enviar el nombre de la ciudad (ej. Bogotá). Orion homologa a ciu_id y cli_zona."
+            "description": "POST /softjm/usuarios/api/orion/clientes-recibir.php. Requeridos: identificacion, nombre. ciudad = código DIAN (ciu_cod_dian, ej. 05001 o 11001). NO enviar el nombre de la ciudad (ej. Bogotá). Orion homologa a ciu_id y cli_zona. Sin origen = solo Orion. Con origen=tienda_web también empuja a Ofima."
+          }
+        },
+        {
+          "name": "Clientes tienda (origen tienda_web)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origen\": \"tienda_web\",\n  \"identificacion\": \"900123456-1\",\n  \"tipodcto\": \"N\",\n  \"nombre\": \"Cliente Tienda Web S.A.S\",\n  \"email\": \"tienda@ejemplo.com\",\n  \"telefono\": \"6011234567\",\n  \"direccion\": \"Calle 123\",\n  \"ciudad\": \"05001\",\n  \"celular\": \"3001234567\",\n  \"referencia\": \"\",\n  \"id_empresa\": {{id_empresa}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_orion}}/usuarios/api/orion/clientes-recibir.php",
+            "description": "Misma URL que Clientes. Con origen=tienda_web Orion guarda y llama a Ofima Crear/Actualizar. Respuesta incluye bloque ofima."
+          }
+        },
+        {
+          "name": "Pedidos tienda (origen tienda_web)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origen\": \"tienda_web\",\n  \"cliente_identificacion\": \"900123456-1\",\n  \"fecha\": \"2026-11-05\",\n  \"observaciones\": \"Compra tienda web\",\n  \"items\": [\n    {\n      \"producto_id\": 3388,\n      \"referencia\": \"COD001\",\n      \"cantidad\": 1,\n      \"valor\": 150000,\n      \"descuento\": 0,\n      \"impuesto\": 19\n    }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_orion}}/usuarios/api/orion/pedidos-recibir.php",
+            "description": "POST pedidos-recibir.php. Crea pedido en Orion; con origen=tienda_web envía a Ofima Pedidos/Crear. Producto por producto_id y/o referencia (prod_referencia)."
           }
         },
         {

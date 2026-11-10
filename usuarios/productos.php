@@ -130,14 +130,17 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 			}, 3000);
 		}
 
-		$('#resp').empty().hide().html("Esperando...").show(1);
+		productosToast('Guardando cambios…', 'info');
 		datos = "producto=" + (producto) + "&proceso=" + (proceso) + "&valor=" + (valor) + "&campo=" + (campo) + "&tabla=" + $("#tabla").val() + "&pk=" + $("#pk").val();
 		$.ajax({
 			type: "POST",
 			url: "ajax/ajax-productos.php",
 			data: datos,
 			success: function(data) {
-				$('#resp').empty().hide().html(data).show(1);
+				productosMostrarRespuestaAjax(data);
+			},
+			error: function () {
+				productosToast('Error de red al guardar los cambios.', 'error');
 			}
 		});
 	}
@@ -158,41 +161,162 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 			document.getElementById("p" + producto).title = 0;
 		}
 
-		$('#resp').empty().hide().html("Esperando...").show(1);
+		productosToast('Actualizando producto predeterminado…', 'info');
 		datos = "producto=" + (producto) + "&proceso=" + (proceso) + "&valorActual=" + (valorActual);
 		$.ajax({
 			type: "POST",
 			url: "ajax/ajax-productos.php",
 			data: datos,
 			success: function(data) {
-				$('#resp').empty().hide().html(data).show(1);
+				productosMostrarRespuestaAjax(data);
+			},
+			error: function () {
+				productosToast('Error de red al actualizar el producto predeterminado.', 'error');
 			}
 		});
 	}
 
+	function productosToastOffsetY() {
+		var nav = document.querySelector('.navbar .navbar-inner') || document.querySelector('.navbar-inner') || document.querySelector('.navbar');
+		if (!nav) return 96;
+		var bottom = nav.getBoundingClientRect().bottom;
+		return Math.max(88, Math.round(bottom + 12));
+	}
+
+	function productosToast(texto, tipo) {
+		tipo = tipo || 'info';
+		var colores = {
+			// Mismo verde del alert-success / VIS. WEB (#047857)
+			success: '#047857',
+			error: '#b91c1c',
+			warning: '#b45309',
+			info: '#334155'
+		};
+		var color = colores[tipo] || colores.info;
+		var duracion = 4200;
+		if (tipo === 'success') duracion = 7000;
+		else if (tipo === 'error') duracion = 5500;
+		else if (tipo === 'warning') duracion = 6000;
+		if (typeof Toastify === 'function') {
+			Toastify({
+				text: String(texto || ''),
+				duration: duracion,
+				gravity: 'top',
+				position: 'right',
+				close: true,
+				stopOnFocus: true,
+				backgroundColor: color,
+				offset: {
+					x: 16,
+					y: productosToastOffsetY()
+				},
+				style: {
+					background: color,
+					backgroundColor: color,
+					color: '#fff',
+					borderRadius: '10px',
+					boxShadow: '0 12px 30px rgba(15, 23, 42, 0.25)',
+					fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif",
+					fontSize: '0.875rem',
+					fontWeight: '600',
+					maxWidth: '420px',
+					padding: '12px 16px',
+					zIndex: 10060
+				}
+			}).showToast();
+			return;
+		}
+		var resp = document.getElementById('resp');
+		if (resp) {
+			resp.style.display = '';
+			resp.innerHTML = '<span style="color:' + color + ';">' + String(texto || '') + '</span>';
+		}
+	}
+
+	function productosMostrarRespuestaAjax(data) {
+		var resp = document.getElementById('resp');
+		if (resp) {
+			resp.innerHTML = '';
+			resp.style.display = 'none';
+		}
+		if (data == null || data === '') return;
+
+		var $tmp = $('<div>').append($.parseHTML(String(data), document, true));
+		var $alert = $tmp.find('.alert').first();
+		if ($alert.length) {
+			var tipo = 'info';
+			if ($alert.hasClass('alert-success')) tipo = 'success';
+			else if ($alert.hasClass('alert-danger') || $alert.hasClass('alert-error')) tipo = 'error';
+			else if ($alert.hasClass('alert-warning')) tipo = 'warning';
+			var texto = ($alert.text() || '').replace(/×/g, ' ').replace(/\s+/g, ' ').trim();
+			texto = texto.replace(/^Exito!\s*/i, 'Éxito: ').replace(/^Éxito!\s*/i, 'Éxito: ');
+			if (texto) productosToast(texto, tipo);
+			$alert.remove();
+		}
+
+		var leftover = ($tmp.html() || '').trim();
+		if (!leftover) return;
+
+		// Conserva scripts u HTML residual sin volver a mostrar el alert en #resp
+		var $holder = $('<div style="display:none"></div>').appendTo(document.body);
+		$holder.html(leftover);
+		setTimeout(function () { $holder.remove(); }, 0);
+
+		var textoPlano = $tmp.text().replace(/\s+/g, ' ').trim();
+		if (!$alert.length && textoPlano) {
+			productosToast(textoPlano, 'info');
+		}
+	}
+
+	window.productosToast = productosToast;
+	window.productosMostrarRespuestaAjax = productosMostrarRespuestaAjax;
+
 	function visweb(enviada) {
-		var valorActual = enviada.title;
+		var valorActual = parseInt(enviada.title, 10) === 1 ? 1 : 0;
 		var producto = enviada.name;
-		var proceso = 10;
+		var el = document.getElementById('vw' + producto);
+		var estadoOptimistic = valorActual === 0 ? 1 : 0;
 
-		if (valorActual == 0) {
-			document.getElementById("vw" + producto).innerHTML = "SI";
-			document.getElementById("vw" + producto).title = 1;
+		if (el) {
+			el.innerHTML = estadoOptimistic === 1 ? 'SI' : 'NO';
+			el.title = String(estadoOptimistic);
 		}
 
-		if (valorActual == 1) {
-			document.getElementById("vw" + producto).innerHTML = "NO";
-			document.getElementById("vw" + producto).title = 0;
-		}
+		productosToast('Actualizando VIS. WEB…', 'info');
 
-		$('#resp').empty().hide().html("Esperando...").show(1);
-		datos = "producto=" + (producto) + "&proceso=" + (proceso) + "&valorActual=" + (valorActual);
 		$.ajax({
-			type: "POST",
-			url: "ajax/ajax-productos.php",
-			data: datos,
-			success: function(data) {
-				$('#resp').empty().hide().html(data).show(1);
+			type: 'POST',
+			url: 'ajax/ajax-productos.php',
+			dataType: 'json',
+			data: {
+				producto: producto,
+				proceso: 10,
+				valorActual: valorActual
+			},
+			success: function (data) {
+				if (!data) {
+					productosToast('No se pudo actualizar VIS. WEB.', 'error');
+					if (el) {
+						el.innerHTML = valorActual === 1 ? 'SI' : 'NO';
+						el.title = String(valorActual);
+					}
+					return;
+				}
+				var estadoFinal = data.estado === null || data.estado === undefined
+					? valorActual
+					: (parseInt(data.estado, 10) === 1 ? 1 : 0);
+				if (el) {
+					el.innerHTML = estadoFinal === 1 ? 'SI' : 'NO';
+					el.title = String(estadoFinal);
+				}
+				productosToast(data.message || 'VIS. WEB actualizado.', data.tipo || (data.success ? 'success' : 'error'));
+			},
+			error: function () {
+				if (el) {
+					el.innerHTML = valorActual === 1 ? 'SI' : 'NO';
+					el.title = String(valorActual);
+				}
+				productosToast('Error de red al actualizar VIS. WEB.', 'error');
 			}
 		});
 	}
@@ -348,8 +472,28 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 	.clientes-page .clientes-table tbody tr:nth-child(odd) td,
 	.clientes-page .clientes-table tbody tr:nth-child(odd):hover td { background: #fff; }
 	.clientes-page .clientes-table tbody tr:hover { background: transparent; }
+	.clientes-page .clientes-table th[data-col="codigo"],
+	.clientes-page .clientes-table td.col-codigo {
+		position: relative;
+		box-sizing: border-box;
+		width: var(--ancho-codigo, 93px);
+		min-width: var(--ancho-codigo, 93px);
+		max-width: var(--ancho-codigo, 93px);
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+	.clientes-page .clientes-table td.col-codigo .codigo-producto {
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-weight: 700;
+		text-align: center;
+	}
 	.clientes-page .clientes-table th[data-col="nombre"],
 	.clientes-page .clientes-table td.col-nombre {
+		position: relative;
 		width: var(--ancho-nombre, 220px);
 		min-width: var(--ancho-nombre, 220px);
 		max-width: var(--ancho-nombre, 220px);
@@ -358,7 +502,8 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 		overflow: hidden;
 	}
 	.clientes-page .clientes-table td.col-nombre .columnas1 { width: auto !important; max-width: none; white-space: nowrap; overflow: hidden; }
-	.col-nombre-agarre { position: absolute; top: 0; right: 0; width: 8px; height: 100%; cursor: col-resize; }
+	.col-nombre-agarre,
+	.col-codigo-agarre { position: absolute; top: 0; right: 0; width: 8px; height: 100%; cursor: col-resize; z-index: 2; }
 	.clientes-page .clientes-table td.col-nombre h4 {
 		display: flex;
 		justify-content: center;
@@ -493,21 +638,46 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 	}
 	#confirmacionProductoCancelar { border: 1px solid #cbd5e1; background: #fff; color: #334155; }
 	#confirmacionProductoAceptar { border: 0; background: #1d4ed8; color: #fff; }
-	.clientes-page .clientes-panel-header { align-items: flex-end; }
+	.clientes-page .clientes-panel-header {
+		align-items: center;
+		flex-wrap: wrap;
+		row-gap: 0.65rem;
+	}
+	.clientes-page .clientes-panel-header > div:first-child {
+		display: flex;
+		flex: 0 0 auto;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.1rem;
+		min-width: 0;
+		margin-right: 1rem;
+	}
+	.clientes-page .clientes-panel-header > div:first-child h3,
+	.clientes-page .clientes-panel-header > div:first-child p {
+		white-space: nowrap;
+	}
+	.clientes-page .clientes-panel-header > div:first-child p {
+		margin: 0;
+		line-height: 1.3;
+	}
 	.clientes-page .clientes-panel-toolbar { align-items: flex-end; }
 	.clientes-panel-header .productos-filtros-buscar {
 		display: flex;
-		flex: 1 1 auto;
-		flex-wrap: wrap;
+		flex: 1 1 720px;
+		flex-wrap: nowrap;
 		justify-content: flex-end;
 		align-items: flex-end;
 		gap: 0.4rem;
-		margin: 0;
+		margin: 0 0 0 auto;
+		min-width: min(100%, 720px);
+		max-width: 100%;
 		grid-template-columns: none;
 	}
 	.clientes-panel-header .productos-filtros-buscar > .clientes-panel-toolbar {
 		align-self: flex-end;
-		margin: 0 0 10px 0;
+		flex: 0 0 auto;
+		flex-wrap: nowrap;
+		margin: 0 0 0 0.15rem;
 		height: 33px;
 	}
 	.clientes-panel-header .productos-filtros-buscar .clientes-toolbar-btn {
@@ -518,9 +688,155 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 		display: inline-flex;
 		align-items: center;
 	}
-	.clientes-panel-header .productos-filtro { width: 148px; }
+	.clientes-panel-header .productos-filtro {
+		width: auto;
+		flex: 1 1 108px;
+		min-width: 96px;
+		max-width: 158px;
+	}
+	@media (max-width: 1280px) {
+		.clientes-panel-header .productos-filtros-buscar {
+			flex: 1 1 100%;
+			flex-wrap: wrap;
+			justify-content: flex-start;
+			min-width: 100%;
+			margin-left: 0;
+		}
+		.clientes-page .clientes-panel-header > div:first-child h3,
+		.clientes-page .clientes-panel-header > div:first-child p {
+			white-space: normal;
+		}
+	}
 	.clientes-panel-header .productos-filtro label { color: rgba(255, 255, 255, 0.85); margin-bottom: 0.15rem; font-size: 0.6rem; }
 	.clientes-panel-header .productos-filtro-input { height: 33px; min-height: 33px; padding: 0.2rem 0.45rem; font-size: 0.75rem; border-radius: 8px; color: #0f172a; background: #fff; box-sizing: border-box; }
+	.clientes-page .clientes-table th.col-sel,
+	.clientes-page .clientes-table td.col-sel {
+		width: 42px;
+		min-width: 42px;
+		text-align: center;
+		vertical-align: middle;
+	}
+	.productos-sel-label {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		margin: 0;
+		cursor: pointer;
+	}
+	.productos-sel-label input {
+		width: 16px;
+		height: 16px;
+		margin: 0;
+		accent-color: #047857;
+		cursor: pointer;
+	}
+	.clientes-table tr.is-selected {
+		background: rgba(16, 185, 129, 0.08);
+	}
+	.clientes-page .clientes-table th[data-col="web"] {
+		min-width: 92px;
+		vertical-align: middle;
+	}
+	.productos-web-head {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.25rem;
+		line-height: 1.15;
+	}
+	.productos-web-head-label {
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.03em;
+	}
+	.productos-web-bulk-select {
+		display: none;
+		width: 100%;
+		min-width: 72px;
+		height: 26px;
+		border: 1px solid #059669;
+		border-radius: 6px;
+		background: #fff;
+		color: #0f172a;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		padding: 0 0.2rem;
+		box-sizing: border-box;
+		box-shadow: 0 0 0 1px rgba(5, 150, 105, 0.2);
+	}
+	.productos-web-bulk-select.is-visible {
+		display: block;
+	}
+	.productos-web-bulk-select:disabled {
+		opacity: 0.6;
+		cursor: wait;
+	}
+	.productos-bulk-bar {
+		position: fixed;
+		left: 50%;
+		bottom: 22px;
+		transform: translateX(-50%) translateY(120%);
+		z-index: 1200;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+		padding: 0.7rem 0.9rem;
+		border-radius: 14px;
+		background: #0f172a;
+		color: #fff;
+		box-shadow: 0 12px 40px rgba(15, 23, 42, 0.35);
+		opacity: 0;
+		pointer-events: none;
+		transition: transform 0.22s ease, opacity 0.22s ease;
+		max-width: calc(100vw - 24px);
+	}
+	.productos-bulk-bar.is-open {
+		transform: translateX(-50%) translateY(0);
+		opacity: 1;
+		pointer-events: auto;
+	}
+	.productos-bulk-count {
+		font-size: 0.875rem;
+		font-weight: 600;
+		white-space: nowrap;
+	}
+	.productos-bulk-count span { color: #6ee7b7; }
+	.productos-bulk-msg {
+		font-size: 0.875rem;
+		font-weight: 600;
+		margin: 0;
+		flex: 1 1 180px;
+		min-width: 0;
+		line-height: 1.35;
+	}
+	.productos-bulk-actions {
+		display: flex;
+		gap: 0.4rem;
+		flex-wrap: wrap;
+	}
+	.productos-bulk-btn {
+		border: 0;
+		border-radius: 9px;
+		padding: 0.45rem 0.75rem;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		cursor: pointer;
+		font-family: inherit;
+	}
+	.productos-bulk-btn:disabled {
+		opacity: 0.55;
+		cursor: wait;
+	}
+	.productos-bulk-btn.is-si { background: #059669; color: #fff; }
+	.productos-bulk-btn.is-no { background: #e2e8f0; color: #0f172a; }
+	.productos-bulk-btn.is-clear { background: transparent; color: #94a3b8; border: 1px solid #334155; }
+	.productos-bulk-hint {
+		font-size: 0.75rem;
+		color: #94a3b8;
+		margin: 0;
+		width: 100%;
+	}
 	.productos-filtro label {
 		display: block;
 		margin-bottom: 0.35rem;
@@ -788,15 +1104,11 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 										$vistaActual = $claveVista;
 									}
 								}
-								$habilitadoActual = isset($_GET['habilitado']) ? (string) $_GET['habilitado'] : '';
-								if (!in_array($habilitadoActual, ['1', '0', ''], true)) {
-									$habilitadoActual = '';
-								}
+								$habilitadoActual = (isset($_GET['habilitado']) && (string) $_GET['habilitado'] === '0') ? '0' : '1';
 								?>
 								<div class="productos-filtro">
 									<label for="filtroHabilitadoProducto">Habilitado</label>
 									<select id="filtroHabilitadoProducto" class="js-filtro-buscar" name="habilitado" form="formBusquedaProductos">
-										<option value=""<?= $habilitadoActual === '' ? ' selected' : ''; ?>>Todos</option>
 										<option value="1"<?= $habilitadoActual === '1' ? ' selected' : ''; ?>>Habilitados</option>
 										<option value="0"<?= $habilitadoActual === '0' ? ' selected' : ''; ?>>No habilitados</option>
 									</select>
@@ -911,11 +1223,27 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 								<table class="clientes-table" id="data-table">
 									<thead>
 										<tr>
+											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+												<th data-col="sel" class="col-sel" title="Seleccionar">
+													<label class="productos-sel-label">
+														<input type="checkbox" id="prodSelTodos" aria-label="Seleccionar todos los de esta página">
+													</label>
+												</th>
+											<?php } ?>
 											<th data-col="no">No</th>
 
 											<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 												<th data-col="pdt">PDT</th>
-												<th data-col="web">VIS. WEB</th>
+												<th data-col="web">
+													<div class="productos-web-head">
+														<span class="productos-web-head-label">VIS. WEB</span>
+														<select id="prodWebBulkSelect" class="productos-web-bulk-select" title="Cambiar VIS. WEB de los seleccionados" aria-label="Cambiar VIS. WEB de los seleccionados">
+															<option value="">Estado…</option>
+															<option value="1">SI</option>
+															<option value="0">NO</option>
+														</select>
+													</div>
+												</th>
 											<?php } ?>
 
 											<th data-col="codigo"><?= $ofimaProductosActiva ? 'CÓDIGO OFIMA' : 'CÓDIGO'; ?></th>
@@ -1052,24 +1380,62 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 			</div>
 		</div>
 	</div>
+	<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+	<div class="productos-bulk-bar" id="productosBulkBar" aria-hidden="true" role="dialog" aria-modal="true">
+		<div class="productos-bulk-count"><span id="productosBulkCount">0</span> seleccionados</div>
+		<p class="productos-bulk-msg" id="productosBulkMsg"></p>
+		<div class="productos-bulk-actions">
+			<button type="button" class="productos-bulk-btn is-clear" id="productosBulkCancelar">Cancelar</button>
+			<button type="button" class="productos-bulk-btn is-si" id="productosBulkAceptar">Aceptar</button>
+		</div>
+		<p class="productos-bulk-hint" id="productosBulkHint">Solo productos habilitados pueden pasar a SI. El lote sincroniza con la tienda JM.</p>
+	</div>
+	<?php } ?>
 	<script>
 	(function () {
 		var confirmacion = document.getElementById('confirmacionProducto');
 		var confirmacionTexto = document.getElementById('confirmacionProductoTexto');
 		var destinoConfirmacion = '';
+		var onAcceptConfirmacion = null;
+		var onCancelConfirmacion = null;
 		function cerrarConfirmacion() {
 			confirmacion.classList.remove('is-open');
 			confirmacion.setAttribute('aria-hidden', 'true');
 			destinoConfirmacion = '';
+			onAcceptConfirmacion = null;
+			onCancelConfirmacion = null;
 		}
-		document.getElementById('confirmacionProductoCancelar').addEventListener('click', cerrarConfirmacion);
+		function abrirConfirmacionProducto(texto, opciones) {
+			opciones = opciones || {};
+			destinoConfirmacion = opciones.destino || '';
+			onAcceptConfirmacion = typeof opciones.onAccept === 'function' ? opciones.onAccept : null;
+			onCancelConfirmacion = typeof opciones.onCancel === 'function' ? opciones.onCancel : null;
+			confirmacionTexto.textContent = texto || '';
+			confirmacion.classList.add('is-open');
+			confirmacion.setAttribute('aria-hidden', 'false');
+		}
+		window.abrirConfirmacionProducto = abrirConfirmacionProducto;
+		document.getElementById('confirmacionProductoCancelar').addEventListener('click', function () {
+			var onCancel = onCancelConfirmacion;
+			cerrarConfirmacion();
+			if (onCancel) onCancel();
+		});
 		document.getElementById('confirmacionProductoAceptar').addEventListener('click', function () {
 			var destino = destinoConfirmacion;
+			var onAccept = onAcceptConfirmacion;
 			cerrarConfirmacion();
+			if (onAccept) {
+				onAccept();
+				return;
+			}
 			if (destino) window.location.href = destino;
 		});
 		confirmacion.addEventListener('click', function (e) {
-			if (e.target === confirmacion) cerrarConfirmacion();
+			if (e.target === confirmacion) {
+				var onCancel = onCancelConfirmacion;
+				cerrarConfirmacion();
+				if (onCancel) onCancel();
+			}
 		});
 		document.addEventListener('click', function (e) {
 			var eliminar = e.target.closest ? e.target.closest('.js-eliminar-producto') : null;
@@ -1078,13 +1444,13 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 			if (!enlace) return;
 			e.preventDefault();
 			e.stopPropagation();
-			destinoConfirmacion = enlace.getAttribute('href');
 			var nombreProducto = enlace.getAttribute('data-nombre') || 'este producto';
-			confirmacionTexto.textContent = eliminar
-				? '¿Desea eliminar el producto ' + nombreProducto + '?'
-				: '¿Desea replicar el producto ' + nombreProducto + ' a soporte operativo?';
-			confirmacion.classList.add('is-open');
-			confirmacion.setAttribute('aria-hidden', 'false');
+			abrirConfirmacionProducto(
+				eliminar
+					? '¿Desea eliminar el producto ' + nombreProducto + '?'
+					: '¿Desea replicar el producto ' + nombreProducto + ' a soporte operativo?',
+				{ destino: enlace.getAttribute('href') }
+			);
 		}, true);
 		var galeria = document.getElementById('drawerGaleriaProducto');
 		var galeriaOverlay = document.getElementById('drawerGaleriaOverlay');
@@ -1273,30 +1639,33 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 				})
 				.catch(function () { galeriaMensaje.textContent = 'No se pudo subir la foto.'; });
 		});
-		var thNombre = document.querySelector('#data-table th[data-col="nombre"]');
-		if (thNombre) {
-			var anchoGuardado = parseInt(localStorage.getItem('productos-ancho-nombre') || '', 10);
-			if (anchoGuardado) document.documentElement.style.setProperty('--ancho-nombre', anchoGuardado + 'px');
+		function activarAjusteColumna(selector, variable, clave, minimo) {
+			var th = document.querySelector(selector);
+			if (!th) return;
+			var anchoGuardado = parseInt(localStorage.getItem(clave) || '', 10);
+			if (anchoGuardado) document.documentElement.style.setProperty(variable, anchoGuardado + 'px');
 			var agarre = document.createElement('span');
-			agarre.className = 'col-nombre-agarre';
-			thNombre.appendChild(agarre);
+			agarre.className = selector.indexOf('codigo') !== -1 ? 'col-codigo-agarre' : 'col-nombre-agarre';
+			th.appendChild(agarre);
 			agarre.addEventListener('mousedown', function (e) {
 				e.preventDefault();
 				var inicioX = e.clientX;
-				var inicioAncho = thNombre.getBoundingClientRect().width;
+				var inicioAncho = th.getBoundingClientRect().width;
 				function mover(ev) {
-					var nuevo = Math.max(140, inicioAncho + ev.clientX - inicioX);
-					document.documentElement.style.setProperty('--ancho-nombre', nuevo + 'px');
+					var nuevo = Math.max(minimo, inicioAncho + ev.clientX - inicioX);
+					document.documentElement.style.setProperty(variable, nuevo + 'px');
 				}
 				function soltar() {
 					document.removeEventListener('mousemove', mover);
 					document.removeEventListener('mouseup', soltar);
-					localStorage.setItem('productos-ancho-nombre', String(Math.round(thNombre.getBoundingClientRect().width)));
+					localStorage.setItem(clave, String(Math.round(th.getBoundingClientRect().width)));
 				}
 				document.addEventListener('mousemove', mover);
 				document.addEventListener('mouseup', soltar);
 			});
 		}
+		activarAjusteColumna('#data-table th[data-col="codigo"]', '--ancho-codigo', 'productos-ancho-codigo', 72);
+		activarAjusteColumna('#data-table th[data-col="nombre"]', '--ancho-nombre', 'productos-ancho-nombre', 140);
 		var tabla = document.getElementById('data-table');
 		var boton = document.getElementById('btnColumnasProducto');
 		var panel = document.getElementById('panelColumnasProducto');
@@ -1304,7 +1673,7 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 			var clave = 'productos-columnas-ocultas';
 			var ocultas = [];
 			try { ocultas = JSON.parse(localStorage.getItem(clave) || '[]'); } catch (e) { ocultas = []; }
-			var fijas = { codigo: true, nombre: true };
+			var fijas = { codigo: true, nombre: true, sel: true };
 			function aplicar() {
 				tabla.querySelectorAll('thead th[data-col]').forEach(function (th, indice) {
 					var oculta = ocultas.indexOf(th.getAttribute('data-col')) !== -1;
@@ -1386,6 +1755,9 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 						if (typeof window.productosAplicarColumnas === 'function') {
 							window.productosAplicarColumnas();
 						}
+						if (typeof window.productosBulkRefresh === 'function') {
+							window.productosBulkRefresh();
+						}
 						if (window.jQuery && jQuery.fn.tooltip) {
 							jQuery('[data-toggle="tooltip"]').tooltip();
 						}
@@ -1423,6 +1795,213 @@ if (Modulos::validarRol([400], $conexionBdPrincipal, $conexionBdAdmin, $datosUsu
 				var por = porSel ? parseInt(porSel.value, 10) : null;
 				cargarListado(pagina, por);
 			});
+		})();
+
+		(function () {
+			var selectEstado = document.getElementById('prodWebBulkSelect');
+			var selTodos = document.getElementById('prodSelTodos');
+			var tbody = document.getElementById('productos_buscar');
+			var resp = document.getElementById('resp');
+			var barra = document.getElementById('productosBulkBar');
+			var barraCount = document.getElementById('productosBulkCount');
+			var barraMsg = document.getElementById('productosBulkMsg');
+			var barraHint = document.getElementById('productosBulkHint');
+			var btnCancelar = document.getElementById('productosBulkCancelar');
+			var btnAceptar = document.getElementById('productosBulkAceptar');
+			if (!selectEstado || !tbody) return;
+			var enviando = false;
+			var pendienteEstado = null;
+
+			function checks() {
+				return Array.prototype.slice.call(tbody.querySelectorAll('.js-prod-sel'));
+			}
+			function seleccionados() {
+				return checks().filter(function (c) { return c.checked; });
+			}
+			function cerrarBarraConfirmacion() {
+				pendienteEstado = null;
+				if (barra) {
+					barra.classList.remove('is-open');
+					barra.setAttribute('aria-hidden', 'true');
+				}
+				if (btnAceptar) {
+					btnAceptar.classList.remove('is-no');
+					btnAceptar.classList.add('is-si');
+					btnAceptar.textContent = 'Aceptar';
+					btnAceptar.disabled = false;
+				}
+				if (btnCancelar) btnCancelar.disabled = false;
+			}
+			function abrirBarraConfirmacion(estadoDestino, n) {
+				pendienteEstado = estadoDestino;
+				var etiqueta = estadoDestino === 1 ? 'SI' : 'NO';
+				if (barraCount) barraCount.textContent = String(n);
+				if (barraMsg) {
+					barraMsg.textContent = n === 1
+						? '¿Marcar VIS. WEB como ' + etiqueta + ' en el producto seleccionado?'
+						: '¿Marcar VIS. WEB como ' + etiqueta + ' en los ' + n + ' seleccionados?';
+				}
+				if (barraHint) {
+					barraHint.textContent = estadoDestino === 1
+						? 'Solo productos habilitados pueden pasar a SI. El lote sincroniza con la tienda JM.'
+						: 'El lote sincroniza con la tienda JM.';
+				}
+				if (btnAceptar) {
+					btnAceptar.classList.toggle('is-si', estadoDestino === 1);
+					btnAceptar.classList.toggle('is-no', estadoDestino !== 1);
+					btnAceptar.textContent = 'Marcar VIS. WEB ' + etiqueta;
+				}
+				if (barra) {
+					barra.classList.add('is-open');
+					barra.setAttribute('aria-hidden', 'false');
+				}
+			}
+			function refrescar() {
+				var lista = seleccionados();
+				tbody.querySelectorAll('tr[data-prod-id]').forEach(function (tr) {
+					var c = tr.querySelector('.js-prod-sel');
+					tr.classList.toggle('is-selected', !!(c && c.checked));
+				});
+				if (selTodos) {
+					var todos = checks();
+					selTodos.checked = todos.length > 0 && todos.every(function (c) { return c.checked; });
+					selTodos.indeterminate = lista.length > 0 && lista.length < todos.length;
+				}
+				selectEstado.classList.toggle('is-visible', lista.length > 0);
+				if (lista.length === 0) {
+					selectEstado.value = '';
+					cerrarBarraConfirmacion();
+				}
+				selectEstado.title = lista.length > 0
+					? ('Cambiar VIS. WEB de ' + lista.length + ' seleccionado(s)')
+					: 'Seleccione productos y elija SI o NO';
+			}
+			window.productosBulkRefresh = refrescar;
+
+			function aplicarEstadoUi(detalle) {
+				(detalle || []).forEach(function (item) {
+					if (!item || item.estado === null || item.estado === undefined) return;
+					if (item.code === 'not_habilitado' || item.code === 'not_found') return;
+					var el = document.getElementById('vw' + item.id);
+					if (el) {
+						el.innerHTML = Number(item.estado) === 1 ? 'SI' : 'NO';
+						el.title = String(item.estado);
+					}
+					var chk = tbody.querySelector('.js-prod-sel[value="' + item.id + '"]');
+					if (chk) chk.setAttribute('data-visible', String(item.estado));
+				});
+			}
+
+			function toast(texto, tipo) {
+				if (typeof window.productosToast === 'function') {
+					window.productosToast(texto, tipo);
+					return;
+				}
+				if (resp) {
+					resp.style.display = '';
+					resp.innerHTML = String(texto || '');
+				}
+			}
+
+			function enviarLote(estadoDestino) {
+				if (enviando) return;
+				var ids = seleccionados().map(function (c) { return c.value; });
+				if (!ids.length) {
+					toast('Seleccione uno o más productos antes de cambiar VIS. WEB.', 'warning');
+					selectEstado.value = '';
+					cerrarBarraConfirmacion();
+					return;
+				}
+				enviando = true;
+				selectEstado.disabled = true;
+				if (btnAceptar) btnAceptar.disabled = true;
+				if (btnCancelar) btnCancelar.disabled = true;
+				toast('Actualizando VIS. WEB de ' + ids.length + ' producto(s)…', 'info');
+				var body = new URLSearchParams();
+				body.set('proceso', '12');
+				body.set('estado', String(estadoDestino));
+				ids.forEach(function (id) { body.append('productos[]', id); });
+
+				fetch('ajax/ajax-productos.php', {
+					method: 'POST',
+					credentials: 'same-origin',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+					body: body.toString()
+				})
+					.then(function (r) { return r.json(); })
+					.then(function (data) {
+						enviando = false;
+						selectEstado.disabled = false;
+						selectEstado.value = '';
+						cerrarBarraConfirmacion();
+						if (!data || !data.success) {
+							toast((data && data.message) ? data.message : 'No se pudo actualizar el lote VIS. WEB.', 'error');
+							return;
+						}
+						aplicarEstadoUi(data.detalle || []);
+						var etiqueta = parseInt(estadoDestino, 10) === 1 ? 'SI' : 'NO';
+						var msg = 'Lote VIS. WEB → ' + etiqueta + ': ' + (data.ok || 0) + ' actualizado(s)';
+						if (data.omitidos) msg += ', ' + data.omitidos + ' omitido(s)';
+						if (data.errores) msg += ', ' + data.errores + ' con error';
+						if (!data.jm_conectado) msg += '. Sin conexión JM';
+						else msg += '. Sync con tienda JM aplicada';
+						toast(msg + '.', data.errores ? 'warning' : 'success');
+						checks().forEach(function (c) { c.checked = false; });
+						refrescar();
+					})
+					.catch(function () {
+						enviando = false;
+						selectEstado.disabled = false;
+						selectEstado.value = '';
+						cerrarBarraConfirmacion();
+						toast('Error de red al actualizar el lote VIS. WEB.', 'error');
+					});
+			}
+
+			tbody.addEventListener('change', function (e) {
+				if (!e.target || !e.target.classList.contains('js-prod-sel')) return;
+				refrescar();
+			});
+			if (selTodos) {
+				selTodos.addEventListener('change', function () {
+					var on = selTodos.checked;
+					checks().forEach(function (c) { c.checked = on; });
+					refrescar();
+				});
+			}
+			if (btnCancelar) {
+				btnCancelar.addEventListener('click', function () {
+					selectEstado.value = '';
+					cerrarBarraConfirmacion();
+				});
+			}
+			if (btnAceptar) {
+				btnAceptar.addEventListener('click', function () {
+					if (pendienteEstado === null) return;
+					enviarLote(pendienteEstado);
+				});
+			}
+			selectEstado.addEventListener('change', function () {
+				var valor = selectEstado.value;
+				if (valor === '') {
+					cerrarBarraConfirmacion();
+					return;
+				}
+				var estadoDestino = parseInt(valor, 10) === 1 ? 1 : 0;
+				var n = seleccionados().length;
+				if (!n) {
+					selectEstado.value = '';
+					cerrarBarraConfirmacion();
+					toast('Seleccione uno o más productos antes de cambiar VIS. WEB.', 'warning');
+					return;
+				}
+				if (!barra) {
+					enviarLote(estadoDestino);
+					return;
+				}
+				abrirBarraConfirmacion(estadoDestino, n);
+			});
+			refrescar();
 		})();
 
 		var form = document.getElementById('formBusquedaProductos');

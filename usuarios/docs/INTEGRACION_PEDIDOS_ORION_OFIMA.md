@@ -12,6 +12,7 @@ Flujo **unidireccional**: cuando se crea o modifica un pedido en Orion, Orion ll
 
 1. **Al crear el pedido** (`bd_create/cotizaciones-generar-pedido.php`): después de insertar el pedido y sus ítems (desde la cotización), se llama a `ApiOfimaClient::sincronizarPedido($pedidId, 'CREATE')`. Si Ofima falla, el pedido en Orion se mantiene y el error se registra en `api_sincronizaciones`.
 2. **Al actualizar el pedido** (`bd_update/pedido-timelina-actualizar.php`): después de actualizar fecha/estado/empresa de envío/código de seguimiento, se llama a `sincronizarPedido($pedidId, 'UPDATE')`. Si el pedido está facturado, la sync retorna error y se registra en logs.
+3. **Desde la tienda/CMS** (`api/orion/pedidos-recibir.php`): crea primero una **cotización** (ítems tipo COTZ) para visualizarla en el CRM, luego el **pedido** vinculado (`pedid_cotizacion`) con ítems tipo PED y marca la cotización como vendida. Si el body trae `"origen": "tienda_web"` (o `cms`), llama a `sincronizarPedido($pedidId, 'CREATE')`. Sin `origen`, solo queda en Orion.
 
 ## Contrato del payload (Orion → Ofima)
 

@@ -4,7 +4,7 @@
  * Ejecutar contra BDADMIN del ambiente actual (sensitive.php).
  */
 $_SERVER['HTTP_HOST'] = 'localhost';
-require __DIR__ . '/sensitive.php';
+require __DIR__ . '/../sensitive.php';
 
 echo 'ENV=' . CURRENT_ENVIROMENT . PHP_EOL;
 echo 'BDADMIN=' . BDADMIN . ' @ ' . SERVER . PHP_EOL;
@@ -104,9 +104,35 @@ if (!columnaExiste($admin, 'localidad_ciudades', 'ciu_cod_dian')) {
     echo "OK ciu_cod_dian ya existe\n";
 }
 
-// Índices (ignorar si ya existen)
-@$admin->query('CREATE INDEX idx_dep_cod_dian ON localidad_departamentos (dep_cod_dian)');
-@$admin->query('CREATE INDEX idx_ciu_cod_dian ON localidad_ciudades (ciu_cod_dian)');
+// Índices (idempotente: PHP 8 lanza excepción si ya existen)
+function indiceExiste(mysqli $db, string $tabla, string $indice): bool
+{
+    $stmt = $db->prepare(
+        "SELECT COUNT(*) AS n
+         FROM information_schema.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = ?
+           AND INDEX_NAME = ?"
+    );
+    $stmt->bind_param('ss', $tabla, $indice);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    return (int) ($row['n'] ?? 0) > 0;
+}
+
+if (!indiceExiste($admin, 'localidad_departamentos', 'idx_dep_cod_dian')) {
+    $ok = $admin->query('CREATE INDEX idx_dep_cod_dian ON localidad_departamentos (dep_cod_dian)');
+    echo $ok ? "OK índice idx_dep_cod_dian\n" : ('FAIL idx_dep_cod_dian: ' . $admin->error . PHP_EOL);
+} else {
+    echo "OK idx_dep_cod_dian ya existe\n";
+}
+
+if (!indiceExiste($admin, 'localidad_ciudades', 'idx_ciu_cod_dian')) {
+    $ok = $admin->query('CREATE INDEX idx_ciu_cod_dian ON localidad_ciudades (ciu_cod_dian)');
+    echo $ok ? "OK índice idx_ciu_cod_dian\n" : ('FAIL idx_ciu_cod_dian: ' . $admin->error . PHP_EOL);
+} else {
+    echo "OK idx_ciu_cod_dian ya existe\n";
+}
 
 // 2) Departamentos DIAN (código 2 dígitos)
 $departamentosDian = [

@@ -1,0 +1,45 @@
+---
+description: Nombrar scripts SQL/migración con fecha de creación para orden de ejecución
+alwaysApply: true
+---
+
+# Scripts SQL: fecha en el nombre
+
+Al **crear** scripts nuevos en `sql/` (`.sql` o homologadores `.php`), el nombre debe empezar con la fecha de creación en formato `YYYYMMDD_`.
+
+## Convención
+
+```
+sql/YYYYMMDD_descripcion_corta.sql
+sql/YYYYMMDD_homologar_algo.php
+```
+
+- Fecha = día en que se crea el archivo (zona local del proyecto).
+- Descripción en `snake_case`, sin espacios.
+- Prefijos tipo `_run_` van **después** de la fecha: `20261110_run_ofima_alter_faltantes.sql`.
+- No renombrar scripts históricos salvo que el usuario lo pida.
+
+## Orden de ejecución
+
+El prefijo fecha define el orden: correr de menor a mayor `YYYYMMDD`.  
+Si el mismo día hay varios scripts con dependencia, usar sufijo de secuencia:
+
+```
+20261110_01_alter_bodegas.sql
+20261110_02_run_endpoints.sql
+20261110_03_homologar_marcas.php
+```
+
+## Ejemplo
+
+```
+# ❌ BAD
+sql/bodegas_bod_tienda_web.sql
+sql/_run_ofima_alter_faltantes.sql
+
+# ✅ GOOD
+sql/20261110_bodegas_bod_tienda_web.sql
+sql/20261110_01_run_ofima_alter_faltantes.sql
+```
+
+En el encabezado del script, comentar brevemente: para qué BD (MAIN / BDADMIN / JM) y si depende de otro script del mismo día.

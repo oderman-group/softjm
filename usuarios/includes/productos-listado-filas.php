@@ -47,7 +47,19 @@ if ($consulta->num_rows === 0) {
 
 											$precioListaDolarHoy = ($precioListaUSD * $configuracion['conf_trm_venta']);
 										?>
-											<tr>
+											<tr data-prod-id="<?= (int) $res[$pk]; ?>" data-habilitado="<?= (int) ($res['prod_habilitado'] ?? 0); ?>">
+												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+													<td data-col="sel" class="col-sel">
+														<label class="productos-sel-label">
+															<input type="checkbox"
+																class="js-prod-sel"
+																value="<?= (int) $res[$pk]; ?>"
+																data-habilitado="<?= (int) ($res['prod_habilitado'] ?? 0); ?>"
+																data-visible="<?= (int) ($res['prod_visible_web'] ?? 0); ?>"
+																aria-label="Seleccionar producto <?= (int) $res[$pk]; ?>">
+														</label>
+													</td>
+												<?php } ?>
 												<td><?= $no; ?></td>
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
@@ -78,18 +90,8 @@ if ($consulta->num_rows === 0) {
 													</td>
 												<?php } ?>
 
-												<td align="center" style="font-weight: bold;">
-													<input 
-														type="text" 
-														title="prod_referencia" 
-														name="<?= $res[$pk]; ?>" 
-														value="<?= $res['prod_referencia']; ?>" 
-														style="width: 60px; text-align: center" 
-														onChange="productos(this)" 
-														<?php if (!Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {echo "disabled";} ?>
-														translate="no"
-													>
-													<span style="visibility: hidden;" translate="no"><?= $res['prod_referencia']; ?></span>
+												<td class="col-codigo">
+													<span class="codigo-producto" title="<?= htmlspecialchars($res['prod_referencia'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><?= htmlspecialchars($res['prod_referencia'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
 												</td>
 
 												<td class="col-nombre">

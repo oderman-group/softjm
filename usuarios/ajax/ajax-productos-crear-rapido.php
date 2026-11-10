@@ -77,7 +77,7 @@ $nombreEsc = mysqli_real_escape_string($conexionBdPrincipal, $nombre);
 
 $conexionBdPrincipal->query(
     "INSERT INTO productos(
-        prod_nombre, prod_categoria, prod_grupo1, prod_grupo3, prod_marca, prod_referencia, prod_proveedor, prod_id_empresa
+        prod_nombre, prod_categoria, prod_grupo1, prod_grupo3, prod_marca, prod_referencia, prod_proveedor, prod_id_empresa, prod_visible_web
     ) VALUES (
         '" . $nombreEsc . "',
         '" . $categoria . "',
@@ -86,7 +86,8 @@ $conexionBdPrincipal->query(
         '" . $marca . "',
         '" . $referenciaEsc . "',
         '" . $proveedor . "',
-        '" . (int) $idEmpresa . "'
+        '" . (int) $idEmpresa . "',
+        0
     )"
 );
 
