@@ -64,31 +64,75 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 </script>
 
 <script type="text/javascript">
+	function productosLeer(id) {
+		var el = document.getElementById(id);
+		if (!el || el.value == null || el.value === '') return 0;
+		return parseFloat(String(el.value).replace(',', '.')) || 0;
+	}
+
+	function productosParseMoneda(texto) {
+		var limpio = String(texto || '').replace(/\$/g, '').replace(/\s/g, '').trim();
+		if (!limpio) return 0;
+		var tieneComa = limpio.indexOf(',') !== -1;
+		var tienePunto = limpio.indexOf('.') !== -1;
+		if (tieneComa && tienePunto) {
+			if (limpio.lastIndexOf(',') > limpio.lastIndexOf('.')) {
+				limpio = limpio.replace(/\./g, '').replace(',', '.');
+			} else {
+				limpio = limpio.replace(/,/g, '');
+			}
+		} else if (tieneComa) {
+			limpio = limpio.replace(',', '.');
+		} else if (tienePunto) {
+			var partes = limpio.split('.');
+			var gruposDeMiles = partes.slice(1).every(function (parte) { return parte.length === 3; });
+			if (partes.length > 2 || gruposDeMiles) {
+				limpio = limpio.replace(/\./g, '');
+			}
+		}
+		return parseFloat(limpio) || 0;
+	}
+
+	function productosFormatoMoneda(numero) {
+		var partes = (Number(numero) || 0).toFixed(2).split('.');
+		partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+		return '$' + partes[0] + ',' + partes[1];
+	}
+
 	function productos(enviada) {
 		var campo    = enviada.title;
 		var producto = enviada.name;
 		var proceso  = 1;
 		var valor    = enviada.value;
 
-		var costo;
-		var utilidad;
 		var precioNuevo;
 		var precioNuevoIva;
 		var precioNuevoUSD;
 
-		const descuentoDealer          = document.getElementById("descuentoDealer" + producto).value;
-		const descuentoDealerSobreCien = (descuentoDealer / 100);
-		const descuentoWeb             = document.getElementById("dctoWeb" + producto).value;
-		const descuentoWebSobreCien    = (descuentoWeb / 100);       
-		const utilidadActual           = document.getElementById("utilidad" + producto).value;
-		const utilidadSobreCien        = (utilidadActual / 100);
-		const costoActual              = document.getElementById("costo" + producto).value;
-		const costoActualUSD           = document.getElementById("costoUSD" + producto).value;
+		const descuentoDealerSobreCien = productosLeer("descuentoDealer" + producto) / 100;
+		const descuentoWebSobreCien    = productosLeer("dctoWeb" + producto) / 100;
+		const utilidadEl               = document.getElementById("utilidad" + producto);
+		const costoEl                  = document.getElementById("costo" + producto);
+		const costoUsdEl               = document.getElementById("costoUSD" + producto);
+		const precioEl                 = document.getElementById("precioListaInput" + producto);
 
-		precioNuevo        = Math.round(parseFloat(costoActual) / (1 - parseFloat(utilidadSobreCien)));
-		precioNuevoIva     = Math.round(parseFloat(precioNuevo) + (parseFloat(precioNuevo) * 0.19));
+		if (campo === 'prod_precio') {
+			precioNuevo = productosParseMoneda(valor);
+			enviada.value = productosFormatoMoneda(precioNuevo);
+			valor = String(precioNuevo);
+		} else if (utilidadEl && costoEl) {
+			var utilidadSobreCien = (parseFloat(utilidadEl.value) || 0) / 100;
+			precioNuevo = Math.round((parseFloat(costoEl.value) || 0) / (1 - utilidadSobreCien));
+		} else if (precioEl) {
+			precioNuevo = productosParseMoneda(precioEl.value);
+		} else {
+			precioNuevo = 0;
+		}
 
-		precioNuevoUSD     = Math.round(parseFloat(costoActualUSD) / (1 - parseFloat(utilidadSobreCien)));
+		precioNuevoIva = Math.round(precioNuevo + (precioNuevo * 0.19));
+		precioNuevoUSD = (costoUsdEl && utilidadEl)
+			? Math.round((parseFloat(costoUsdEl.value) || 0) / (1 - ((parseFloat(utilidadEl.value) || 0) / 100)))
+			: 0;
 
 		const precioDealer = Math.round(precioNuevo - (precioNuevo * descuentoDealerSobreCien));
 		const precioWeb    = Math.round(precioNuevo - (precioNuevo * descuentoWebSobreCien));
@@ -109,6 +153,23 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 				setTimeout(() => {
 					element.style.backgroundColor = "";
 				}, 3000);
+			});
+		}
+
+		if (campo == 'prod_precio') {
+			var iva = document.getElementById("precioListaIva" + producto);
+			var dealer = document.getElementById("precioDealer" + producto);
+			var web = document.getElementById("precioWeb" + producto);
+			[iva, dealer, web].forEach(function (element, indice) {
+				if (!element) return;
+				var textos = [
+					"$" + precioNuevoIva.toLocaleString(),
+					"$" + precioDealer.toLocaleString(),
+					"$" + precioWeb.toLocaleString()
+				];
+				element.innerHTML = textos[indice];
+				element.style.backgroundColor = "yellow";
+				setTimeout(function () { element.style.backgroundColor = ""; }, 3000);
 			});
 		}
 
@@ -524,6 +585,14 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 	.precio-par-fila:last-child { border-bottom: 0; }
 	.precio-par-fila span { flex: 0 0 auto; }
 	.clientes-page .clientes-table .precio-par input[type="text"] { width: 78px !important; height: 22px; margin: 0; padding: 0; border: 0; background: #fff !important; text-align: right; box-shadow: none; }
+	.clientes-page .clientes-table .precio-par .precio-par-valor { display: inline-block; width: 78px; height: 22px; line-height: 22px; text-align: right; font-weight: 600; }
+	.clientes-page .clientes-table .utilidad-ofima { display: inline-block; min-width: 40px; text-align: center; font-weight: 700; }
+	.clientes-page .clientes-table th[data-col="precio"],
+	.clientes-page .clientes-table td.col-precio {
+		width: 148px;
+		min-width: 148px;
+	}
+	.clientes-page .clientes-table input.precio-lista-input[type="text"] { width: 124px !important; height: 22px; margin: 0; padding: 0 0.15rem; text-align: right; font-weight: 700; box-sizing: border-box; }
 	.clientes-page .clientes-busqueda-principal .productos-columnas { flex: 0 0 auto; }
 	.clientes-page .clientes-busqueda-principal #btnColumnasProducto {
 		height: 36px;

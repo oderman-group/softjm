@@ -18,7 +18,7 @@ if (!$fila) {
     exit;
 }
 
-$origenes = $origenPrecioProducto ?? ["N/A", "Costo", "Utilidad", "Costo y utilidad", "Guardado de precios"];
+$origenes = $origenPrecioProducto ?? ["N/A", "Costo", "Utilidad", "Costo y utilidad", "Guardado de precios", "Precio lista"];
 $movimientos = [];
 $consulta = $conexionBdPrincipal->query("SELECT php_precio_anterior, php_precio_nuevo, php_causa, php_fecha_cambio, usr_nombre
 	FROM productos_historial_precios

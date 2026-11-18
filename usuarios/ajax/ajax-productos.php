@@ -114,11 +114,60 @@ function aplicarVisibleWebProducto(
 if ($_POST["proceso"] == 1) {
 
 	try {
+		$campoEdicion = (string) ($_POST['campo'] ?? '');
+		if ($campoEdicion === Producto::PROD_COSTO || $campoEdicion === Producto::PROD_UTILIDAD) {
+			include_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+			if (ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa)) {
+				echo '<span style="color:#b91c1c;">Con Ofima activo, el costo y la utilidad solo se modifican desde Ofima.</span>';
+				exit();
+			}
+		}
+
+		$precioAnterior = null;
+		if ($campoEdicion === 'prod_precio') {
+			$consultaPrecio = mysqli_query($conexionBdPrincipal, "SELECT prod_precio FROM productos WHERE prod_id='".$_POST["producto"]."' LIMIT 1");
+			$filaPrecio = $consultaPrecio ? mysqli_fetch_assoc($consultaPrecio) : null;
+			$precioAnterior = $filaPrecio['prod_precio'] ?? null;
+		}
+
 		mysqli_query($conexionBdPrincipal,"UPDATE ".$_POST["tabla"]." 
 		SET ".$_POST["campo"]."='".$_POST["valor"]."', 
 		prod_ultima_actualizacion=now(), 
 		prod_ultima_actualizacion_usuario='".$_SESSION["id"]."' 
 		WHERE ".$_POST["pk"]."='".$_POST["producto"]."'");
+
+		if ($campoEdicion === 'prod_precio' && $precioAnterior !== null) {
+			mysqli_query($conexionBdPrincipal,"INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)
+			VALUES('".$_POST["producto"]."', '".$precioAnterior."', '".$_POST["valor"]."', '".$_SESSION["id"]."', 5)");
+
+			$syncOfima = ['success' => false, 'error' => 'No se pudo sincronizar el precio con Ofima'];
+			try {
+				$syncOfima = Producto::sincronizarConOfima((int) $_POST['producto'], $conexionBdPrincipal, (int) $idEmpresa, 'UPDATE');
+			} catch (Exception $e) {
+				error_log('Error al actualizar precio de lista en Ofima: ' . $e->getMessage());
+				$syncOfima = [
+					'success' => false,
+					'error' => $e->getMessage(),
+					'notificacion' => [
+						'tipo' => 'error',
+						'mensaje' => 'Ofima: ' . $e->getMessage(),
+					],
+				];
+			}
+			$ofimaOk = !empty($syncOfima['success']);
+			$ofimaTipo = $syncOfima['notificacion']['tipo'] ?? ($ofimaOk ? 'success' : 'error');
+			$ofimaMensaje = $syncOfima['notificacion']['mensaje']
+				?? $syncOfima['error']
+				?? $syncOfima['message']
+				?? 'No se pudo actualizar el precio de lista en Ofima.';
+			$claseAlerta = 'alert-danger';
+			if ($ofimaTipo === 'success') {
+				$claseAlerta = 'alert-success';
+			} elseif ($ofimaTipo === 'warning') {
+				$claseAlerta = 'alert-warning';
+			}
+			echo '<div class="alert ' . $claseAlerta . '">' . htmlspecialchars((string) $ofimaMensaje, ENT_QUOTES, 'UTF-8') . '</div>';
+		}
 
 		if ($_POST["campo"] == Producto::PROD_UTILIDAD) {
 			$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM productos WHERE prod_id='".$_POST["producto"]."'");

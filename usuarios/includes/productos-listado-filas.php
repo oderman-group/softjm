@@ -134,6 +134,9 @@ if ($consulta->num_rows === 0) {
 														<div class="precio-par" translate="no">
 															<label class="precio-par-fila">
 																<span>COP:</span>
+																<?php if (!empty($ofimaProductosActiva)) { ?>
+																	<span class="precio-par-valor" title="El costo lo actualiza Ofima"><?= htmlspecialchars((string) ($res['prod_costo'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></span>
+																<?php } else { ?>
 																<input
 																	id="costo<?= $res['prod_id']; ?>"
 																	type="text"
@@ -143,6 +146,7 @@ if ($consulta->num_rows === 0) {
 																	value="<?= $res['prod_costo']; ?>"
 																	onChange="productos(this)"
 																>
+																<?php } ?>
 															</label>
 															<label class="precio-par-fila">
 																<span>USD:</span>
@@ -162,6 +166,9 @@ if ($consulta->num_rows === 0) {
 													<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 
 													<td>
+														<?php if (!empty($ofimaProductosActiva)) { ?>
+															<span class="utilidad-ofima" title="La utilidad la actualiza Ofima" translate="no"><?= htmlspecialchars((string) ($res['prod_utilidad'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></span>
+														<?php } else { ?>
 														<input 
 															id="utilidad<?= $res['prod_id']; ?>" 
 															type="text" 
@@ -173,6 +180,7 @@ if ($consulta->num_rows === 0) {
 															onChange="productos(this)"
 															translate="no"
 														>
+														<?php } ?>
 														<span style="visibility: hidden;" translate="no"><?= $res['prod_utilidad']; ?></span>
 													</td>
 												<?php }
@@ -183,7 +191,22 @@ if ($consulta->num_rows === 0) {
 												}
 												?>
 
-												<td id="precioLista<?= $res['prod_id']; ?>">$<?= number_format($precioLista, 0, ",", "."); ?></td>
+												<td id="precioLista<?= $res['prod_id']; ?>" class="col-precio">
+													<?php if (!empty($ofimaProductosActiva)) { ?>
+														<input
+															id="precioListaInput<?= $res['prod_id']; ?>"
+															class="precio-lista-input"
+															type="text"
+															title="prod_precio"
+															name="<?= $res[$pk]; ?>"
+															value="<?= htmlspecialchars('$' . number_format((float) $precioLista, 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?>"
+															onChange="productos(this)"
+															translate="no"
+														>
+													<?php } else { ?>
+														$<?= number_format($precioLista, 0, ",", "."); ?>
+													<?php } ?>
+												</td>
 
 												<?php if (Modulos::validarRol([402], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 													<td id="precioListaIva<?= $res['prod_id']; ?>">$<?= number_format($precioConIva, 0, ",", "."); ?></td>
