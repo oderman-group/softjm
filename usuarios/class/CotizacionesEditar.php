@@ -33,6 +33,20 @@ class CotizacionesEditar {
     }
 
     /**
+     * Muestra el porcentaje guardado: dos decimales si no necesita más,
+     * o los decimales extra cuando el valor del descuento se digitó exacto.
+     */
+    private static function textoDescuento($valor): string {
+        $numero = self::toFloat($valor);
+        if (abs($numero - round($numero, 2)) < 0.000000005) {
+            return number_format($numero, 2, '.', '');
+        }
+
+        $texto = rtrim(rtrim(number_format($numero, 8, '.', ''), '0'), '.');
+        return $texto === '' ? '0.00' : $texto;
+    }
+
+    /**
      * 
      */
     public static function generarTablaProductos(
@@ -124,7 +138,7 @@ class CotizacionesEditar {
             $htmlTabla .= '<td>';
             $htmlTabla .= '<div class="precio-par cotiz-dcto" translate="no">';
             $htmlTabla .= '<label class="precio-par-fila"><span>%</span>';
-            $htmlTabla .= '<input type="text" class="dcto-porcentaje" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" oninput="mostrarMontoDescuento(this)" onChange="productos(this)" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_descuento'].'">';
+            $htmlTabla .= '<input type="text" class="dcto-porcentaje" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . self::textoDescuento($prod['czpp_descuento']) . '" oninput="descuentoPorcentaje(this)" onChange="productos(this)" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.self::textoDescuento($prod['czpp_descuento']).'">';
             $htmlTabla .= '</label>';
             $htmlTabla .= '<label class="precio-par-fila"><span>Valor</span>';
             $htmlTabla .= '<input type="text" class="dcto-valor" value="' . number_format($dcto, 2, '.', '') . '" onChange="descuentoValor(this)" title="Valor descontado" translate="no" placeholder="0.00" '.$camposCotizacionDisabled.'>';
@@ -292,7 +306,7 @@ class CotizacionesEditar {
             $htmlTabla .= '<td>';
             $htmlTabla .= '<div class="precio-par cotiz-dcto" translate="no">';
             $htmlTabla .= '<label class="precio-par-fila"><span>%</span>';
-            $htmlTabla .= '<input type="text" class="dcto-porcentaje" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" oninput="mostrarMontoDescuento(this)" onChange="combos(this)" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_descuento'].'">';
+            $htmlTabla .= '<input type="text" class="dcto-porcentaje" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . self::textoDescuento($prod['czpp_descuento']) . '" oninput="descuentoPorcentaje(this)" onChange="combos(this)" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.self::textoDescuento($prod['czpp_descuento']).'">';
             $htmlTabla .= '</label>';
             $htmlTabla .= '<label class="precio-par-fila"><span>Valor</span>';
             $htmlTabla .= '<input type="text" class="dcto-valor" value="' . number_format($dcto, 2, '.', '') . '" onChange="descuentoValor(this)" title="Valor descontado" translate="no" placeholder="0.00" '.$camposCotizacionDisabled.'>';

@@ -228,15 +228,43 @@ include("includes/js-formularios.php");
 			var n = parseFloat(String(el.value).trim().replace(/\s/g, '').replace(',', '.'));
 			return isNaN(n) ? 0 : n;
 		}
+		function porcentajeDesdeMonto(monto, base) {
+			var centavos = Math.round(monto * 100);
+			var bruto = (monto / base) * 100;
+			var decimales;
+			var factor;
+			var candidato;
+			for (decimales = 2; decimales <= 8; decimales++) {
+				factor = Math.pow(10, decimales);
+				candidato = Math.round(bruto * factor) / factor;
+				if (Math.round(base * candidato) === centavos) {
+					return candidato.toFixed(decimales);
+				}
+			}
+			return bruto.toFixed(8);
+		}
 		function mostrarMontoDescuento(origen) {
 			var fila = origen && origen.closest ? origen.closest('tr') : null;
 			if (!fila) return;
 			var pct = fila.querySelector('input[title="czpp_descuento"]');
 			var monto = fila.querySelector('input.dcto-valor');
 			if (!pct || !monto) return;
+			if (monto.getAttribute('data-valor-fijo') === '1') return;
 			var base = numeroCampoCotiz(fila.querySelector('input[title="czpp_cantidad"]')) * numeroCampoCotiz(fila.querySelector('input[title="czpp_valor"]'));
 			var valor = base * (numeroCampoCotiz(pct) / 100);
 			monto.value = (isFinite(valor) ? valor : 0).toFixed(2);
+		}
+		function descuentoPorcentaje(origen) {
+			var fila = origen && origen.closest ? origen.closest('tr') : null;
+			var monto = fila ? fila.querySelector('input.dcto-valor') : null;
+			if (monto) monto.removeAttribute('data-valor-fijo');
+			mostrarMontoDescuento(origen);
+		}
+		function restaurarMontoDescuento(enviada) {
+			var fila = enviada && enviada.closest ? enviada.closest('tr') : null;
+			var monto = fila ? fila.querySelector('input.dcto-valor') : null;
+			if (monto) monto.removeAttribute('data-valor-fijo');
+			mostrarMontoDescuento(enviada);
 		}
 		function descuentoValor(input) {
 			var fila = input.closest('tr');
@@ -251,9 +279,11 @@ include("includes/js-formularios.php");
 			}
 			if (monto < 0) monto = 0;
 			if (monto > base) monto = base;
-			pctInput.setAttribute('data-valor-actual', pctInput.value);
-			pctInput.value = ((monto / base) * 100).toFixed(2);
+			monto = Math.round(monto * 100) / 100;
 			input.value = monto.toFixed(2);
+			input.setAttribute('data-valor-fijo', '1');
+			pctInput.setAttribute('data-valor-actual', pctInput.value);
+			pctInput.value = porcentajeDesdeMonto(monto, base);
 			if (fila.classList.contains('combo')) combos(pctInput);
 			else productos(pctInput);
 		}
@@ -286,14 +316,14 @@ include("includes/js-formularios.php");
 						hideAjaxOverlay();
 						notificarCotizacion(response.message, 'error');
 						enviada.value = valorAnterior;
-						mostrarMontoDescuento(enviada);
+						restaurarMontoDescuento(enviada);
 					}
 				},
 				error: function() {
 					hideAjaxOverlay();
 					notificarCotizacion('Error al actualizar el producto', 'error');
 					enviada.value = valorAnterior;
-					mostrarMontoDescuento(enviada);
+					restaurarMontoDescuento(enviada);
 				}
 			});
 		}
@@ -322,7 +352,7 @@ include("includes/js-formularios.php");
 							if (aviso) {
 								notificarCotizacion(aviso[1], 'error');
 								if (valorAnterior !== null) enviada.value = valorAnterior;
-								mostrarMontoDescuento(enviada);
+								restaurarMontoDescuento(enviada);
 								return;
 							}
 							enviada.setAttribute('data-valor-actual', enviada.value);
@@ -335,7 +365,7 @@ include("includes/js-formularios.php");
 							hideAjaxOverlay();
 							notificarCotizacion('Error al actualizar el combo', 'error');
 							if (valorAnterior !== null) enviada.value = valorAnterior;
-							mostrarMontoDescuento(enviada);
+							restaurarMontoDescuento(enviada);
 						}
 					});
 		}	
@@ -740,6 +770,26 @@ include("includes/js-formularios.php");
 	}
 	.clientes-page .widget-head h3 { color: #fff; font-size: 1rem; font-weight: 700; margin: 0; }
 	.clientes-page .widget-container { background: #fff; border-radius: 0 0 13px 13px; padding: 1rem 1.15rem 1.15rem; }
+	#productos.is-cargando #data-table { display: none; }
+	#productos .items-cargando { display: none; }
+	#productos.is-cargando .items-cargando {
+		align-items: center;
+		color: #047857;
+		display: flex;
+		flex-direction: column;
+		font-weight: 700;
+		gap: 10px;
+		justify-content: center;
+		min-height: 180px;
+	}
+	#productos .items-cargando p { margin: 0; }
+	#productos .items-cargando .spinner-modern {
+		border-right-color: #047857;
+		border-top-color: #059669;
+		height: 42px;
+		margin: 0;
+		width: 42px;
+	}
 	.clientes-page .form-horizontal .control-label { color: #334155; font-weight: 600; font-size: 0.8125rem; }
 	.clientes-page .form-horizontal input[type="text"],
 	.clientes-page .form-horizontal input[type="number"],
@@ -1419,11 +1469,15 @@ include("includes/js-formularios.php");
 					
 					<span id="resp"></span>
 					
-					<div class="content-widgets light-gray" id="productos">
+					<div class="content-widgets light-gray is-cargando" id="productos">
 						<div class="widget-head green">
 							<h3>PRODUCTOS</h3>
 						</div>
 						<div class="widget-container">
+							<div class="items-cargando" id="itemsCargando">
+								<div class="spinner-modern"></div>
+								<p>Cargando productos...</p>
+							</div>
 							<p></p>
 							<table class="table table-striped table-bordered" id="data-table">
 							<thead>
@@ -1461,7 +1515,7 @@ include("includes/js-formularios.php");
 									<td style="text-align: right;" colspan="<?=$colspan;?>">DESCUENTO</td>
 									<td id="totalDiscount"><span class="moneda-simbolo">
 										<?=$simbolosMonedas[$resultadoD['cotiz_moneda']];?> </span>
-										<span class="valor-numerico"><?=!empty($totalDescuento) ? number_format($envio,0,",",".") : 0;?>
+										<span class="valor-numerico"><?=!empty($totalDescuento) ? number_format($totalDescuento,0,",",".") : 0;?>
 										</span></td>
 								</tr>
 								<tr style="font-weight: bold; font-size: 16px;">
@@ -1602,7 +1656,7 @@ include("includes/js-formularios.php");
 		</div>
 	</div>
 	<?php include("includes/pie.php");?>
-	<script src="js/Cotizaciones.js"></script>
+	<script src="js/Cotizaciones.js?v=20261119c"></script>
 </div>
 
 <script>

@@ -451,6 +451,44 @@ class JmWebProductosSync
     }
 
     /**
+     * Actualiza solo el precio web de un producto que ya existe en el CMS.
+     *
+     * @return array{success:bool, action:string, precio:?string, message:?string}
+     */
+    public static function actualizarPrecioWebExistente(mysqli $jm, array $productoOrion): array
+    {
+        $prodIdCrm = (int) ($productoOrion['prod_id'] ?? 0);
+        if ($prodIdCrm <= 0) {
+            return [
+                'success' => false,
+                'action' => 'error',
+                'precio' => null,
+                'message' => 'prod_id Orion inválido',
+            ];
+        }
+
+        $existenteId = self::obtenerProductoJmPorCrmId($jm, $prodIdCrm);
+        if ($existenteId <= 0) {
+            return [
+                'success' => true,
+                'action' => 'noop',
+                'precio' => null,
+                'message' => 'El producto no está en el CMS',
+            ];
+        }
+
+        $precio = self::calcularPrecioWebOrion($productoOrion);
+        self::actualizarSoloPrecioJm($jm, $existenteId, $precio);
+
+        return [
+            'success' => true,
+            'action' => 'update',
+            'precio' => $precio,
+            'message' => null,
+        ];
+    }
+
+    /**
      * Precio lista menos descuento web (si aplica).
      */
     public static function calcularPrecioWebOrion(array $productoOrion): string
@@ -508,6 +546,22 @@ class JmWebProductosSync
         if (!$stmt->execute()) {
             $stmt->close();
             throw new RuntimeException('JM Web: ocultar producto falló: ' . $jm->error);
+        }
+        $stmt->close();
+    }
+
+    private static function actualizarSoloPrecioJm(mysqli $jm, int $propId, string $precio): void
+    {
+        $stmt = $jm->prepare(
+            'UPDATE gw_productos SET prod_precio = ? WHERE prop_id = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            throw new RuntimeException('JM Web: prepare precio web falló: ' . $jm->error);
+        }
+        $stmt->bind_param('si', $precio, $propId);
+        if (!$stmt->execute()) {
+            $stmt->close();
+            throw new RuntimeException('JM Web: actualizar precio web falló: ' . $jm->error);
         }
         $stmt->close();
     }

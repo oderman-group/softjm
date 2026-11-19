@@ -303,8 +303,10 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 		if (data == null || data === '') return;
 
 		var $tmp = $('<div>').append($.parseHTML(String(data), document, true));
-		var $alert = $tmp.find('.alert').first();
-		if ($alert.length) {
+		var huboAlerta = false;
+		$tmp.find('.alert').each(function () {
+			huboAlerta = true;
+			var $alert = $(this);
 			var tipo = 'info';
 			if ($alert.hasClass('alert-success')) tipo = 'success';
 			else if ($alert.hasClass('alert-danger') || $alert.hasClass('alert-error')) tipo = 'error';
@@ -313,7 +315,7 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 			texto = texto.replace(/^Exito!\s*/i, 'Éxito: ').replace(/^Éxito!\s*/i, 'Éxito: ');
 			if (texto) productosToast(texto, tipo);
 			$alert.remove();
-		}
+		});
 
 		var leftover = ($tmp.html() || '').trim();
 		if (!leftover) return;
@@ -324,7 +326,7 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 		setTimeout(function () { $holder.remove(); }, 0);
 
 		var textoPlano = $tmp.text().replace(/\s+/g, ' ').trim();
-		if (!$alert.length && textoPlano) {
+		if (!huboAlerta && textoPlano) {
 			productosToast(textoPlano, 'info');
 		}
 	}
@@ -580,8 +582,8 @@ $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEm
 	}
 	.clientes-page .clientes-table td.col-nombre h4 a:hover { transform: scale(1.45); }
 	.clientes-page .clientes-table input[type="text"] { width: 52px !important; font-size: 0.7rem; padding: 0.15rem; }
-	.precio-par { display: inline-flex; flex-direction: column; border: 1px solid #94a3b8; line-height: 1.2; background: #fff; }
-	.precio-par-fila { display: flex; align-items: center; gap: 0.35rem; margin: 0; padding: 0 0.35rem; border-bottom: 1px solid #94a3b8; font-weight: 600; color: #0f172a; text-transform: none; letter-spacing: 0; }
+	.precio-par { display: inline-flex; flex-direction: column; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; line-height: 1.2; background: #fff; }
+	.precio-par-fila { display: flex; align-items: center; gap: 0.35rem; margin: 0; padding: 0 0.35rem; border-bottom: 1px solid #cbd5e1; font-weight: 600; color: #0f172a; text-transform: none; letter-spacing: 0; }
 	.precio-par-fila:last-child { border-bottom: 0; }
 	.precio-par-fila span { flex: 0 0 auto; }
 	.clientes-page .clientes-table .precio-par input[type="text"] { width: 78px !important; height: 22px; margin: 0; padding: 0; border: 0; background: #fff !important; text-align: right; box-shadow: none; }

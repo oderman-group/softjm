@@ -110,6 +110,59 @@ function aplicarVisibleWebProducto(
 	}
 }
 
+/**
+ * Envía al CMS el precio web (lista menos descuento web) del producto ya publicado.
+ */
+function sincronizarPrecioWebCms(mysqli $conexionBdPrincipal, int $productoId): void
+{
+	if ($productoId <= 0) {
+		return;
+	}
+
+	require_once RUTA_PROYECTO . '/usuarios/includes/jm-web-conexion.php';
+	require_once RUTA_PROYECTO . '/usuarios/class/JmWebProductosSync.php';
+
+	$stmt = $conexionBdPrincipal->prepare(
+		'SELECT prod_id, prod_precio, prod_descuento_web FROM productos WHERE prod_id = ? LIMIT 1'
+	);
+	if (!$stmt) {
+		echo '<div class="alert alert-warning">No se pudo leer el producto para actualizar el precio web en el CMS.</div>';
+		return;
+	}
+	$stmt->bind_param('i', $productoId);
+	$stmt->execute();
+	$producto = $stmt->get_result()->fetch_assoc();
+	$stmt->close();
+	if (!$producto) {
+		return;
+	}
+
+	$jm = obtenerConexionJmWeb();
+	if (!$jm) {
+		echo '<div class="alert alert-warning">El precio quedó guardado en Orion. No hay conexión con el CMS para actualizar el precio web.</div>';
+		return;
+	}
+
+	try {
+		$resultado = JmWebProductosSync::actualizarPrecioWebExistente($jm, $producto);
+	} catch (Throwable $e) {
+		echo '<div class="alert alert-warning">El precio quedó guardado en Orion. No se pudo actualizar el CMS: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</div>';
+		return;
+	}
+
+	if (($resultado['action'] ?? '') === 'noop') {
+		echo '<div class="alert alert-warning">El precio quedó guardado en Orion. Este producto no está en el CMS.</div>';
+		return;
+	}
+	if (empty($resultado['success'])) {
+		echo '<div class="alert alert-warning">El precio quedó guardado en Orion. No se pudo actualizar el precio web en el CMS.</div>';
+		return;
+	}
+
+	$precio = (string) ($resultado['precio'] ?? '');
+	echo '<div class="alert alert-success">Precio web actualizado en el CMS: $' . htmlspecialchars($precio, ENT_QUOTES, 'UTF-8') . '.</div>';
+}
+
 //EDITAR PRODUCTOS
 if ($_POST["proceso"] == 1) {
 
@@ -167,6 +220,10 @@ if ($_POST["proceso"] == 1) {
 				$claseAlerta = 'alert-warning';
 			}
 			echo '<div class="alert ' . $claseAlerta . '">' . htmlspecialchars((string) $ofimaMensaje, ENT_QUOTES, 'UTF-8') . '</div>';
+		}
+
+		if ($campoEdicion === 'prod_precio' || $campoEdicion === 'prod_descuento_web') {
+			sincronizarPrecioWebCms($conexionBdPrincipal, (int) $_POST['producto']);
 		}
 
 		if ($_POST["campo"] == Producto::PROD_UTILIDAD) {
@@ -485,30 +542,37 @@ if($_POST["proceso"]==8){
 	}
 
 	if($campoCotizacion=='czpp_cantidad'){
-		$datosProducto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
-		INNER JOIN productos_bodegas ON prodb_producto=czpp_producto AND prodb_bodega=czpp_bodega
-		WHERE czpp_id='".$_POST["producto"]."'
-		"), MYSQLI_BOTH);
-		
-		if($_POST["valor"]>$datosProducto['prodb_existencias']){
-			echo '<script type="text/javascript">alert("Excedió el limite: Solo existen '.$datosProducto['prodb_existencias'].' unidades de este producto en esta bodega. No es posible colocar '.$_POST["valor"].'.");</script>';
-			exit();	
-		}
+		include_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+		$tipoLinea = mysqli_fetch_assoc(mysqli_query(
+			$conexionBdPrincipal,
+			"SELECT czpp_tipo FROM cotizacion_productos WHERE czpp_id='".(int) $_POST['producto']."' LIMIT 1"
+		));
+		$remisionSinStock = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa)
+			&& (int) ($tipoLinea['czpp_tipo'] ?? 0) === (int) CZPP_TIPO_REM;
 
-		//Restamos a las existencias
-		if($_POST["valor"]>$datosProducto['czpp_cantidad']){
-			$result = $_POST["valor"] - $datosProducto['czpp_cantidad'];
-
-			mysqli_query($conexionBdPrincipal,"UPDATE productos_bodegas SET prodb_existencias=(prodb_existencias - $result) WHERE prodb_id='".$datosProducto["prodb_id"]."'");
+		if (!$remisionSinStock) {
+			$datosProducto = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM cotizacion_productos 
+			INNER JOIN productos_bodegas ON prodb_producto=czpp_producto AND prodb_bodega=czpp_bodega
+			WHERE czpp_id='".$_POST["producto"]."'
+			"), MYSQLI_BOTH);
 			
-		}else{
-			$result = $datosProducto['czpp_cantidad'] - $_POST["valor"] ;
+			if($_POST["valor"]>$datosProducto['prodb_existencias']){
+				echo '<script type="text/javascript">alert("Excedió el limite: Solo existen '.$datosProducto['prodb_existencias'].' unidades de este producto en esta bodega. No es posible colocar '.$_POST["valor"].'.");</script>';
+				exit();	
+			}
 
-			mysqli_query($conexionBdPrincipal,"UPDATE productos_bodegas SET prodb_existencias=(prodb_existencias + $result) WHERE prodb_id='".$datosProducto["prodb_id"]."'");
-			
+			if($_POST["valor"]>$datosProducto['czpp_cantidad']){
+				$result = $_POST["valor"] - $datosProducto['czpp_cantidad'];
+
+				mysqli_query($conexionBdPrincipal,"UPDATE productos_bodegas SET prodb_existencias=(prodb_existencias - $result) WHERE prodb_id='".$datosProducto["prodb_id"]."'");
+				
+			}else{
+				$result = $datosProducto['czpp_cantidad'] - $_POST["valor"] ;
+
+				mysqli_query($conexionBdPrincipal,"UPDATE productos_bodegas SET prodb_existencias=(prodb_existencias + $result) WHERE prodb_id='".$datosProducto["prodb_id"]."'");
+				
+			}
 		}
-
-		
 	}
 
 	mysqli_query($conexionBdPrincipal,"UPDATE cotizacion_productos SET ".$campoCotizacion."='".mysqli_real_escape_string($conexionBdPrincipal,$_POST["valor"])."' WHERE czpp_id='".$_POST["producto"]."'");

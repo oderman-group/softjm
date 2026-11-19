@@ -64,8 +64,12 @@ foreach ($pedidosFilas as $res) {
 					<?php if (!empty($puedePdfPedido)) { ?>
 						<li><a href="reportes/formato-pedido-1_pdf.php?id=<?= (int) $res['pedid_id']; ?>" class="accion-pdf" target="_blank"><i class="icon-file-alt"></i>Generar PDF</a></li>
 					<?php } ?>
-					<?php if (empty($ofimaPedidosBloqueados) && $idRemision === '' && !empty($puedeRemisionPedido)) { ?>
-						<li><a href="bd_create/pedidos-generar-remision-v2.php?id=<?= (int) $res['pedid_id']; ?>" class="accion-remision" onClick="if(!confirm('Esta acción descontará existencias de los productos asociados. Desea generar remisión de este pedido?')){return false;}"><i class="icon-truck"></i>Generar remisión</a></li>
+					<?php if (empty($ofimaPedidosBloqueados) && $idRemision === '' && !empty($puedeRemisionPedido)) {
+						$confirmaRemision = !empty($ofimaBotonEnvio)
+							? 'La integración con Ofima está activa. Se generará la remisión sin descontar existencias. ¿Desea continuar?'
+							: 'Esta acción descontará existencias de los productos asociados. Desea generar remisión de este pedido?';
+					?>
+						<li><a href="bd_create/pedidos-generar-remision-v2.php?id=<?= (int) $res['pedid_id']; ?>" class="accion-remision" onClick="if(!confirm('<?= htmlspecialchars($confirmaRemision, ENT_QUOTES, 'UTF-8'); ?>')){return false;}"><i class="icon-truck"></i>Generar remisión</a></li>
 					<?php } ?>
 				</ul>
 			</div>
