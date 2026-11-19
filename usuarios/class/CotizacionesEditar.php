@@ -121,7 +121,14 @@ class CotizacionesEditar {
 
             $htmlTabla .= '</td>';
             $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_impuesto'].'"></td>';
-            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_descuento'].'"></td>';
+            $htmlTabla .= '<td>';
+            $htmlTabla .= '<div class="precio-par cotiz-dcto" translate="no">';
+            $htmlTabla .= '<label class="precio-par-fila"><span>%</span>';
+            $htmlTabla .= '<input type="text" class="dcto-porcentaje" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" oninput="mostrarMontoDescuento(this)" onChange="productos(this)" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_descuento'].'">';
+            $htmlTabla .= '</label>';
+            $htmlTabla .= '<label class="precio-par-fila"><span>Valor</span>';
+            $htmlTabla .= '<input type="text" class="dcto-valor" value="' . number_format($dcto, 2, '.', '') . '" onChange="descuentoValor(this)" title="Valor descontado" translate="no" placeholder="0.00" '.$camposCotizacionDisabled.'>';
+            $htmlTabla .= '</label></div></td>';
 
             if ($resultadoD['cotiz_descuentos_especiales'] == 1) {
                 $htmlTabla .= '<td>';
@@ -282,7 +289,14 @@ class CotizacionesEditar {
             }
             $htmlTabla .= '</td>';
             $htmlTabla .= '<td><input type="text" title="czpp_impuesto" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_impuesto'] . '" onChange="productos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
-            $htmlTabla .= '<td><input type="text" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'></td>';
+            $htmlTabla .= '<td>';
+            $htmlTabla .= '<div class="precio-par cotiz-dcto" translate="no">';
+            $htmlTabla .= '<label class="precio-par-fila"><span>%</span>';
+            $htmlTabla .= '<input type="text" class="dcto-porcentaje" title="czpp_descuento" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento'] . '" oninput="mostrarMontoDescuento(this)" onChange="combos(this)" translate="no" '.$camposCotizacionDisabled.' data-valor-actual="'.$prod['czpp_descuento'].'">';
+            $htmlTabla .= '</label>';
+            $htmlTabla .= '<label class="precio-par-fila"><span>Valor</span>';
+            $htmlTabla .= '<input type="text" class="dcto-valor" value="' . number_format($dcto, 2, '.', '') . '" onChange="descuentoValor(this)" title="Valor descontado" translate="no" placeholder="0.00" '.$camposCotizacionDisabled.'>';
+            $htmlTabla .= '</label></div></td>';
             if ($resultadoD['cotiz_descuentos_especiales'] == 1) {
                 $htmlTabla .= '<td>';
                 $htmlTabla .= '<input type="text" title="czpp_descuento_especial" name="' . $prod['czpp_id'] . '" value="' . $prod['czpp_descuento_especial'] . '" onChange="combos(this)" style="width: 50px; text-align: center;" translate="no" '.$camposCotizacionDisabled.'>';

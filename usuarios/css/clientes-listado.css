@@ -903,3 +903,155 @@
     grid-template-columns: 1fr;
   }
 }
+
+#drawerOfimaOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 100000;
+  opacity: 0;
+  visibility: hidden;
+}
+#drawerOfimaOverlay.is-open { opacity: 1; visibility: visible; }
+#drawerOfimaError {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(520px, 92vw);
+  height: 100vh;
+  background: #fff;
+  z-index: 100001;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.35s ease;
+  box-shadow: -8px 0 32px rgba(15, 23, 42, 0.15);
+}
+#drawerOfimaError.is-open { transform: translateX(0); }
+#drawerOfimaError .drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.25rem;
+  color: #fff;
+  background: #b91c1c;
+}
+#drawerOfimaError.is-ok .drawer-header { background: #047857; }
+#drawerOfimaError .drawer-header h2 { margin: 0; font-size: 1.1rem; }
+#drawerOfimaError .drawer-close {
+  background: rgba(255, 255, 255, 0.15);
+  border: 0;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+#drawerOfimaError .drawer-body { flex: 1; overflow: auto; padding: 1rem 1.25rem; }
+#drawerOfimaError .drawer-label {
+  margin: 0 0 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+#drawerOfimaError .drawer-label.is-second { margin-top: 1rem; }
+#drawerOfimaError pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #334155;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0.85rem;
+}
+#drawerOfimaError pre.is-enviado {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+#drawerOfimaError.is-ok pre:not(.is-enviado) {
+  color: #065f46;
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.clientes-page .cotiz-acciones .btn-group { position: relative; }
+.clientes-page tr:has(.btn-group.open) { position: relative; z-index: 6; }
+.clientes-page .cotiz-acciones .dropdown-menu {
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  float: none;
+  min-width: 228px;
+  margin: 0;
+  padding: 0.35rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+  z-index: 40;
+}
+.clientes-page .cotiz-acciones .dropdown-menu > li > a {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.clientes-page .cotiz-acciones .dropdown-menu > li > a:hover,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a:focus {
+  background: #f8fafc;
+  text-decoration: none;
+}
+.clientes-page .cotiz-acciones .dropdown-menu > li > a i {
+  width: 1rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-pendiente,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-pendiente:hover,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-pendiente:focus { color: #c2410c; }
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-ok,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-ok:hover,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-ok:focus { color: #047857; }
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-error,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-error:hover,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-error:focus { color: #b91c1c; }
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-msg,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-msg:hover,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.ofima-msg:focus { color: #334155; }
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-eliminar,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-eliminar:hover,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-eliminar:focus { color: #b91c1c; }
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-pdf,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-pdf:hover,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-pdf:focus { color: #1d4ed8; }
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-remision,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-remision:hover,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-remision:focus { color: #047857; }
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-editar,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-editar:hover,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-editar:focus { color: #0f172a; }
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-replicar,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-replicar:hover,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-replicar:focus { color: #6d28d9; }
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-pedido,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-pedido:hover,
+.clientes-page .cotiz-acciones .dropdown-menu > li > a.accion-pedido:focus { color: #0369a1; }
+.clientes-page .cotiz-acciones .dropdown-menu .divider {
+  height: 1px;
+  margin: 0.3rem 0.45rem;
+  background: #e2e8f0;
+  border: 0;
+}

@@ -157,6 +157,7 @@ if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaServicios') {
 <?php include("includes/head.php"); ?>
 
 <link href="css/chosen.css" rel="stylesheet">
+<link href="css/clientes-listado.css" rel="stylesheet">
 <link href="../assets-login/plugins/select2/css/select2.css" rel="stylesheet" />
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -184,6 +185,78 @@ include("includes/js-formularios.php");
 <?php if($resultadoD['cotiz_vendida']!=1){?>
 
 	<script type="text/javascript">
+		function notificarCotizacion(mensaje, tipo) {
+			tipo = tipo || 'info';
+			var colores = { success: '#047857', error: '#b91c1c', warning: '#b45309', info: '#334155' };
+			var color = colores[tipo] || colores.info;
+			var duracion = tipo === 'success' ? 7000 : (tipo === 'error' ? 5500 : 4200);
+			var nav = document.querySelector('.navbar .navbar-inner') || document.querySelector('.navbar-inner') || document.querySelector('.navbar');
+			var offsetY = 96;
+			if (nav) offsetY = Math.max(88, Math.round(nav.getBoundingClientRect().bottom + 12));
+			var caja = document.getElementById('resp');
+			if (caja) {
+				caja.innerHTML = '';
+				caja.style.display = 'none';
+			}
+			if (typeof Toastify === 'function') {
+				Toastify({
+					text: String(mensaje || ''),
+					duration: duracion,
+					gravity: 'top',
+					position: 'right',
+					close: true,
+					stopOnFocus: true,
+					backgroundColor: color,
+					offset: { x: 16, y: offsetY },
+					style: {
+						background: color,
+						color: '#fff',
+						borderRadius: '10px',
+						boxShadow: '0 12px 30px rgba(15, 23, 42, 0.25)',
+						fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif",
+						fontSize: '0.875rem',
+						fontWeight: '600',
+						maxWidth: '420px',
+						padding: '12px 16px',
+						zIndex: 10060
+					}
+				}).showToast();
+			}
+		}
+		function numeroCampoCotiz(el) {
+			if (!el) return 0;
+			var n = parseFloat(String(el.value).trim().replace(/\s/g, '').replace(',', '.'));
+			return isNaN(n) ? 0 : n;
+		}
+		function mostrarMontoDescuento(origen) {
+			var fila = origen && origen.closest ? origen.closest('tr') : null;
+			if (!fila) return;
+			var pct = fila.querySelector('input[title="czpp_descuento"]');
+			var monto = fila.querySelector('input.dcto-valor');
+			if (!pct || !monto) return;
+			var base = numeroCampoCotiz(fila.querySelector('input[title="czpp_cantidad"]')) * numeroCampoCotiz(fila.querySelector('input[title="czpp_valor"]'));
+			var valor = base * (numeroCampoCotiz(pct) / 100);
+			monto.value = (isFinite(valor) ? valor : 0).toFixed(2);
+		}
+		function descuentoValor(input) {
+			var fila = input.closest('tr');
+			var pctInput = fila ? fila.querySelector('input[title="czpp_descuento"]') : null;
+			if (!pctInput) return;
+			var base = numeroCampoCotiz(fila.querySelector('input[title="czpp_cantidad"]')) * numeroCampoCotiz(fila.querySelector('input[title="czpp_valor"]'));
+			var monto = numeroCampoCotiz(input);
+			if (base <= 0) {
+				notificarCotizacion('Indique cantidad y precio antes de escribir el valor del descuento.', 'error');
+				input.value = '0.00';
+				return;
+			}
+			if (monto < 0) monto = 0;
+			if (monto > base) monto = base;
+			pctInput.setAttribute('data-valor-actual', pctInput.value);
+			pctInput.value = ((monto / base) * 100).toFixed(2);
+			input.value = monto.toFixed(2);
+			if (fila.classList.contains('combo')) combos(pctInput);
+			else productos(pctInput);
+		}
 		function productos(enviada){
 			var tipoCliente   = enviada.alt;
 			var campo         = enviada.getAttribute('data-campo') || enviada.title;
@@ -191,6 +264,7 @@ include("includes/js-formularios.php");
 			var proceso       = 2;
 			var valor         = enviada.value;
 			var valorAnterior = enviada.getAttribute('data-valor-actual');
+			mostrarMontoDescuento(enviada);
 			
 			// Mostrar overlay con mensaje específico
 			showAjaxOverlay('Actualizando producto...');
@@ -205,20 +279,21 @@ include("includes/js-formularios.php");
 					var response = JSON.parse(data);
 					if(response.success) {
 						$('#resp').empty().hide().html(response.message).show(1);
-						// Ocultar overlay con éxito
+						enviada.setAttribute('data-valor-actual', enviada.value);
+						mostrarMontoDescuento(enviada);
 						hideAjaxOverlay();
 					} else {
-						$('#resp').empty().hide().html('').show(1);
-						// Ocultar overlay y mostrar error
 						hideAjaxOverlay();
-						alert(response.message);
+						notificarCotizacion(response.message, 'error');
 						enviada.value = valorAnterior;
+						mostrarMontoDescuento(enviada);
 					}
 				},
 				error: function() {
 					hideAjaxOverlay();
-					alert('Error al actualizar el producto');
+					notificarCotizacion('Error al actualizar el producto', 'error');
 					enviada.value = valorAnterior;
+					mostrarMontoDescuento(enviada);
 				}
 			});
 		}
@@ -229,8 +304,9 @@ include("includes/js-formularios.php");
 			var producto = enviada.name;
 			var proceso = 11;
 			var valor = enviada.value;
+			var valorAnterior = enviada.getAttribute('data-valor-actual');
+			mostrarMontoDescuento(enviada);
 			
-			// Mostrar overlay
 			showAjaxOverlay('Actualizando combo...');
 			
 			$('#resp').empty().hide().html("Esperando...").show(1);
@@ -240,12 +316,26 @@ include("includes/js-formularios.php");
 						url: "ajax/ajax-productos.php",
 						data: datos,
 						success: function(data){
-						$('#resp').empty().hide().html(data).show(1);
-						hideAjaxOverlay();
+							hideAjaxOverlay();
+							var texto = String(data || '');
+							var aviso = texto.match(/alert\("([\s\S]*?)"\)/);
+							if (aviso) {
+								notificarCotizacion(aviso[1], 'error');
+								if (valorAnterior !== null) enviada.value = valorAnterior;
+								mostrarMontoDescuento(enviada);
+								return;
+							}
+							enviada.setAttribute('data-valor-actual', enviada.value);
+							mostrarMontoDescuento(enviada);
+							if (texto.replace(/\s/g, '') !== '') {
+								$('#resp').empty().hide().html(texto).show(1);
+							}
 						},
 						error: function() {
 							hideAjaxOverlay();
-							alert('Error al actualizar el combo');
+							notificarCotizacion('Error al actualizar el combo', 'error');
+							if (valorAnterior !== null) enviada.value = valorAnterior;
+							mostrarMontoDescuento(enviada);
 						}
 					});
 		}	
@@ -278,7 +368,7 @@ include("includes/js-formularios.php");
 	</script>
 <?php }?>
 </head>
-<body>
+<body class="clientes-page">
 
 <!-- Overlay de carga inicial -->
 <div id="loading-overlay" class="loading-overlay-modern">
@@ -583,70 +673,240 @@ include("includes/js-formularios.php");
 }
 </style>
 
+<style>
+	.clientes-page .cotiz-editar-tabs { border: 0; margin: 0 0 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+	.clientes-page .cotiz-editar-tabs > li { float: none; margin: 0; }
+	.clientes-page .cotiz-editar-tabs > li > a {
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		background: #fff;
+		color: #334155;
+		font-weight: 600;
+		font-size: 0.8125rem;
+		padding: 0.5rem 0.85rem;
+		margin: 0;
+	}
+	.clientes-page .cotiz-editar-tabs > li > a:hover { background: #f8fafc; color: #0f172a; }
+	.clientes-page .cotiz-editar-tabs > li.active > a,
+	.clientes-page .cotiz-editar-tabs > li.active > a:hover,
+	.clientes-page .cotiz-editar-tabs > li.active > a:focus {
+		background: #1d4ed8;
+		border-color: #1d4ed8;
+		color: #fff;
+	}
+	.clientes-page .cotiz-editar-tabs > li.active > a[href="#itemsCotizados"],
+	.clientes-page .cotiz-editar-tabs > li.active > a[href="#itemsCotizados"]:hover,
+	.clientes-page .cotiz-editar-tabs > li.active > a[href="#itemsCotizados"]:focus {
+		background: linear-gradient(135deg, #059669 0%, #047857 100%);
+		border-color: #047857;
+		color: #fff;
+	}
+	.clientes-page .cotiz-editar-tabs > li.active > a[href="#enviarCotizacion"],
+	.clientes-page .cotiz-editar-tabs > li.active > a[href="#enviarCotizacion"]:hover,
+	.clientes-page .cotiz-editar-tabs > li.active > a[href="#enviarCotizacion"]:focus {
+		background: #b91c1c;
+		border-color: #991b1b;
+		color: #fff;
+	}
+	.clientes-page .content-widgets,
+	.clientes-page .content-widgets.gray,
+	.clientes-page .content-widgets.light-gray {
+		background: #fff;
+		border: 1px solid #e2e8f0;
+		border-radius: 14px;
+		box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+		margin-bottom: 1rem;
+		overflow: visible;
+	}
+	.clientes-page .widget-head {
+		background: #0f172a;
+		border: 0;
+		border-radius: 13px 13px 0 0;
+		color: #fff;
+		padding: 0.9rem 1.15rem;
+	}
+	.clientes-page .widget-head.bondi-blue {
+		background: #1d4ed8;
+	}
+	.clientes-page .widget-head.orange {
+		background: #b91c1c;
+	}
+	.clientes-page .widget-head.green {
+		background: linear-gradient(135deg, #059669 0%, #047857 100%);
+		border: 0;
+		border-radius: 13px 13px 0 0;
+		color: #fff;
+		padding: 0.9rem 1.15rem;
+	}
+	.clientes-page .widget-head h3 { color: #fff; font-size: 1rem; font-weight: 700; margin: 0; }
+	.clientes-page .widget-container { background: #fff; border-radius: 0 0 13px 13px; padding: 1rem 1.15rem 1.15rem; }
+	.clientes-page .form-horizontal .control-label { color: #334155; font-weight: 600; font-size: 0.8125rem; }
+	.clientes-page .form-horizontal input[type="text"],
+	.clientes-page .form-horizontal input[type="number"],
+	.clientes-page .form-horizontal input[type="email"],
+	.clientes-page .form-horizontal input[type="date"],
+	.clientes-page .form-horizontal select,
+	.clientes-page .form-horizontal textarea,
+	.clientes-page #itemsCotizados input[type="text"],
+	.clientes-page #itemsCotizados input[type="number"],
+	.clientes-page #itemsCotizados textarea {
+		border: 1px solid #cbd5e1;
+		border-radius: 8px;
+		box-shadow: none;
+		color: #0f172a;
+	}
+	.clientes-page .btn { border-radius: 8px; font-weight: 600; }
+	.clientes-page .btn-pdf-2 { background: #ea580c; border-color: #c2410c; color: #fff; }
+	.clientes-page .btn-pdf-2:hover { background: #c2410c; color: #fff; }
+	.clientes-page .alert { border-radius: 10px; }
+	.clientes-page ul.breadcrumb {
+		background: #fff;
+		border: 1px solid #e2e8f0;
+		border-radius: 10px;
+		padding: 0.65rem 1rem;
+	}
+	.clientes-page ul.breadcrumb.cotiz-flujo { background: #fffbeb; border-color: #fde68a; }
+	.clientes-page .cotiz-estado {
+		margin: 0 0 0.75rem;
+		padding: 0.75rem 1rem;
+		border-radius: 10px;
+		font-weight: 600;
+		font-size: 0.875rem;
+	}
+	.clientes-page .cotiz-estado.is-ok { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+	.clientes-page .cotiz-estado.is-bloqueo { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+	#enviarCotizacion .mceLayout,
+	#enviarCotizacion .mceIframeContainer iframe {
+		height: 280px !important;
+	}
+	.clientes-page #itemsCotizados .cotiz-dcto { display: inline-flex; flex-direction: column; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; line-height: 1.2; background: #fff; }
+	.clientes-page #itemsCotizados .cotiz-dcto .precio-par-fila { display: flex; align-items: center; gap: 0.35rem; margin: 0; padding: 0 0.35rem; border-bottom: 1px solid #cbd5e1; font-weight: 600; color: #0f172a; }
+	.clientes-page #itemsCotizados .cotiz-dcto .precio-par-fila:last-child { border-bottom: 0; }
+	.clientes-page #itemsCotizados .cotiz-dcto .precio-par-fila span { flex: 0 0 auto; min-width: 2.4rem; font-size: 0.75rem; }
+	.clientes-page #itemsCotizados .cotiz-dcto input[type="text"] { width: 78px !important; height: 22px; margin: 0; padding: 0; border: 0; background: #fff !important; text-align: right; box-shadow: none; }
+	.clientes-page #itemsCotizados .table { font-size: 0.75rem; border-color: #e2e8f0; }
+	.clientes-page #itemsCotizados .table thead th {
+		background: #f8fafc;
+		color: #475569;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+		border-color: #e2e8f0;
+	}
+	.clientes-page #itemsCotizados .table td,
+	.clientes-page #itemsCotizados .table th { padding: 0.4rem 0.45rem; vertical-align: top; }
+	.clientes-page #itemsCotizados tfoot td { background: #f8fafc; font-size: 0.8125rem; }
+	.clientes-page .tab-content { overflow: visible; background: transparent; border: 0; padding: 0; }
+	.clientes-page fieldset.default {
+		box-sizing: border-box;
+		width: 100%;
+		max-width: 100%;
+		min-width: 0;
+		margin: 0 0 1rem;
+		padding: 0.75rem 1rem 0.25rem;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
+		background: #f8fafc;
+	}
+	.clientes-page fieldset.default .control-group,
+	.clientes-page fieldset.default .controls,
+	.clientes-page fieldset.default .cotiz-campo-accion {
+		min-width: 0;
+		max-width: 100%;
+	}
+	.clientes-page fieldset.default legend {
+		width: auto;
+		margin: 0 0 0.5rem;
+		padding: 0 0.35rem;
+		border: 0;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: #047857;
+		line-height: 1.2;
+	}
+	.clientes-page fieldset.default .control-group { margin-bottom: 0.65rem; }
+	.clientes-page .cotiz-campo-accion { display: flex; align-items: center; gap: 0.5rem; }
+	.clientes-page .cotiz-campo-accion .cotiz-select {
+		flex: 1 1 0;
+		width: 0;
+		min-width: 0;
+		max-width: 100%;
+		height: 38px;
+		margin: 0;
+		padding: 0 0.7rem;
+		border: 1px solid #cbd5e1;
+		border-radius: 8px;
+		background: #fff;
+		color: #0f172a;
+		font-size: 0.875rem;
+		box-shadow: none;
+	}
+	.clientes-page .cotiz-campo-accion .btn {
+		flex: 0 0 auto;
+		height: 38px;
+		margin: 0;
+		padding: 0 0.85rem;
+		line-height: 36px;
+		white-space: nowrap;
+	}
+	#product-select + .select2-container .select2-selection__choice:has(.combo-prod-off),
+	.select2-results__option .combo-prod-off {
+		background-color: #fee2e2 !important;
+		border-color: #fca5a5 !important;
+		color: #991b1b !important;
+		font-weight: 700;
+	}
+	#product-select + .select2-container .select2-selection__choice:has(.combo-prod-ok) {
+		background-color: #d1fae5 !important;
+		border-color: #6ee7b7 !important;
+		color: #065f46 !important;
+		font-weight: 700;
+	}
+	.select2-results__option .combo-prod-ok {
+		color: #065f46 !important;
+		font-weight: 700;
+	}
+</style>
+
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
     
     
     
 	<div class="main-wrapper">
-		<div class="container-fluid">
-			<div class="row-fluid ">
-				<div class="span12">
-					<div class="primary-head">
-						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>                        
-					</div>
-					<ul class="breadcrumb">
-						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<li><a href="cotizaciones.php">Cotizaciones</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
-					</ul>
+		<div class="container-fluid clientes-page-inner">
+			<?php $versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultadoD['cotiz_version']); ?>
+			<div class="clientes-hero">
+				<div>
+					<h1 class="clientes-hero-title">Cotización #<?= (int) $resultadoD['cotiz_id']; ?> <?= $versionActualCotizacion; ?></h1>
+					<p class="clientes-hero-subtitle"><?= htmlspecialchars((string) $resultadoD['cli_nombre'], ENT_QUOTES, 'UTF-8'); ?><?php if (!empty($resultadoD['cotiz_ultima_modificacion'])) { ?> · Última modificación <?= htmlspecialchars((string) $resultadoD['cotiz_ultima_modificacion'], ENT_QUOTES, 'UTF-8'); ?><?php } ?></p>
+				</div>
+				<div class="clientes-hero-actions">
+					<a href="cotizaciones.php" class="btn btn-primary"><i class="icon-arrow-left"></i> Volver</a>
+					<?php if (Modulos::validarRol([78], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+					<a href="cotizaciones-agregar.php" class="btn btn-success"><i class="icon-plus"></i> Agregar nuevo</a>
+					<?php } ?>
+					<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+					<a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-info" target="_blank"><i class="icon-print"></i> PDF 1</a>
+					<a href="reportes/formato-cotizacion-3_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-pdf-2" target="_blank"><i class="icon-print"></i> PDF 2</a>
+					<?php } ?>
+					<?php if (
+						empty($ofimaPedidosBloqueados) &&
+						$resultadoD['cotiz_vendida'] != 1 &&
+						Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
+						!empty($ticketAsociado) &&
+						$resultadoD['cotiz_es_precotizacion'] != 1
+					) { ?>
+					<a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $resultadoD['cotiz_id']; ?>" class="btn btn-warning" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}"><i class="icon-money"></i> Generar pedido</a>
+					<?php } ?>
 				</div>
 			</div>
-            
+
             <?php include("includes/notificaciones.php");?>
 
-			<p>
-				<?php if (Modulos::validarRol([78], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-				<a href="cotizaciones-agregar.php" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>
-				<?php } ?>
-				<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-				<div class="btn-group">
-					<a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-success" target="_blank"><i class="icon-print"></i> Imprimir (Formato 1)</a>
-					<a href="reportes/formato-cotizacion-3_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-warning" target="_blank"><i class="icon-print"></i> Imprimir (Formato 2)</a>
-				</div>
-				<?php } ?>
-				
-				<?php
-				if (!empty($ofimaPedidosBloqueados) && $resultadoD['cotiz_vendida'] != 1 && $resultadoD['cotiz_es_precotizacion'] != 1) {
-				?>
-					<div class="alert alert-info">
-						<button type="button" class="close" data-dismiss="alert">&times;</button>
-						<?= htmlspecialchars(ofimaMensajePedidosBloqueados(), ENT_QUOTES, 'UTF-8'); ?>
-					</div>
-				<?php
-				} else if(
-					$resultadoD['cotiz_vendida'] != 1 && 
-					Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
-					!empty($ticketAsociado) && 
-					$resultadoD['cotiz_es_precotizacion'] != 1
-				) {
-				?>
-					<a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $resultadoD['cotiz_id']; ?>" class="btn btn-info" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}"><i class="icon-money"></i> Generar pedido</a>
-				<?php
-				} else if ($resultadoD['cotiz_vendida'] != 1 && empty($ticketAsociado) && $resultadoD['cotiz_es_precotizacion'] != 1) {
-				?>
-					<div class="alert alert-warning">
-						<button type="button" class="close" data-dismiss="alert">&times;</button>
-						<i class="icon-warning-sign"></i><strong>Ticket pendiente!</strong> No es posible generar pedido en una cotización sin ticket comercial asociado.
-					</div>
-				<?php } else if ($resultadoD['cotiz_es_precotizacion'] == 1) {?>
-					<div class="alert alert-warning">
-						<button type="button" class="close" data-dismiss="alert">&times;</button>
-						<i class="icon-warning-sign"></i><strong>Precotización!</strong> No es posible generar pedido con una PRE-cotización.
-					</div>
-				<?php }?>
-			</p>
-			
 			<?php
 			$camposCotizacionDisabled = '';
 
@@ -696,11 +956,11 @@ include("includes/js-formularios.php");
 					$breadCrumbFactura = 'Factura Nro. '.$facturaAsociadaDatos[Factura::$primaryKey];
 				}
 			?>
-				<p style="color: black; background-color: aquamarine; padding: 10px; font-weight: bold;">
-					Esta cotización ya generó pedido en la siguiente fecha: <?=$resultadoD['cotiz_fecha_vendida'];?>. 
+				<p class="cotiz-estado is-ok">
+					Esta cotización ya generó pedido en la siguiente fecha: <?=$resultadoD['cotiz_fecha_vendida'];?>.
 				</p>
 
-				<ul class="breadcrumb" style="background: antiquewhite;">
+				<ul class="breadcrumb cotiz-flujo">
 					<?php if (!empty($ticketAsociado)) {?>
 						<li><a href="clientes-tikets-editar.php?id=<?=$ticketAsociado['tik_id'];?>">Ticket Nro. <?=$ticketAsociado['tik_id'];?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
 					<?php }?>
@@ -710,21 +970,29 @@ include("includes/js-formularios.php");
 					<li><a href="<?=$linkFactura;?>" target="_blank"><?=$breadCrumbFactura;?></a><span class="divider"></li>
 				</ul>
 
-				<p style="color: black; background-color: gold; padding: 10px; font-weight: bold;"> No es posible hacer más cambios en esta cotización.</p>
+				<p class="cotiz-estado is-bloqueo">No es posible hacer más cambios en esta cotización.</p>
 			<?php
 			} else if(!empty($ticketAsociado)) {
 			?>
-				<ul class="breadcrumb" style="background: antiquewhite;">
+				<ul class="breadcrumb cotiz-flujo">
 					<li><a href="clientes-tikets-editar.php?id=<?=$ticketAsociado['tik_id'];?>">Ticket Nro. <?=$ticketAsociado['tik_id'];?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
 					<li><a href="#">Cotización Nro. <?=$resultadoD['cotiz_id'];?></a><span class="divider"></span></li>
 				</ul>
 			<?php
 			}
 
-			$versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultadoD['cotiz_version']);
+			if (!empty($ofimaPedidosBloqueados) && $resultadoD['cotiz_vendida'] != 1 && $resultadoD['cotiz_es_precotizacion'] != 1) { ?>
+				<div class="cotiz-estado is-bloqueo"><?= htmlspecialchars(ofimaMensajePedidosBloqueados(), ENT_QUOTES, 'UTF-8'); ?></div>
+			<?php } else if ($resultadoD['cotiz_vendida'] != 1 && empty($ticketAsociado) && $resultadoD['cotiz_es_precotizacion'] != 1) { ?>
+				<div class="cotiz-estado is-bloqueo">No es posible generar pedido en una cotización sin ticket comercial asociado.</div>
+			<?php } else if ($resultadoD['cotiz_es_precotizacion'] == 1 && $resultadoD['cotiz_vendida'] != 1) { ?>
+				<div class="cotiz-estado is-bloqueo">No es posible generar pedido con una pre-cotización.</div>
+			<?php }
+
+			$versionActualCotizacion = $versionActualCotizacion ?? Cotizacion::obtenerVersionCotizacion($resultadoD['cotiz_version']);
 			?>
 
-		<ul class="nav nav-tabs" id="myTab1">
+		<ul class="nav nav-tabs cotiz-editar-tabs" id="myTab1">
 			<li class="active"><a href="#cotizacion" data-toggle="tab"><i class="icon-file-alt"></i> Información de la cotización</a></li>
 			<li><a href="#itemsCotizados" data-toggle="tab"><i class="icon-list"></i> Items cotizados</a></li>
 			<li><a href="#enviarCotizacion" data-toggle="tab"><i class="icon-envelope"></i> Enviar cotización por correo</a></li>
@@ -819,8 +1087,9 @@ include("includes/js-formularios.php");
 									<div class="control-group">
 											<label class="control-label">Cliente</label>
 											<div class="controls">
-												<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" required onChange="clientes(this)" <?=$camposCotizacionDisabled;?>>
-													<option value=""></option>
+												<div class="cotiz-campo-accion">
+												<select class="cotiz-select" name="cliente" required onChange="clientes(this)" <?=$camposCotizacionDisabled;?>>
+													<option value="">Escoja un cliente</option>
 													<?php
 													$conOp = $conexionBdPrincipal->query("SELECT cli_id, cli_nombre, cli_categoria, 
 														CASE 
@@ -857,19 +1126,20 @@ include("includes/js-formularios.php");
 													}
 													?>
 												</select>
-											</div>
-											<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA) {?>
+												<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA) {?>
 													<a href="clientes-editar.php?id=<?=$cliente;?>" class="btn btn-info" target="_blank">Editar cliente</a>
-											<?php } ?>
+												<?php } ?>
+												</div>
+											</div>
 									</div>
 									
 									<div class="control-group">
 										<label class="control-label">Sucursal</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="sucursal" required <?=$camposCotizacionDisabled;?>>
-												<option value=""></option>
+											<div class="cotiz-campo-accion">
+											<select class="cotiz-select" name="sucursal" required <?=$camposCotizacionDisabled;?>>
+												<option value="">Escoja una sucursal</option>
 												<?php
-												// Usar sucursales del cache
 												foreach($sucursales as $sucursal){
 												?>
 													<option value="<?=$sucursal['sucu_id'];?>" <?php if($resultadoD['cotiz_sucursal']==$sucursal['sucu_id'] || count($sucursales) == 1){echo "selected";} ?>><?=$sucursal['sucu_nombre'];?></option>
@@ -877,19 +1147,20 @@ include("includes/js-formularios.php");
 												}
 												?>
 											</select>
+											<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+											<a href="clientes-sucursales.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver sucursales</a>
+											<?php } ?>
+											</div>
 										</div>
-										<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-									<a href="clientes-sucursales.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver sucursales</a>
-										<?php } ?>
 								</div>
 										
 									<div class="control-group">
 										<label class="control-label">Contacto</label>
 										<div class="controls">
-											<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required <?=$camposCotizacionDisabled;?>>
-												<option value=""></option>
+											<div class="cotiz-campo-accion">
+											<select class="cotiz-select" name="contacto" required <?=$camposCotizacionDisabled;?>>
+												<option value="">Escoja un contacto</option>
 												<?php
-												// Usar contactos del cache
 												foreach($contactos as $contacto){
 												?>
 													<option value="<?=$contacto['cont_id'];?>" <?php if($resultadoD['cotiz_contacto']==$contacto['cont_id'] || count($contactos) == 1){echo "selected";}?>><?=strtoupper($contacto['cont_nombre'])." (".$contacto['cont_email'].")";?></option>
@@ -897,10 +1168,11 @@ include("includes/js-formularios.php");
 												}
 												?>
 											</select>
+											<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+											<a href="clientes-contactos.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver contactos</a>
+											<?php } ?>
+											</div>
 										</div>
-										<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-										<a href="clientes-contactos.php?cte=<?=$cliente;?>" class="btn btn-info" target="_blank">Ver contactos</a>
-										<?php } ?>
 								</div>
 									
 									</fieldset>
@@ -1019,7 +1291,7 @@ include("includes/js-formularios.php");
 												<?php
 													// Consulta optimizada: solo campos necesarios para el select
 													$consultaProductos = $conexionBdPrincipal->query("
-														SELECT p.prod_id, p.prod_nombre, cp.czpp_cantidad
+														SELECT p.prod_id, p.prod_nombre, p.prod_habilitado, cp.czpp_cantidad
 														FROM cotizacion_productos cp
 														INNER JOIN productos p ON p.prod_id = cp.czpp_producto AND p.prod_id_empresa = '".$idEmpresa."'
 														WHERE cp.czpp_cotizacion = '".$_GET["id"]."' AND cp.czpp_tipo = ".CZPP_TIPO_COTZ."
@@ -1027,8 +1299,9 @@ include("includes/js-formularios.php");
 													");
 
 													while ($resProducto = mysqli_fetch_array($consultaProductos, MYSQLI_BOTH)) {
+														$productoHabilitado = ((int) ($resProducto['prod_habilitado'] ?? 0) === 1) ? 1 : 0;
 													?>
-														<option selected value="<?= $resProducto['prod_id']; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
+														<option selected value="<?= $resProducto['prod_id']; ?>" data-habilitado="<?= $productoHabilitado; ?>"><?= $resProducto['prod_id'] . ". " . strtoupper($resProducto['prod_nombre']) . " - [HAY " . $resProducto['czpp_cantidad'] . "]"; ?></option>
 													<?php
 														}
 													?>
@@ -1687,7 +1960,10 @@ $(document).ready(function() {
 	
 	// Detectar si hay un hash en la URL para cargar ese tab directamente
 	const hash = window.location.hash;
-	if (hash) {
+	if (hash === '#productos') {
+		var pestanaItems = document.querySelector('a[href="#itemsCotizados"]');
+		if (pestanaItems && $.fn.tab) $(pestanaItems).tab('show');
+	} else if (hash) {
 		const tabId = hash.substring(1);
 		const $tabLink = $('a[href="' + hash + '"]');
 		

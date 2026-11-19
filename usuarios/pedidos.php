@@ -1,4 +1,4 @@
-<?php 
+<?php
 include("sesion.php");
 
 $idPagina = 151;
@@ -8,13 +8,86 @@ include("includes/head.php");
 require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
 require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
 $ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
+$ofimaBotonEnvio = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa) && empty($ofimaPedidosBloqueados);
+$puedeTimelinePedido = Modulos::validarRol([237], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
+$puedeEliminarPedido = Modulos::validarRol([372], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
+$puedePdfPedido = Modulos::validarRol([373], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
+$puedeRemisionPedido = Modulos::validarRol([374], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
 ?>
-<!-- styles -->
-
-
+<link href="css/clientes-listado.css" rel="stylesheet">
 <link href="css/tablecloth.css" rel="stylesheet">
-
-<!--============j avascript===========-->
+<style>
+	.clientes-page .clientes-panel { overflow: visible; border-radius: 14px; }
+	.clientes-page .clientes-panel-header { border-radius: 13px 13px 0 0; }
+	.clientes-page .clientes-panel-body { border-radius: 0 0 13px 13px; }
+	.clientes-page .clientes-table thead th { position: sticky; top: 0; z-index: 2; }
+	.clientes-page .clientes-table tbody tr.is-remision td { background: #ecfdf5; }
+	.clientes-page #data-table { table-layout: fixed; font-size: 0.75rem; }
+	.clientes-page #data-table thead th { font-size: 0.625rem; padding: 0.4rem 0.35rem; white-space: normal; }
+	.clientes-page #data-table tbody td { padding: 0.35rem 0.4rem; line-height: 1.25; }
+	.clientes-page #data-table th:nth-child(1),
+	.clientes-page #data-table td:nth-child(1) { width: 36px; }
+	.clientes-page #data-table th:nth-child(2),
+	.clientes-page #data-table td:nth-child(2) { width: 52px; }
+	.clientes-page #data-table th:nth-child(3),
+	.clientes-page #data-table td:nth-child(3) { width: 92px; }
+	.clientes-page #data-table th:nth-child(7),
+	.clientes-page #data-table td:nth-child(7) { width: 88px; }
+	.clientes-page #data-table th:nth-child(8),
+	.clientes-page #data-table td:nth-child(8) { width: 64px; }
+	.clientes-page #data-table th:nth-child(9),
+	.clientes-page #data-table td:nth-child(9) { width: 96px; }
+	.clientes-page #data-table th:nth-child(4),
+	.clientes-page #data-table td:nth-child(4),
+	.clientes-page #data-table th:nth-child(5),
+	.clientes-page #data-table td:nth-child(5),
+	.clientes-page #data-table th:nth-child(6),
+	.clientes-page #data-table td:nth-child(6) { overflow-wrap: anywhere; }
+	.clientes-page .clientes-table-wrap + .productos-paginacion { margin: 0.65rem 0 0; font-size: 0.75rem; }
+	.clientes-page .clientes-table-wrap { overflow: visible; }
+	.clientes-page .cotiz-acciones { white-space: nowrap; text-align: right; }
+	.clientes-page .cotiz-acciones .btn-group > .btn.dropdown-toggle {
+		border-radius: 8px;
+		padding-left: 0.9rem;
+		padding-right: 0.9rem;
+	}
+	.clientes-page .cotiz-aviso {
+		margin: 0 0 1rem; padding: 0.75rem 1rem; border-radius: 10px;
+		background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; font-size: 0.875rem;
+	}
+	.clientes-page .cotiz-aviso.is-ok { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+	.clientes-page .cotiz-aviso.is-error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+	.clientes-page .btn-ofima-pendiente { background: #ea580c; border-color: #c2410c; color: #fff; }
+	.clientes-page .btn-ofima-pendiente:hover { background: #c2410c; color: #fff; }
+	.clientes-page .btn-ofima-ok { background: #047857; border-color: #065f46; color: #fff; }
+	.clientes-page .btn-ofima-ok:hover { background: #065f46; color: #fff; }
+	.clientes-page .btn-ofima-error { background: #b91c1c; border-color: #991b1b; color: #fff; }
+	.clientes-page .btn-ofima-error:hover { background: #991b1b; color: #fff; }
+	.clientes-page .btn-ofima-msg { background: #fff; border: 1px solid #cbd5e1; color: #334155; }
+	.productos-paginacion {
+		display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+		gap: 0.75rem 1rem; margin: 0 0 0.75rem; padding: 0.5rem 0.75rem;
+		font-size: 0.8125rem; line-height: 1; color: #475569;
+		background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+	}
+	.productos-paginacion-grupo, .productos-paginacion form { display: flex; align-items: center; gap: 0.4rem; margin: 0; }
+	.productos-paginacion label { margin: 0; line-height: 34px; }
+	.productos-paginacion select, .productos-paginacion input[type="number"], .productos-paginacion button,
+	.productos-paginacion a, .productos-paginacion .es-actual {
+		box-sizing: border-box; height: 34px; min-height: 34px; margin: 0; padding: 0 0.7rem;
+		border-radius: 8px; font-size: 0.8125rem; line-height: 32px; vertical-align: middle;
+	}
+	.productos-paginacion select, .productos-paginacion input[type="number"] { border: 1px solid #cbd5e1; background: #fff; color: #0f172a; }
+	.productos-paginacion input[type="number"] { width: 4.2rem; text-align: center; }
+	.productos-paginacion a, .productos-paginacion .es-actual, .productos-paginacion .es-puntos {
+		display: inline-flex; align-items: center; justify-content: center; min-width: 34px;
+		border: 1px solid #cbd5e1; background: #fff; color: #334155; text-decoration: none; font-weight: 600;
+	}
+	.productos-paginacion a:hover { background: #e2e8f0; color: #0f172a; }
+	.productos-paginacion .es-actual { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
+	.productos-paginacion .es-puntos { border: 0; background: transparent; min-width: 1.2rem; height: auto; }
+	.productos-paginacion button { border: 0; background: #1d4ed8; color: #fff; font-weight: 600; cursor: pointer; }
+</style>
 <script src="js/jquery.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
 <script src="js/bootstrap.js"></script>
@@ -28,230 +101,269 @@ $ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $id
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script src="js/bootbox.js"></script>
-
 <script type="text/javascript">
-            $(function () {
-                $('#data-table').dataTable({
-                    "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                });
-            });
-            $(function () {
-                $('.tbl-simple').dataTable({
-                    "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                });
-            });
-			
-			$(function () {
-			$(".tbl-paper-theme").tablecloth({
-          theme: "paper"
-		   });
+	$(function() {
+		if ($('#data-table').length && !$('body').hasClass('clientes-page')) {
+			$('#data-table').dataTable({
+				"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
 			});
-			
-		$(function () {
-			$(".tbl-dark-theme").tablecloth({
-          theme: "dark"
-		   });
-
-		});
-			$(function () {
-                $('.tbl-paper-theme,.tbl-dark-theme').dataTable({
-                    "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-                });
-	
-
-            });
-			
-			function confirmar (e) {
-                bootbox.confirm("Desea enviar esta cotización?", function (result) {
-                    var id = e.id;
-					var cont = e.name;
-					if(result == true){
-						window.location.href="enviar-cotizacion-correo.php?get=44&id="+id+"&cont="+cont;
-					}
-            })
-			};
-        </script>
+		}
+	});
+</script>
 </head>
-<body>
+<body class="clientes-page">
 <div class="layout">
-	<?php include("includes/encabezado.php");?>
-    
-    
+	<?php include("includes/encabezado.php"); ?>
 	<div class="main-wrapper">
-		<div class="container-fluid">
-            <?php include("includes/notificaciones.php");?>
-            <p>
-            <a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-				<!--
-            <a href="#pedidos-agregar.php?cte=<?=$_GET["cte"];?>" class="btn btn-danger"><i class="icon-plus"></i> Agregar nuevo</a>-->
-            </p>
-			<div class="row-fluid">
-				<div class="span12">
-					<div class="content-widgets light-gray">
-						<div class="widget-head green">
-							<h3><?=$paginaActual['pag_nombre'];?></h3>
-						</div>
-                            <?php
-							$filtro = '';
-							if($_GET["busqueda"]!=""){$filtro .= " AND (pedid_id='".$_GET["busqueda"]."' OR cli_nombre='".$_GET["busqueda"]."' OR usr_nombre='".$_GET["busqueda"]."')";}
-								
-							if(isset($_GET["cte"]) and $_GET["cte"]!=""){
-								$SQL = "SELECT * FROM pedidos
-								INNER JOIN clientes ON cli_id=pedid_cliente AND cli_id='".$_GET["cte"]."'
-								ORDER BY pedid_id DESC";
-							}else{
-								$SQL = "SELECT * FROM pedidos
-								INNER JOIN clientes ON cli_id=pedid_cliente
-								INNER JOIN usuarios ON usr_id=pedid_creador
-								WHERE pedid_id=pedid_id $filtro
-								ORDER BY pedid_id DESC";
-							}
-						?>
-						<div class="widget-container">
-							<?php if (!empty($ofimaPedidosBloqueados)) { ?>
-							<div class="alert alert-info" style="margin:10px;">
-								<?= htmlspecialchars(ofimaMensajePedidosBloqueados(), ENT_QUOTES, 'UTF-8'); ?>
-								Solo puede consultar y generar PDF.
-							</div>
-							<?php } ?>
-                            <div style="border:thin; border-style:solid; height:150px; margin:10px; padding:10px;">
-                                <h4 align="center">-Busqueda general y paginación-</h4>
-                                <p> 
-                                    <form class="form-horizontal" style="text-align: right;" action="<?=$_SERVER['PHP_SELF'];?>" method="get">
-                                        <div class="search-box">
-                                            <div class="input-append input-icon">
-                                                <input placeholder="Buscar..." type="text" name="busqueda" value="<?php if(isset($_GET["busqueda"])) echo $_GET["busqueda"]; ?>">
-                                                <i class=" icon-search"></i>
-                                                <input class="btn" type="submit" value="Buscar">
-                                            </div>
-                                            <?php if(isset($_GET["busqueda"]) and $_GET["busqueda"]!=""){?> <a href="<?=$_SERVER['PHP_SELF'];?>" class="btn btn-warning"><i class="icon-minus"></i> Quitar Filtro</a> <?php } ?>
-                                        </div>
-                                    </form>
-                                    <p style="margin: 10px;"><?php include("includes/paginacion.php");?></p> 
-                                </p>
-                            </div>
-						
-							<table class="table table-striped table-bordered" id="data-table">
-							<thead>
-							<tr>
-							<th>No.</th>	
-							<th>ID</th>
-                                <th>Fecha Documento</th>
-                                <th>Cliente</th>
-								<th>Responsable</th>
-								<th>Vendedor</th>
-								<th>Estado</th>
-								<th>#Cotización</th>
-                                <th></th>
-							</tr>
-							</thead>
-							<tbody>
-                            <?php								
-							if(isset($_GET["cte"]) and $_GET["cte"]!=""){
-								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos
-								INNER JOIN clientes ON cli_id=pedid_cliente AND cli_id='".$_GET["cte"]."'
-								WHERE pedid_id_empresa='".$idEmpresa."'
-								ORDER BY pedid_id DESC
-								LIMIT $inicio, $limite
-								");
-							}else{
-								$consulta = mysqli_query($conexionBdPrincipal,"SELECT * FROM pedidos
-								INNER JOIN clientes ON cli_id=pedid_cliente
-								INNER JOIN usuarios ON usr_id=pedid_creador
-								WHERE pedid_id=pedid_id AND pedid_id_empresa='".$idEmpresa."' $filtro
-								ORDER BY pedid_id DESC
-								LIMIT $inicio, $limite
-								");
-							}
-							$no = 1;
-							while($res = mysqli_fetch_array($consulta, MYSQLI_BOTH)){
-								if(!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){
-									$numZ = mysqli_num_rows(mysqli_query($conexionBdPrincipal,"SELECT * FROM zonas_usuarios WHERE zpu_usuario='".$_SESSION["id"]."' AND zpu_zona='".$res['cli_zona']."'"));
-									if($numZ==0) continue;
-								}
-								
-								$vendedor = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM usuarios WHERE usr_id='".$res['pedid_vendedor']."' AND usr_id_empresa='".$idEmpresa."'"), MYSQLI_BOTH);
-
-								$generoRemision = mysqli_fetch_array(mysqli_query($conexionBdPrincipal,"SELECT * FROM remisionbdg WHERE remi_pedido='" . $res['pedid_id'] . "' AND remi_id_empresa='".$idEmpresa."'"), MYSQLI_BOTH);
-
-
-											$infoRem = '';
-											$fondoPedido = '';
-											if($generoRemision[0]!=""){
-												$infoRem = 'Este pedido ya generó la remisión con ID: '.$generoRemision[0].". En la fecha: ".$generoRemision['remi_fecha_creacion'];
-												$fondoPedido = 'aquamarine';
-											}
-
-											$nombreCliente="";
-											if(!empty($res['cli_nombre'])){
-												$nombreCliente=strtoupper($res['cli_nombre']);
-											}
-											$nombreResponsable="";
-											if(!empty($res['usr_nombre'])){
-												$nombreResponsable=strtoupper($res['usr_nombre']);
-											}
-											$nombreVendedor="";
-											if(!empty($vendedor['usr_nombre'])){
-												$nombreVendedor=strtoupper($vendedor['usr_nombre']);
-											}
-							?>
-							<tr>
-							<td><?= $no; ?></td>	
-							<td style="background-color: <?= $fondoPedido; ?>;" title="<?=$infoRem;?>"><?=$res['pedid_id'];?></td>
-                                <td><?=$res['pedid_fecha_propuesta'];?></td>
-                                <td><?=$nombreCliente;?></td>
-								<td><?=$nombreResponsable;?></td>
-								<td><?=$nombreVendedor;?></td>
-								<td>
-									<?php if (Modulos::validarRol([237], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-										<a href="pedidos-timeline.php?id=<?=$res['pedid_id'];?>" target="_blank" class="normalLink"><?=Pedido::ESTADO_PEDIDO[$res['pedid_estado']];?></a>
-										<?php } else {?>
-										<span><?=Pedido::ESTADO_PEDIDO[$res['pedid_estado']];?></span>
-									<?php } ?>
-								</td>
-								<td><a href="cotizaciones-editar.php?id=<?=$res['pedid_cotizacion'];?>" class="normalLink"><?=$res['pedid_cotizacion'];?></a></td>
-                                <td>
-									<div class="btn-group">
-										<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span>
-										</button>
-										<ul class="dropdown-menu">
-											<?php if($_SESSION["id"]==$res['pedid_creador'] or $_SESSION["id"]==$res['pedid_vendedor']){?>
-											<!--
-											<li><a href="#pedidos-editar.php?id=<?=$res[0];?>#productos"> Editar</a></li>
-											
-											<li><a href="bd_delete/pedidos-anular.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea anular el registro?')){return false;}">Anular</a></li>-->
-											<?php if (empty($ofimaPedidosBloqueados) && Modulos::validarRol([372], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-											<li><a href="bd_delete/pedidos-eliminar.php?id=<?=$res[0];?>" onClick="if(!confirm('Desea eliminar el registro?')){return false;}">Eliminar</a></li>
-											<?php } ?>
-											<?php }?>
-											
-											<?php if (Modulos::validarRol([373], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-											<li><a href="reportes/formato-pedido-1_pdf.php?id=<?=$res[0];?>" target="_blank">Generar PDF</a></li>
-											<?php } ?>
-
-											<?php if(empty($ofimaPedidosBloqueados) && $generoRemision[0]=="" && Modulos::validarRol([374], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
-											
-												<li><a href="bd_create/pedidos-generar-remision-v2.php?id=<?=$res[0];?>" onClick="if(!confirm('Esta acción descontará existencias de los productos asociados. Desea generar remisión de este pedido?')){return false;}">Generar remisión</a></li>
-
-											<?php }?>
-											
-										</ul>
-									</div>
-								</td>
-							</tr>
-                            <?php $no++;}?>
-							</tbody>
-							</table>
-						</div>
-					</div>
+		<div class="container-fluid clientes-page-inner">
+			<div class="clientes-hero">
+				<div>
+					<h1 class="clientes-hero-title"><?= htmlspecialchars($paginaActual['pag_nombre'] ?? 'Pedidos'); ?></h1>
+					<p class="clientes-hero-subtitle">Consulte pedidos, remisiones y el envío a Ofima</p>
+				</div>
+				<div class="clientes-hero-actions">
+					<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
 				</div>
 			</div>
-	
-		
-			</div>
+			<?php include("includes/notificaciones.php"); ?>
+			<section class="clientes-panel">
+				<div class="clientes-panel-header">
+					<div>
+						<h3>Listado de pedidos</h3>
+						<p>Busque por ID, cliente o responsable</p>
+					</div>
+				</div>
+				<div class="clientes-panel-body">
+					<?php if (!empty($ofimaPedidosBloqueados)) { ?>
+					<div class="cotiz-aviso">
+						<?= htmlspecialchars(ofimaMensajePedidosBloqueados(), ENT_QUOTES, 'UTF-8'); ?>
+						Solo puede consultar y generar PDF.
+					</div>
+					<?php } ?>
+					<?php if (isset($_GET['ofima'])) { ?>
+					<div class="cotiz-aviso <?= $_GET['ofima'] === '1' ? 'is-ok' : 'is-error'; ?>">
+						<?= $_GET['ofima'] === '1' ? 'El pedido se envió a Ofima.' : 'No se pudo enviar el pedido a Ofima. El detalle está en el panel.'; ?>
+					</div>
+					<?php } ?>
+
+					<form method="get" action="pedidos.php" class="clientes-busqueda-principal">
+						<?php if (!empty($_GET['cte'])) { ?>
+							<input type="hidden" name="cte" value="<?= htmlspecialchars((string) $_GET['cte'], ENT_QUOTES, 'UTF-8'); ?>">
+						<?php } ?>
+						<label class="clientes-busqueda-label" for="pedidosBusqueda">Buscar</label>
+						<div class="clientes-busqueda-input-wrap">
+							<i class="icon-search clientes-busqueda-icon" aria-hidden="true"></i>
+							<input type="search" id="pedidosBusqueda" name="busqueda" value="<?php if (isset($_GET['busqueda'])) echo htmlspecialchars($_GET['busqueda'], ENT_QUOTES, 'UTF-8'); ?>" placeholder="ID, cliente o responsable" autocomplete="off">
+							<button type="submit" class="clientes-busqueda-btn">Buscar</button>
+						</div>
+						<?php if (!empty($_GET['busqueda'])) { ?>
+						<p class="clientes-busqueda-hint">
+							Buscando «<?= htmlspecialchars($_GET['busqueda'], ENT_QUOTES, 'UTF-8'); ?>».
+							<a href="pedidos.php<?= !empty($_GET['cte']) ? '?cte='.urlencode($_GET['cte']) : ''; ?>">Quitar búsqueda</a>
+						</p>
+						<?php } ?>
+					</form>
+
+					<?php include("includes/pedidos-listado-consulta.php"); ?>
+
+					<div class="clientes-table-wrap">
+						<table class="clientes-table" id="data-table">
+							<thead>
+								<tr>
+									<th>No.</th>
+									<th>ID</th>
+									<th>Fecha documento</th>
+									<th>Cliente</th>
+									<th>Responsable</th>
+									<th>Vendedor</th>
+									<th>Estado</th>
+									<th># Cotización</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody id="pedidos_buscar">
+								<?php include("includes/pedidos-listado-filas.php"); ?>
+							</tbody>
+						</table>
+					</div>
+					<?php include("includes/pedidos-listado-paginacion.php"); ?>
+				</div>
+			</section>
 		</div>
 	</div>
-	<?php include("includes/pie.php");?>
 </div>
+<div id="drawerOfimaOverlay"></div>
+<aside id="drawerOfimaError" aria-hidden="true">
+	<div class="drawer-header">
+		<h2 id="drawerOfimaTitulo">Error al enviar a Ofima</h2>
+		<button type="button" class="drawer-close" id="cerrarOfimaMensaje" aria-label="Cerrar">×</button>
+	</div>
+	<div class="drawer-body">
+		<p class="drawer-label" id="drawerOfimaRespuestaLabel">Respuesta de Ofima</p>
+		<pre id="drawerOfimaTexto"></pre>
+		<p class="drawer-label is-second" id="drawerOfimaEnviadoLabel" hidden>JSON enviado</p>
+		<pre id="drawerOfimaEnviado" class="is-enviado" hidden></pre>
+	</div>
+</aside>
+<?php if (isset($_GET['ofima']) && $_GET['ofima'] !== '1') {
+	$ofimaErrorEnvio = (isset($_GET['ofima_msg']) && $_GET['ofima_msg'] !== '') ? $_GET['ofima_msg'] : 'No se pudo enviar el pedido a Ofima.';
+	$busquedaOfima = isset($_GET['busqueda']) ? (string) $_GET['busqueda'] : '';
+	if ($busquedaOfima !== '' && !empty($pedidosFilas)) {
+		foreach ($pedidosFilas as $filaOfima) {
+			if ((string) $filaOfima['pedid_id'] === $busquedaOfima && !empty($filaOfima['pedid_ofima_respuesta'])) {
+				$ofimaErrorEnvio = (string) $filaOfima['pedid_ofima_respuesta'];
+				break;
+			}
+		}
+	}
+?>
+<script>window.OFIMA_ERROR_ENVIO = <?= json_encode($ofimaErrorEnvio, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;</script>
+<?php } ?>
+<?php include("includes/pie.php"); ?>
+<script>
+	(function () {
+		var drawer = document.getElementById('drawerOfimaError');
+		var overlay = document.getElementById('drawerOfimaOverlay');
+		var drawerTexto = document.getElementById('drawerOfimaTexto');
+		var drawerTitulo = document.getElementById('drawerOfimaTitulo');
+		function formatearJson(texto) {
+			try { return JSON.stringify(JSON.parse(texto), null, 2); } catch (e) { return texto; }
+		}
+		function separarMensaje(texto) {
+			var respuesta = texto || 'Sin mensaje de Ofima.';
+			var enviado = '';
+			try {
+				var data = JSON.parse(texto);
+				if (data && typeof data === 'object' && !Array.isArray(data) && Object.prototype.hasOwnProperty.call(data, 'enviado') && Object.prototype.hasOwnProperty.call(data, 'respuesta')) {
+					respuesta = typeof data.respuesta === 'string' ? data.respuesta : JSON.stringify(data.respuesta);
+					enviado = typeof data.enviado === 'string' ? data.enviado : JSON.stringify(data.enviado);
+				}
+			} catch (e) {}
+			return { respuesta: formatearJson(respuesta), enviado: enviado ? formatearJson(enviado) : '' };
+		}
+		function esRespuestaOfimaExitosa(texto, estado) {
+			if (String(estado) === '1') return true;
+			if (String(estado) === '2') return false;
+			var fuente = String(texto || '');
+			try {
+				var data = JSON.parse(fuente);
+				if (data && typeof data === 'object' && data.respuesta != null) {
+					fuente = typeof data.respuesta === 'string' ? data.respuesta : JSON.stringify(data.respuesta);
+					try { data = JSON.parse(fuente); } catch (e2) { data = { mensaje: fuente }; }
+				}
+				if (data && typeof data === 'object') {
+					var mensaje = String(data.mensaje || data.message || '');
+					if (/exitos/i.test(mensaje) || data.success === true) return true;
+				}
+			} catch (e) {}
+			return /pedido creado exitosamente/i.test(fuente);
+		}
+		function abrirMensaje(texto, titulo, estado) {
+			if (!drawer || !drawerTexto) return;
+			var exitoso = esRespuestaOfimaExitosa(texto, estado);
+			drawer.classList.toggle('is-ok', exitoso);
+			if (drawerTitulo) drawerTitulo.textContent = exitoso ? 'Enviado a Ofima' : (titulo || 'Error al enviar a Ofima');
+			var partes = separarMensaje(texto);
+			drawerTexto.textContent = partes.respuesta;
+			var labelEnv = document.getElementById('drawerOfimaEnviadoLabel');
+			var preEnv = document.getElementById('drawerOfimaEnviado');
+			if (labelEnv && preEnv) {
+				preEnv.textContent = partes.enviado;
+				preEnv.hidden = !partes.enviado;
+				labelEnv.hidden = !partes.enviado;
+			}
+			drawer.classList.add('is-open');
+			if (overlay) overlay.classList.add('is-open');
+			drawer.setAttribute('aria-hidden', 'false');
+		}
+		function cerrarMensaje() {
+			if (!drawer) return;
+			drawer.classList.remove('is-open');
+			if (overlay) overlay.classList.remove('is-open');
+			drawer.setAttribute('aria-hidden', 'true');
+		}
+		document.getElementById('cerrarOfimaMensaje').addEventListener('click', cerrarMensaje);
+		if (overlay) overlay.addEventListener('click', cerrarMensaje);
+		if (window.OFIMA_ERROR_ENVIO) abrirMensaje(window.OFIMA_ERROR_ENVIO, 'Error al enviar a Ofima');
+		document.addEventListener('click', function (e) {
+			var boton = e.target.closest ? e.target.closest('.js-ofima-mensaje') : null;
+			if (!boton) return;
+			e.preventDefault();
+			abrirMensaje(boton.getAttribute('data-mensaje') || '', 'Respuesta de Ofima', boton.getAttribute('data-estado'));
+		});
+
+		var tbody = document.getElementById('pedidos_buscar');
+		var paginacionWrap = document.getElementById('pedidosPaginacionContenedor');
+		if (!tbody || !paginacionWrap) return;
+		var requestId = 0;
+		function paramsActuales() {
+			return new URLSearchParams(window.location.search);
+		}
+		function actualizarUrl(pagina, por) {
+			var params = paramsActuales();
+			params.delete('ofima');
+			params.delete('ofima_msg');
+			if (por) params.set('por', String(por));
+			if (pagina && pagina > 1) params.set('inicio', String(pagina));
+			else params.delete('inicio');
+			var query = params.toString();
+			window.history.replaceState({}, '', 'pedidos.php' + (query ? '?' + query : ''));
+		}
+		function cargarListado(pagina, por) {
+			var params = paramsActuales();
+			params.delete('ofima');
+			params.delete('ofima_msg');
+			if (por) params.set('por', String(por));
+			if (pagina && pagina > 1) params.set('inicio', String(pagina));
+			else params.delete('inicio');
+			var id = ++requestId;
+			tbody.style.opacity = '0.55';
+			fetch('ajax/ajax-pedidos-listado.php?' + params.toString(), { credentials: 'same-origin' })
+				.then(function (r) { return r.json(); })
+				.then(function (data) {
+					if (id !== requestId) return;
+					tbody.style.opacity = '';
+					if (!data || !data.success) return;
+					tbody.innerHTML = data.html || '';
+					var padre = paginacionWrap.parentNode;
+					var tmp = document.createElement('div');
+					tmp.innerHTML = data.pagination || '';
+					var nueva = tmp.firstElementChild;
+					if (nueva && padre) {
+						padre.replaceChild(nueva, paginacionWrap);
+						paginacionWrap = document.getElementById('pedidosPaginacionContenedor');
+					}
+					actualizarUrl(data.pagina || 1, data.por);
+				})
+				.catch(function () {
+					if (id !== requestId) return;
+					tbody.style.opacity = '';
+				});
+		}
+		document.addEventListener('click', function (e) {
+			var link = e.target.closest ? e.target.closest('a.js-pedidos-pagina') : null;
+			if (!link || !link.closest('.productos-paginacion')) return;
+			e.preventDefault();
+			var pagina = parseInt(link.getAttribute('data-pagina'), 10) || 1;
+			var porSel = document.getElementById('pedidosPorPagina');
+			cargarListado(pagina, porSel ? parseInt(porSel.value, 10) : null);
+		});
+		document.addEventListener('change', function (e) {
+			if (!e.target || !e.target.classList || !e.target.classList.contains('js-pedidos-por-pagina')) return;
+			cargarListado(1, parseInt(e.target.value, 10) || 10);
+		});
+		document.addEventListener('submit', function (e) {
+			if (!e.target || e.target.id !== 'formIrPaginaPedido') return;
+			e.preventDefault();
+			var input = document.getElementById('pedidosIrPagina');
+			var pagina = parseInt(input && input.value, 10);
+			var maximo = parseInt(input && input.max, 10) || 1;
+			if (!pagina || pagina < 1) pagina = 1;
+			if (pagina > maximo) pagina = maximo;
+			var porSel = document.getElementById('pedidosPorPagina');
+			cargarListado(pagina, porSel ? parseInt(porSel.value, 10) : null);
+		});
+	})();
+</script>
 </body>
 </html>

@@ -38,20 +38,45 @@ $(document).ready(function () {
         return false;
     }
 
+    function cotizacionProductoHabilitado(item) {
+        if (item.habilitado !== undefined && item.habilitado !== null && item.habilitado !== "") {
+            return parseInt(item.habilitado, 10) === 1;
+        }
+        if (item.element) {
+            return parseInt($(item.element).attr("data-habilitado"), 10) === 1;
+        }
+        return true;
+    }
+
+    function cotizacionEtiquetaProducto(item) {
+        if (!item.id) {
+            return item.text;
+        }
+        var clase = cotizacionProductoHabilitado(item) ? "combo-prod-ok" : "combo-prod-off";
+        return $("<span></span>").addClass(clase).text(item.text || "");
+    }
+
     let productSelect = $("#product-select").select2({
-        placeholder: "Escoja una opción...",
+        placeholder: "Escriba para buscar productos habilitados...",
         multiple: true,
         minimumInputLength: 3,
+        templateResult: cotizacionEtiquetaProducto,
+        templateSelection: cotizacionEtiquetaProducto,
         ajax: {
             type: "GET",
             url: "ajax/ajax-buscar-productos.php",
             dataType: "json",
+            delay: 250,
+            data: function (params) {
+                return { term: params.term || "", habilitado: 1 };
+            },
             processResults: function (items) {
                 return {
-                    results: items.map(function (item) {
+                    results: (items || []).map(function (item) {
                         return {
                             id: item.id,
                             text: item.text,
+                            habilitado: parseInt(item.habilitado, 10) === 1 ? 1 : 0
                         };
                     })
                 };
@@ -60,7 +85,7 @@ $(document).ready(function () {
     });
     
     let comboSelect = $("#combos-select").select2({
-        placeholder: "Escoja una opción...",
+        placeholder: "Escriba para buscar combos activos...",
         multiple: true,
         minimumInputLength: 3,
         ajax: {

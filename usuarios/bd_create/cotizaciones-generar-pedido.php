@@ -23,7 +23,7 @@ if (!empty($generoPedido)) {
     exit();
 }
 
-$consulta = $conexionBdPrincipal->query("INSERT INTO pedidos (pedid_fecha_propuesta, pedid_observaciones, pedid_cliente, pedid_fecha_vencimiento, pedid_vendedor, pedid_creador, pedid_sucursal, pedid_contacto, pedid_forma_pago, pedid_fecha_creacion, pedid_moneda, pedid_cotizacion, pedid_estado) SELECT now(), cotiz_observaciones, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, '" . $_SESSION["id"] . "', cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, now(), cotiz_moneda, '" . $_GET["id"] . "', 1 
+$consulta = $conexionBdPrincipal->query("INSERT INTO pedidos (pedid_fecha_propuesta, pedid_observaciones, pedid_cliente, pedid_fecha_vencimiento, pedid_vendedor, pedid_creador, pedid_sucursal, pedid_contacto, pedid_forma_pago, pedid_fecha_creacion, pedid_moneda, pedid_cotizacion, pedid_estado, pedid_id_empresa) SELECT now(), cotiz_observaciones, cotiz_cliente, cotiz_fecha_vencimiento, cotiz_vendedor, '" . $_SESSION["id"] . "', cotiz_sucursal, cotiz_contacto, cotiz_forma_pago, now(), cotiz_moneda, '" . $_GET["id"] . "', 1, '" . (int) $idEmpresa . "'
 FROM cotizacion 
 WHERE cotiz_id='" . $_GET["id"] . "'");
 $idInsert = mysqli_insert_id($conexionBdPrincipal);
@@ -83,13 +83,14 @@ WHERE cotiz_id='" . $_GET["id"] . "'");
 
 include(RUTA_PROYECTO."/usuarios/includes/guardar-historial-acciones.php");
 
-// Sincronizar pedido con Ofima (Orion → Ofima). No bloquea si falla.
-try {
-    require_once RUTA_PROYECTO.'/usuarios/class/ApiOfimaClient.php';
-    $apiOfima = new ApiOfimaClient($conexionBdPrincipal, $idEmpresa);
-    $apiOfima->sincronizarPedido($idInsert, 'CREATE');
-} catch (Exception $e) {
-    error_log("Error al sincronizar pedido con Ofima: " . $e->getMessage());
+if (ofimaEnviarPedidosAutomatico($conexionBdPrincipal, (int) $idEmpresa)) {
+    try {
+        require_once RUTA_PROYECTO.'/usuarios/class/ApiOfimaClient.php';
+        $apiOfima = new ApiOfimaClient($conexionBdPrincipal, $idEmpresa);
+        $apiOfima->sincronizarPedido($idInsert, $apiOfima->operacionPedidoOfima($idInsert));
+    } catch (Exception $e) {
+        error_log("Error al sincronizar pedido con Ofima: " . $e->getMessage());
+    }
 }
 
 echo '<script type="text/javascript">window.location.href="../pedidos.php?busqueda=' . $idInsert . '";</script>';
