@@ -961,9 +961,10 @@ include("includes/js-formularios.php");
 		<div class="container-fluid clientes-page-inner">
 			<?php
 			$versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultadoD['cotiz_version']);
+			$versionMiga = ((int) $resultadoD['cotiz_version'] > 0) ? ' (V ' . (int) $resultadoD['cotiz_version'] . ')' : '';
 			$migaTema = [
 				['texto' => 'Cotizaciones', 'url' => 'cotizaciones.php'],
-				['texto' => trim('Cotización #' . (int) $resultadoD['cotiz_id'] . ' ' . $versionActualCotizacion)],
+				['texto' => 'Cotización #' . (int) $resultadoD['cotiz_id'] . $versionMiga],
 			];
 			ob_start();
 			if (Modulos::validarRol([78], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
