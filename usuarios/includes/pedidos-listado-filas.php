@@ -9,9 +9,11 @@ foreach ($pedidosFilas as $res) {
 	}
 	$estadoOfima = isset($res['pedid_ofima_estado']) ? (int) $res['pedid_ofima_estado'] : 0;
 	$respuestaOfima = isset($res['pedid_ofima_respuesta']) ? (string) $res['pedid_ofima_respuesta'] : '';
+	$enOfima = (int) ($res['pedid_ofima_integrado'] ?? 0) === 1 || $estadoOfima === 1;
 	$estadoTexto = isset(Pedido::ESTADO_PEDIDO[$res['pedid_estado']]) ? Pedido::ESTADO_PEDIDO[$res['pedid_estado']] : '';
 	$esDueno = (string) $_SESSION['id'] === (string) $res['pedid_creador'] || (string) $_SESSION['id'] === (string) $res['pedid_vendedor'];
-	$hayMasAcciones = ($esDueno && empty($ofimaPedidosBloqueados) && !empty($puedeEliminarPedido))
+	$puedeEliminarEstaFila = $esDueno && empty($ofimaPedidosBloqueados) && !empty($puedeEliminarPedido) && !$enOfima;
+	$hayMasAcciones = $puedeEliminarEstaFila
 		|| !empty($puedePdfPedido)
 		|| (empty($ofimaPedidosBloqueados) && $idRemision === '' && !empty($puedeRemisionPedido));
 	?>
@@ -30,6 +32,31 @@ foreach ($pedidosFilas as $res) {
 			<?php } ?>
 		</td>
 		<td><a href="cotizaciones-editar.php?id=<?= (int) $res['pedid_cotizacion']; ?>"><?= (int) $res['pedid_cotizacion']; ?></a></td>
+		<?php if (!empty($ofimaIntegracionActiva)) {
+			if ($enOfima && $estadoOfima === 2) {
+				$claseOfimaIcono = 'is-ok';
+				$iconoOfimaEstado = 'icon-ok-sign';
+				$tituloOfima = 'Este pedido ya está en Ofima. El último envío no se actualizó.';
+			} elseif ($enOfima) {
+				$claseOfimaIcono = 'is-ok';
+				$iconoOfimaEstado = 'icon-ok-sign';
+				$tituloOfima = 'Este pedido ya está en Ofima';
+			} elseif ($estadoOfima === 2) {
+				$claseOfimaIcono = 'is-error';
+				$iconoOfimaEstado = 'icon-exclamation-sign';
+				$tituloOfima = 'No está en Ofima. El envío falló.';
+			} else {
+				$claseOfimaIcono = 'is-off';
+				$iconoOfimaEstado = 'icon-check-empty';
+				$tituloOfima = 'Pendiente de enviar a Ofima';
+			}
+		?>
+		<td class="col-ofima"><?php if ($respuestaOfima !== '') { ?>
+			<a href="#" class="pedidos-icono-ofima <?= $claseOfimaIcono; ?> js-ofima-mensaje" data-estado="<?= (int) $estadoOfima; ?>" data-mensaje="<?= htmlspecialchars($respuestaOfima, ENT_QUOTES, 'UTF-8'); ?>" title="Ver mensaje de Ofima" aria-label="Ver mensaje de Ofima"><i class="<?= $iconoOfimaEstado; ?>"></i></a>
+		<?php } else { ?>
+			<span class="pedidos-icono-ofima <?= $claseOfimaIcono; ?>" title="<?= htmlspecialchars($tituloOfima, ENT_QUOTES, 'UTF-8'); ?>"><i class="<?= $iconoOfimaEstado; ?>"></i></span>
+		<?php } ?></td>
+		<?php } ?>
 		<td class="cotiz-acciones">
 			<div class="btn-group">
 				<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Acciones <span class="caret"></span></button>
@@ -58,7 +85,7 @@ foreach ($pedidosFilas as $res) {
 						<?php } ?>
 						<?php if ($hayMasAcciones) { ?><li class="divider"></li><?php } ?>
 					<?php } ?>
-					<?php if ($esDueno && empty($ofimaPedidosBloqueados) && !empty($puedeEliminarPedido)) { ?>
+					<?php if ($puedeEliminarEstaFila) { ?>
 						<li><a href="bd_delete/pedidos-eliminar.php?id=<?= (int) $res['pedid_id']; ?>" class="accion-eliminar" onClick="if(!confirm('Desea eliminar el registro?')){return false;}"><i class="icon-trash"></i>Eliminar</a></li>
 					<?php } ?>
 					<?php if (!empty($puedePdfPedido)) { ?>

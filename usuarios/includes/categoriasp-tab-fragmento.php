@@ -247,19 +247,27 @@
 							</thead>
 							<tbody>
 							<?php
+							$conteoGrupo3 = [];
+							$consultaConteoG3 = $conexionBdPrincipal->query("SELECT prod_grupo3 AS id, COUNT(*) AS total FROM productos WHERE prod_id_empresa='".$idEmpresa."' GROUP BY prod_grupo3");
+							while ($consultaConteoG3 && ($filaConteo = mysqli_fetch_assoc($consultaConteoG3))) {
+								$conteoGrupo3[(int) $filaConteo['id']] = (int) $filaConteo['total'];
+							}
 							$consultaG3 = $conexionBdPrincipal->query("SELECT * FROM productos_categorias WHERE catp_grupo=3 AND catp_id_empresa='".$idEmpresa."'");
 							$noG3 = 1;
 							$hayGrupo3 = false;
 							if ($consultaG3) {
 								while ($resG3 = mysqli_fetch_array($consultaG3, MYSQLI_BOTH)) {
 									$hayGrupo3 = true;
+									$numProductosG3 = $conteoGrupo3[(int) $resG3[0]] ?? 0;
 									$habilitadaG3 = !isset($resG3['catp_habilitada']) || (int) $resG3['catp_habilitada'] === 1;
 							?>
 							<tr class="<?= $habilitadaG3 ? 'categoria-habilitada' : 'categoria-deshabilitada'; ?>">
 								<td><?= $noG3; ?></td>
 								<td><?= $ofimaActiva ? htmlspecialchars((string) ($resG3['catp_cod_grupo'] ?? ''), ENT_QUOTES, 'UTF-8') : $resG3[0]; ?></td>
 								<td><?= htmlspecialchars((string) $resG3['catp_nombre'], ENT_QUOTES, 'UTF-8'); ?></td>
-								<td style="text-align:center;">—</td>
+								<td style="text-align:center;">
+									<a href="productos.php?grupo3=<?= (int) $resG3[0]; ?>" data-toggle="tooltip" title="Productos"><?= $numProductosG3; ?></a>
+								</td>
 								<td>
 									<?php if (Modulos::validarRol([41], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
 									<a href="#" class="js-editar-grupo" data-tab="g3" data-id="<?= (int) $resG3[0]; ?>" data-nombre="<?= htmlspecialchars((string) $resG3['catp_nombre'], ENT_QUOTES, 'UTF-8'); ?>" data-codigo="<?= htmlspecialchars((string) ($resG3['catp_cod_grupo'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" data-habilitada="<?= $habilitadaG3 ? '1' : '0'; ?>" title="Editar"><i class="icon-edit"></i></a>

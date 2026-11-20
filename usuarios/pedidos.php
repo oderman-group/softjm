@@ -8,7 +8,8 @@ include("includes/head.php");
 require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
 require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
 $ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
-$ofimaBotonEnvio = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa) && empty($ofimaPedidosBloqueados);
+$ofimaIntegracionActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
+$ofimaBotonEnvio = $ofimaIntegracionActiva && empty($ofimaPedidosBloqueados);
 $puedeTimelinePedido = Modulos::validarRol([237], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
 $puedeEliminarPedido = Modulos::validarRol([372], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
 $puedePdfPedido = Modulos::validarRol([373], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
@@ -35,8 +36,21 @@ $puedeRemisionPedido = Modulos::validarRol([374], $conexionBdPrincipal, $conexio
 	.clientes-page #data-table td:nth-child(7) { width: 88px; }
 	.clientes-page #data-table th:nth-child(8),
 	.clientes-page #data-table td:nth-child(8) { width: 64px; }
-	.clientes-page #data-table th:nth-child(9),
-	.clientes-page #data-table td:nth-child(9) { width: 96px; }
+	.clientes-page #data-table th.col-ofima,
+	.clientes-page #data-table td.col-ofima { width: 56px; text-align: center; }
+	.clientes-page #data-table th.col-acciones,
+	.clientes-page #data-table td.cotiz-acciones { width: 96px; }
+	.clientes-page #data-table td.col-ofima { padding: 0; }
+	.pedidos-icono-ofima {
+		display: flex; align-items: center; justify-content: center;
+		width: 100%; min-height: 46px; line-height: 1; font-size: 1.05rem;
+		color: inherit; text-decoration: none; cursor: default; background: transparent; border: 0;
+	}
+	a.pedidos-icono-ofima { cursor: pointer; }
+	a.pedidos-icono-ofima:hover, a.pedidos-icono-ofima:focus { text-decoration: none; }
+	.pedidos-icono-ofima.is-ok, a.pedidos-icono-ofima.is-ok { color: #16a34a; }
+	.pedidos-icono-ofima.is-error, a.pedidos-icono-ofima.is-error { color: #b91c1c; }
+	.pedidos-icono-ofima.is-off, a.pedidos-icono-ofima.is-off { color: #cbd5e1; }
 	.clientes-page #data-table th:nth-child(4),
 	.clientes-page #data-table td:nth-child(4),
 	.clientes-page #data-table th:nth-child(5),
@@ -178,7 +192,10 @@ $puedeRemisionPedido = Modulos::validarRol([374], $conexionBdPrincipal, $conexio
 									<th>Vendedor</th>
 									<th>Estado</th>
 									<th># Cotización</th>
-									<th></th>
+									<?php if (!empty($ofimaIntegracionActiva)) { ?>
+									<th class="col-ofima">Ofima</th>
+									<?php } ?>
+									<th class="col-acciones"></th>
 								</tr>
 							</thead>
 							<tbody id="pedidos_buscar">
