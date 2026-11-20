@@ -23,7 +23,7 @@ $consultaCliente = $conexionBdPrincipal->query("
 		cont.cont_id, cont.cont_nombre, cont.cont_email
 	FROM cotizacion c
 	INNER JOIN clientes cli ON cli.cli_id = c.cotiz_cliente
-	INNER JOIN contactos cont ON cont.cont_id = c.cotiz_contacto
+	LEFT JOIN contactos cont ON cont.cont_id = c.cotiz_contacto
 	WHERE c.cotiz_id = '".$_GET["id"]."' AND c.cotiz_id_empresa = '".$idEmpresa."'
 	LIMIT 1
 ");
@@ -991,6 +991,7 @@ include("includes/js-formularios.php");
 
 			<?php
 			$camposCotizacionDisabled = '';
+			$faltaContactoCotizacion = empty($resultadoD['cotiz_contacto']);
 
 			if ($resultadoD['cotiz_vendida'] == Cotizacion::COTIZACION_VENDIDA) {
 				$camposCotizacionDisabled = 'disabled';
@@ -1002,40 +1003,49 @@ include("includes/js-formularios.php");
 				];
 
 				$pedidoAsociado = Pedido::Select($predicado);
-				$pedidoAsociadoDatos = mysqli_fetch_array($pedidoAsociado, MYSQLI_BOTH);
+				$pedidoAsociadoDatos = mysqli_fetch_array($pedidoAsociado, MYSQLI_BOTH) ?: [];
+				$pedidoIdAsociado = (string) ($pedidoAsociadoDatos[Pedido::$primaryKey] ?? '');
 
 				//Remisión
-				$predicado = [
-					'remi_pedido' => $pedidoAsociadoDatos[Pedido::$primaryKey],
-					'remi_id_empresa' => $idEmpresa
-				];
+				$remisionAsociadaDatos = [];
+				if ($pedidoIdAsociado !== '') {
+					$predicado = [
+						'remi_pedido' => $pedidoIdAsociado,
+						'remi_id_empresa' => $idEmpresa
+					];
 
-				$remisionAsociada = Remision::Select($predicado);
-				$remisionAsociadaDatos = mysqli_fetch_array($remisionAsociada, MYSQLI_BOTH);
+					$remisionAsociada = Remision::Select($predicado);
+					$remisionAsociadaDatos = mysqli_fetch_array($remisionAsociada, MYSQLI_BOTH) ?: [];
+				}
+				$remisionIdAsociada = (string) ($remisionAsociadaDatos[Remision::$primaryKey] ?? '');
 
 				$linkRemision = '#';
 				$breadCrumbRemision = 'Remisión Pendiente';
 
-				if (!empty($remisionAsociadaDatos[Remision::$primaryKey])) {
-					$linkRemision = 'remisionbdg.php?busqueda='.$remisionAsociadaDatos[Remision::$primaryKey];
-					$breadCrumbRemision = 'Remisión Nro. '.$remisionAsociadaDatos[Remision::$primaryKey];
+				if ($remisionIdAsociada !== '') {
+					$linkRemision = 'remisionbdg.php?busqueda='.$remisionIdAsociada;
+					$breadCrumbRemision = 'Remisión Nro. '.$remisionIdAsociada;
 				}
 
 				//Factura
-				$predicado = [
-					'factura_remision' => $remisionAsociadaDatos[Remision::$primaryKey],
-					'factura_id_empresa' => $idEmpresa
-				];
+				$facturaAsociadaDatos = [];
+				if ($remisionIdAsociada !== '') {
+					$predicado = [
+						'factura_remision' => $remisionIdAsociada,
+						'factura_id_empresa' => $idEmpresa
+					];
 
-				$facturaAsociada = Factura::Select($predicado);
-				$facturaAsociadaDatos = mysqli_fetch_array($facturaAsociada, MYSQLI_BOTH);
+					$facturaAsociada = Factura::Select($predicado);
+					$facturaAsociadaDatos = mysqli_fetch_array($facturaAsociada, MYSQLI_BOTH) ?: [];
+				}
+				$facturaIdAsociada = (string) ($facturaAsociadaDatos[Factura::$primaryKey] ?? '');
 
 				$linkFactura = '#';
 				$breadCrumbFactura = 'Factura Pendiente';
 
-				if (!empty($facturaAsociadaDatos[Factura::$primaryKey])) {
-					$linkFactura = 'facturas.php?busqueda='.$facturaAsociadaDatos[Factura::$primaryKey];
-					$breadCrumbFactura = 'Factura Nro. '.$facturaAsociadaDatos[Factura::$primaryKey];
+				if ($facturaIdAsociada !== '') {
+					$linkFactura = 'facturas.php?busqueda='.$facturaIdAsociada;
+					$breadCrumbFactura = 'Factura Nro. '.$facturaIdAsociada;
 				}
 			?>
 				<p class="cotiz-estado is-ok">
@@ -1047,12 +1057,16 @@ include("includes/js-formularios.php");
 						<li><a href="clientes-tikets-editar.php?id=<?=$ticketAsociado['tik_id'];?>">Ticket Nro. <?=$ticketAsociado['tik_id'];?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
 					<?php }?>
 					<li><a href="#">Cotización Nro. <?=$resultadoD['cotiz_id'];?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
-					<li><a href="pedidos.php?busqueda=<?=$pedidoAsociadoDatos[Pedido::$primaryKey];?>" target="_blank">Pedido Nro.<?=$pedidoAsociadoDatos[Pedido::$primaryKey];?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
+					<li><a href="pedidos.php?busqueda=<?= htmlspecialchars($pedidoIdAsociado, ENT_QUOTES, 'UTF-8'); ?>" target="_blank">Pedido Nro.<?= htmlspecialchars($pedidoIdAsociado !== '' ? $pedidoIdAsociado : 'pendiente', ENT_QUOTES, 'UTF-8'); ?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
 					<li><a href="<?=$linkRemision;?>" target="_blank"><?=$breadCrumbRemision;?></a><span class="divider"><i class="icon-angle-right"></i></span></li>
 					<li><a href="<?=$linkFactura;?>" target="_blank"><?=$breadCrumbFactura;?></a><span class="divider"></li>
 				</ul>
 
+				<?php if ($faltaContactoCotizacion) { ?>
+				<p class="cotiz-estado is-bloqueo">Falta el contacto. Puede elegir la sucursal y el contacto, y guardar solo esos datos.</p>
+				<?php } else { ?>
 				<p class="cotiz-estado is-bloqueo">No es posible hacer más cambios en esta cotización.</p>
+				<?php } ?>
 			<?php
 			} else if(!empty($ticketAsociado)) {
 			?>
@@ -1126,7 +1140,7 @@ include("includes/js-formularios.php");
 									<div class="form-actions">
 										<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
 										<?php
-										if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
+										if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA || !empty($faltaContactoCotizacion)){
 										?>
 										<button type="button" id="btn-guardar-cambios" class="btn btn-info">
 											<i class="icon-save"></i> <span id="btn-text">Guardar cambios</span>
@@ -1228,7 +1242,7 @@ include("includes/js-formularios.php");
 										<label class="control-label">Sucursal</label>
 										<div class="controls">
 											<div class="cotiz-campo-accion">
-											<select class="cotiz-select" name="sucursal" required <?=$camposCotizacionDisabled;?>>
+											<select class="cotiz-select" name="sucursal" required <?= ($camposCotizacionDisabled !== '' && empty($faltaContactoCotizacion)) ? $camposCotizacionDisabled : ''; ?>>
 												<option value="">Escoja una sucursal</option>
 												<?php
 												foreach($sucursales as $sucursal){
@@ -1249,7 +1263,7 @@ include("includes/js-formularios.php");
 										<label class="control-label">Contacto</label>
 										<div class="controls">
 											<div class="cotiz-campo-accion">
-											<select class="cotiz-select" name="contacto" required <?=$camposCotizacionDisabled;?>>
+											<select class="cotiz-select" name="contacto" required <?= ($camposCotizacionDisabled !== '' && empty($faltaContactoCotizacion)) ? $camposCotizacionDisabled : ''; ?>>
 												<option value="">Escoja un contacto</option>
 												<?php
 												foreach($contactos as $contacto){
@@ -1488,7 +1502,7 @@ include("includes/js-formularios.php");
 								<div class="form-actions">
 										<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
 										<?php
-										if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA){
+										if($resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA || !empty($faltaContactoCotizacion)){
 										?>
 										<button type="button" id="btn-guardar-cambios-2" class="btn btn-info">
 											<i class="icon-save"></i> <span id="btn-text-2">Guardar cambios</span>
