@@ -58,10 +58,14 @@ $columnasCombo = $verDescuentos ? 11 : 9;
 	.clientes-page .clientes-busqueda-principal { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0 0 0.75rem; }
 	.clientes-page .clientes-busqueda-principal input[type="search"],
 	.clientes-page .clientes-busqueda-principal select {
-		height: 36px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 0.7rem; margin: 0; font-size: 0.875rem;
+		height: 36px; min-height: 36px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 0.7rem; margin: 0; font-size: 0.875rem; line-height: 36px;
 	}
-	.clientes-page .clientes-busqueda-principal input[type="search"] { flex: 1 1 220px; }
-	.clientes-page .clientes-busqueda-btn { height: 36px; border: 0; border-radius: 8px; padding: 0 0.9rem; background: #047857; color: #fff; font-weight: 700; }
+	.clientes-page .clientes-busqueda-principal input[type="search"] { flex: 1 1 220px; width: auto; min-width: 0; }
+	.clientes-page .clientes-busqueda-principal select { flex: 0 0 auto; }
+	.clientes-page .clientes-busqueda-btn {
+		position: static; top: auto; right: auto; transform: none; flex: 0 0 auto;
+		height: 36px; line-height: 36px; border: 0; border-radius: 8px; padding: 0 0.9rem; background: #047857; color: #fff; font-weight: 700;
+	}
 	.clientes-page .clientes-leyenda { margin: 0 0 0.65rem; text-align: left; }
 	.clientes-page .clientes-table-wrap { max-height: calc(100vh - 280px); overflow: auto; }
 	.clientes-page .clientes-table { font-size: 0.75rem; }

@@ -51,6 +51,7 @@ $clienteInfo = [
 	'cli_categoria' => $resultadoD['cli_categoria']
 ];
 
+require_once RUTA_PROYECTO.'/usuarios/class/Cliente.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Pedido.php';
 require_once RUTA_PROYECTO.'/usuarios/class/Remision.php';
@@ -265,6 +266,7 @@ include("includes/js-formularios.php");
 			var monto = fila ? fila.querySelector('input.dcto-valor') : null;
 			if (monto) monto.removeAttribute('data-valor-fijo');
 			mostrarMontoDescuento(enviada);
+			if (typeof recalculate === 'function') recalculate();
 		}
 		function descuentoValor(input) {
 			var fila = input.closest('tr');
@@ -300,7 +302,13 @@ include("includes/js-formularios.php");
 			showAjaxOverlay('Actualizando producto...');
 			
 			$('#resp').empty().hide().html("Esperando...").show(1);
-			datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo)+"&tipoCliente="+(tipoCliente);
+			var filaProd = enviada.closest ? enviada.closest('tr') : null;
+			var montoProd = filaProd ? filaProd.querySelector('input.dcto-valor') : null;
+			var monto = montoProd ? montoProd.value : '';
+			if (montoProd && montoProd.getAttribute('data-valor-fijo') !== '1') {
+				monto = montoProd.value;
+			}
+			datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(encodeURIComponent(valor))+"&campo="+(encodeURIComponent(campo))+"&tipoCliente="+(encodeURIComponent(tipoCliente || ''))+"&monto="+(encodeURIComponent(monto));
 			$.ajax({
 				type: "POST",
 				url: "ajax/ajax-productos.php",
@@ -335,12 +343,18 @@ include("includes/js-formularios.php");
 			var proceso = 11;
 			var valor = enviada.value;
 			var valorAnterior = enviada.getAttribute('data-valor-actual');
+			var fila = enviada.closest ? enviada.closest('tr') : null;
+			var montoEl = fila ? fila.querySelector('input.dcto-valor') : null;
+			var monto = montoEl ? montoEl.value : '';
 			mostrarMontoDescuento(enviada);
+			if (montoEl && montoEl.getAttribute('data-valor-fijo') !== '1') {
+				monto = montoEl.value;
+			}
 			
 			showAjaxOverlay('Actualizando combo...');
 			
 			$('#resp').empty().hide().html("Esperando...").show(1);
-				datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(valor)+"&campo="+(campo);
+				datos = "producto="+(producto)+"&proceso="+(proceso)+"&valor="+(encodeURIComponent(valor))+"&campo="+(encodeURIComponent(campo))+"&monto="+(encodeURIComponent(monto));
 					$.ajax({
 						type: "POST",
 						url: "ajax/ajax-productos.php",
@@ -769,6 +783,7 @@ include("includes/js-formularios.php");
 		padding: 0.9rem 1.15rem;
 	}
 	.clientes-page .widget-head h3 { color: #fff; font-size: 1rem; font-weight: 700; margin: 0; }
+	.clientes-page .widget-head .cotiz-cliente { margin: 0.2rem 0 0; color: rgba(255, 255, 255, 0.92); font-size: 0.875rem; font-weight: 600; }
 	.clientes-page .widget-container { background: #fff; border-radius: 0 0 13px 13px; padding: 1rem 1.15rem 1.15rem; }
 	#productos.is-cargando #data-table { display: none; }
 	#productos .items-cargando { display: none; }
@@ -808,6 +823,16 @@ include("includes/js-formularios.php");
 	.clientes-page .btn { border-radius: 8px; font-weight: 600; }
 	.clientes-page .btn-pdf-2 { background: #ea580c; border-color: #c2410c; color: #fff; }
 	.clientes-page .btn-pdf-2:hover { background: #c2410c; color: #fff; }
+	.clientes-page .miga-tema ul.breadcrumb > li.miga-tema-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin-left: auto; }
+	.clientes-page .miga-tema ul.breadcrumb > li.miga-tema-acciones a.btn,
+	.clientes-page .miga-tema ul.breadcrumb > li.miga-tema-acciones a.btn:hover,
+	.clientes-page .miga-tema ul.breadcrumb > li.miga-tema-acciones a.btn i { color: #fff; }
+	.clientes-page .miga-tema-acciones a.btn-success { background: #b91c1c; border-color: #991b1b; color: #fff; }
+	.clientes-page .miga-tema-acciones a.btn-success:hover { background: #991b1b; color: #fff; }
+	.clientes-page .miga-tema-acciones a.btn-info { background: #047857; border-color: #065f46; color: #fff; }
+	.clientes-page .miga-tema-acciones a.btn-info:hover { background: #065f46; color: #fff; }
+	.clientes-page .miga-tema-acciones a.btn-warning { background: #1d4ed8; border-color: #1e40af; color: #fff; }
+	.clientes-page .miga-tema-acciones a.btn-warning:hover { background: #1e40af; color: #fff; }
 	.clientes-page .alert { border-radius: 10px; }
 	.clientes-page ul.breadcrumb {
 		background: #fff;
@@ -901,6 +926,12 @@ include("includes/js-formularios.php");
 		padding: 0 0.85rem;
 		line-height: 36px;
 		white-space: nowrap;
+		border-radius: 8px;
+	}
+	@media (max-width: 768px) {
+		.clientes-page .cotiz-campo-accion { flex-wrap: wrap; align-items: stretch; }
+		.clientes-page .cotiz-campo-accion .cotiz-select { flex: 1 1 100%; width: 100%; }
+		.clientes-page .cotiz-campo-accion .btn { flex: 1 1 auto; }
 	}
 	#product-select + .select2-container .select2-selection__choice:has(.combo-prod-off),
 	.select2-results__option .combo-prod-off {
@@ -928,32 +959,32 @@ include("includes/js-formularios.php");
     
 	<div class="main-wrapper">
 		<div class="container-fluid clientes-page-inner">
-			<?php $versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultadoD['cotiz_version']); ?>
-			<div class="clientes-hero">
-				<div>
-					<h1 class="clientes-hero-title">Cotización #<?= (int) $resultadoD['cotiz_id']; ?> <?= $versionActualCotizacion; ?></h1>
-					<p class="clientes-hero-subtitle"><?= htmlspecialchars((string) $resultadoD['cli_nombre'], ENT_QUOTES, 'UTF-8'); ?><?php if (!empty($resultadoD['cotiz_ultima_modificacion'])) { ?> · Última modificación <?= htmlspecialchars((string) $resultadoD['cotiz_ultima_modificacion'], ENT_QUOTES, 'UTF-8'); ?><?php } ?></p>
-				</div>
-				<div class="clientes-hero-actions">
-					<a href="cotizaciones.php" class="btn btn-primary"><i class="icon-arrow-left"></i> Volver</a>
-					<?php if (Modulos::validarRol([78], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-					<a href="cotizaciones-agregar.php" class="btn btn-success"><i class="icon-plus"></i> Agregar nuevo</a>
-					<?php } ?>
-					<?php if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-					<a href="reportes/formato-cotizacion-1_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-info" target="_blank"><i class="icon-print"></i> PDF 1</a>
-					<a href="reportes/formato-cotizacion-3_pdf.php?id=<?=$_GET["id"];?>" class="btn btn-pdf-2" target="_blank"><i class="icon-print"></i> PDF 2</a>
-					<?php } ?>
-					<?php if (
-						empty($ofimaPedidosBloqueados) &&
-						$resultadoD['cotiz_vendida'] != 1 &&
-						Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
-						!empty($ticketAsociado) &&
-						$resultadoD['cotiz_es_precotizacion'] != 1
-					) { ?>
-					<a href="bd_create/cotizaciones-generar-pedido.php?id=<?= $resultadoD['cotiz_id']; ?>" class="btn btn-warning" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}"><i class="icon-money"></i> Generar pedido</a>
-					<?php } ?>
-				</div>
-			</div>
+			<?php
+			$versionActualCotizacion = Cotizacion::obtenerVersionCotizacion($resultadoD['cotiz_version']);
+			$migaTema = [
+				['texto' => 'Cotizaciones', 'url' => 'cotizaciones.php'],
+				['texto' => trim('Cotización #' . (int) $resultadoD['cotiz_id'] . ' ' . $versionActualCotizacion)],
+			];
+			ob_start();
+			if (Modulos::validarRol([78], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+				<a href="cotizaciones-agregar.php" class="btn btn-success"><i class="icon-plus"></i> Agregar nuevo</a>
+			<?php }
+			if (Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) { ?>
+				<a href="reportes/formato-cotizacion-1_pdf.php?id=<?= (int) $_GET['id']; ?>" class="btn btn-info" target="_blank"><i class="icon-print"></i> PDF 1</a>
+				<a href="reportes/formato-cotizacion-3_pdf.php?id=<?= (int) $_GET['id']; ?>" class="btn btn-pdf-2" target="_blank"><i class="icon-print"></i> PDF 2</a>
+			<?php }
+			if (
+				empty($ofimaPedidosBloqueados) &&
+				$resultadoD['cotiz_vendida'] != 1 &&
+				Modulos::validarRol([263], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) &&
+				!empty($ticketAsociado) &&
+				$resultadoD['cotiz_es_precotizacion'] != 1
+			) { ?>
+				<a href="bd_create/cotizaciones-generar-pedido.php?id=<?= (int) $resultadoD['cotiz_id']; ?>" class="btn btn-warning" onClick="if(!confirm('Desea generar pedido de esta cotización?')){return false;}"><i class="icon-money"></i> Generar pedido</a>
+			<?php }
+			$migaTemaAcciones = ob_get_clean();
+			include 'includes/miga-tema.php';
+			?>
 
             <?php include("includes/notificaciones.php");?>
 
@@ -1057,6 +1088,7 @@ include("includes/js-formularios.php");
 							<div class="content-widgets gray">
 								<div class="widget-head bondi-blue">
 									<h3> <?=$paginaActual['pag_nombre'];?> #<?=$resultadoD['cotiz_id'];?> <?=$versionActualCotizacion;?> <?php if (!empty($resultadoD['cotiz_ultima_modificacion'])) echo " - Ultima modificación: " . $resultadoD['cotiz_ultima_modificacion'];?></h3>
+									<p class="cotiz-cliente"><?= htmlspecialchars((string) $resultadoD['cli_nombre'], ENT_QUOTES, 'UTF-8'); ?></p>
 								</div>
 							<div class="widget-container">
 								<!-- Mensaje de respuesta para guardado asíncrono -->
@@ -1141,15 +1173,22 @@ include("includes/js-formularios.php");
 												<select class="cotiz-select" name="cliente" required onChange="clientes(this)" <?=$camposCotizacionDisabled;?>>
 													<option value="">Escoja un cliente</option>
 													<?php
-													$conOp = $conexionBdPrincipal->query("SELECT cli_id, cli_nombre, cli_categoria, 
+													$sqlClientesCotiz = "SELECT cli.cli_id, cli.cli_nombre, cli.cli_categoria, 
 														CASE 
-															WHEN cli_categoria = '".CLI_CATEGORIA_DEALER."' THEN '(DEALER)'
+															WHEN cli.cli_categoria = '".CLI_CATEGORIA_DEALER."' THEN '(DEALER)'
 															ELSE ''
-														END AS 'categoria'	
-														FROM clientes 
-														WHERE cli_id_empresa='".$idEmpresa."'
-														ORDER BY cli_categoria, cli_nombre
-														");
+														END AS categoria
+														FROM clientes cli
+														WHERE cli.cli_id_empresa='".$idEmpresa."'
+														AND (cli.cli_integrado_ofima = 1 OR cli.cli_id='".(int) $cliente."')";
+													$sqlClientesCotiz = Cliente::appendFiltrosVisibilidadAnalyticsWhere(
+														$sqlClientesCotiz,
+														(int) ($_SESSION['id'] ?? 0),
+														!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion),
+														(int) $cliente
+													);
+													$sqlClientesCotiz .= " ORDER BY cli.cli_categoria, cli.cli_nombre";
+													$conOp = $conexionBdPrincipal->query($sqlClientesCotiz);
 
 														$categoriaActual = 1;
 														$nombreCategoria = ['','Prospectos', 'Clientes', 'Dealer'];
@@ -1179,6 +1218,7 @@ include("includes/js-formularios.php");
 												<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA) {?>
 													<a href="clientes-editar.php?id=<?=$cliente;?>" class="btn btn-info" target="_blank">Editar cliente</a>
 												<?php } ?>
+												<button type="button" class="btn btn-info" id="btnBuscarClientes">Buscar clientes</button>
 												</div>
 											</div>
 									</div>
@@ -1655,8 +1695,10 @@ include("includes/js-formularios.php");
 
 		</div>
 	</div>
+	<?php include("includes/drawer-buscar-clientes.php");?>
+	<?php include("includes/drawer-crear-cliente.php");?>
 	<?php include("includes/pie.php");?>
-	<script src="js/Cotizaciones.js?v=20261119c"></script>
+	<script src="js/Cotizaciones.js?v=20261120a"></script>
 </div>
 
 <script>

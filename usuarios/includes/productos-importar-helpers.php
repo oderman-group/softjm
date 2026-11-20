@@ -58,6 +58,122 @@ function productosImportGuardarJob(string $jobId, array $job): bool
 	return $json !== false && file_put_contents($path, $json, LOCK_EX) !== false;
 }
 
+function productosImportCodigoClave(string $referencia): string
+{
+	return strtoupper(trim($referencia));
+}
+
+/**
+ * La primera fila de un código se procesa. Devuelve true si esa referencia ya salió en el archivo.
+ *
+ * @param array<string, true> $vistos
+ */
+function productosImportMarcarCodigo(array &$vistos, string $referencia): bool
+{
+	$clave = productosImportCodigoClave($referencia);
+	if ($clave === '') {
+		return false;
+	}
+	if (isset($vistos[$clave])) {
+		return true;
+	}
+	$vistos[$clave] = true;
+	return false;
+}
+
+function productosImportBorrarJob(string $jobId): void
+{
+	$path = productosImportJobPath($jobId);
+	if (is_file($path)) {
+		@unlink($path);
+	}
+}
+
+/**
+ * Quita los JSON de importación de este usuario al entrar o recargar la página.
+ * El resultado visible ya está en sesión; el archivo solo sirve mientras el lote corre.
+ */
+function productosImportLimpiarJobsUsuario(int $userId, int $empresaId): void
+{
+	if ($userId <= 0 || $empresaId <= 0) {
+		return;
+	}
+	$archivos = glob(productosImportJobsDir() . '/imp_*.json') ?: [];
+	foreach ($archivos as $path) {
+		if (!is_file($path)) {
+			continue;
+		}
+		$data = json_decode((string) file_get_contents($path), true);
+		if (!is_array($data)) {
+			continue;
+		}
+		if ((int) ($data['user_id'] ?? 0) !== $userId || (int) ($data['empresa_id'] ?? 0) !== $empresaId) {
+			continue;
+		}
+		@unlink($path);
+	}
+}
+
+function productosImportIdComparable($valor): string
+{
+	$texto = trim((string) $valor);
+	if ($texto === '' || !is_numeric($texto)) {
+		return $texto;
+	}
+	return (string) (int) round((float) $texto);
+}
+
+function productosImportIdGuardar($excel, $actual): string
+{
+	$nuevo = productosImportIdComparable($excel);
+	if ($nuevo === '') {
+		return productosImportIdComparable($actual);
+	}
+	return $nuevo;
+}
+
+/**
+ * Compara los campos que autorizan un UPDATE: nombre, línea, sublínea,
+ * grupo, precio de lista, integrado Ofima y habilitado.
+ * Una celda de código vacía conserva el valor actual y no cuenta como cambio.
+ *
+ * @return array{cambio:bool,precio:float,precio_cambio:bool,grupo1:string,categoria:string,marca:string,integrar_ofima:int}
+ */
+function productosImportDetectarCambios(array $datos, array $fila, int $habilitado, int $integrarOfima): array
+{
+	$precioActual = round((float) ($datos['prod_precio'] ?? 0), 2);
+	$precioExcel = $fila['prod_precio'] ?? null;
+	$precioNuevo = (is_numeric($precioExcel) && trim((string) $precioExcel) !== '')
+		? round((float) $precioExcel, 2)
+		: $precioActual;
+
+	$grupo1 = productosImportIdGuardar($fila['prod_grupo1'] ?? '', $datos['prod_grupo1'] ?? '');
+	$categoria = productosImportIdGuardar($fila['prod_categoria'] ?? '', $datos['prod_categoria'] ?? '');
+	$marca = productosImportIdGuardar($fila['prod_marca'] ?? '', $datos['prod_marca'] ?? '');
+	$integradoActual = ((int) ($datos['prod_integrado_ofima'] ?? 0) === 1) ? 1 : 0;
+	$integradoNuevo = $integradoActual === 1 ? 1 : ($integrarOfima === 1 ? 1 : 0);
+
+	$cambios = [
+		trim((string) ($datos['prod_nombre'] ?? '')) !== trim((string) ($fila['prod_nombre'] ?? '')),
+		productosImportIdComparable($datos['prod_grupo1'] ?? '') !== $grupo1,
+		productosImportIdComparable($datos['prod_categoria'] ?? '') !== $categoria,
+		productosImportIdComparable($datos['prod_marca'] ?? '') !== $marca,
+		$precioActual !== $precioNuevo,
+		$integradoActual !== $integradoNuevo,
+		(((int) ($datos['prod_habilitado'] ?? 0) === 1) ? 1 : 0) !== ($habilitado === 1 ? 1 : 0),
+	];
+
+	return [
+		'cambio' => in_array(true, $cambios, true),
+		'precio' => $precioNuevo,
+		'precio_cambio' => $precioActual !== $precioNuevo,
+		'grupo1' => $grupo1,
+		'categoria' => $categoria,
+		'marca' => $marca,
+		'integrar_ofima' => $integradoNuevo,
+	];
+}
+
 /**
  * Procesa una fila ya normalizada del Excel.
  * @return array{ok:bool,tipo?:string,detalle?:array,ofima?:array}
@@ -101,32 +217,55 @@ function productosImportProcesarFila(
 
 	if ($datos && !empty($datos['prod_id'])) {
 		$productoId = (int) $datos['prod_id'];
-		$precioLista = is_numeric($fila['prod_precio'] ?? null)
-			? (float) $fila['prod_precio']
-			: (float) ($datos['prod_precio'] ?? 0);
-		$precioAnterior = (float) ($datos['prod_precio'] ?? 0);
+		$detalle = productosImportItemDetalle([
+			'prod_referencia' => $referencia,
+			'prod_nombre' => $nombre,
+		], $nroFila, $productoId);
+		$cambios = productosImportDetectarCambios($datos, $fila, (int) $habilitado, (int) $integrarOfima);
+		$integrarOfima = (int) ($cambios['integrar_ofima'] ?? 0);
 
-		if ($precioLista != $precioAnterior) {
+		if (!$cambios['cambio']) {
+			return [
+				'ok' => true,
+				'tipo' => 'sin_cambios',
+				'detalle' => $detalle,
+			];
+		}
+
+		$precioLista = $cambios['precio'];
+		$precioAnterior = round((float) ($datos['prod_precio'] ?? 0), 2);
+		if ($cambios['precio_cambio']) {
 			$conexion->query(
 				"INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)
 				 VALUES('{$productoId}', '{$precioAnterior}', '{$precioLista}', '{$usuarioId}', 1)"
 			);
 		}
 
-		$conexion->query(
+		$nombreEsc = $conexion->real_escape_string($nombre);
+		$grupo1Esc = $conexion->real_escape_string($cambios['grupo1']);
+		$categoriaEsc = $conexion->real_escape_string($cambios['categoria']);
+		$marcaEsc = $conexion->real_escape_string($cambios['marca']);
+		$actualizado = $conexion->query(
 			"UPDATE productos SET
+			prod_nombre='{$nombreEsc}',
+			prod_grupo1='{$grupo1Esc}',
+			prod_categoria='{$categoriaEsc}',
+			prod_marca='{$marcaEsc}',
 			prod_precio='{$precioLista}',
+			" . ($integrarOfima === 1 ? '' : "prod_integrado_ofima='0',") . "
 			prod_habilitado='" . (int) $habilitado . "',
 			prod_ultima_actualizacion=now(),
 			prod_ultima_actualizacion_usuario='{$usuarioId}'
 			WHERE prod_id='{$productoId}'
 			  AND prod_id_empresa='{$idEmpresa}'"
 		);
-
-		$detalle = productosImportItemDetalle([
-			'prod_referencia' => $referencia,
-			'prod_nombre' => $nombre,
-		], $nroFila, $productoId);
+		if (!$actualizado) {
+			return [
+				'ok' => false,
+				'tipo' => 'invalido',
+				'detalle' => $detalle + ['motivo' => 'No se pudo actualizar el producto', 'mensaje' => $conexion->error],
+			];
+		}
 
 		$ofimaInfo = productosImportSincronizarOfima(
 			$conexion,
@@ -270,6 +409,8 @@ function productosImportResultadoVacio(): array
 	return [
 		'creados' => [],
 		'actualizados' => [],
+		'sin_cambios' => [],
+		'duplicados' => [],
 		'invalidos' => [],
 		'ofima_creados' => [],
 		'ofima_actualizados' => [],
@@ -288,6 +429,10 @@ function productosImportAcumularResultado(array &$resultado, array $proc): void
 		$resultado['creados'][] = $proc['detalle'];
 	} elseif (($proc['tipo'] ?? '') === 'actualizado') {
 		$resultado['actualizados'][] = $proc['detalle'];
+	} elseif (($proc['tipo'] ?? '') === 'sin_cambios') {
+		$resultado['sin_cambios'][] = $proc['detalle'];
+	} elseif (($proc['tipo'] ?? '') === 'duplicado') {
+		$resultado['duplicados'][] = $proc['detalle'] ?? [];
 	}
 
 	$ofima = $proc['ofima'] ?? null;

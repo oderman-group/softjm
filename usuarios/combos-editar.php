@@ -306,17 +306,14 @@ include("includes/js-formularios.php");
 
 	<div class="main-wrapper">
 		<div class="container-fluid clientes-page-inner">
-			<?php $combosCotizacion = Combo::numeroCotizacionesCombo($_GET["id"], $conexionBdPrincipal); ?>
-			<div class="clientes-hero">
-				<div>
-					<h1 class="clientes-hero-title"><?= htmlspecialchars($paginaActual['pag_nombre'] ?? 'Editar combo'); ?></h1>
-					<p class="clientes-hero-subtitle"><?= htmlspecialchars($resultadoD['combo_nombre'] ?? ''); ?></p>
-				</div>
-				<div class="clientes-hero-actions">
-					<a href="combos.php" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-				</div>
-			</div>
-
+			<?php
+			$combosCotizacion = Combo::numeroCotizacionesCombo($_GET["id"], $conexionBdPrincipal);
+			$migaTema = [
+				['texto' => 'Combos', 'url' => 'combos.php'],
+				['texto' => $paginaActual['pag_nombre'] ?? 'Editar combos'],
+			];
+			include 'includes/miga-tema.php';
+			?>
 			<?php if ($combosCotizacion > 0) { ?>
 				<p class="combo-aviso">Este combo se encuentra incluído en <b><?= (int) $combosCotizacion; ?></b> documentos.</p>
 			<?php } ?>
@@ -324,8 +321,8 @@ include("includes/js-formularios.php");
 			<section class="clientes-panel">
 				<div class="clientes-panel-header">
 					<div>
-						<h3>Datos del combo</h3>
-						<p>Nombre, imagen, productos y descuentos</p>
+						<h3><?= htmlspecialchars($paginaActual['pag_nombre'] ?? 'Editar combos'); ?></h3>
+						<p><?= htmlspecialchars($resultadoD['combo_nombre'] ?? ''); ?></p>
 					</div>
 				</div>
 				<div class="clientes-panel-body">

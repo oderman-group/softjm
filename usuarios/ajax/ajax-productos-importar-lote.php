@@ -56,12 +56,26 @@ if (!isset($job['resultado']) || !is_array($job['resultado'])) {
 
 $ofimaActiva = !empty($job['ofima_activa']);
 $usuarioId = (int) ($_SESSION['id'] ?? 0);
+if (!isset($job['codigos_vistos']) || !is_array($job['codigos_vistos'])) {
+	$job['codigos_vistos'] = [];
+}
 $t0 = microtime(true);
 $finLote = min($total, $procesados + $tamanoLote);
 
 for ($i = $procesados; $i < $finLote; $i++) {
 	$fila = $filas[$i] ?? null;
 	if (!is_array($fila)) {
+		continue;
+	}
+	$referenciaFila = trim((string) ($fila['prod_referencia'] ?? ''));
+	if (productosImportMarcarCodigo($job['codigos_vistos'], $referenciaFila)) {
+		$detalleDuplicado = productosImportItemDetalle($fila, (int) ($fila['fila'] ?? 0));
+		$detalleDuplicado['mensaje'] = 'Código repetido en el archivo. No se actualizó.';
+		productosImportAcumularResultado($job['resultado'], [
+			'ok' => true,
+			'tipo' => 'duplicado',
+			'detalle' => $detalleDuplicado,
+		]);
 		continue;
 	}
 	$proc = productosImportProcesarFila(
@@ -89,25 +103,28 @@ $porcentaje = $total > 0 ? (int) floor(($procesados / $total) * 100) : 100;
 
 if ($job['estado'] === 'done') {
 	$job['fin'] = time();
+	$inicioJob = (int) ($job['inicio'] ?? time());
 	$_SESSION['import_productos_resultado'] = [
 		'fecha' => date('Y-m-d H:i:s'),
+		'duracion_segundos' => max(0, (int) $job['fin'] - $inicioJob),
 		'ofima_activa' => $ofimaActiva ? 1 : 0,
 		'filas_excel' => (int) ($job['filas_excel'] ?? 0),
 		'filas_con_datos' => $total,
 		'filas_vacias' => (int) ($job['filas_vacias'] ?? 0),
 		'creados' => $job['resultado']['creados'] ?? [],
 		'actualizados' => $job['resultado']['actualizados'] ?? [],
+		'sin_cambios' => $job['resultado']['sin_cambios'] ?? [],
+		'duplicados' => $job['resultado']['duplicados'] ?? [],
 		'invalidos' => $job['resultado']['invalidos'] ?? [],
 		'ofima_creados' => $job['resultado']['ofima_creados'] ?? [],
 		'ofima_actualizados' => $job['resultado']['ofima_actualizados'] ?? [],
 		'ofima_errores' => $job['resultado']['ofima_errores'] ?? [],
 		'ofima_omitidos' => $job['resultado']['ofima_omitidos'] ?? [],
 	];
-	// Liberar filas del job para no dejar JSON enorme.
-	$job['filas'] = [];
+	productosImportBorrarJob($jobId);
+} else {
+	productosImportGuardarJob($jobId, $job);
 }
-
-productosImportGuardarJob($jobId, $job);
 
 echo json_encode([
 	'success' => true,
@@ -121,6 +138,8 @@ echo json_encode([
 	'conteos' => [
 		'creados' => count($job['resultado']['creados'] ?? []),
 		'actualizados' => count($job['resultado']['actualizados'] ?? []),
+		'sin_cambios' => count($job['resultado']['sin_cambios'] ?? []),
+		'duplicados' => count($job['resultado']['duplicados'] ?? []),
 		'ofima_creados' => count($job['resultado']['ofima_creados'] ?? []),
 		'ofima_actualizados' => count($job['resultado']['ofima_actualizados'] ?? []),
 		'ofima_errores' => count($job['resultado']['ofima_errores'] ?? []),

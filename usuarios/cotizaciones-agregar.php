@@ -3,10 +3,71 @@ include("sesion.php");
 
 $idPagina = 78;
 include("includes/verificar-paginas.php");
+require_once RUTA_PROYECTO.'/usuarios/class/Cliente.php';
 include("includes/head.php");
 ?>
 <link href="css/chosen.css" rel="stylesheet">
+<link href="css/clientes-listado.css" rel="stylesheet">
 <link href="../assets-login/plugins/select2/css/select2.css" rel="stylesheet" />
+<style>
+	.cotiz-agregar .combo-ayuda { display: block; margin-top: 0.35rem; font-size: 0.75rem; color: #64748b; }
+	.cotiz-agregar .clientes-panel { overflow: visible; }
+	.cotiz-agregar .clientes-panel-header { border-radius: 13px 13px 0 0; }
+	.cotiz-agregar fieldset.default {
+		box-sizing: border-box;
+		width: 100%;
+		max-width: 100%;
+		min-width: 0;
+		margin: 0 0 1rem;
+		padding: 0.75rem 1rem 0.25rem;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
+		background: #f8fafc;
+	}
+	.cotiz-agregar fieldset.default legend {
+		width: auto;
+		margin: 0 0 0.5rem;
+		padding: 0 0.35rem;
+		border: 0;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: #047857;
+		line-height: 1.2;
+	}
+	.cotiz-agregar fieldset.default .control-group { margin-bottom: 0.65rem; }
+	.cotiz-agregar .cotiz-campo-accion { display: flex; align-items: center; gap: 0.5rem; min-width: 0; max-width: 100%; }
+	.cotiz-agregar .cotiz-campo-accion .cotiz-select {
+		flex: 1 1 0;
+		width: 0;
+		min-width: 0;
+		max-width: 100%;
+		height: 38px;
+		margin: 0;
+		padding: 0 0.7rem;
+		border: 1px solid #cbd5e1;
+		border-radius: 8px;
+		background: #fff;
+		color: #0f172a;
+		font-size: 0.875rem;
+		box-shadow: none;
+	}
+	.cotiz-agregar .cotiz-campo-accion .btn {
+		flex: 0 0 auto;
+		height: 38px;
+		margin: 0;
+		padding: 0 0.85rem;
+		line-height: 36px;
+		white-space: nowrap;
+		border-radius: 8px;
+	}
+	@media (max-width: 768px) {
+		.cotiz-agregar .cotiz-campo-accion { flex-wrap: wrap; align-items: stretch; }
+		.cotiz-agregar .cotiz-campo-accion .cotiz-select { flex: 1 1 100%; width: 100%; }
+		.cotiz-agregar .cotiz-campo-accion .btn { flex: 1 1 auto; }
+	}
+</style>
 
 <!--============ javascript ===========-->
 <script src="js/jquery.js"></script>
@@ -34,37 +95,27 @@ include("includes/js-formularios.php");
 
 <?php include("includes/texto-editor.php");?>
 </head>
-<body>
+<body class="clientes-page cotiz-agregar">
 <div class="layout">
 	<?php include("includes/encabezado.php");?>
-    
-    
-    
 	<div class="main-wrapper">
-		<div class="container-fluid">
-			<div class="row-fluid ">
-				<div class="span12">
-					<div class="primary-head">
-						<h3 class="page-header"><?=$paginaActual['pag_nombre'];?></h3>
-						
-                        
+		<div class="container-fluid clientes-page-inner">
+			<?php
+			$migaTema = [];
+			if (Modulos::validarRol([77], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+				$migaTema[] = ['texto' => 'Cotizaciones', 'url' => 'cotizaciones.php'];
+			}
+			$migaTema[] = ['texto' => $paginaActual['pag_nombre'] ?? 'Agregar cotización'];
+			include 'includes/miga-tema.php';
+			?>
+			<section class="clientes-panel">
+				<div class="clientes-panel-header">
+					<div>
+						<h3><?= htmlspecialchars($paginaActual['pag_nombre'] ?? 'Agregar cotización'); ?></h3>
+						<p>Solo clientes integrados con Ofima</p>
 					</div>
-					<ul class="breadcrumb">
-						<li><a href="index.php" class="icon-home"></a><span class="divider "><i class="icon-angle-right"></i></span></li>
-						<?php if (Modulos::validarRol([77], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-						<li><a href="cotizaciones.php">Cotizaciones</a><span class="divider"><i class="icon-angle-right"></i></span></li>
-						<?php } ?>
-						<li class="active"><?=$paginaActual['pag_nombre'];?></li>
-					</ul>
 				</div>
-			</div>
-			<div class="row-fluid">
-				<div class="span12">
-					<div class="content-widgets gray">
-						<div class="widget-head bondi-blue">
-							<h3> <?=$paginaActual['pag_nombre'];?></h3>
-						</div>
-						<div class="widget-container">
+				<div class="clientes-panel-body">
 							<form class="form-horizontal" method="post" action="bd_create/cotizaciones-guardar.php">
 
 								<script type="application/javascript">
@@ -74,26 +125,41 @@ include("includes/js-formularios.php");
 									}
 								</script>
 								
+                               <fieldset class="default">
+									<legend>Datos del cliente</legend>
                                <div class="control-group">
-									<label class="control-label">Escoja un cliente</label>
+									<label class="control-label">Cliente</label>
 									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="cliente" onChange="clientes(this)" required>
+										<div class="cotiz-campo-accion">
+										<select class="cotiz-select" name="cliente" onChange="clientes(this)" required>
 											<option value=""></option>
                                             <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
-											WHERE cli_ciudad != ".CIUDADES_INTERNACIONALES."
-											AND cli_id_empresa='".$idEmpresa."'
-											ORDER BY cli_categoria, cli_nombre
-											");
+											$sqlClientesAgregar = "SELECT * FROM clientes cli
+											WHERE cli.cli_ciudad != ".CIUDADES_INTERNACIONALES."
+											AND cli.cli_id_empresa='".$idEmpresa."'
+											AND cli.cli_integrado_ofima = 1";
+											$sqlClientesAgregar = Cliente::appendFiltrosVisibilidadAnalyticsWhere(
+												$sqlClientesAgregar,
+												(int) ($_SESSION['id'] ?? 0),
+												!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)
+											);
+											$sqlClientesAgregar .= " ORDER BY cli.cli_categoria, cli.cli_nombre";
+											$conOp = $conexionBdPrincipal->query($sqlClientesAgregar);
 
 											//Permiso para mostrar todos los clientes, incluyendo los internacionales.
 											$paginasParaValidar = [389];
 
 											if (Modulos::validarRol($paginasParaValidar, $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
-												$conOp = $conexionBdPrincipal->query("SELECT * FROM clientes 
-												WHERE cli_id_empresa='".$idEmpresa."'
-												ORDER BY cli_categoria, cli_nombre
-												");
+												$sqlClientesAgregar = "SELECT * FROM clientes cli
+												WHERE cli.cli_id_empresa='".$idEmpresa."'
+												AND cli.cli_integrado_ofima = 1";
+												$sqlClientesAgregar = Cliente::appendFiltrosVisibilidadAnalyticsWhere(
+													$sqlClientesAgregar,
+													(int) ($_SESSION['id'] ?? 0),
+													!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)
+												);
+												$sqlClientesAgregar .= " ORDER BY cli.cli_categoria, cli.cli_nombre";
+												$conOp = $conexionBdPrincipal->query($sqlClientesAgregar);
 											}
 
 											$categoriaActual = 1;
@@ -106,15 +172,6 @@ include("includes/js-formularios.php");
 													echo '</optgroup>';
 													echo '<optgroup label="'.$nombreCategoria[$resOp['cli_categoria']].'">';
 													$categoriaActual = $resOp['cli_categoria'];
-												}
-
-												if (!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
-													$consultaNumZ = $conexionBdPrincipal->query("SELECT * FROM zonas_usuarios 
-													WHERE zpu_usuario='".$_SESSION["id"]."' 
-													AND zpu_zona='".$resOp['cli_zona']."'");
-													$numZ = $consultaNumZ->num_rows;
-
-													if($numZ == 0) continue;
 												}
 
 												$disabled = '';
@@ -140,15 +197,109 @@ include("includes/js-formularios.php");
 											echo '</optgroup>';
 											?>
                                     	</select>
-                                    </div>
-								   
-								   <?php if(is_numeric($_GET['cte']) && Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
-											<a href="clientes-editar.php?id=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Editar cliente</a>
+										<?php if(isset($_GET['cte']) && is_numeric($_GET['cte']) && Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
+											<a href="clientes-editar.php?id=<?= (int) $_GET["cte"]; ?>" class="btn btn-info" target="_blank">Editar cliente</a>
 								   <?php }?>
-								   
+										<button type="button" class="btn btn-info" id="btnBuscarClientes">Buscar clientes</button>
+										</div>
+										<span class="combo-ayuda">Solo aparecen clientes integrados con Ofima.</span>
+                                    </div>
 							   </div>
+							   <?php if (!isset($_GET['cte']) || !is_numeric($_GET['cte'])) { ?>
+							   </fieldset>
+							   <?php } ?>
 
 							   <?php if(is_numeric($_GET['cte'])){?>
+
+								<?php
+								$consultaCli=$conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET['cte']."' AND cli_id_empresa='".$idEmpresa."' AND cli_integrado_ofima = 1");
+								$clienteInfo = mysqli_fetch_array($consultaCli, MYSQLI_BOTH);
+								$fueraDeZona = false;
+								if ($clienteInfo && !Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
+									$permisosZona = Cliente::permisosVisibilidadListado((int) ($_SESSION['id'] ?? 0), $conexionBdPrincipal);
+									$fueraDeZona = !Cliente::usuarioPuedeVerClienteEnListado(
+										$permisosZona,
+										(int) ($clienteInfo['cli_zona'] ?? 0),
+										(int) $clienteInfo['cli_id']
+									);
+								}
+								if (!$clienteInfo || $fueraDeZona) {
+									$mensajeCliente = $fueraDeZona
+										? 'Este cliente no está en sus zonas.'
+										: 'Este cliente no está integrado con Ofima. Elija uno que sí lo esté.';
+									echo '<div class="alert alert-warning">'.htmlspecialchars($mensajeCliente).'</div>';
+									echo '</fieldset>';
+								} else {
+								?>
+								<div class="control-group">
+									<label class="control-label">Sucursal</label>
+									<div class="controls">
+										<div class="cotiz-campo-accion">
+										<select class="cotiz-select" name="sucursal" required>
+											<option value=""></option>
+                                            <?php
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_GET["cte"]."'");
+											$numOp = $conOp->num_rows;
+											$selectedSucursal = '';
+											if($numOp == 0) {
+												//Crear automáticamente la sucursal
+												$conexionBdPrincipal->query("INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$_GET["cte"]."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')");
+												
+												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
+												exit();
+											} else if ($numOp == 1) {
+												$selectedSucursal = 'selected';
+											}
+
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+											?>
+                                            	<option value="<?=$resOp[0];?>" <?=$selectedSucursal;?>><?=$resOp[7];?></option>
+                                            <?php
+											}
+											?>
+                                    	</select>
+									<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<a href="clientes-sucursales.php?cte=<?= (int) $_GET["cte"]; ?>" class="btn btn-info" target="_blank">Ver sucursales</a>
+									<?php } ?>
+										</div>
+                                    </div>
+                               </div>
+								
+								<div class="control-group">
+									<label class="control-label">Contacto</label>
+									<div class="controls">
+										<div class="cotiz-campo-accion">
+										<select class="cotiz-select" name="contacto" required>
+											<option value=""></option>
+                                            <?php
+											$conOp = $conexionBdPrincipal->query("SELECT * FROM contactos WHERE cont_cliente_principal='".$_GET["cte"]."'");
+											$numOp = $conOp->num_rows;
+											$selectedContacto = '';
+
+											if($numOp==0){
+												//Crear automáticamente el contacto
+												$conexionBdPrincipal->query("INSERT INTO contactos(cont_nombre, cont_cliente_principal)VALUES('Contacto principal (Automático)', '".$_GET["cte"]."')");
+												
+												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
+												exit();
+											} else if ($numOp == 1) {
+												$selectedContacto = 'selected';
+											}
+
+											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
+											?>
+                                            	<option value="<?=$resOp[0];?>" <?=$selectedContacto;?>><?=strtoupper($resOp[1])." (".$resOp[3].")";?></option>
+                                            <?php
+											}
+											?>
+                                    	</select>
+									<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
+									<a href="clientes-contactos.php?cte=<?= (int) $_GET["cte"]; ?>" class="btn btn-info" target="_blank">Ver contactos</a>
+									<?php } ?>
+										</div>
+                                    </div>
+                               </div>
+							   </fieldset>
 
 							   <?php if($configuracion['conf_proveedor_cotizacion'] == 1){?>
 
@@ -187,76 +338,6 @@ include("includes/js-formularios.php");
 									<?php }else{?>
 									<input type="hidden" name="proveedor" value="0">
 									<?php }?>
-								
-								
-								<?php
-								$consultaCli=$conexionBdPrincipal->query("SELECT * FROM clientes WHERE cli_id='".$_GET['cte']."' AND cli_id_empresa='".$idEmpresa."'");
-								$clienteInfo = mysqli_fetch_array($consultaCli, MYSQLI_BOTH);
-								?>
-								<div class="control-group">
-									<label class="control-label">Sucursal</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="sucursal" required>
-											<option value=""></option>
-                                            <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM sucursales WHERE sucu_cliente_principal='".$_GET["cte"]."'");
-											$numOp = $conOp->num_rows;
-											$selectedSucursal = '';
-											if($numOp == 0) {
-												//Crear automáticamente la sucursal
-												$conexionBdPrincipal->query("INSERT INTO sucursales(sucu_cliente_principal, sucu_ciudad, sucu_direccion, sucu_telefono, sucu_celular, sucu_nombre)VALUES('".$_GET["cte"]."', '".$clienteInfo['cli_ciudad']."', '".$clienteInfo['cli_direccion']."', '".$clienteInfo['cli_telefono']."', '".$clienteInfo['cli_celular']."','Sede principal (Automática)')");
-												
-												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
-												exit();
-											} else if ($numOp == 1) {
-												$selectedSucursal = 'selected';
-											}
-
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-											?>
-                                            	<option value="<?=$resOp[0];?>" <?=$selectedSucursal;?>><?=$resOp[7];?></option>
-                                            <?php
-											}
-											?>
-                                    	</select>
-                                    </div>
-									<?php if (Modulos::validarRol([83], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-									<a href="clientes-sucursales.php?cte=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Ver sucursales</a>
-									<?php } ?>									
-                               </div>
-								
-								<div class="control-group">
-									<label class="control-label">Contacto</label>
-									<div class="controls">
-										<select data-placeholder="Escoja una opción..." class="chzn-select span8" tabindex="2" name="contacto" required>
-											<option value=""></option>
-                                            <?php
-											$conOp = $conexionBdPrincipal->query("SELECT * FROM contactos WHERE cont_cliente_principal='".$_GET["cte"]."'");
-											$numOp = $conOp->num_rows;
-											$selectedContacto = '';
-
-											if($numOp==0){
-												//Crear automáticamente el contacto
-												$conexionBdPrincipal->query("INSERT INTO contactos(cont_nombre, cont_cliente_principal)VALUES('Contacto principal (Automático)', '".$_GET["cte"]."')");
-												
-												echo '<script type="text/javascript">window.location.href="'.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'].'";</script>';
-												exit();
-											} else if ($numOp == 1) {
-												$selectedContacto = 'selected';
-											}
-
-											while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-											?>
-                                            	<option value="<?=$resOp[0];?>" <?=$selectedContacto;?>><?=strtoupper($resOp[1])." (".$resOp[3].")";?></option>
-                                            <?php
-											}
-											?>
-                                    	</select>
-                                    </div>
-									<?php if (Modulos::validarRol([44], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-									<a href="clientes-contactos.php?cte=<?=$_GET["cte"];?>" class="btn btn-info" target="_blank">Ver contactos</a>
-									<?php } ?>
-                               </div>	
                                
 								<div class="control-group">
 									<label class="control-label">Usuario Influyente</label>
@@ -409,18 +490,18 @@ include("includes/js-formularios.php");
 								<div class="form-actions">
 									<button type="submit" class="btn btn-info"><i class="icon-arrow-right"></i> Continuar</button>
 								</div>
+								<?php } ?>
 
-						</div>
-					</div>
+			<?php }?>
+							</form>
 				</div>
-			</div>
-				
-
-			<?php }?>	
+			</section>	
             
 
 		</div>
 	</div>
+	<?php include("includes/drawer-buscar-clientes.php");?>
+	<?php include("includes/drawer-crear-cliente.php");?>
 	<?php include("includes/pie.php");?>
 	<script src="js/Cotizaciones.js"></script>
 </div>

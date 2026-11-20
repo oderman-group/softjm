@@ -166,7 +166,6 @@ foreach (array('usuario_resp', 'tipo_cot', 'genero_pedido', 'fecha_inicio', 'fec
 				<div class="clientes-hero">
 					<div>
 						<h1 class="clientes-hero-title"><?= htmlspecialchars($paginaActual['pag_nombre'] ?? 'Cotizaciones'); ?></h1>
-						<p class="clientes-hero-subtitle">Consulte cotizaciones, genere pedidos y envíe a Ofima</p>
 					</div>
 					<div class="clientes-hero-actions">
 						<a href="javascript:history.go(-1);" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>

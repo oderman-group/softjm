@@ -6,6 +6,8 @@ include("includes/verificar-paginas.php");
 include("includes/head.php");
 
 include_once RUTA_PROYECTO . '/usuarios/includes/api-ofima-conexion.php';
+include_once RUTA_PROYECTO . '/usuarios/includes/productos-importar-helpers.php';
+productosImportLimpiarJobsUsuario((int) ($_SESSION['id'] ?? 0), (int) $idEmpresa);
 $ofimaProductosActiva = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
 
 $habilitadoActual = (isset($_GET['habilitado']) && (string) $_GET['habilitado'] === '0') ? '0' : '1';
@@ -112,6 +114,10 @@ $grupo3Actual = isset($_GET['grupo3']) ? (string) $_GET['grupo3'] : '';
 		flex-wrap: wrap;
 		gap: 0.5rem;
 		margin-top: 1rem;
+	}
+	.importar-page .importar-acciones .btn {
+		border-radius: 8px;
+		font-weight: 600;
 	}
 	.importar-info {
 		margin: 0 0 1.25rem;
@@ -300,7 +306,7 @@ $grupo3Actual = isset($_GET['grupo3']) ? (string) $_GET['grupo3'] : '';
 	.export-conteo.is-loading strong { color: #64748b; }
 	.export-conteo-hint { color: #64748b; font-size: 0.8125rem; }
 	.import-resultado {
-		margin: 0 0 1.25rem;
+		margin: 0.85rem 0 1.25rem;
 		padding: 1rem 1.15rem;
 		border-radius: 14px;
 		border: 1px solid #a7f3d0;
@@ -311,51 +317,63 @@ $grupo3Actual = isset($_GET['grupo3']) ? (string) $_GET['grupo3'] : '';
 		font-size: 1rem;
 		color: #065f46;
 	}
-	.import-resultado-kpis {
+	.import-resultado-tabs {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
 		gap: 0.55rem;
-		margin-bottom: 0.9rem;
+		margin-bottom: 0.7rem;
 	}
-	.import-resultado-kpi {
+	.import-resultado-tab {
+		appearance: none;
+		-webkit-appearance: none;
+		text-align: left;
+		font-family: inherit;
 		background: #fff;
 		border: 1px solid #e2e8f0;
 		border-radius: 10px;
 		padding: 0.65rem 0.75rem;
+		cursor: pointer;
 	}
-	.import-resultado-kpi span {
+	.import-resultado-tab span {
 		display: block;
 		font-size: 0.7rem;
 		color: #64748b;
 		text-transform: uppercase;
 		letter-spacing: 0.03em;
 	}
-	.import-resultado-kpi strong {
+	.import-resultado-tab strong {
 		font-size: 1.25rem;
 		color: #0f172a;
 		font-variant-numeric: tabular-nums;
 	}
-	.import-resultado-kpi.is-ok strong { color: #047857; }
-	.import-resultado-kpi.is-warn strong { color: #b45309; }
-	.import-resultado-kpi.is-err strong { color: #b91c1c; }
-	.import-resultado details {
-		margin-top: 0.55rem;
+	.import-resultado-tab.is-ok strong { color: #047857; }
+	.import-resultado-tab.is-warn strong { color: #b45309; }
+	.import-resultado-tab.is-err strong { color: #b91c1c; }
+	.import-resultado-tab.is-active {
+		border-color: #059669;
+		box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.18);
+	}
+	.import-resultado-tab.is-warn.is-active {
+		border-color: #b45309;
+		box-shadow: 0 0 0 2px rgba(180, 83, 9, 0.16);
+	}
+	.import-resultado-tab.is-err.is-active {
+		border-color: #b91c1c;
+		box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.16);
+	}
+	.import-resultado-panel {
+		display: none;
 		background: #fff;
 		border: 1px solid #e2e8f0;
 		border-radius: 10px;
-		padding: 0.55rem 0.75rem;
+		padding: 0.35rem 0.85rem 0.55rem;
 	}
-	.import-resultado summary {
-		cursor: pointer;
-		font-weight: 700;
-		color: #334155;
-		font-size: 0.875rem;
-	}
+	.import-resultado-panel.is-active { display: block; }
 	.import-resultado-lista {
-		margin: 0.55rem 0 0;
+		margin: 0;
 		padding: 0;
 		list-style: none;
-		max-height: 220px;
+		max-height: 240px;
 		overflow: auto;
 	}
 	.import-resultado-lista li {
@@ -423,15 +441,13 @@ $grupo3Actual = isset($_GET['grupo3']) ? (string) $_GET['grupo3'] : '';
 	<?php include("includes/encabezado.php"); ?>
 	<div class="main-wrapper">
 		<div class="container-fluid clientes-page-inner">
-			<div class="clientes-hero">
-				<div>
-					<h1 class="clientes-hero-title"><?= htmlspecialchars($paginaActual['pag_nombre'] ?? 'Importar productos'); ?></h1>
-					<p class="clientes-hero-subtitle">Exportar plantilla e importar Excel del catálogo</p>
-				</div>
-				<div class="clientes-hero-actions">
-					<a href="productos.php" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
-				</div>
-			</div>
+			<?php
+			$migaTema = [
+				['texto' => 'Productos', 'url' => 'productos.php'],
+				['texto' => $paginaActual['pag_nombre'] ?? 'Importar productos'],
+			];
+			include 'includes/miga-tema.php';
+			?>
 
 			<?php include("includes/notificaciones.php"); ?>
 
@@ -457,61 +473,57 @@ $grupo3Actual = isset($_GET['grupo3']) ? (string) $_GET['grupo3'] : '';
 					if (!empty($item['operacion'])) {
 						$extra = ' [' . htmlspecialchars((string) $item['operacion'], ENT_QUOTES, 'UTF-8') . ']' . $extra;
 					}
-					$html .= '<li><code>#' . $id . '</code> ' . $ref . ' — ' . $nom . $extra . '</li>';
+					$prefijo = $id > 0 ? '<code>#' . $id . '</code> ' : '';
+					$html .= '<li>' . $prefijo . $ref . ' — ' . $nom . $extra . '</li>';
 				}
 				return $html;
 			};
 			?>
 			<?php if ($resultadoImport) {
-				$nCreados = count($resultadoImport['creados'] ?? []);
-				$nActualizados = count($resultadoImport['actualizados'] ?? []);
-				$nOfimaCreados = count($resultadoImport['ofima_creados'] ?? []);
-				$nOfimaActualizados = count($resultadoImport['ofima_actualizados'] ?? []);
-				$nOfimaErrores = count($resultadoImport['ofima_errores'] ?? []);
-				$nOfimaOmitidos = count($resultadoImport['ofima_omitidos'] ?? []);
-				$nInvalidos = count($resultadoImport['invalidos'] ?? []);
-			?>
-			<section class="import-resultado" id="importResultado">
-				<h3><i class="fa-solid fa-circle-check"></i> Resultado de la importación<?= !empty($resultadoImport['fecha']) ? ' · ' . htmlspecialchars($resultadoImport['fecha']) : ''; ?></h3>
-				<div class="import-resultado-kpis">
-					<div class="import-resultado-kpi is-ok"><span>Creados Orion</span><strong><?= $nCreados; ?></strong></div>
-					<div class="import-resultado-kpi is-ok"><span>Actualizados Orion</span><strong><?= $nActualizados; ?></strong></div>
-					<div class="import-resultado-kpi is-ok"><span>Creados Ofima</span><strong><?= $nOfimaCreados; ?></strong></div>
-					<div class="import-resultado-kpi is-ok"><span>Actualizados Ofima</span><strong><?= $nOfimaActualizados; ?></strong></div>
-					<div class="import-resultado-kpi is-warn"><span>Ofima omitidos (NO)</span><strong><?= $nOfimaOmitidos; ?></strong></div>
-					<div class="import-resultado-kpi is-err"><span>Errores Ofima</span><strong><?= $nOfimaErrores; ?></strong></div>
-					<div class="import-resultado-kpi is-err"><span>Filas inválidas</span><strong><?= $nInvalidos; ?></strong></div>
-				</div>
-				<details open>
-					<summary>Creados en Orion (<?= $nCreados; ?>)</summary>
-					<ul class="import-resultado-lista"><?= $fmtListaImport($resultadoImport['creados'] ?? []); ?></ul>
-				</details>
-				<details open>
-					<summary>Actualizados en Orion (<?= $nActualizados; ?>)</summary>
-					<ul class="import-resultado-lista"><?= $fmtListaImport($resultadoImport['actualizados'] ?? []); ?></ul>
-				</details>
-				<details open>
-					<summary>Enviados a Ofima — creados (<?= $nOfimaCreados; ?>)</summary>
-					<ul class="import-resultado-lista"><?= $fmtListaImport($resultadoImport['ofima_creados'] ?? []); ?></ul>
-				</details>
-				<details open>
-					<summary>Enviados a Ofima — actualizados (<?= $nOfimaActualizados; ?>)</summary>
-					<ul class="import-resultado-lista"><?= $fmtListaImport($resultadoImport['ofima_actualizados'] ?? []); ?></ul>
-				</details>
-				<?php if ($nOfimaErrores > 0) { ?>
-				<details open>
-					<summary>Errores Ofima (<?= $nOfimaErrores; ?>)</summary>
-					<ul class="import-resultado-lista"><?= $fmtListaImport($resultadoImport['ofima_errores'] ?? []); ?></ul>
-				</details>
-				<?php } ?>
-				<?php if ($nInvalidos > 0) { ?>
-				<details>
-					<summary>Filas inválidas (<?= $nInvalidos; ?>)</summary>
-					<ul class="import-resultado-lista"><?= $fmtListaImport($resultadoImport['invalidos'] ?? []); ?></ul>
-				</details>
-				<?php } ?>
-			</section>
-			<?php } ?>
+				$gruposResultado = [
+					['id' => 'creados', 'titulo' => 'Creados Orion', 'clase' => 'is-ok', 'items' => $resultadoImport['creados'] ?? []],
+					['id' => 'actualizados', 'titulo' => 'Actualizados Orion', 'clase' => 'is-ok', 'items' => $resultadoImport['actualizados'] ?? []],
+					['id' => 'sin_cambios', 'titulo' => 'Sin cambios', 'clase' => '', 'items' => $resultadoImport['sin_cambios'] ?? []],
+					['id' => 'duplicados', 'titulo' => 'Duplicados', 'clase' => 'is-warn', 'items' => $resultadoImport['duplicados'] ?? []],
+					['id' => 'ofima_creados', 'titulo' => 'Creados Ofima', 'clase' => 'is-ok', 'items' => $resultadoImport['ofima_creados'] ?? []],
+					['id' => 'ofima_actualizados', 'titulo' => 'Actualizados Ofima', 'clase' => 'is-ok', 'items' => $resultadoImport['ofima_actualizados'] ?? []],
+					['id' => 'ofima_omitidos', 'titulo' => 'Ofima omitidos (NO)', 'clase' => 'is-warn', 'items' => $resultadoImport['ofima_omitidos'] ?? []],
+					['id' => 'ofima_errores', 'titulo' => 'Errores Ofima', 'clase' => 'is-err', 'items' => $resultadoImport['ofima_errores'] ?? []],
+					['id' => 'invalidos', 'titulo' => 'Filas inválidas', 'clase' => 'is-err', 'items' => $resultadoImport['invalidos'] ?? []],
+				];
+				$tabActivo = $gruposResultado[0]['id'];
+				foreach ($gruposResultado as $grupoResultado) {
+					if (count($grupoResultado['items']) > 0) {
+						$tabActivo = $grupoResultado['id'];
+						break;
+					}
+				}
+				$duracionSeg = max(0, (int) ($resultadoImport['duracion_segundos'] ?? 0));
+				if (isset($_GET['duracion']) && preg_match('/^\d+$/', (string) $_GET['duracion'])) {
+					$duracionSeg = (int) $_GET['duracion'];
+				}
+				$duracionTexto = sprintf(
+					'%02d h %02d min %02d s',
+					intdiv($duracionSeg, 3600),
+					intdiv($duracionSeg % 3600, 60),
+					$duracionSeg % 60
+				);
+				$nCreadosImp = count($resultadoImport['creados'] ?? []);
+				$nActualizadosImp = count($resultadoImport['actualizados'] ?? []);
+				$nSinCambiosImp = count($resultadoImport['sin_cambios'] ?? []);
+				$nDuplicadosImp = count($resultadoImport['duplicados'] ?? []);
+				$nOfimaCreadosImp = count($resultadoImport['ofima_creados'] ?? []);
+				$nOfimaActualizadosImp = count($resultadoImport['ofima_actualizados'] ?? []);
+				$nOfimaErroresImp = count($resultadoImport['ofima_errores'] ?? []);
+				$nInvalidosImp = count($resultadoImport['invalidos'] ?? []);
+				$totalHechosImp = (int) ($resultadoImport['filas_con_datos'] ?? ($nCreadosImp + $nActualizadosImp + $nSinCambiosImp + $nDuplicadosImp + $nInvalidosImp));
+				$textoConteoImp = 'Orion: ' . $nCreadosImp . ' creados, ' . $nActualizadosImp . ' actualizados, ' . $nSinCambiosImp . ' sin cambios'
+					. ($nDuplicadosImp ? (', ' . $nDuplicadosImp . ' duplicados') : '')
+					. ' · Ofima: '
+					. $nOfimaCreadosImp . ' creados, ' . $nOfimaActualizadosImp . ' actualizados'
+					. ($nOfimaErroresImp ? (', ' . $nOfimaErroresImp . ' errores') : '')
+					. ($nInvalidosImp ? (', ' . $nInvalidosImp . ' inválidos') : '');
+			} ?>
 
 			<section class="clientes-panel">
 				<div class="clientes-panel-header">
@@ -602,7 +614,6 @@ $grupo3Actual = isset($_GET['grupo3']) ? (string) $_GET['grupo3'] : '';
 						</div>
 						<div class="importar-acciones">
 							<button type="submit" id="btnExportar" class="btn btn-info"><i class="icon-download"></i> Exportar Excel</button>
-							<a href="productos-exportar.php?habilitado=1" class="btn btn-primary" target="_blank"><i class="icon-file"></i> Plantilla (habilitados)</a>
 						</div>
 					</form>
 				</div>
@@ -619,18 +630,17 @@ $grupo3Actual = isset($_GET['grupo3']) ? (string) $_GET['grupo3'] : '';
 					<div class="importar-info">
 						<h4>Información importante</h4>
 						<ol>
-							<li>Descargue la plantilla Excel con los filtros de arriba (o use la plantilla de habilitados).</li>
+							<li>Descargue la plantilla Excel con los filtros de arriba.</li>
 							<li>Complete la información y guárdela en formato <strong>Excel xlsx</strong>.</li>
 							<li>Suba la plantilla: el sistema lee solo las filas con datos. Encabezados en <strong style="color:#b91c1c;">rojo</strong> son obligatorios (Código, Nombre, Precio lista, Integrar Ofima SI/NO, Habilitado SI/NO). Filas no habilitadas salen en gris.</li>
-							<li>La clave es el <strong>Código</strong>: si ya existe se actualiza; si no, se crea (el ID es autoincrement). El código no se modifica en actualizaciones.</li>
-							<li>Si <em>Integrar Ofima</em> = SI y Ofima está activo, el producto se crea/actualiza también en Ofima.</li>
-							<li>La importación corre por lotes en segundo plano con barra de progreso y tiempo estimado (ETA).</li>
+							<li>La clave es el <strong>Código</strong>: si no existe se crea. Si ya existe, solo se actualiza cuando cambia el nombre, la línea, la sublínea, el grupo, el precio de lista, Integrar Ofima o Habilitado. Si esos datos vienen iguales, el producto no se toca. Si el mismo código se repite en el archivo, solo se toma la primera fila; las demás quedan como duplicadas y no se actualizan.</li>
+							<li>Si <em>Integrar Ofima</em> = SI y Ofima está activo, el producto se crea/actualiza también en Ofima. Si el producto ya está integrado en Ofima, la importación no cambia ese campo; el resto de datos sí se puede actualizar.</li>
 						</ol>
 					</div>
 
 					<div class="importar-aviso">
 						<h4>Existencias y precios</h4>
-						<p>Las existencias ya no se toman desde este archivo (se manejan por bodegas). En productos existentes solo se actualiza el <strong>precio lista</strong> (no costo ni utilidad). Si Ofima está activo, los productos se crean/actualizan también allá.</p>
+						<p>Las existencias ya no se toman desde este archivo (se manejan por bodegas). En productos existentes no se tocan costo ni utilidad. Solo se guardan nombre, línea, sublínea, grupo, precio de lista, Integrar Ofima y Habilitado cuando alguno de esos valores cambió. Si Ofima está activo y el producto sí cambió, también se envía allá.</p>
 					</div>
 
 					<form id="formImportar" method="post" action="productos-importar-excel.php" enctype="multipart/form-data">
@@ -655,13 +665,36 @@ $grupo3Actual = isset($_GET['grupo3']) ? (string) $_GET['grupo3'] : '';
 							</div>
 						</div>
 
-						<div class="import-progreso" id="importProgreso" aria-live="polite">
-							<p class="import-progreso-titulo" id="importProgresoTitulo">Procesando importación…</p>
-							<p class="import-progreso-timer" id="importProgresoTimer">Tiempo: 00 h 00 min 00 s</p>
-							<p class="import-progreso-meta" id="importProgresoMeta">Preparando archivo</p>
-							<div class="import-progreso-barra"><div class="import-progreso-fill" id="importProgresoFill"></div></div>
-							<p class="import-progreso-conteos" id="importProgresoConteos"></p>
+						<div class="import-progreso<?= $resultadoImport ? ' is-visible' : ''; ?>" id="importProgreso" aria-live="polite">
+							<p class="import-progreso-titulo" id="importProgresoTitulo"><?= $resultadoImport ? 'Importación finalizada' : 'Procesando importación…'; ?></p>
+							<p class="import-progreso-timer<?= $resultadoImport ? ' is-done' : ''; ?>" id="importProgresoTimer">Tiempo: <?= $resultadoImport ? htmlspecialchars($duracionTexto, ENT_QUOTES, 'UTF-8') : '00 h 00 min 00 s'; ?></p>
+							<p class="import-progreso-meta" id="importProgresoMeta"><?= $resultadoImport ? ('Completado: ' . (int) $totalHechosImp . ' / ' . (int) $totalHechosImp . ' productos') : 'Preparando archivo'; ?></p>
+							<div class="import-progreso-barra"><div class="import-progreso-fill" id="importProgresoFill"<?= $resultadoImport ? ' style="width:100%"' : ''; ?>></div></div>
+							<p class="import-progreso-conteos" id="importProgresoConteos"><?= $resultadoImport ? htmlspecialchars($textoConteoImp, ENT_QUOTES, 'UTF-8') : ''; ?></p>
 						</div>
+
+						<?php if ($resultadoImport) { ?>
+						<section class="import-resultado" id="importResultado">
+							<h3><i class="fa-solid fa-circle-check"></i> Resultado de la importación<?= !empty($resultadoImport['fecha']) ? ' · ' . htmlspecialchars($resultadoImport['fecha']) : ''; ?> · Duración: <?= htmlspecialchars($duracionTexto, ENT_QUOTES, 'UTF-8'); ?></h3>
+							<div class="import-resultado-tabs" role="tablist">
+								<?php foreach ($gruposResultado as $grupoResultado) {
+									$activo = $grupoResultado['id'] === $tabActivo;
+								?>
+								<button type="button" class="import-resultado-tab <?= htmlspecialchars(trim($grupoResultado['clase'] . ($activo ? ' is-active' : '')), ENT_QUOTES, 'UTF-8'); ?>" role="tab" id="tab-<?= htmlspecialchars($grupoResultado['id'], ENT_QUOTES, 'UTF-8'); ?>" data-tab="<?= htmlspecialchars($grupoResultado['id'], ENT_QUOTES, 'UTF-8'); ?>" aria-selected="<?= $activo ? 'true' : 'false'; ?>" aria-controls="panel-<?= htmlspecialchars($grupoResultado['id'], ENT_QUOTES, 'UTF-8'); ?>">
+									<span><?= htmlspecialchars($grupoResultado['titulo'], ENT_QUOTES, 'UTF-8'); ?></span>
+									<strong><?= count($grupoResultado['items']); ?></strong>
+								</button>
+								<?php } ?>
+							</div>
+							<?php foreach ($gruposResultado as $grupoResultado) {
+								$activo = $grupoResultado['id'] === $tabActivo;
+							?>
+							<div class="import-resultado-panel<?= $activo ? ' is-active' : ''; ?>" role="tabpanel" id="panel-<?= htmlspecialchars($grupoResultado['id'], ENT_QUOTES, 'UTF-8'); ?>" data-panel="<?= htmlspecialchars($grupoResultado['id'], ENT_QUOTES, 'UTF-8'); ?>"<?= $activo ? '' : ' hidden'; ?>>
+								<ul class="import-resultado-lista"><?= $fmtListaImport($grupoResultado['items']); ?></ul>
+							</div>
+							<?php } ?>
+						</section>
+						<?php } ?>
 
 						<div class="importar-acciones">
 							<a href="productos.php" class="btn btn-primary"><i class="icon-arrow-left"></i> Regresar</a>
@@ -824,7 +857,9 @@ $grupo3Actual = isset($_GET['grupo3']) ? (string) $_GET['grupo3'] : '';
 		}
 		if (progConteos && data.conteos) {
 			var c = data.conteos;
-			progConteos.textContent = 'Orion: ' + (c.creados || 0) + ' creados, ' + (c.actualizados || 0) + ' actualizados · Ofima: '
+			progConteos.textContent = 'Orion: ' + (c.creados || 0) + ' creados, ' + (c.actualizados || 0) + ' actualizados, ' + (c.sin_cambios || 0) + ' sin cambios'
+				+ ((c.duplicados || 0) ? (', ' + c.duplicados + ' duplicados') : '')
+				+ ' · Ofima: '
 				+ (c.ofima_creados || 0) + ' creados, ' + (c.ofima_actualizados || 0) + ' actualizados'
 				+ ((c.ofima_errores || 0) ? (', ' + c.ofima_errores + ' errores') : '')
 				+ ((c.invalidos || 0) ? (', ' + c.invalidos + ' inválidos') : '');
@@ -897,7 +932,7 @@ $grupo3Actual = isset($_GET['grupo3']) ? (string) $_GET['grupo3'] : '';
 				.then(function () {
 					detenerContadorTiempo();
 					if (progTitulo) progTitulo.textContent = 'Importación finalizada';
-					window.location.href = 'productos-importar.php?import=ok';
+					window.location.href = 'productos-importar.php?import=ok&duracion=' + timerSegundosFinal;
 				})
 				.catch(function (err) {
 					importando = false;
@@ -1074,6 +1109,22 @@ $grupo3Actual = isset($_GET['grupo3']) ? (string) $_GET['grupo3'] : '';
 
 	var cajaResultado = document.getElementById('importResultado');
 	if (cajaResultado) {
+		cajaResultado.querySelectorAll('.import-resultado-tab').forEach(function (boton) {
+			boton.addEventListener('click', function () {
+				var id = boton.getAttribute('data-tab');
+				cajaResultado.querySelectorAll('.import-resultado-tab').forEach(function (otro) {
+					var activo = otro === boton;
+					otro.classList.toggle('is-active', activo);
+					otro.setAttribute('aria-selected', activo ? 'true' : 'false');
+				});
+				cajaResultado.querySelectorAll('.import-resultado-panel').forEach(function (panel) {
+					var activo = panel.getAttribute('data-panel') === id;
+					panel.classList.toggle('is-active', activo);
+					if (activo) panel.removeAttribute('hidden');
+					else panel.setAttribute('hidden', '');
+				});
+			});
+		});
 		cajaResultado.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
 })();

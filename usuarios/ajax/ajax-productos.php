@@ -2,6 +2,23 @@
 include("../sesion.php");
 include_once RUTA_PROYECTO."/usuarios/class/Producto.php";
 
+function mensajeDescuentoExcedido(array $linea, $porcentaje, $monto, $maximo, string $tipo): string
+{
+	$porcentaje = (float) str_replace(',', '.', (string) $porcentaje);
+	$maximo = (float) str_replace(',', '.', (string) $maximo);
+	$monto = (float) str_replace(',', '.', (string) $monto);
+	if ($monto <= 0) {
+		$base = (float) ($linea['czpp_cantidad'] ?? 0) * (float) ($linea['czpp_valor'] ?? 0);
+		$monto = $base * ($porcentaje / 100);
+	}
+	$textoPct = rtrim(rtrim(number_format(round($porcentaje, 3), 3, '.', ''), '0'), '.');
+	$textoMax = rtrim(rtrim(number_format(round($maximo, 3), 3, '.', ''), '0'), '.');
+	$textoMonto = number_format($monto, 2, ',', '.');
+	$quien = $tipo === 'combo' ? 'combo' : 'producto';
+
+	return 'Está intentando un descuento de $'.$textoMonto.', que equivale a '.$textoPct.'%. El máximo para este '.$quien.' es '.$textoMax.'%.';
+}
+
 /**
  * Devuelve el nombre de columna válido en cotizacion_productos.
  * En BD la columna es czpp_observacion (sin tilde); si el cliente envía czpp_observación u otra variante, el UPDATE falla.
@@ -285,7 +302,13 @@ if ($_POST["proceso"] == 2) {
 			if ($_POST["valor"] > $datosProducto['prod_descuento1']) {
 				$response = [
 					'success' => false,
-					'message' => "El descuento que está otorgando es mayor al máximo permitido para este producto, el cual es de ".$datosProducto['prod_descuento1']."%."
+					'message' => mensajeDescuentoExcedido(
+						$datosProducto,
+						$_POST['valor'],
+						$_POST['monto'] ?? 0,
+						$datosProducto['prod_descuento1'],
+						'producto'
+					),
 				];
 				echo json_encode($response);
 				exit();
@@ -536,8 +559,9 @@ if($_POST["proceso"]==8){
 		"), MYSQLI_BOTH);
 		
 		if($_POST["valor"]>$datosProducto['prod_descuento1']){
-			echo '<script type="text/javascript">alert("El descuento que está otorgando es mayor al máximo permitido para este producto, el cual es de '.$datosProducto['prod_descuento1'].'%.");</script>';
-			exit();	
+			$mensaje = mensajeDescuentoExcedido($datosProducto, $_POST['valor'], $_POST['monto'] ?? 0, $datosProducto['prod_descuento1'], 'producto');
+			echo '<script type="text/javascript">alert("'.addslashes($mensaje).'");</script>';
+			exit();
 		}
 	}
 
@@ -591,8 +615,9 @@ if($_POST["proceso"]==9){
 		"), MYSQLI_BOTH);
 		
 		if($_POST["valor"]>$datosProducto['prod_descuento1']){
-			echo '<script type="text/javascript">alert("El descuento que está otorgando es mayor al máximo permitido para este producto, el cual es de '.$datosProducto['prod_descuento1'].'%.");</script>';
-			exit();	
+			$mensaje = mensajeDescuentoExcedido($datosProducto, $_POST['valor'], $_POST['monto'] ?? 0, $datosProducto['prod_descuento1'], 'producto');
+			echo '<script type="text/javascript">alert("'.addslashes($mensaje).'");</script>';
+			exit();
 		}
 	}
 
@@ -755,8 +780,9 @@ if($_POST["proceso"]==11){
 	if($campoCotizacion=='czpp_descuento'){
 		
 		if($_POST["valor"] > $datosProducto['combo_descuento_maximo']){
-			echo '<script type="text/javascript">alert("El descuento que está otorgando es mayor al máximo permitido para este combo, el cual es de '.$datosProducto['combo_descuento_maximo'].'%.");</script>';
-			exit();	
+			$mensaje = mensajeDescuentoExcedido($datosProducto, $_POST['valor'], $_POST['monto'] ?? 0, $datosProducto['combo_descuento_maximo'], 'combo');
+			echo '<script type="text/javascript">alert("'.addslashes($mensaje).'");</script>';
+			exit();
 		}
 	}
 

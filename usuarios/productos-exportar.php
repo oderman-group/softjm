@@ -33,18 +33,18 @@ $hojaActiva->setCellValue('B1', 'Código *');
 $hojaActiva->getColumnDimension('C')->setWidth(24);
 $hojaActiva->setCellValue('C1', 'Nombre *');
 
-$hojaActiva->getColumnDimension('D')->setWidth(8);
-$hojaActiva->setCellValue('D1', 'Cod. G1');
+$hojaActiva->getColumnDimension('D')->setWidth(12);
+$hojaActiva->setCellValue('D1', 'Cod. Línea');
 $hojaActiva->getColumnDimension('E')->setWidth(20);
-$hojaActiva->setCellValue('E1', 'Grupo 1');
-$hojaActiva->getColumnDimension('F')->setWidth(8);
-$hojaActiva->setCellValue('F1', 'Cod. G2');
+$hojaActiva->setCellValue('E1', 'Línea');
+$hojaActiva->getColumnDimension('F')->setWidth(14);
+$hojaActiva->setCellValue('F1', 'Cod. Sublínea');
 $hojaActiva->getColumnDimension('G')->setWidth(20);
-$hojaActiva->setCellValue('G1', 'Grupo 2');
-$hojaActiva->getColumnDimension('H')->setWidth(15);
-$hojaActiva->setCellValue('H1', 'Cod. Marca');
+$hojaActiva->setCellValue('G1', 'Sublínea');
+$hojaActiva->getColumnDimension('H')->setWidth(12);
+$hojaActiva->setCellValue('H1', 'Cod. Grupo');
 $hojaActiva->getColumnDimension('I')->setWidth(20);
-$hojaActiva->setCellValue('I1', 'Marca');
+$hojaActiva->setCellValue('I1', 'Grupo');
 
 $hojaActiva->getColumnDimension('J')->setWidth(20);
 $hojaActiva->setCellValue('J1', 'Existencias'.PHP_EOL.'(solo lectura)');

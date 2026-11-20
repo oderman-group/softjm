@@ -328,6 +328,7 @@ if (idEditar) {
     let tbody = document.getElementById("data-table").getElementsByTagName("tbody")[0];
     let config = { childList: true };
     observer.observe(tbody, config);
+    window.recalculate = recalculate;
     recalculate();
 
     // Función para actualizar una subtotal parcial específica

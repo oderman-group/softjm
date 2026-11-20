@@ -2,6 +2,7 @@
 include("sesion.php");
 include_once RUTA_PROYECTO . "/usuarios/class/Producto.php";
 include_once RUTA_PROYECTO . "/usuarios/includes/api-ofima-conexion.php";
+include_once RUTA_PROYECTO . "/usuarios/includes/productos-importar-helpers.php";
 
 $idPagina = 207;
 include("includes/verificar-paginas.php");
@@ -64,6 +65,9 @@ if ($extension == 'xlsx') {
 			$f = 2;
 			$creadosOrion = [];
 			$actualizadosOrion = [];
+			$sinCambiosOrion = [];
+			$duplicadosOrion = [];
+			$codigosVistos = [];
 			$ofimaCreados = [];
 			$ofimaActualizados = [];
 			$ofimaErrores = [];
@@ -82,6 +86,7 @@ if ($extension == 'xlsx') {
 				return false;
 			};
 
+			$importInicioTs = time();
 			while ($f <= $numFilas) {
 				if (!$filaTieneDatos($hojaActual, $f)) {
 					$filasVaciasOmitidas++;
@@ -125,6 +130,12 @@ if ($extension == 'xlsx') {
 					continue;
 				}
 
+				if (productosImportMarcarCodigo($codigosVistos, (string) $arrayIndividual['prod_referencia'])) {
+					$duplicadosOrion[] = $detalleBase + ['mensaje' => 'Código repetido en el archivo. No se actualizó.'];
+					$f++;
+					continue;
+				}
+
 				$refEsc = $conexionBdPrincipal->real_escape_string($arrayIndividual['prod_referencia']);
 				$consultaProducto = $conexionBdPrincipal->query(
 					"SELECT * FROM productos
@@ -135,68 +146,35 @@ if ($extension == 'xlsx') {
 				$datos = $consultaProducto ? mysqli_fetch_array($consultaProducto, MYSQLI_BOTH) : null;
 
 				if ($datos && !empty($datos['prod_id'])) {
-					// Actualizar por código: solo precio lista + habilitado (el código no se modifica).
-					$productoId = (int) $datos['prod_id'];
-					$precioLista = is_numeric($arrayIndividual['prod_precio'])
-						? (float) $arrayIndividual['prod_precio']
-						: (float) ($datos['prod_precio'] ?? 0);
-					$precioAnterior = (float) ($datos['prod_precio'] ?? 0);
-
-					if ($precioLista != $precioAnterior) {
-						$conexionBdPrincipal->query(
-							"INSERT INTO productos_historial_precios(php_producto, php_precio_anterior, php_precio_nuevo, php_usuario, php_causa)
-							 VALUES('{$productoId}', '{$precioAnterior}', '{$precioLista}', '" . (int) $_SESSION["id"] . "', 1)"
-						);
+					$filaProc = $arrayIndividual;
+					$filaProc['fila'] = $f;
+					$proc = productosImportProcesarFila(
+						$conexionBdPrincipal,
+						$idEmpresaImport,
+						$ofimaActiva,
+						$filaProc,
+						(int) ($_SESSION['id'] ?? 0)
+					);
+					if (($proc['tipo'] ?? '') === 'sin_cambios') {
+						$sinCambiosOrion[] = $proc['detalle'] ?? [];
+					} elseif (($proc['tipo'] ?? '') === 'actualizado') {
+						$actualizadosOrion[] = $proc['detalle'] ?? [];
+					} elseif (empty($proc['ok'])) {
+						$filasInvalidas[] = $proc['detalle'] ?? $detalleBase;
 					}
-
-					try {
-						$conexionBdPrincipal->query(
-							"UPDATE productos SET
-							prod_precio='{$precioLista}',
-							prod_habilitado='" . (int) $habilitado . "',
-							prod_ultima_actualizacion=now(),
-							prod_ultima_actualizacion_usuario='" . (int) $_SESSION["id"] . "'
-							WHERE prod_id='{$productoId}'
-							  AND prod_id_empresa='{$idEmpresaImport}'"
-						);
-
-						$detalle = $itemProducto($arrayIndividual, $f, $productoId);
-						$actualizadosOrion[] = $detalle;
-
-						if ($integrarOfima === 1 && $ofimaActiva) {
-							$tipoOfima = ((int) ($datos['prod_integrado_ofima'] ?? 0) === 1) ? 'UPDATE' : 'CREATE';
-							try {
-								$sync = Producto::sincronizarConOfima($productoId, $conexionBdPrincipal, $idEmpresaImport, $tipoOfima);
-								if (!empty($sync['success'])) {
-									if ($tipoOfima === 'CREATE') {
-										$ofimaCreados[] = $detalle;
-									} else {
-										$ofimaActualizados[] = $detalle;
-									}
-								} else {
-									$ofimaErrores[] = $detalle + [
-										'operacion' => $tipoOfima,
-										'mensaje' => (string) ($sync['error'] ?? $sync['message'] ?? 'Error Ofima'),
-									];
-								}
-							} catch (Throwable $e) {
-								$ofimaErrores[] = $detalle + [
-									'operacion' => $tipoOfima,
-									'mensaje' => $e->getMessage(),
-								];
-								error_log('Import productos Ofima: ' . $e->getMessage());
-							}
-						} elseif ($integrarOfima !== 1) {
-							$ofimaOmitidos[] = $detalle;
-						} elseif (!$ofimaActiva && $integrarOfima === 1) {
-							$ofimaErrores[] = $detalle + [
-								'operacion' => 'CREATE/UPDATE',
-								'mensaje' => 'Ofima no está activo en la empresa',
-							];
+					$ofima = $proc['ofima'] ?? null;
+					if (is_array($ofima)) {
+						$estadoOfima = (string) ($ofima['estado'] ?? '');
+						$detOfima = $ofima['detalle'] ?? ($proc['detalle'] ?? []);
+						if ($estadoOfima === 'creado') {
+							$ofimaCreados[] = $detOfima;
+						} elseif ($estadoOfima === 'actualizado') {
+							$ofimaActualizados[] = $detOfima;
+						} elseif ($estadoOfima === 'omitido') {
+							$ofimaOmitidos[] = $detOfima;
+						} elseif ($estadoOfima === 'error') {
+							$ofimaErrores[] = $detOfima;
 						}
-					} catch (Exception $e) {
-						echo "Excepción catpurada: " . $e->getMessage();
-						exit();
 					}
 				} else {
 					// Crear: prod_id autoincrement; el código es la clave nueva.
@@ -283,12 +261,15 @@ if ($extension == 'xlsx') {
 
 			$_SESSION['import_productos_resultado'] = [
 				'fecha' => date('Y-m-d H:i:s'),
+				'duracion_segundos' => max(0, time() - (int) ($importInicioTs ?? time())),
 				'ofima_activa' => $ofimaActiva ? 1 : 0,
 				'filas_excel' => $numFilas,
 				'filas_con_datos' => $filasConDatos,
 				'filas_vacias' => $filasVaciasOmitidas,
 				'creados' => $creadosOrion,
 				'actualizados' => $actualizadosOrion,
+				'sin_cambios' => $sinCambiosOrion,
+				'duplicados' => $duplicadosOrion,
 				'invalidos' => $filasInvalidas,
 				'ofima_creados' => $ofimaCreados,
 				'ofima_actualizados' => $ofimaActualizados,
