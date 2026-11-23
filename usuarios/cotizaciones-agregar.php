@@ -98,29 +98,35 @@ include("includes/head.php");
 		line-height: 26px;
 	}
 	.select2-container--default .select2-results__option { padding: 0.28rem 0.6rem; font-size: 0.8125rem; }
-	#product-select + .select2-container .select2-selection__choice:has(.combo-prod-off),
-	.select2-container--default .select2-results__option:has(.combo-prod-off),
-	.select2-container--default .select2-results__option--highlighted:has(.combo-prod-off),
-	.select2-container--default .select2-results__option--highlighted[aria-selected]:has(.combo-prod-off) {
+	#product-select + .select2-container .select2-selection__choice:has(.combo-prod-off) {
 		background-color: #fee2e2 !important;
 		border-color: #fca5a5 !important;
 		color: #991b1b !important;
 		font-weight: 700;
 	}
-	#product-select + .select2-container .select2-selection__choice:has(.combo-prod-ok),
-	.select2-container--default .select2-results__option:has(.combo-prod-ok),
-	.select2-container--default .select2-results__option--highlighted:has(.combo-prod-ok),
-	.select2-container--default .select2-results__option--highlighted[aria-selected]:has(.combo-prod-ok) {
+	#product-select + .select2-container .select2-selection__choice:has(.combo-prod-ok) {
 		background-color: #d1fae5 !important;
 		border-color: #6ee7b7 !important;
 		color: #065f46 !important;
 		font-weight: 700;
+	}
+	.select2-container--default .select2-results__option:has(.combo-prod-ok),
+	.select2-container--default .select2-results__option--highlighted:has(.combo-prod-ok),
+	.select2-container--default .select2-results__option--highlighted[aria-selected]:has(.combo-prod-ok) {
+		background: #fff !important;
+		color: #065f46 !important;
 	}
 	.select2-results__option .combo-prod-ok,
 	.select2-container--default .select2-results__option--highlighted .combo-prod-ok {
 		color: #065f46 !important;
 		font-weight: 700;
 		background: transparent !important;
+	}
+	.select2-container--default .select2-results__option:has(.combo-prod-off),
+	.select2-container--default .select2-results__option--highlighted:has(.combo-prod-off),
+	.select2-container--default .select2-results__option--highlighted[aria-selected]:has(.combo-prod-off) {
+		background: #fff !important;
+		color: #991b1b !important;
 	}
 	.select2-results__option .combo-prod-off,
 	.select2-container--default .select2-results__option--highlighted .combo-prod-off {
