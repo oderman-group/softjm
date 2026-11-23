@@ -62,9 +62,54 @@ include("includes/head.php");
 		white-space: nowrap;
 		border-radius: 8px;
 	}
+	.cotiz-agregar .cotiz-campo-accion .select2-container { flex: 1 1 0; width: 0 !important; min-width: 0; max-width: 100%; }
+	.cotiz-agregar .cotiz-campo-accion .select2-container .select2-selection--single {
+		height: 38px;
+		border: 1px solid #cbd5e1;
+		border-radius: 8px;
+		background: #fff;
+	}
+	.cotiz-agregar .cotiz-campo-accion .select2-container .select2-selection__rendered {
+		line-height: 36px;
+		padding-left: 0.7rem;
+		color: #0f172a;
+		font-size: 0.875rem;
+	}
+	.cotiz-agregar .cotiz-campo-accion .select2-container .select2-selection__placeholder { color: #94a3b8; }
+	.cotiz-agregar .cotiz-campo-accion .select2-container--focus .select2-selection--single,
+	.cotiz-agregar .cotiz-campo-accion .select2-container--open .select2-selection--single { background: #fff; color: #0f172a; }
+	.cotiz-agregar .cotiz-campo-accion .select2-container .select2-selection__arrow { height: 36px; }
+	.select2-container--open { z-index: 10060; }
+	.select2-container--open .select2-dropdown {
+		border: 1px solid #cbd5e1;
+		border-radius: 8px;
+		overflow: hidden;
+		box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+	}
+	.select2-container--default .select2-search--dropdown { padding: 0.35rem 0.45rem; background: #f8fafc; }
+	.select2-container--default .select2-search--dropdown .select2-search__field {
+		height: 28px;
+		margin: 0;
+		padding: 0 0.55rem;
+		border: 1px solid #cbd5e1;
+		border-radius: 6px;
+		box-shadow: none;
+		font-size: 0.8125rem;
+		line-height: 26px;
+	}
+	.select2-container--default .select2-results__option { padding: 0.28rem 0.6rem; font-size: 0.8125rem; }
+	.select2-container--default .select2-results__group {
+		padding: 0.3rem 0.6rem;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		color: #64748b;
+	}
 	@media (max-width: 768px) {
 		.cotiz-agregar .cotiz-campo-accion { flex-wrap: wrap; align-items: stretch; }
-		.cotiz-agregar .cotiz-campo-accion .cotiz-select { flex: 1 1 100%; width: 100%; }
+		.cotiz-agregar .cotiz-campo-accion .cotiz-select,
+		.cotiz-agregar .cotiz-campo-accion .select2-container { flex: 1 1 100%; width: 100% !important; }
 		.cotiz-agregar .cotiz-campo-accion .btn { flex: 1 1 auto; }
 	}
 </style>
@@ -85,6 +130,54 @@ include("includes/head.php");
 <script src="js/respond.min.js"></script>
 <script src="js/ios-orientationchange-fix.js"></script>
 <script src="../assets-login/plugins/select2/js/select2.js"></script>
+<script>
+	$(function () {
+		var cliente = $('select.cotiz-select[name="cliente"]');
+		if (!cliente.length || !$.fn.select2) {
+			return;
+		}
+		function filtrarCliente(params, data) {
+			var termino = $.trim(params.term || '').toUpperCase();
+			if (data.children) {
+				var hijos = [];
+				for (var i = 0; i < data.children.length; i++) {
+					var hijo = filtrarCliente(params, data.children[i]);
+					if (hijo) {
+						hijos.push(hijo);
+					}
+				}
+				if (!hijos.length) {
+					return null;
+				}
+				var grupo = $.extend(true, {}, data);
+				grupo.children = hijos;
+				return grupo;
+			}
+			if (!data.id) {
+				return null;
+			}
+			if (termino === '' || (data.text || '').toUpperCase().indexOf(termino) > -1) {
+				return data;
+			}
+			return null;
+		}
+		cliente.select2({
+			width: '100%',
+			placeholder: 'Escoja un cliente',
+			minimumResultsForSearch: 0,
+			dropdownParent: $(document.body),
+			matcher: filtrarCliente,
+			language: { noResults: function () { return 'Sin resultados'; } }
+		});
+		cliente.on('select2:open', function () {
+			var campo = document.querySelector('.select2-container--open .select2-search__field');
+			if (campo) {
+				campo.setAttribute('placeholder', 'Buscar cliente');
+				campo.focus();
+			}
+		});
+	});
+</script>
 <?php 
 //Son todas las funciones javascript para que los campos del formulario funcionen bien.
 include("includes/js-formularios.php");
