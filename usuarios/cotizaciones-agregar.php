@@ -98,6 +98,36 @@ include("includes/head.php");
 		line-height: 26px;
 	}
 	.select2-container--default .select2-results__option { padding: 0.28rem 0.6rem; font-size: 0.8125rem; }
+	#product-select + .select2-container .select2-selection__choice:has(.combo-prod-off),
+	.select2-container--default .select2-results__option:has(.combo-prod-off),
+	.select2-container--default .select2-results__option--highlighted:has(.combo-prod-off),
+	.select2-container--default .select2-results__option--highlighted[aria-selected]:has(.combo-prod-off) {
+		background-color: #fee2e2 !important;
+		border-color: #fca5a5 !important;
+		color: #991b1b !important;
+		font-weight: 700;
+	}
+	#product-select + .select2-container .select2-selection__choice:has(.combo-prod-ok),
+	.select2-container--default .select2-results__option:has(.combo-prod-ok),
+	.select2-container--default .select2-results__option--highlighted:has(.combo-prod-ok),
+	.select2-container--default .select2-results__option--highlighted[aria-selected]:has(.combo-prod-ok) {
+		background-color: #d1fae5 !important;
+		border-color: #6ee7b7 !important;
+		color: #065f46 !important;
+		font-weight: 700;
+	}
+	.select2-results__option .combo-prod-ok,
+	.select2-container--default .select2-results__option--highlighted .combo-prod-ok {
+		color: #065f46 !important;
+		font-weight: 700;
+		background: transparent !important;
+	}
+	.select2-results__option .combo-prod-off,
+	.select2-container--default .select2-results__option--highlighted .combo-prod-off {
+		color: #991b1b !important;
+		font-weight: 700;
+		background: transparent !important;
+	}
 	.select2-container--default .select2-results__group {
 		padding: 0.3rem 0.6rem;
 		font-size: 0.6875rem;
@@ -605,7 +635,7 @@ include("includes/js-formularios.php");
 	<?php include("includes/drawer-buscar-clientes.php");?>
 	<?php include("includes/drawer-crear-cliente.php");?>
 	<?php include("includes/pie.php");?>
-	<script src="js/Cotizaciones.js"></script>
+	<script src="js/Cotizaciones.js?v=20261123a"></script>
 </div>
 </body>
 </html>

@@ -80,11 +80,13 @@ $(document).ready(function () {
             },
             processResults: function (items) {
                 return {
-                    results: (items || []).map(function (item) {
+                    results: (items || []).filter(function (item) {
+                        return parseInt(item.habilitado, 10) === 1;
+                    }).map(function (item) {
                         return {
                             id: item.id,
                             text: item.text,
-                            habilitado: parseInt(item.habilitado, 10) === 1 ? 1 : 0
+                            habilitado: 1
                         };
                     })
                 };
