@@ -42,6 +42,22 @@ foreach (array('usuario_resp', 'tipo_cot', 'genero_pedido', 'fecha_inicio', 'fec
 	.clientes-page #data-table th:nth-child(9),
 	.clientes-page #data-table td:nth-child(9) { width: 96px; }
 	.clientes-page #data-table td.col-items { font-size: 0.6875rem; line-height: 1.3; }
+	.clientes-page #data-table td.col-cliente { overflow: visible; }
+	.clientes-page #data-table td.col-cliente .select2-container { width: 100% !important; }
+	.clientes-page #data-table td.col-cliente .select2-container .select2-selection--single {
+		height: 30px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff;
+	}
+	.clientes-page #data-table td.col-cliente .select2-selection__rendered {
+		line-height: 28px; font-size: 0.75rem; color: #1d4ed8; padding-left: 0.4rem;
+	}
+	.clientes-page #data-table td.col-cliente .select2-selection__arrow { height: 28px; }
+	.select2-container--open { z-index: 10060; }
+	.select2-dropdown { border-radius: 8px; border-color: #cbd5e1; overflow: hidden; }
+	.select2-container--open .select2-search--dropdown { padding: 0.35rem 0.45rem; background: #f8fafc; }
+	.select2-container--open .select2-search__field {
+		height: 28px; margin: 0; border-radius: 6px; font-size: 0.8125rem;
+	}
+	.select2-results__option { padding: 0.28rem 0.6rem; font-size: 0.8125rem; }
 	.clientes-page #data-table th:nth-child(5),
 	.clientes-page #data-table td:nth-child(5),
 	.clientes-page #data-table th:nth-child(7),
@@ -98,7 +114,9 @@ foreach (array('usuario_resp', 'tipo_cot', 'genero_pedido', 'fecha_inicio', 'fec
 </style>
 
 <!--============j avascript===========-->
+<link href="../assets-login/plugins/select2/css/select2.css" rel="stylesheet" />
 <script src="js/jquery.js"></script>
+<script src="../assets-login/plugins/select2/js/select2.js"></script>
 <script src="js/jquery-ui-1.10.1.custom.min.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src="js/accordion.nav.js"></script>
@@ -402,6 +420,69 @@ foreach (array('usuario_resp', 'tipo_cot', 'genero_pedido', 'fecha_inicio', 'fec
 				abrirMensaje(boton.getAttribute('data-mensaje') || '', 'Respuesta de Ofima', boton.getAttribute('data-estado'));
 			});
 
+			function activarClientesCotizacion() {
+				if (!window.jQuery || !jQuery.fn.select2) return;
+				jQuery('#cotizaciones_buscar select.js-cotiz-cliente').each(function () {
+					var $sel = jQuery(this);
+					if ($sel.data('select2')) return;
+					$sel.select2({
+						width: '100%',
+						minimumInputLength: 2,
+						dropdownParent: jQuery(document.body),
+						ajax: {
+							url: 'ajax/ajax-buscar-clientes-cotizacion.php',
+							dataType: 'json',
+							delay: 300,
+							data: function (params) { return { q: params.term, habilitados: 1 }; },
+							processResults: function (data) {
+								var lista = (data && data.clientes) || [];
+								return {
+									results: lista.map(function (cliente) {
+										return { id: cliente.id, text: String(cliente.nombre || '').toUpperCase() };
+									})
+								};
+							}
+						},
+						language: {
+							inputTooShort: function () { return 'Escriba al menos 2 letras. Solo clientes habilitados.'; },
+							noResults: function () { return 'No hay clientes habilitados'; },
+							searching: function () { return 'Buscando...'; }
+						}
+					});
+					$sel.on('select2:selecting', function (e) {
+						var nombre = (e.params && e.params.args && e.params.args.data && e.params.args.data.text) || 'el cliente elegido';
+						if (!window.confirm('¿Cambiar el cliente de esta cotización a ' + nombre + '?')) {
+							e.preventDefault();
+						}
+					});
+					$sel.on('select2:select', function (e) {
+						var elegido = e.params.data;
+						var previo = $sel.attr('data-previo');
+						var cuerpo = new FormData();
+						cuerpo.append('idCliente', elegido.id);
+						cuerpo.append('idCotizacion', $sel.attr('data-cotiz'));
+						$sel.prop('disabled', true);
+						fetch('ajax/ajax-cotizaciones-actualizar.php', { method: 'POST', body: cuerpo, credentials: 'same-origin' })
+							.then(function (r) { return r.json(); })
+							.then(function (data) {
+								$sel.prop('disabled', false);
+								if (!data || !data.success) {
+									$sel.val(previo).trigger('change.select2');
+									window.alert((data && data.message) || 'No se pudo cambiar el cliente.');
+									return;
+								}
+								$sel.attr('data-previo', String(elegido.id));
+							})
+							.catch(function () {
+								$sel.prop('disabled', false);
+								$sel.val(previo).trigger('change.select2');
+								window.alert('No se pudo cambiar el cliente.');
+							});
+					});
+				});
+			}
+			activarClientesCotizacion();
+
 			var tbody = document.getElementById('cotizaciones_buscar');
 			var paginacionWrap = document.getElementById('cotizacionesPaginacionContenedor');
 			if (!tbody || !paginacionWrap) return;
@@ -432,6 +513,7 @@ foreach (array('usuario_resp', 'tipo_cot', 'genero_pedido', 'fecha_inicio', 'fec
 						tbody.style.opacity = '';
 						if (!data || !data.success) return;
 						tbody.innerHTML = data.html || '';
+						activarClientesCotizacion();
 						var padre = paginacionWrap.parentNode;
 						var tmp = document.createElement('div');
 						tmp.innerHTML = data.pagination || '';

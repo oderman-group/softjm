@@ -178,16 +178,15 @@ if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaServicios') {
 <script src="../assets-login/plugins/select2/js/select2.js"></script>
 <script>
 	$(function () {
-		var cliente = $('select.cotiz-select[name="cliente"]');
-		if (!cliente.length || !$.fn.select2) {
+		if (!$.fn.select2) {
 			return;
 		}
-		function filtrarCliente(params, data) {
+		function filtrarOpcion(params, data) {
 			var termino = $.trim(params.term || '').toUpperCase();
 			if (data.children) {
 				var hijos = [];
 				for (var i = 0; i < data.children.length; i++) {
-					var hijo = filtrarCliente(params, data.children[i]);
+					var hijo = filtrarOpcion(params, data.children[i]);
 					if (hijo) {
 						hijos.push(hijo);
 					}
@@ -207,20 +206,30 @@ if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaServicios') {
 			}
 			return null;
 		}
-		cliente.select2({
-			width: '100%',
-			placeholder: 'Escoja un cliente',
-			minimumResultsForSearch: 0,
-			dropdownParent: $(document.body),
-			matcher: filtrarCliente,
-			language: { noResults: function () { return 'Sin resultados'; } }
-		});
-		cliente.on('select2:open', function () {
-			var campo = document.querySelector('.select2-container--open .select2-search__field');
-			if (campo) {
-				campo.setAttribute('placeholder', 'Buscar cliente');
-				campo.focus();
+		[
+			{ nombre: 'cliente', placeholder: 'Escoja un cliente', buscar: 'Buscar cliente' },
+			{ nombre: 'sucursal', placeholder: 'Escoja una sucursal', buscar: 'Buscar sucursal' },
+			{ nombre: 'contacto', placeholder: 'Escoja un contacto', buscar: 'Buscar contacto' }
+		].forEach(function (campo) {
+			var select = $('select.cotiz-select[name="' + campo.nombre + '"]');
+			if (!select.length || select.data('select2')) {
+				return;
 			}
+			select.select2({
+				width: '100%',
+				placeholder: campo.placeholder,
+				minimumResultsForSearch: 0,
+				dropdownParent: $(document.body),
+				matcher: filtrarOpcion,
+				language: { noResults: function () { return 'Sin resultados'; } }
+			});
+			select.on('select2:open', function () {
+				var buscador = document.querySelector('.select2-container--open .select2-search__field');
+				if (buscador) {
+					buscador.setAttribute('placeholder', campo.buscar);
+					buscador.focus();
+				}
+			});
 		});
 	});
 </script>

@@ -16,6 +16,9 @@ foreach ($cotizacionesFilas as $res) {
 		&& !empty($puedeGenerarPedidoCotiz)
 		&& !empty($res['cotiz_ticket'])
 		&& (int) $res['cotiz_es_precotizacion'] !== 1;
+	$puedeCambiarCliente = !empty($puedeEditarCotiz)
+		&& $idPedido === ''
+		&& (int) $res['cotiz_vendida'] !== 1;
 	$estadoOfima = isset($pedido['pedid_ofima_estado']) ? (int) $pedido['pedid_ofima_estado'] : 0;
 	$respuestaOfima = isset($pedido['pedid_ofima_respuesta']) ? (string) $pedido['pedid_ofima_respuesta'] : '';
 	?>
@@ -24,7 +27,13 @@ foreach ($cotizacionesFilas as $res) {
 		<td title="<?= htmlspecialchars($infoPedido, ENT_QUOTES, 'UTF-8'); ?>"><a href="cotizaciones-editar.php?id=<?= (int) $res['cotiz_id']; ?>"><?= (int) $res['cotiz_id']; ?></a></td>
 		<td><?= $tipoCotizacion; ?></td>
 		<td><?= htmlspecialchars((string) $res['cotiz_fecha_propuesta'], ENT_QUOTES, 'UTF-8'); ?></td>
-		<td><a href="clientes-editar.php?id=<?= (int) $res['cli_id']; ?>"><?= htmlspecialchars(strtoupper((string) $res['cli_nombre']), ENT_QUOTES, 'UTF-8'); ?></a></td>
+		<td class="col-cliente"><?php if ($puedeCambiarCliente) { ?>
+			<select class="js-cotiz-cliente" data-cotiz="<?= (int) $res['cotiz_id']; ?>" data-previo="<?= (int) $res['cli_id']; ?>">
+				<option value="<?= (int) $res['cli_id']; ?>" selected><?= htmlspecialchars(strtoupper((string) $res['cli_nombre']), ENT_QUOTES, 'UTF-8'); ?></option>
+			</select>
+		<?php } else { ?>
+			<a href="clientes-editar.php?id=<?= (int) $res['cli_id']; ?>"><?= htmlspecialchars(strtoupper((string) $res['cli_nombre']), ENT_QUOTES, 'UTF-8'); ?></a>
+		<?php } ?></td>
 		<td class="col-items"><?php
 			$gruposItems = array(
 				'Productos' => $res['productos'],

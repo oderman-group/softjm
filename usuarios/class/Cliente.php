@@ -342,7 +342,7 @@ class Cliente extends BaseDatos {
      *
      * @return array<int, array<string, mixed>>
      */
-    public static function buscarParaCotizacion($conexionBdPrincipal, $idEmpresa, $termino, $limite = 25, $usuarioId = 0, $restringirPorZona = false) {
+    public static function buscarParaCotizacion($conexionBdPrincipal, $idEmpresa, $termino, $limite = 25, $usuarioId = 0, $restringirPorZona = false, $soloHabilitados = false, $soloIntegradosOfima = false, $excluirDealers = false) {
         $termino = trim((string) $termino);
         $idEmpresa = (int) $idEmpresa;
         $usuarioId = (int) $usuarioId;
@@ -361,6 +361,15 @@ class Cliente extends BaseDatos {
                 OR cli.cli_email LIKE ?
                 OR cli.cli_sigla LIKE ?
               )';
+        if ($soloHabilitados) {
+            $sql .= ' AND (cli.cli_papelera IS NULL OR cli.cli_papelera = 0)';
+        }
+        if ($soloIntegradosOfima) {
+            $sql .= ' AND cli.cli_integrado_ofima = 1';
+        }
+        if ($excluirDealers && defined('CLI_CATEGORIA_DEALER')) {
+            $sql .= ' AND cli.cli_categoria <> ' . (int) CLI_CATEGORIA_DEALER;
+        }
         $sql = self::appendFiltrosVisibilidadAnalyticsWhere($sql, $usuarioId, (bool) $restringirPorZona);
         $sql .= ' ORDER BY cli.cli_nombre ASC LIMIT ' . $limite;
         $stmt = $conexionBdPrincipal->prepare($sql);
