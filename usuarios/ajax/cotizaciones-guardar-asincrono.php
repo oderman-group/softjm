@@ -21,7 +21,7 @@ try {
 
     // Verificar que la cotización existe y pertenece a la empresa
     $verificarCotiz = $conexionBdPrincipal->query("
-        SELECT cotiz_id, cotiz_vendida, cotiz_cliente, cotiz_sucursal, cotiz_ticket
+        SELECT cotiz_id, cotiz_vendida, cotiz_cliente, cotiz_sucursal, cotiz_contacto, cotiz_ticket
         FROM cotizacion 
         WHERE cotiz_id = '".$cotizacionId."' AND cotiz_id_empresa = '".$idEmpresa."'
     ");
@@ -32,9 +32,35 @@ try {
 
     $cotizacion = mysqli_fetch_array($verificarCotiz, MYSQLI_BOTH);
 
-    // Verificar que no esté vendida
-    if ($cotizacion['cotiz_vendida'] == 1) {
+    // Una cotización vendida solo admite completar sucursal y contacto si todavía no los tiene.
+    if ($cotizacion['cotiz_vendida'] == 1 && !empty($cotizacion['cotiz_contacto'])) {
         throw new Exception('No es posible editar una cotización que ya generó pedido');
+    }
+
+    if ($cotizacion['cotiz_vendida'] == 1 && empty($cotizacion['cotiz_contacto'])) {
+        $contacto = intval($_POST['contacto'] ?? 0);
+        $sucursal = intval($_POST['sucursal'] ?? 0);
+        $clienteCotizacion = intval($cotizacion['cotiz_cliente']);
+        if ($contacto <= 0 || $sucursal <= 0) {
+            throw new Exception('Seleccione la sucursal y el contacto.');
+        }
+        $contactoValido = $conexionBdPrincipal->query("SELECT cont_id FROM contactos WHERE cont_id='".$contacto."' AND cont_cliente_principal='".$clienteCotizacion."' LIMIT 1");
+        $sucursalValida = $conexionBdPrincipal->query("SELECT sucu_id FROM sucursales WHERE sucu_id='".$sucursal."' AND sucu_cliente_principal='".$clienteCotizacion."' LIMIT 1");
+        if (!$contactoValido || $contactoValido->num_rows === 0 || !$sucursalValida || $sucursalValida->num_rows === 0) {
+            throw new Exception('La sucursal o el contacto no pertenecen al cliente de la cotización.');
+        }
+        if (!$conexionBdPrincipal->query("UPDATE cotizacion SET cotiz_sucursal='".$sucursal."', cotiz_contacto='".$contacto."', cotiz_usuario_modificacion='".intval($_SESSION['id'] ?? 0)."', cotiz_ultima_modificacion=NOW() WHERE cotiz_id='".$cotizacionId."' AND cotiz_id_empresa='".$idEmpresa."'")) {
+            throw new Exception('Error al guardar el contacto: ' . $conexionBdPrincipal->error);
+        }
+        $consultaFecha = $conexionBdPrincipal->query("SELECT cotiz_ultima_modificacion FROM cotizacion WHERE cotiz_id='".$cotizacionId."'");
+        $fecha = mysqli_fetch_array($consultaFecha, MYSQLI_BOTH);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Contacto guardado.',
+            'affected_rows' => $conexionBdPrincipal->affected_rows,
+            'ultima_modificacion' => $fecha['cotiz_ultima_modificacion'] ?? ''
+        ]);
+        exit;
     }
 
     // Construir la consulta de actualización dinámicamente

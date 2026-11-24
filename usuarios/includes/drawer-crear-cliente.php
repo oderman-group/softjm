@@ -16,7 +16,7 @@ $reqOfima = ' <span class="required js-req-ofima" hidden>*</span>';
   width: 100%;
   height: 100%;
   background: rgba(15, 23, 42, 0.45);
-  z-index: 99998;
+  z-index: 100009;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -43,7 +43,7 @@ $reqOfima = ' <span class="required js-req-ofima" hidden>*</span>';
   padding: 0;
   border: none;
   background: #fff;
-  z-index: 99999;
+  z-index: 100011;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -460,6 +460,7 @@ body.drawer-open {
     <div class="drawer-alert drawer-alert-ofima" id="drawerClienteOfima" role="status"></div>
 
     <form class="drawer-form" id="formCrearClienteRapido" novalidate>
+      <input type="hidden" id="cliRapidoId" name="id" value="">
       <div class="form-row">
         <div class="form-group">
           <label for="cliRapidoTipoDocumento">Tipo de documento<?= $reqOfima ?></label>
@@ -583,13 +584,13 @@ body.drawer-open {
         <span class="field-hint">Por defecto se asigna el usuario actual.</span>
       </div>
 
-      <div class="form-group drawer-etiquetas-group">
+      <div class="form-group drawer-etiquetas-group js-solo-crear">
         <label>Etiquetas comerciales <span class="field-hint" style="display:inline; margin-left:0.25rem;">(opcional)</span></label>
         <span class="field-hint">Clasifique al cliente con una o más etiquetas visibles en todo el CRM.</span>
         <?php include __DIR__ . '/cliente-etiquetas-selector.php'; ?>
       </div>
 
-      <div class="form-group drawer-nota-interna-group">
+      <div class="form-group drawer-nota-interna-group js-solo-crear">
         <label>Nota interna <span class="field-hint" style="display:inline; margin-left:0.25rem;">(opcional)</span></label>
         <span class="field-hint">Quedará registrada en el historial del cliente.</span>
         <?php include __DIR__ . '/cliente-notas-tipo-selector.php'; ?>
@@ -604,7 +605,7 @@ body.drawer-open {
       </div>
 
       <?php if ($ofimaActivaDrawer) { ?>
-      <div class="form-group drawer-ofima-check">
+      <div class="form-group drawer-ofima-check js-solo-crear">
         <label for="cliRapidoCrearEnOfima">
           <input type="checkbox" id="cliRapidoCrearEnOfima" name="crearEnOfima" value="1">
           Crear también en Ofima
@@ -691,7 +692,8 @@ document.addEventListener('DOMContentLoaded', function () {
         btnGuardar.insertBefore(spinner, label);
       }
     } else {
-      label.textContent = 'Guardar';
+      var idEdicion = document.getElementById('cliRapidoId');
+      label.textContent = idEdicion && idEdicion.value ? 'Guardar cambios' : 'Guardar';
       if (spinner) spinner.remove();
     }
   }
@@ -800,6 +802,8 @@ document.addEventListener('DOMContentLoaded', function () {
     body.append('usuario', documento);
     body.append('opcion', '1');
     body.append('format', 'json');
+    var exceptoId = document.getElementById('cliRapidoId');
+    if (exceptoId && exceptoId.value) body.append('excepto', exceptoId.value);
 
     return fetch('ajax/ajax-clientes-verificar.php', {
       method: 'POST',
@@ -869,6 +873,7 @@ document.addEventListener('DOMContentLoaded', function () {
     resetEtiquetasVisuales();
     resetNotaInterna();
     resetDocumentoEstado();
+    aplicarModoDrawer(false);
     if (grupoEvento) grupoEvento.style.display = 'none';
     overlay.classList.add('is-open');
     drawer.classList.add('is-open');
@@ -900,6 +905,69 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   window.abrirDrawerCrearCliente = abrirDrawer;
+
+  function aplicarModoDrawer(editar) {
+    var titulo = document.getElementById('drawerCrearClienteTitulo');
+    var idCampo = document.getElementById('cliRapidoId');
+    if (titulo) {
+      titulo.innerHTML = editar
+        ? '<i class="fa fa-pencil" aria-hidden="true"></i> Editar cliente'
+        : '<i class="fa fa-user-plus" aria-hidden="true"></i> Crear cliente';
+    }
+    if (drawerIntro) {
+      drawerIntro.textContent = editar
+        ? 'Corrija los datos del cliente. Al guardar se actualizan estos valores.'
+        : 'Complete los datos básicos para registrar un cliente de forma rápida. El número de documento y la ciudad son obligatorios. Podrá completar el resto de la información después.';
+    }
+    document.querySelectorAll('#drawerCrearCliente .js-solo-crear').forEach(function (el) {
+      el.hidden = !!editar;
+    });
+    if (!editar && idCampo) idCampo.value = '';
+    var label = btnGuardar ? btnGuardar.querySelector('.drawer-btn-label') : null;
+    if (label && !guardando) label.textContent = editar ? 'Guardar cambios' : 'Guardar';
+  }
+
+  function llenarClienteEdicion(cliente) {
+    var idCampo = document.getElementById('cliRapidoId');
+    if (idCampo) idCampo.value = String(cliente.id || '');
+    if (tipoDocumentoInput) tipoDocumentoInput.value = cliente.tipoDocumento || '';
+    if (documentoInput) documentoInput.value = cliente.documento || '';
+    if (nombreInput) nombreInput.value = cliente.nombre || '';
+    var email = document.getElementById('cliRapidoEmail');
+    var celular = document.getElementById('cliRapidoCelular');
+    if (email) email.value = cliente.email || '';
+    if (telefonoInput) telefonoInput.value = cliente.telefono || '';
+    if (celular) celular.value = cliente.celular || '';
+    if (ciudadInput) ciudadInput.value = cliente.ciudad || '';
+    if (direccionInput) direccionInput.value = cliente.direccion || '';
+    if (referencia) referencia.value = cliente.referencia || '';
+    var evento = document.getElementById('cliRapidoNombreEvento');
+    if (evento) evento.value = cliente.nombreEvento || '';
+    if (grupoEvento) grupoEvento.style.display = referencia && referencia.value === '4' ? 'block' : 'none';
+    var asesor = document.getElementById('cliRapidoAsesor');
+    if (asesor && cliente.asesor) asesor.value = String(cliente.asesor);
+    documentoEstado = 'available';
+    documentoVerificado = cliente.documento || '';
+    if (documentoInput) documentoInput.classList.remove('is-invalid');
+    mostrarEstadoDocumento('ok', 'Documento del cliente.');
+  }
+
+  window.abrirDrawerEditarCliente = function (clienteId) {
+    fetch('ajax/ajax-cliente-datos-rapido.php?id=' + encodeURIComponent(clienteId), { credentials: 'same-origin' })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!data || !data.success || !data.cliente) {
+          window.alert((data && data.message) || 'No se pudo abrir el cliente.');
+          return;
+        }
+        abrirDrawer(null);
+        aplicarModoDrawer(true);
+        llenarClienteEdicion(data.cliente);
+      })
+      .catch(function () {
+        window.alert('No se pudo abrir el cliente.');
+      });
+  };
 
   function validarFormulario() {
     limpiarErrores();
@@ -1117,7 +1185,9 @@ document.addEventListener('DOMContentLoaded', function () {
         typeof widgetVozCrear.tieneVozPendiente === 'function' &&
         widgetVozCrear.tieneVozPendiente();
 
-      fetch('ajax/ajax-clientes-crear-rapido.php', {
+      var idEdicion = document.getElementById('cliRapidoId');
+      var esEdicion = !!(idEdicion && idEdicion.value);
+      fetch(esEdicion ? 'ajax/ajax-cliente-actualizar-rapido.php' : 'ajax/ajax-clientes-crear-rapido.php', {
         method: 'POST',
         body: formData
       })
@@ -1145,6 +1215,15 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(function (data) {
           if (!data) return;
+          var idEdicion = document.getElementById('cliRapidoId');
+          if (idEdicion && idEdicion.value) {
+            if (typeof window.alActualizarClienteBusqueda === 'function') {
+              window.alActualizarClienteBusqueda(data.cliente || { id: idEdicion.value });
+            }
+            setGuardando(false);
+            cerrarDrawer();
+            return;
+          }
           mostrarExito(data);
         })
         .catch(function () {

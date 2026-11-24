@@ -16,9 +16,11 @@ if($_POST["opcion"]==1){
 	}
 
 	$documentoEsc = mysqli_real_escape_string($conexionBdPrincipal, $documento);
+	$excepto = (int) ($_POST['excepto'] ?? 0);
 	$consulta = $conexionBdPrincipal->query(
 		"SELECT cli_id, cli_nombre FROM clientes
-		 WHERE cli_usuario='" . $documentoEsc . "' AND cli_id_empresa='" . $idEmpresa . "'"
+		 WHERE cli_usuario='" . $documentoEsc . "' AND cli_id_empresa='" . $idEmpresa . "'
+		 AND cli_id <> '" . $excepto . "'"
 	);
 	$clienteV = mysqli_fetch_array($consulta, MYSQLI_BOTH);
 

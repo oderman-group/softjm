@@ -337,6 +337,56 @@ class Cliente extends BaseDatos {
     }
 
     /**
+     * Busca clientes de la empresa por nombre, documento, sigla o correo.
+     * Incluye los que aún no están en Ofima.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function buscarParaCotizacion($conexionBdPrincipal, $idEmpresa, $termino, $limite = 25, $usuarioId = 0, $restringirPorZona = false, $soloHabilitados = false, $soloIntegradosOfima = false, $excluirDealers = false) {
+        $termino = trim((string) $termino);
+        $idEmpresa = (int) $idEmpresa;
+        $usuarioId = (int) $usuarioId;
+        $limite = max(1, min(50, (int) $limite));
+        if ($idEmpresa <= 0 || mb_strlen($termino) < 2) {
+            return [];
+        }
+
+        $like = '%' . $termino . '%';
+        $sql = 'SELECT cli.cli_id, cli.cli_nombre, cli.cli_usuario, cli.cli_email, cli.cli_sigla, cli.cli_integrado_ofima
+            FROM clientes cli
+            WHERE cli.cli_id_empresa = ?
+              AND (
+                cli.cli_nombre LIKE ?
+                OR cli.cli_usuario LIKE ?
+                OR cli.cli_email LIKE ?
+                OR cli.cli_sigla LIKE ?
+              )';
+        if ($soloHabilitados) {
+            $sql .= ' AND (cli.cli_papelera IS NULL OR cli.cli_papelera = 0)';
+        }
+        if ($soloIntegradosOfima) {
+            $sql .= ' AND cli.cli_integrado_ofima = 1';
+        }
+        if ($excluirDealers && defined('CLI_CATEGORIA_DEALER')) {
+            $sql .= ' AND cli.cli_categoria <> ' . (int) CLI_CATEGORIA_DEALER;
+        }
+        $sql = self::appendFiltrosVisibilidadAnalyticsWhere($sql, $usuarioId, (bool) $restringirPorZona);
+        $sql .= ' ORDER BY cli.cli_nombre ASC LIMIT ' . $limite;
+        $stmt = $conexionBdPrincipal->prepare($sql);
+        if (!$stmt) {
+            return [];
+        }
+        $stmt->bind_param('issss', $idEmpresa, $like, $like, $like, $like);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
+        $filas = [];
+        while ($resultado && ($fila = $resultado->fetch_assoc())) {
+            $filas[] = $fila;
+        }
+        return $filas;
+    }
+
+    /**
      * Obtiene en una sola consulta las fechas clave de evolución comercial del cliente.
      */
     public static function obtenerEvolucionComercial(int $idCliente, int $idEmpresa, $conexionBdPrincipal) {
@@ -808,13 +858,18 @@ class Cliente extends BaseDatos {
     public static function appendFiltrosVisibilidadAnalyticsWhere(
         string $where,
         int $usuarioId,
-        bool $restringirPorZona
+        bool $restringirPorZona,
+        int $clienteSiempreVisible = 0
     ): string {
         if (!$restringirPorZona) {
             return $where;
         }
 
         $usuarioId = intval($usuarioId);
+        $clienteSiempreVisible = intval($clienteSiempreVisible);
+        $clienteActual = $clienteSiempreVisible > 0
+            ? " OR cli.cli_id = '" . $clienteSiempreVisible . "'"
+            : '';
         $where    .= " AND (
             cli.cli_zona IN (
                 SELECT zpu_zona
@@ -825,7 +880,7 @@ class Cliente extends BaseDatos {
                 SELECT cliu_cliente
                 FROM " . MAINBD . ".clientes_usuarios
                 WHERE cliu_usuario = '" . $usuarioId . "'
-            )
+            )" . $clienteActual . "
         )";
 
         return $where;

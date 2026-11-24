@@ -19,6 +19,10 @@ $ofimaUsuarioPruebas = $ofimaConexion['aoc_usuario_pruebas'] ?? '';
 $ofimaUsuarioProduccion = $ofimaConexion['aoc_usuario_produccion'] ?? '';
 $ofimaActivo = isset($ofimaConexion['aoc_activo']) ? (int) $ofimaConexion['aoc_activo'] : 1;
 $ofimaBloquearPedidos = isset($ofimaConexion['aoc_bloquear_pedidos']) ? (int) $ofimaConexion['aoc_bloquear_pedidos'] : 0;
+$ofimaEnviarPedidosAuto = isset($ofimaConexion['aoc_enviar_pedidos_auto']) ? (int) $ofimaConexion['aoc_enviar_pedidos_auto'] : 0;
+if ($ofimaBloquearPedidos === 1) {
+    $ofimaEnviarPedidosAuto = 0;
+}
 $ofimaTokenExpira = $ofimaConexion['aoc_token_expira'] ?? null;
 $ofimaTieneToken = !empty($ofimaConexion['aoc_token']);
 $ofimaUrlActiva = $ofimaAmbiente === 'produccion' ? $ofimaUrlProduccion : $ofimaUrlPruebas;
@@ -1252,12 +1256,28 @@ function renderTablaEndpointsApi(array $endpoints, string $tituloVacio, string $
                         <label for="ofima_bloquear_pedidos" style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
                             <input type="checkbox" id="ofima_bloquear_pedidos" name="ofima_bloquear_pedidos" value="1" data-ofima="1"
                                    <?= (int)$ofimaBloquearPedidos === 1 ? 'checked' : ''; ?>
+                                   onchange="actualizarEnvioPedidosOfima()"
                                    style="margin-top:4px; width:auto;">
                             <span>
                                 Bloquear pedidos en Orion
                                 <span class="help-text" style="display:block; margin-top:4px;">
                                     Si la integración está activa y este check también, no se podrán generar, actualizar, anular ni eliminar pedidos,
                                     ni generar remisiones desde un pedido. Solo consulta/visualización.
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ofima_enviar_pedidos" id="ofima_enviar_pedidos_label" style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
+                            <input type="checkbox" id="ofima_enviar_pedidos" name="ofima_enviar_pedidos" value="1" data-ofima="1"
+                                   <?= $ofimaEnviarPedidosAuto === 1 ? 'checked' : ''; ?>
+                                   <?= $ofimaBloquearPedidos === 1 ? 'disabled' : ''; ?>
+                                   style="margin-top:4px; width:auto;">
+                            <span>
+                                Enviar automáticamente pedidos a Ofima
+                                <span class="help-text" style="display:block; margin-top:4px;">
+                                    Disponible cuando «Bloquear pedidos en Orion» está desactivado. Guarda la preferencia; el envío se conectará después.
                                 </span>
                             </span>
                         </label>
@@ -1414,6 +1434,7 @@ function renderTablaEndpointsApi(array $endpoints, string $tituloVacio, string $
         inicializarValidaciones();
         guardarConfiguracionOriginal();
         actualizarVistaAmbienteOfima();
+        actualizarEnvioPedidosOfima();
         
         // Detectar cambios en tiempo real (excluye campos Ofima: tiene su propio guardado)
         document.querySelectorAll('input, select, textarea').forEach(elemento => {
@@ -1454,6 +1475,17 @@ function renderTablaEndpointsApi(array $endpoints, string $tituloVacio, string $
     }
 
     // ========== INTEGRACIÓN OFIMA ==========
+    function actualizarEnvioPedidosOfima() {
+        const bloquear = document.getElementById('ofima_bloquear_pedidos');
+        const enviar = document.getElementById('ofima_enviar_pedidos');
+        const etiqueta = document.getElementById('ofima_enviar_pedidos_label');
+        if (!bloquear || !enviar) return;
+        const bloqueado = bloquear.checked;
+        enviar.disabled = bloqueado;
+        if (bloqueado) enviar.checked = false;
+        if (etiqueta) etiqueta.style.opacity = bloqueado ? '0.55' : '1';
+    }
+
     function actualizarResumenOfima() {
         const activo = document.getElementById('ofima_activo');
         const ambiente = document.getElementById('ofima_ambiente');
@@ -1509,9 +1541,12 @@ function renderTablaEndpointsApi(array $endpoints, string $tituloVacio, string $
 
         const formData = new FormData();
         const bloquearPedidos = document.getElementById('ofima_bloquear_pedidos');
+        const enviarPedidos = document.getElementById('ofima_enviar_pedidos');
+        const pedidosBloqueados = bloquearPedidos && bloquearPedidos.checked;
         formData.append('ambiente', document.getElementById('ofima_ambiente').value);
         formData.append('activo', document.getElementById('ofima_activo').value);
-        formData.append('bloquear_pedidos', bloquearPedidos && bloquearPedidos.checked ? '1' : '0');
+        formData.append('bloquear_pedidos', pedidosBloqueados ? '1' : '0');
+        formData.append('enviar_pedidos_auto', !pedidosBloqueados && enviarPedidos && enviarPedidos.checked ? '1' : '0');
         formData.append('url_pruebas', document.getElementById('ofima_url_pruebas').value.trim());
         formData.append('url_produccion', document.getElementById('ofima_url_produccion').value.trim());
         formData.append('usuario_pruebas', document.getElementById('ofima_usuario_pruebas').value.trim());

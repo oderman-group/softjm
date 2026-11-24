@@ -27,31 +27,66 @@ $(document).ready(function () {
             $typedRows = $rows;
         }
 
-        $('#tableBody ' + rowClassSelector).remove();
-
         if ($typedRows.length) {
+            $('#tableBody ' + rowClassSelector).remove();
             $('#tableBody').append($typedRows);
+            if (debugLabel === 'productos') {
+                $('#resp .alert-warning').remove();
+            }
             return true;
         }
 
-        console.warn('No se encontraron filas para', debugLabel, response);
+        var html = typeof response === "string" ? response : "";
+        var sinFilas = !html.trim() || !/<tr[\s>]/i.test(html);
+        if (sinFilas) {
+            $('#tableBody ' + rowClassSelector).remove();
+            return true;
+        }
+
         return false;
     }
 
+    function cotizacionProductoHabilitado(item) {
+        if (item.habilitado !== undefined && item.habilitado !== null && item.habilitado !== "") {
+            return parseInt(item.habilitado, 10) === 1;
+        }
+        if (item.element) {
+            return parseInt($(item.element).attr("data-habilitado"), 10) === 1;
+        }
+        return true;
+    }
+
+    function cotizacionEtiquetaProducto(item) {
+        if (!item.id) {
+            return item.text;
+        }
+        var clase = cotizacionProductoHabilitado(item) ? "combo-prod-ok" : "combo-prod-off";
+        return $("<span></span>").addClass(clase).text(item.text || "");
+    }
+
     let productSelect = $("#product-select").select2({
-        placeholder: "Escoja una opción...",
+        placeholder: "Escriba para buscar productos habilitados...",
         multiple: true,
         minimumInputLength: 3,
+        templateResult: cotizacionEtiquetaProducto,
+        templateSelection: cotizacionEtiquetaProducto,
         ajax: {
             type: "GET",
             url: "ajax/ajax-buscar-productos.php",
             dataType: "json",
+            delay: 250,
+            data: function (params) {
+                return { term: params.term || "", habilitado: 1 };
+            },
             processResults: function (items) {
                 return {
-                    results: items.map(function (item) {
+                    results: (items || []).filter(function (item) {
+                        return parseInt(item.habilitado, 10) === 1;
+                    }).map(function (item) {
                         return {
                             id: item.id,
                             text: item.text,
+                            habilitado: 1
                         };
                     })
                 };
@@ -60,7 +95,7 @@ $(document).ready(function () {
     });
     
     let comboSelect = $("#combos-select").select2({
-        placeholder: "Escoja una opción...",
+        placeholder: "Escriba para buscar combos activos...",
         multiple: true,
         minimumInputLength: 3,
         ajax: {
@@ -102,7 +137,7 @@ $(document).ready(function () {
     });
     
     if (idEditar) {
-        productSelect.on("change", function (e) {
+        function guardarProductosCotizacion() {
             const producto = productSelect.val() || [];
             const url = new URL(window.location.href);
             const id = url.searchParams.get("id");
@@ -113,15 +148,32 @@ $(document).ready(function () {
                     producto,
                     id
                 },
-                success: function (response) {
-                    actulizarTablaProductos()
+                success: function () {
+                    actulizarTablaProductos();
                 }
             });
-        });
+        }
 
-        productSelect.on("select2:clear", function (e) {
-            console.log("clear")
-        });
+        productSelect.on("select2:select select2:unselect select2:clear", guardarProductosCotizacion);
+
+        var cargasIniciales = { productos: false, combos: false, servicios: false };
+
+        function cerrarCargaInicial(tipo) {
+            if (cargasIniciales[tipo]) {
+                return;
+            }
+            cargasIniciales[tipo] = true;
+            if (cargasIniciales.productos && cargasIniciales.combos && cargasIniciales.servicios) {
+                $('#productos').removeClass('is-cargando');
+            }
+        }
+
+        function avisoProductosNoCargados() {
+            if ($('#tableBody tr.producto').length) {
+                return;
+            }
+            $('#resp').html('<div class="alert alert-warning">No se pudieron cargar los productos cotizados. Recargue la página.</div>');
+        }
 
         function actulizarTablaProductos() {
             $.ajax({
@@ -133,8 +185,14 @@ $(document).ready(function () {
                 success: function (response) {
                     var rendered = renderRowsByType(response, '.producto', 'productos');
                     if (!rendered) {
-                        $('#resp').html('<div class="alert alert-warning">No se pudieron cargar los productos cotizados. Recargue la página.</div>');
+                        avisoProductosNoCargados();
                     }
+                },
+                error: function () {
+                    avisoProductosNoCargados();
+                },
+                complete: function () {
+                    cerrarCargaInicial('productos');
                 }
             });
         }
@@ -170,6 +228,9 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     renderRowsByType(response, '.combo', 'combos');
+                },
+                complete: function () {
+                    cerrarCargaInicial('combos');
                 }
             });
         }
@@ -205,6 +266,9 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     renderRowsByType(response, '.servicio', 'servicios');
+                },
+                complete: function () {
+                    cerrarCargaInicial('servicios');
                 }
             });
         }
@@ -224,7 +288,10 @@ if (idEditar) {
             let value = parseFloat($(this).find("input[title='czpp_valor']").val()) || 0;
             let discount = parseFloat($(this).find("input[title='czpp_descuento']").val()) || 0;
             let subtotalRow = quantity * value;
-            let discountAmount = subtotalRow * (discount / 100);
+            let montoDescuento = $(this).find("input.dcto-valor");
+            let discountAmount = montoDescuento.length
+                ? (parseFloat(String(montoDescuento.val()).replace(/\s/g, "").replace(",", ".")) || 0)
+                : subtotalRow * (discount / 100);
             let rowTotal = subtotalRow - discountAmount;
             let rowIva = (rowTotal * (parseFloat($(this).find("input[title='czpp_impuesto']").val()) || 0)) / 100;
 
@@ -238,7 +305,7 @@ if (idEditar) {
         });
 
         $("#subtotal .valor-numerico").text(subtotal.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
-        $("#totalDiscount .valor-numerico").text(totalDiscount.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
+        $("#totalDiscount .valor-numerico").text(totalDiscount.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 }));
         $("#totalIva .valor-numerico").text(totalIva.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
 
         let envio = parseFloat($("input[name='envio']").val()) || 0;
@@ -253,7 +320,7 @@ if (idEditar) {
         $("#utilidadTotal").text(utilidadTotal.toLocaleString('es-CO', { minimumFractionDigits: 0 }));
     }
 
-    $("#data-table tbody").on("input", "input[title='czpp_cantidad'], input[title='czpp_valor'], input[title='czpp_descuento'], input[title='czpp_impuesto']", recalculate);
+    $("#data-table tbody").on("input change", "input[title='czpp_cantidad'], input[title='czpp_valor'], input[title='czpp_descuento'], input[title='czpp_impuesto'], input.dcto-valor", recalculate);
     $("input[name='envio']").on("input", recalculate);
 
     let observer = new MutationObserver(function (mutations) {
@@ -263,6 +330,7 @@ if (idEditar) {
     let tbody = document.getElementById("data-table").getElementsByTagName("tbody")[0];
     let config = { childList: true };
     observer.observe(tbody, config);
+    window.recalculate = recalculate;
     recalculate();
 
     // Función para actualizar una subtotal parcial específica

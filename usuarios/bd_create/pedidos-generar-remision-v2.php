@@ -5,6 +5,7 @@ $idPagina = 374;
 require_once RUTA_PROYECTO.'/usuarios/class/Producto.php';
 require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
 ofimaAbortarSiPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
+$descontarExistencias = !ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
 
 $conexionBdPrincipal->begin_transaction();
 
@@ -34,14 +35,16 @@ while ($prod = mysqli_fetch_array($productos)) {
 
     mysqli_query($conexionBdPrincipal,"INSERT INTO cotizacion_productos(czpp_cotizacion, czpp_producto, czpp_valor, czpp_orden, czpp_cantidad, czpp_impuesto, czpp_tipo, czpp_bodega, czpp_descuento, czpp_productos_existencias, czpp_nombre_original)VALUES('" . $idInsert . "','" . $prod['czpp_producto'] . "', '" . $prod['czpp_valor'] . "', '" . $prod['czpp_orden'] . "', '".$prod['czpp_cantidad']."', '" . $prod['czpp_impuesto'] . "', ".CZPP_TIPO_REM.", 1, '" . $prod['czpp_descuento'] . "', '" . $prod['prod_existencias'] . "', '" . mysqli_real_escape_string($conexionBdPrincipal, $prod['czpp_nombre_original']) . "')");
 
-    $resultado = Producto::sacarExistenciasProductoMultiBodega($prod['czpp_producto'], $prod['czpp_cantidad'], $conexionBdPrincipal, true);
+    if ($descontarExistencias) {
+        $resultado = Producto::sacarExistenciasProductoMultiBodega($prod['czpp_producto'], $prod['czpp_cantidad'], $conexionBdPrincipal, true);
 
-    if ($resultado['status'] === 'success') {
-        Producto::sincronizarExistenciasConBodegas($prod['czpp_producto'], $conexionBdPrincipal);
-    } else {
-        $conexionBdPrincipal->rollback();
-        echo '<p style="font-family:arial;color:red;">No se pudo generar la remisión. Error al descontar existencias del producto (ID: ' . (int)$prod['czpp_producto'] . '). ' . ($resultado['message'] ?? 'Sin stock suficiente.') . '</p><p><a href="' . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '../pedidos.php') . '">Volver</a></p>';
-        exit();
+        if ($resultado['status'] === 'success') {
+            Producto::sincronizarExistenciasConBodegas($prod['czpp_producto'], $conexionBdPrincipal);
+        } else {
+            $conexionBdPrincipal->rollback();
+            echo '<p style="font-family:arial;color:red;">No se pudo generar la remisión. Error al descontar existencias del producto (ID: ' . (int)$prod['czpp_producto'] . '). ' . ($resultado['message'] ?? 'Sin stock suficiente.') . '</p><p><a href="' . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '../pedidos.php') . '">Volver</a></p>';
+            exit();
+        }
     }
     $contador++;
 }
@@ -68,19 +71,21 @@ while ($combo = mysqli_fetch_array($productosCombos, MYSQLI_ASSOC)) {
                     continue;
                 }
 
-                $resultado = Producto::sacarExistenciasProductoMultiBodega($comProd['id_producto'], $cantidadTotalProductoRemision, $conexionBdPrincipal, true);
-                if ($resultado['status'] !== 'success') {
-                    $conexionBdPrincipal->rollback();
-                    $idProdCombo = (int)($comProd['id_producto'] ?? 0);
-                    $nombreProdCombo = '';
-                    if ($idProdCombo) {
-                        $rNombre = mysqli_fetch_assoc($conexionBdPrincipal->query("SELECT prod_nombre FROM productos WHERE prod_id=" . $idProdCombo . " AND prod_id_empresa='".$idEmpresa."' LIMIT 1"));
-                        $nombreProdCombo = $rNombre ? (' "' . htmlspecialchars($rNombre['prod_nombre']) . '"') : '';
+                if ($descontarExistencias) {
+                    $resultado = Producto::sacarExistenciasProductoMultiBodega($comProd['id_producto'], $cantidadTotalProductoRemision, $conexionBdPrincipal, true);
+                    if ($resultado['status'] !== 'success') {
+                        $conexionBdPrincipal->rollback();
+                        $idProdCombo = (int)($comProd['id_producto'] ?? 0);
+                        $nombreProdCombo = '';
+                        if ($idProdCombo) {
+                            $rNombre = mysqli_fetch_assoc($conexionBdPrincipal->query("SELECT prod_nombre FROM productos WHERE prod_id=" . $idProdCombo . " AND prod_id_empresa='".$idEmpresa."' LIMIT 1"));
+                            $nombreProdCombo = $rNombre ? (' "' . htmlspecialchars($rNombre['prod_nombre']) . '"') : '';
+                        }
+                        echo '<p style="font-family:arial;color:red;">No se pudo generar la remisión. No hay unidades disponibles para uno de los productos del combo: producto' . $nombreProdCombo . ' (ID: ' . $idProdCombo . '). ' . ($resultado['message'] ?? 'Sin stock suficiente.') . '</p><p><a href="' . (isset($_SERVER['HTTP_REFERER']) ? htmlspecialchars($_SERVER['HTTP_REFERER']) : '../pedidos.php') . '">Volver</a></p>';
+                        exit();
                     }
-                    echo '<p style="font-family:arial;color:red;">No se pudo generar la remisión. No hay unidades disponibles para uno de los productos del combo: producto' . $nombreProdCombo . ' (ID: ' . $idProdCombo . '). ' . ($resultado['message'] ?? 'Sin stock suficiente.') . '</p><p><a href="' . (isset($_SERVER['HTTP_REFERER']) ? htmlspecialchars($_SERVER['HTTP_REFERER']) : '../pedidos.php') . '">Volver</a></p>';
-                    exit();
+                    Producto::sincronizarExistenciasConBodegas($comProd['id_producto'], $conexionBdPrincipal);
                 }
-                Producto::sincronizarExistenciasConBodegas($comProd['id_producto'], $conexionBdPrincipal);
 
                 $predicado = [
                     'prod_id'         => $comProd['id_producto'],

@@ -179,7 +179,7 @@ class ApiOfimaClient {
             $payload = $esLista ? $datosOfima : [$datosOfima];
         }
 
-        return $this->realizarPeticion(
+        $resultado = $this->realizarPeticion(
             $envio['url'],
             $envio['metodo'],
             $payload,
@@ -187,6 +187,10 @@ class ApiOfimaClient {
             $envio['password'],
             $envio['token']
         );
+        if (is_array($resultado)) {
+            $resultado['payload_enviado'] = $payload;
+        }
+        return $resultado;
     }
     
     /**
@@ -371,14 +375,16 @@ class ApiOfimaClient {
         
         if ($tipoOperacion === 'UPDATE') {
             if (Pedido::estaFacturado($pedidId, $this->conexionBdPrincipal, $this->idEmpresa)) {
+                $mensajeFacturado = 'El pedido ya está facturado. No puede modificarse en Ofima.';
                 $this->registrarSincronizacion(
                     'pedidos', 'orion_ofima', 'UPDATE', $pedidId, (string) $pedidId,
                     ['pedid_id' => $pedidId], ['success' => false],
-                    'error', 400, 'El pedido ya está facturado y no puede modificarse en Ofima', 1
+                    'error', 400, $mensajeFacturado
                 );
+                $this->guardarResultadoPedidoOfima($pedidId, false, $mensajeFacturado);
                 return [
                     'success' => false,
-                    'error' => 'El pedido ya está facturado. No puede modificarse en Ofima.'
+                    'error' => $mensajeFacturado
                 ];
             }
         }
@@ -387,12 +393,16 @@ class ApiOfimaClient {
         if (isset($datosOfima['error'])) {
             $this->registrarSincronizacion(
                 'pedidos', 'orion_ofima', $tipoOperacion, $pedidId, (string) $pedidId,
-                $pedido, ['success' => false], 'error', 400, $datosOfima['error'], 1
+                $pedido, ['success' => false], 'error', 400, $datosOfima['error']
             );
+            $this->guardarResultadoPedidoOfima($pedidId, false, $datosOfima['error']);
             return ['success' => false, 'error' => $datosOfima['error']];
         }
         
         $resultado = $this->enviarAOfima('pedidos', $tipoOperacion, $datosOfima);
+        $exitoso = !empty($resultado['success']);
+        $mensajeError = $exitoso ? null : ($resultado['error'] ?? ($resultado['datos']['mensaje'] ?? ($resultado['datos']['error'] ?? 'Error desconocido')));
+        $enviado = isset($resultado['payload_enviado']) ? $resultado['payload_enviado'] : null;
         
         $this->registrarSincronizacion(
             'pedidos',
@@ -402,12 +412,84 @@ class ApiOfimaClient {
             (string) $pedidId,
             $datosOfima,
             $resultado,
-            $resultado['success'] ? 'exitoso' : 'error',
+            $exitoso ? 'exitoso' : 'error',
             $resultado['codigo_http'] ?? null,
-            $resultado['success'] ? null : ($resultado['error'] ?? ($resultado['datos']['error'] ?? 'Error desconocido'))
+            $mensajeError
         );
+        $this->guardarResultadoPedidoOfima($pedidId, $exitoso, $this->textoResultadoOfima($resultado, $mensajeError), $enviado);
         
         return $resultado;
+    }
+
+    /**
+     * CREATE si el pedido nunca se integró; UPDATE si ya hubo un envío exitoso.
+     */
+    public function operacionPedidoOfima($pedidId) {
+        $pedidId = (int) $pedidId;
+        $stmt = $this->conexionBdPrincipal->prepare(
+            "SELECT pedid_ofima_integrado FROM pedidos WHERE pedid_id = ? AND pedid_id_empresa = ? LIMIT 1"
+        );
+        if (!$stmt) {
+            return 'CREATE';
+        }
+        $empresa = (int) $this->idEmpresa;
+        $stmt->bind_param('ii', $pedidId, $empresa);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        return ($row && (int) $row['pedid_ofima_integrado'] === 1) ? 'UPDATE' : 'CREATE';
+    }
+
+    /**
+     * Guarda en el pedido el estado y la última respuesta. El flag integrado solo pasa a 1.
+     */
+    private function guardarResultadoPedidoOfima($pedidId, $exitoso, $respuesta, $enviado = null) {
+        $pedidId = (int) $pedidId;
+        if ($pedidId <= 0) {
+            return;
+        }
+        $estado = $exitoso ? 1 : 2;
+        $texto = is_string($respuesta) ? $respuesta : (string) json_encode($respuesta, JSON_UNESCAPED_UNICODE);
+        if ($enviado !== null) {
+            $envelope = json_encode(
+                array('respuesta' => $texto, 'enviado' => $enviado),
+                JSON_UNESCAPED_UNICODE
+            );
+            if ($envelope !== false && strlen($envelope) <= 60000) {
+                $texto = $envelope;
+            }
+        }
+        if (strlen($texto) > 60000) {
+            $texto = substr($texto, 0, 60000);
+        }
+        $empresa = (int) $this->idEmpresa;
+        $sql = $exitoso
+            ? "UPDATE pedidos SET pedid_ofima_estado = ?, pedid_ofima_respuesta = ?, pedid_ofima_integrado = 1 WHERE pedid_id = ? AND pedid_id_empresa = ?"
+            : "UPDATE pedidos SET pedid_ofima_estado = ?, pedid_ofima_respuesta = ? WHERE pedid_id = ? AND pedid_id_empresa = ?";
+        $stmt = $this->conexionBdPrincipal->prepare($sql);
+        if (!$stmt) {
+            error_log('No se pudo guardar el resultado Ofima del pedido ' . $pedidId . ': ' . $this->conexionBdPrincipal->error);
+            return;
+        }
+        $stmt->bind_param('isii', $estado, $texto, $pedidId, $empresa);
+        $stmt->execute();
+    }
+
+    private function textoResultadoOfima(array $resultado, $mensajeError = null) {
+        if (!empty($resultado['respuesta_raw']) && is_string($resultado['respuesta_raw'])) {
+            return $resultado['respuesta_raw'];
+        }
+        if ($mensajeError !== null && $mensajeError !== '') {
+            return (string) $mensajeError;
+        }
+        if (!empty($resultado['error'])) {
+            return (string) $resultado['error'];
+        }
+        if (isset($resultado['datos'])) {
+            return is_string($resultado['datos'])
+                ? $resultado['datos']
+                : (string) json_encode($resultado['datos'], JSON_UNESCAPED_UNICODE);
+        }
+        return !empty($resultado['success']) ? 'OK' : 'Error desconocido';
     }
     
     /**
@@ -449,12 +531,15 @@ class ApiOfimaClient {
         $stmt = $this->conexionBdPrincipal->prepare(
             "SELECT cp.czpp_id, cp.czpp_producto, cp.czpp_cantidad, cp.czpp_valor, cp.czpp_descuento, cp.czpp_impuesto, prod.prod_referencia 
              FROM cotizacion_productos cp 
-             LEFT JOIN productos prod ON prod.prod_id = cp.czpp_producto 
+             INNER JOIN productos prod ON prod.prod_id = cp.czpp_producto AND prod.prod_id_empresa = ?
              WHERE cp.czpp_cotizacion = ? AND cp.czpp_tipo = ? AND (cp.czpp_producto IS NOT NULL AND cp.czpp_producto != '') AND (cp.czpp_combo IS NULL OR cp.czpp_combo = '')
+             AND prod.prod_habilitado = 1 AND prod.prod_integrado_ofima = 1
+             AND prod.prod_referencia IS NOT NULL AND TRIM(prod.prod_referencia) <> ''
              ORDER BY cp.czpp_orden, cp.czpp_id"
         );
         if ($stmt) {
-            $stmt->bind_param("ii", $pedidId, $tipoPed);
+            $empresaItems = (int) $this->idEmpresa;
+            $stmt->bind_param("iii", $empresaItems, $pedidId, $tipoPed);
             $stmt->execute();
             $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
@@ -477,7 +562,7 @@ class ApiOfimaClient {
              ORDER BY cp.czpp_orden, cp.czpp_id"
         );
         if (!$stmtCombo) {
-            return $items;
+            return $this->consolidarItemsPorReferencia($items);
         }
         $stmtCombo->bind_param("ii", $pedidId, $tipoPed);
         $stmtCombo->execute();
@@ -529,7 +614,7 @@ class ApiOfimaClient {
         if (!empty($productIdsParaRef)) {
             $ids = array_keys($productIdsParaRef);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
-            $stmtRef = $this->conexionBdPrincipal->prepare("SELECT prod_id, prod_referencia FROM productos WHERE prod_id IN ($placeholders) AND prod_id_empresa = ?");
+            $stmtRef = $this->conexionBdPrincipal->prepare("SELECT prod_id, prod_referencia, prod_habilitado, prod_integrado_ofima FROM productos WHERE prod_id IN ($placeholders) AND prod_id_empresa = ?");
             if ($stmtRef) {
                 $tipos = str_repeat('i', count($ids)) . 'i';
                 $params = array_merge($ids, [$this->idEmpresa]);
@@ -543,17 +628,50 @@ class ApiOfimaClient {
                 $resRef = $stmtRef->get_result();
                 $mapRef = [];
                 while ($r = $resRef->fetch_assoc()) {
-                    $mapRef[(int) $r['prod_id']] = isset($r['prod_referencia']) ? $r['prod_referencia'] : '';
+                    $mapRef[(int) $r['prod_id']] = $r;
                 }
                 foreach ($items as $idx => $it) {
-                    if (($it['referencia'] ?? '') === '' && isset($mapRef[$it['producto_id']])) {
-                        $items[$idx]['referencia'] = $mapRef[$it['producto_id']];
+                    if (($it['referencia'] ?? '') !== '' || !isset($mapRef[$it['producto_id']])) {
+                        continue;
                     }
+                    $info = $mapRef[$it['producto_id']];
+                    $referencia = isset($info['prod_referencia']) ? trim((string) $info['prod_referencia']) : '';
+                    $habilitado = (int) ($info['prod_habilitado'] ?? 0) === 1;
+                    $integrado = (int) ($info['prod_integrado_ofima'] ?? 0) === 1;
+                    if ($referencia === '' || !$habilitado || !$integrado) {
+                        unset($items[$idx]);
+                        continue;
+                    }
+                    $items[$idx]['referencia'] = $referencia;
                 }
             }
         }
 
-        return $items;
+        $items = array_values(array_filter($items, function ($it) {
+            return trim((string) ($it['referencia'] ?? '')) !== '';
+        }));
+
+        return $this->consolidarItemsPorReferencia($items);
+    }
+
+    /**
+     * Une líneas con la misma referencia (producto suelto y combo) sumando la cantidad.
+     */
+    private function consolidarItemsPorReferencia(array $items) {
+        $agrupados = [];
+        foreach ($items as $it) {
+            $ref = trim((string) ($it['referencia'] ?? ''));
+            if ($ref === '') {
+                continue;
+            }
+            if (!isset($agrupados[$ref])) {
+                $it['referencia'] = $ref;
+                $agrupados[$ref] = $it;
+                continue;
+            }
+            $agrupados[$ref]['cantidad'] = (float) $agrupados[$ref]['cantidad'] + (float) $it['cantidad'];
+        }
+        return array_values($agrupados);
     }
 
     /**
@@ -769,15 +887,18 @@ class ApiOfimaClient {
     
     /**
      * Mapea campos de pedido de Orion a Ofima (cabecera + ítems).
-     * Ofima espera: numero, cliente_identificacion (NIT), fecha, observaciones, items[], id_empresa.
+     * Ofima espera: numero, cliente_identificacion, fecha, observaciones, vendedor, items[], id_empresa.
      */
     private function mapearCamposPedido($pedido) {
         $productos = isset($pedido['productos']) ? $pedido['productos'] : [];
         $items = [];
         foreach ($productos as $item) {
+            $referencia = isset($item['referencia']) ? trim((string) $item['referencia']) : '';
+            if ($referencia === '') {
+                continue;
+            }
             $items[] = [
-                'referencia' => isset($item['referencia']) ? $item['referencia'] : '',
-                'producto_id' => isset($item['producto_id']) ? (int) $item['producto_id'] : 0,
+                'referencia' => $referencia,
                 'cantidad' => isset($item['cantidad']) ? (float) $item['cantidad'] : 0,
                 'valor' => isset($item['valor']) ? (float) $item['valor'] : 0,
                 'descuento' => isset($item['descuento']) ? (float) $item['descuento'] : 0,
@@ -798,15 +919,18 @@ class ApiOfimaClient {
         if (preg_match('/^\d{4}-\d{2}-\d{2}/', $fecha) === 0) {
             $fecha = date('Y-m-d', strtotime($fecha));
         }
+        $fecha = substr($fecha, 0, 10);
         if (empty($items)) {
-            return ['error' => 'El pedido no tiene ítems de producto para enviar a Ofima'];
+            return ['error' => 'El pedido no tiene productos habilitados e integrados con Ofima para enviar'];
         }
+        // Temporal: Ofima rechaza el id de Orion en Venden (FK_TRADE_VENDEN).
+        $vendedor = '0';
         return [
             'numero' => isset($pedido['pedid_id']) ? (string) $pedido['pedid_id'] : '',
             'cliente_identificacion' => $identificacion,
-            'cliente_id' => isset($pedido['pedid_cliente']) ? (int) $pedido['pedid_cliente'] : 0,
             'fecha' => $fecha,
             'observaciones' => isset($pedido['pedid_observaciones']) ? $pedido['pedid_observaciones'] : '',
+            'vendedor' => $vendedor,
             'items' => $items,
             'id_empresa' => $this->idEmpresa
         ];

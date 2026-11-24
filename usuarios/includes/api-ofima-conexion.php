@@ -19,6 +19,7 @@ function asegurarTablaApiOfimaConexion(mysqli $conexion): void
         aoc_token_expira DATETIME NULL,
         aoc_activo TINYINT(1) NOT NULL DEFAULT 1,
         aoc_bloquear_pedidos TINYINT(1) NOT NULL DEFAULT 0,
+        aoc_enviar_pedidos_auto TINYINT(1) NOT NULL DEFAULT 0,
         aoc_fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         aoc_fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (aoc_id),
@@ -27,6 +28,7 @@ function asegurarTablaApiOfimaConexion(mysqli $conexion): void
 
     $conexion->query($sql);
     asegurarColumnaApiOfimaConexion($conexion, 'aoc_bloquear_pedidos', "TINYINT(1) NOT NULL DEFAULT 0 AFTER aoc_activo");
+    asegurarColumnaApiOfimaConexion($conexion, 'aoc_enviar_pedidos_auto', "TINYINT(1) NOT NULL DEFAULT 0 AFTER aoc_bloquear_pedidos");
 }
 
 /**
@@ -75,6 +77,20 @@ function ofimaPedidosBloqueados(mysqli $conexion, int $idEmpresa): bool
 /**
  * Mensaje estándar cuando los movimientos de pedidos están bloqueados por Ofima.
  */
+/**
+ * True si los pedidos deben enviarse automáticamente a Ofima.
+ * Requiere integración activa, «Bloquear pedidos en Orion» apagado y el check de envío automático.
+ */
+function ofimaEnviarPedidosAutomatico(mysqli $conexion, int $idEmpresa): bool
+{
+    if ($idEmpresa <= 0 || !ofimaIntegracionActiva($conexion, $idEmpresa) || ofimaPedidosBloqueados($conexion, $idEmpresa)) {
+        return false;
+    }
+
+    $config = obtenerApiOfimaConexion($conexion, $idEmpresa);
+    return (int) ($config['aoc_enviar_pedidos_auto'] ?? 0) === 1;
+}
+
 function ofimaMensajePedidosBloqueados(): string
 {
     return 'Los movimientos de pedidos están bloqueados: la integración Ofima está activa y la opción "Bloquear pedidos en Orion" está habilitada.';
@@ -291,4 +307,24 @@ function sincronizarEndpointsApiConfiguracion(mysqli $conexion, int $idEmpresa, 
             $ins->execute();
         }
     }
+}
+
+/**
+ * Badge del último envío del pedido a Ofima.
+ * 0 pendiente, 1 exitoso, 2 error.
+ */
+function ofimaBadgePedido($estado, $respuesta = ''): string
+{
+    $mapa = [
+        0 => ['Pendiente', '#64748b'],
+        1 => ['Enviado', '#047857'],
+        2 => ['Error', '#b91c1c'],
+    ];
+    $estado = (int) $estado;
+    $item = isset($mapa[$estado]) ? $mapa[$estado] : $mapa[0];
+    $texto = substr((string) $respuesta, 0, 240);
+    $title = htmlspecialchars($texto, ENT_QUOTES, 'UTF-8');
+
+    return '<span title="' . $title . '" style="display:inline-block;padding:2px 8px;border-radius:999px;color:#fff;background:'
+        . $item[1] . ';font-size:11px;">' . $item[0] . '</span>';
 }

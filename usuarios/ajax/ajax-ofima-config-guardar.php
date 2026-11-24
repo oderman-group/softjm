@@ -20,6 +20,9 @@ try {
     $claveProduccionNueva = (string) ($_POST['clave_produccion'] ?? '');
     $activo = isset($_POST['activo']) && (string) $_POST['activo'] === '1' ? 1 : 0;
     $bloquearPedidos = isset($_POST['bloquear_pedidos']) && (string) $_POST['bloquear_pedidos'] === '1' ? 1 : 0;
+    $enviarPedidosAuto = $bloquearPedidos === 1
+        ? 0
+        : (isset($_POST['enviar_pedidos_auto']) && (string) $_POST['enviar_pedidos_auto'] === '1' ? 1 : 0);
 
     if ($urlPruebas === '') {
         echo json_encode(['success' => false, 'error' => 'La URL de pruebas es obligatoria']);
@@ -50,11 +53,12 @@ try {
                 aoc_usuario_produccion = ?,
                 aoc_clave_produccion = ?,
                 aoc_activo = ?,
-                aoc_bloquear_pedidos = ?
+                aoc_bloquear_pedidos = ?,
+                aoc_enviar_pedidos_auto = ?
              WHERE aoc_id_empresa = ?"
         );
         $stmt->bind_param(
-            'sssssssiii',
+            'sssssssiiii',
             $ambiente,
             $urlPruebas,
             $urlProduccion,
@@ -64,6 +68,7 @@ try {
             $claveProduccion,
             $activo,
             $bloquearPedidos,
+            $enviarPedidosAuto,
             $idEmpresa
         );
         $stmt->execute();
@@ -72,11 +77,11 @@ try {
             "INSERT INTO api_ofima_conexion (
                 aoc_id_empresa, aoc_ambiente, aoc_url_pruebas, aoc_url_produccion,
                 aoc_usuario_pruebas, aoc_clave_pruebas, aoc_usuario_produccion, aoc_clave_produccion,
-                aoc_activo, aoc_bloquear_pedidos
-             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                aoc_activo, aoc_bloquear_pedidos, aoc_enviar_pedidos_auto
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
-            'isssssssii',
+            'isssssssiii',
             $idEmpresa,
             $ambiente,
             $urlPruebas,
@@ -86,7 +91,8 @@ try {
             $usuarioProduccion,
             $claveProduccion,
             $activo,
-            $bloquearPedidos
+            $bloquearPedidos,
+            $enviarPedidosAuto
         );
         $stmt->execute();
     }

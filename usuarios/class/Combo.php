@@ -79,5 +79,54 @@ class Combo extends BaseDatos {
 
     }
 
+    /**
+     * Activa (1) o desactiva (0) un combo de la empresa.
+     */
+    public static function establecerEstado(int $comboId, int $estado, $conexionBdPrincipal, int $idEmpresa): bool
+    {
+        if ($comboId <= 0 || $idEmpresa <= 0) {
+            return false;
+        }
+
+        $estado = $estado === 1 ? 1 : 0;
+        $stmt = $conexionBdPrincipal->prepare(
+            'UPDATE combos SET combo_estado = ? WHERE combo_id = ? AND combo_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return false;
+        }
+
+        $stmt->bind_param('iii', $estado, $comboId, $idEmpresa);
+        $ok = $stmt->execute();
+        $cambio = $stmt->affected_rows;
+        $stmt->close();
+
+        return $ok && $cambio >= 0 && self::estadoActual($comboId, $conexionBdPrincipal, $idEmpresa) === $estado;
+    }
+
+    /**
+     * Estado actual del combo, o null si no pertenece a la empresa.
+     */
+    public static function estadoActual(int $comboId, $conexionBdPrincipal, int $idEmpresa): ?int
+    {
+        $stmt = $conexionBdPrincipal->prepare(
+            'SELECT combo_estado FROM combos WHERE combo_id = ? AND combo_id_empresa = ? LIMIT 1'
+        );
+        if (!$stmt) {
+            return null;
+        }
+
+        $stmt->bind_param('ii', $comboId, $idEmpresa);
+        $stmt->execute();
+        $fila = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if (!$fila) {
+            return null;
+        }
+
+        return (int) $fila['combo_estado'] === 1 ? 1 : 0;
+    }
+
 
 }

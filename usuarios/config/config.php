@@ -28,7 +28,7 @@ $tipoFactura = array("Desc.", "Venta", "Compra");
 $nacionFactura = array("Nacional", "Extrajera");
 $nacionEtiqueta = array("success", "warning");
 
-$origenPrecioProducto = array("N/A", "Costo", "Utilidad", "Costo y utilidad", "Guardado de precios");
+$origenPrecioProducto = array("N/A", "Costo", "Utilidad", "Costo y utilidad", "Guardado de precios", "Precio lista");
 $idEmpresa = $_SESSION["dataAdicional"]["id_empresa"];
 $meses = array("","ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE");
 $opcionesSINO = array("NO","SI");

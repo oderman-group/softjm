@@ -4,6 +4,20 @@ require_once("../sesion.php");
 require_once RUTA_PROYECTO.'/usuarios/class/Cotizacion.php';
 
 if (Cotizacion::esCotizacionVendida($_POST["id"], $idEmpresa)) {
+    $consultaContacto = $conexionBdPrincipal->query("SELECT cotiz_contacto, cotiz_cliente FROM cotizacion WHERE cotiz_id='".intval($_POST["id"])."' AND cotiz_id_empresa='".intval($idEmpresa)."' LIMIT 1");
+    $datosContacto = $consultaContacto ? mysqli_fetch_assoc($consultaContacto) : null;
+    $contactoNuevo = intval($_POST['contacto'] ?? 0);
+    $sucursalNueva = intval($_POST['sucursal'] ?? 0);
+    if ($datosContacto && empty($datosContacto['cotiz_contacto']) && $contactoNuevo > 0 && $sucursalNueva > 0) {
+        $clienteCotizacion = intval($datosContacto['cotiz_cliente']);
+        $contactoValido = $conexionBdPrincipal->query("SELECT cont_id FROM contactos WHERE cont_id='".$contactoNuevo."' AND cont_cliente_principal='".$clienteCotizacion."' LIMIT 1");
+        $sucursalValida = $conexionBdPrincipal->query("SELECT sucu_id FROM sucursales WHERE sucu_id='".$sucursalNueva."' AND sucu_cliente_principal='".$clienteCotizacion."' LIMIT 1");
+        if ($contactoValido && $contactoValido->num_rows > 0 && $sucursalValida && $sucursalValida->num_rows > 0) {
+            $conexionBdPrincipal->query("UPDATE cotizacion SET cotiz_sucursal='".$sucursalNueva."', cotiz_contacto='".$contactoNuevo."', cotiz_usuario_modificacion='".intval($_SESSION['id'] ?? 0)."', cotiz_ultima_modificacion=NOW() WHERE cotiz_id='".intval($_POST["id"])."' AND cotiz_id_empresa='".intval($idEmpresa)."'");
+            echo '<script type="text/javascript">window.location.href="../cotizaciones-editar.php?id=' . intval($_POST["id"]) . '&msg=2";</script>';
+            exit();
+        }
+    }
     echo '<script type="text/javascript">window.location.href="../cotizaciones-editar.php?id=' . $_POST["id"] . '&warning=4";</script>';
     exit();
 }
