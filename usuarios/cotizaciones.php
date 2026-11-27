@@ -6,6 +6,7 @@ include("includes/verificar-paginas.php");
 include("includes/head.php");
 require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
 $ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
+$ofimaBloquearClientesNoIntegrados = ofimaBloquearClientesNoIntegrados($conexionBdPrincipal, (int) $idEmpresa);
 $ofimaBotonEnvio = ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa) && empty($ofimaPedidosBloqueados);
 $puedeEditarCotiz = Modulos::validarRol([79], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
 $puedePdfCotiz = Modulos::validarRol([50], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
@@ -422,6 +423,7 @@ foreach (array('usuario_resp', 'tipo_cot', 'genero_pedido', 'fecha_inicio', 'fec
 
 			function activarClientesCotizacion() {
 				if (!window.jQuery || !jQuery.fn.select2) return;
+				var bloquearClientesNoOfima = <?= !empty($ofimaBloquearClientesNoIntegrados) ? 'true' : 'false'; ?>;
 				jQuery('#cotizaciones_buscar select.js-cotiz-cliente').each(function () {
 					var $sel = jQuery(this);
 					if ($sel.data('select2')) return;
@@ -444,8 +446,16 @@ foreach (array('usuario_resp', 'tipo_cot', 'genero_pedido', 'fecha_inicio', 'fec
 							}
 						},
 						language: {
-							inputTooShort: function () { return 'Escriba al menos 2 letras. Solo clientes habilitados.'; },
-							noResults: function () { return 'No hay clientes habilitados'; },
+							inputTooShort: function () {
+								return bloquearClientesNoOfima
+									? 'Escriba al menos 2 letras. Solo clientes integrados con Ofima.'
+									: 'Escriba al menos 2 letras.';
+							},
+							noResults: function () {
+								return bloquearClientesNoOfima
+									? 'No hay clientes integrados con Ofima'
+									: 'Sin resultados';
+							},
 							searching: function () { return 'Buscando...'; }
 						}
 					});

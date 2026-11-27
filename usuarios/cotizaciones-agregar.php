@@ -229,12 +229,15 @@ include("includes/head.php");
 				return data.text;
 			}
 			var integrado = 0;
-			if (data.element) {
+			if (typeof data.integrado_ofima !== 'undefined') {
+				integrado = parseInt(data.integrado_ofima, 10) || 0;
+			} else if (data.element) {
 				integrado = parseInt($(data.element).attr('data-integrado-ofima') || '0', 10);
 			}
 			var clase = integrado === 1 ? 'cliente-ofima-ok' : 'cliente-ofima-off';
 			return $('<span></span>').addClass(clase).text(data.text || '');
 		}
+		var bloquearClientesNoOfima = <?= !empty($ofimaBloquearClientesNoIntegrados) ? 'true' : 'false'; ?>;
 		[
 			{ nombre: 'cliente', placeholder: 'Escoja un cliente', buscar: 'Buscar cliente' },
 			{ nombre: 'sucursal', placeholder: 'Escoja una sucursal', buscar: 'Buscar sucursal' },
@@ -253,8 +256,38 @@ include("includes/head.php");
 				language: { noResults: function () { return 'Sin resultados'; } }
 			};
 			if (campo.nombre === 'cliente') {
+				opciones.minimumInputLength = 2;
+				delete opciones.matcher;
+				opciones.ajax = {
+					url: 'ajax/ajax-buscar-clientes-cotizacion.php',
+					dataType: 'json',
+					delay: 250,
+					cache: true,
+					data: function (params) { return { q: params.term, habilitados: 1 }; },
+					processResults: function (data) {
+						var lista = (data && data.clientes) || [];
+						return {
+							results: lista.map(function (cliente) {
+								return {
+									id: cliente.id,
+									text: String(cliente.nombre || ''),
+									integrado_ofima: cliente.integrado_ofima
+								};
+							})
+						};
+					}
+				};
 				opciones.templateResult = plantillaClienteOfima;
 				opciones.templateSelection = plantillaClienteOfima;
+				opciones.language = {
+					inputTooShort: function () {
+						return bloquearClientesNoOfima
+							? 'Escriba al menos 2 letras. Solo clientes integrados con Ofima.'
+							: 'Escriba al menos 2 letras.';
+					},
+					noResults: function () { return 'Sin resultados'; },
+					searching: function () { return 'Buscando...'; }
+				};
 			}
 			select.select2(opciones);
 			select.on('select2:open', function () {
@@ -315,71 +348,18 @@ include("includes/js-formularios.php");
 										<div class="cotiz-campo-accion">
 										<select class="cotiz-select" name="cliente" onChange="clientes(this)" required>
 											<option value=""></option>
-                                            <?php
-											$filtroIntegradoOfima = !empty($ofimaBloquearClientesNoIntegrados)
-												? " AND cli.cli_integrado_ofima = 1"
-												: '';
-											$sqlClientesAgregar = "SELECT * FROM clientes cli
-											WHERE cli.cli_ciudad != ".CIUDADES_INTERNACIONALES."
-											AND cli.cli_id_empresa='".$idEmpresa."'"
-											. $filtroIntegradoOfima;
-											$sqlClientesAgregar = Cliente::appendFiltrosVisibilidadAnalyticsWhere(
-												$sqlClientesAgregar,
-												(int) ($_SESSION['id'] ?? 0),
-												!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)
-											);
-											$sqlClientesAgregar .= " ORDER BY cli.cli_categoria, cli.cli_nombre";
-											$conOp = $conexionBdPrincipal->query($sqlClientesAgregar);
-
-											//Permiso para mostrar todos los clientes, incluyendo los internacionales.
-											$paginasParaValidar = [389];
-
-											if (Modulos::validarRol($paginasParaValidar, $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
-												$sqlClientesAgregar = "SELECT * FROM clientes cli
-												WHERE cli.cli_id_empresa='".$idEmpresa."'"
-												. $filtroIntegradoOfima;
-												$sqlClientesAgregar = Cliente::appendFiltrosVisibilidadAnalyticsWhere(
-													$sqlClientesAgregar,
-													(int) ($_SESSION['id'] ?? 0),
-													!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)
-												);
-												$sqlClientesAgregar .= " ORDER BY cli.cli_categoria, cli.cli_nombre";
-												$conOp = $conexionBdPrincipal->query($sqlClientesAgregar);
-											}
-
-											$categoriaActual = 1;
-											$nombreCategoria = ['','Prospectos', 'Clientes', 'Dealer'];
-											echo '<optgroup label="'.$nombreCategoria[1].'">';
-
-											while ($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)) {
-
-												if ($categoriaActual != $resOp['cli_categoria']) {
-													echo '</optgroup>';
-													echo '<optgroup label="'.$nombreCategoria[$resOp['cli_categoria']].'">';
-													$categoriaActual = $resOp['cli_categoria'];
-												}
-
-												$disabled = '';
-												$categoria   = '';
-
-												if ($resOp['cli_categoria']== CLI_CATEGORIA_PROSPECTO) {
-													$timestamp = strtotime($resOp['cli_fecha_registro']);
-													$solo_fecha = date("Y-m-d", $timestamp);
-													$categoria = '(PROSPECTO DESDE '.$solo_fecha.')';
-												} else if ($resOp['cli_categoria']== CLI_CATEGORIA_DEALER) {
-													$categoria = '(DEALER)';
-
-													if (!Modulos::validarRol([415], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {
-														$disabled = 'disabled';
-													}	
-												}
-
-
+											<?php
+											if (isset($_GET['cte']) && is_numeric($_GET['cte'])) {
+												$idClienteSelect = (int) $_GET['cte'];
+												$filaClienteSelect = mysqli_fetch_assoc($conexionBdPrincipal->query(
+													"SELECT cli_id, cli_nombre, cli_integrado_ofima FROM clientes WHERE cli_id='".$idClienteSelect."' AND cli_id_empresa='".(int) $idEmpresa."' LIMIT 1"
+												));
+												if ($filaClienteSelect) {
 											?>
-                                            	<option value="<?=$resOp[0];?>" data-integrado-ofima="<?= (int) ($resOp['cli_integrado_ofima'] ?? 0) === 1 ? 1 : 0; ?>" <?php if(isset($_GET["cte"]) and $_GET["cte"]!="" and $_GET["cte"]==$resOp[0]) echo "selected"; echo $disabled; ?>><?=$resOp[1]." ".$categoria;?></option>
-                                            <?php
+											<option value="<?= (int) $filaClienteSelect['cli_id']; ?>" data-integrado-ofima="<?= (int) ($filaClienteSelect['cli_integrado_ofima'] ?? 0) === 1 ? 1 : 0; ?>" selected><?= htmlspecialchars((string) $filaClienteSelect['cli_nombre'], ENT_QUOTES, 'UTF-8'); ?></option>
+											<?php
+												}
 											}
-											echo '</optgroup>';
 											?>
                                     	</select>
 										<?php if(isset($_GET['cte']) && is_numeric($_GET['cte']) && Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)){?>
