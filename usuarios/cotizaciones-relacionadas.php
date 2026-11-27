@@ -91,7 +91,7 @@
                                 <?php } ?>
                                 
                                 <?php if (Modulos::validarRol([380], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)) {?>
-                                <li><a href="sql.php?get=46&id=<?=$res['cotiz_id'];?>" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
+                                <li><a href="bd_create/cotizaciones-replicar.php?id=<?= (int) $res['cotiz_id']; ?>" class="accion-replicar" onClick="if(!confirm('Desea replicar este registro?')){return false;}">Replicar</a></li>
                                 <?php } ?>		
                                 <?php //el codigo 46 no se encontro en el archivo sql ?> 
                                 <?php
