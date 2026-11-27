@@ -8,7 +8,7 @@ header('Content-Type: application/json; charset=utf-8');
 $termino = trim((string) ($_GET['q'] ?? $_POST['q'] ?? ''));
 $soloHabilitados = (string) ($_GET['habilitados'] ?? $_POST['habilitados'] ?? '') === '1';
 $restringirZona = !Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
-$soloIntegrados = $soloHabilitados && ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa);
+$soloIntegrados = $soloHabilitados && ofimaBloquearClientesNoIntegrados($conexionBdPrincipal, (int) $idEmpresa);
 $excluirDealers = $soloHabilitados && !Modulos::validarRol([393], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion);
 $filas = Cliente::buscarParaCotizacion(
     $conexionBdPrincipal,

@@ -20,6 +20,7 @@ try {
     $claveProduccionNueva = (string) ($_POST['clave_produccion'] ?? '');
     $activo = isset($_POST['activo']) && (string) $_POST['activo'] === '1' ? 1 : 0;
     $bloquearPedidos = isset($_POST['bloquear_pedidos']) && (string) $_POST['bloquear_pedidos'] === '1' ? 1 : 0;
+    $bloquearClientesNoOfima = isset($_POST['bloquear_clientes_no_ofima']) && (string) $_POST['bloquear_clientes_no_ofima'] === '1' ? 1 : 0;
     $enviarPedidosAuto = $bloquearPedidos === 1
         ? 0
         : (isset($_POST['enviar_pedidos_auto']) && (string) $_POST['enviar_pedidos_auto'] === '1' ? 1 : 0);
@@ -54,11 +55,12 @@ try {
                 aoc_clave_produccion = ?,
                 aoc_activo = ?,
                 aoc_bloquear_pedidos = ?,
+                aoc_bloquear_clientes_no_ofima = ?,
                 aoc_enviar_pedidos_auto = ?
              WHERE aoc_id_empresa = ?"
         );
         $stmt->bind_param(
-            'sssssssiiii',
+            'sssssssiiiii',
             $ambiente,
             $urlPruebas,
             $urlProduccion,
@@ -68,6 +70,7 @@ try {
             $claveProduccion,
             $activo,
             $bloquearPedidos,
+            $bloquearClientesNoOfima,
             $enviarPedidosAuto,
             $idEmpresa
         );
@@ -77,11 +80,11 @@ try {
             "INSERT INTO api_ofima_conexion (
                 aoc_id_empresa, aoc_ambiente, aoc_url_pruebas, aoc_url_produccion,
                 aoc_usuario_pruebas, aoc_clave_pruebas, aoc_usuario_produccion, aoc_clave_produccion,
-                aoc_activo, aoc_bloquear_pedidos, aoc_enviar_pedidos_auto
-             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                aoc_activo, aoc_bloquear_pedidos, aoc_bloquear_clientes_no_ofima, aoc_enviar_pedidos_auto
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
-            'isssssssiii',
+            'isssssssiiii',
             $idEmpresa,
             $ambiente,
             $urlPruebas,
@@ -92,6 +95,7 @@ try {
             $claveProduccion,
             $activo,
             $bloquearPedidos,
+            $bloquearClientesNoOfima,
             $enviarPedidosAuto
         );
         $stmt->execute();

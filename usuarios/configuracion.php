@@ -19,6 +19,7 @@ $ofimaUsuarioPruebas = $ofimaConexion['aoc_usuario_pruebas'] ?? '';
 $ofimaUsuarioProduccion = $ofimaConexion['aoc_usuario_produccion'] ?? '';
 $ofimaActivo = isset($ofimaConexion['aoc_activo']) ? (int) $ofimaConexion['aoc_activo'] : 1;
 $ofimaBloquearPedidos = isset($ofimaConexion['aoc_bloquear_pedidos']) ? (int) $ofimaConexion['aoc_bloquear_pedidos'] : 0;
+$ofimaBloquearClientesNoOfima = isset($ofimaConexion['aoc_bloquear_clientes_no_ofima']) ? (int) $ofimaConexion['aoc_bloquear_clientes_no_ofima'] : 1;
 $ofimaEnviarPedidosAuto = isset($ofimaConexion['aoc_enviar_pedidos_auto']) ? (int) $ofimaConexion['aoc_enviar_pedidos_auto'] : 0;
 if ($ofimaBloquearPedidos === 1) {
     $ofimaEnviarPedidosAuto = 0;
@@ -1269,6 +1270,21 @@ function renderTablaEndpointsApi(array $endpoints, string $tituloVacio, string $
                     </div>
 
                     <div class="form-group">
+                        <label for="ofima_bloquear_clientes_no_ofima" style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
+                            <input type="checkbox" id="ofima_bloquear_clientes_no_ofima" name="ofima_bloquear_clientes_no_ofima" value="1" data-ofima="1"
+                                   <?= (int)$ofimaBloquearClientesNoOfima === 1 ? 'checked' : ''; ?>
+                                   style="margin-top:4px; width:auto;">
+                            <span>
+                                Bloquear clientes no integrados con Ofima
+                                <span class="help-text" style="display:block; margin-top:4px;">
+                                    Si está marcado, en cotizaciones solo se podrán elegir clientes integrados con Ofima.
+                                    Si no está marcado, en el listado de clientes de cotizaciones aparecen todos y se oculta el botón «Buscar clientes».
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
                         <label for="ofima_enviar_pedidos" id="ofima_enviar_pedidos_label" style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
                             <input type="checkbox" id="ofima_enviar_pedidos" name="ofima_enviar_pedidos" value="1" data-ofima="1"
                                    <?= $ofimaEnviarPedidosAuto === 1 ? 'checked' : ''; ?>
@@ -1541,11 +1557,13 @@ function renderTablaEndpointsApi(array $endpoints, string $tituloVacio, string $
 
         const formData = new FormData();
         const bloquearPedidos = document.getElementById('ofima_bloquear_pedidos');
+        const bloquearClientesNoOfima = document.getElementById('ofima_bloquear_clientes_no_ofima');
         const enviarPedidos = document.getElementById('ofima_enviar_pedidos');
         const pedidosBloqueados = bloquearPedidos && bloquearPedidos.checked;
         formData.append('ambiente', document.getElementById('ofima_ambiente').value);
         formData.append('activo', document.getElementById('ofima_activo').value);
         formData.append('bloquear_pedidos', pedidosBloqueados ? '1' : '0');
+        formData.append('bloquear_clientes_no_ofima', bloquearClientesNoOfima && bloquearClientesNoOfima.checked ? '1' : '0');
         formData.append('enviar_pedidos_auto', !pedidosBloqueados && enviarPedidos && enviarPedidos.checked ? '1' : '0');
         formData.append('url_pruebas', document.getElementById('ofima_url_pruebas').value.trim());
         formData.append('url_produccion', document.getElementById('ofima_url_produccion').value.trim());

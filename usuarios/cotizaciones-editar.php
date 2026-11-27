@@ -6,6 +6,7 @@ $idPagina = 79;
 include("includes/verificar-paginas.php");
 require_once RUTA_PROYECTO.'/usuarios/includes/api-ofima-conexion.php';
 $ofimaPedidosBloqueados = ofimaPedidosBloqueados($conexionBdPrincipal, (int) $idEmpresa);
+$ofimaBloquearClientesNoIntegrados = ofimaBloquearClientesNoIntegrados($conexionBdPrincipal, (int) $idEmpresa);
 
 // ========================================
 // CONSULTA PRINCIPAL OPTIMIZADA
@@ -19,7 +20,7 @@ $consultaCliente = $conexionBdPrincipal->query("
 		c.cotiz_fecha_vendida, c.cotiz_ocultar_descuento_combo, c.cotiz_descuentos_especiales,
 		c.cotiz_es_precotizacion, c.cotiz_version, c.cotiz_ultima_modificacion, c.cotiz_creador,
 		cli.cli_id, cli.cli_nombre, cli.cli_categoria, cli.cli_ciudad, cli.cli_direccion,
-		cli.cli_telefono, cli.cli_celular, cli.cli_credito,
+		cli.cli_telefono, cli.cli_celular, cli.cli_credito, cli.cli_integrado_ofima,
 		cont.cont_id, cont.cont_nombre, cont.cont_email
 	FROM cotizacion c
 	INNER JOIN clientes cli ON cli.cli_id = c.cotiz_cliente
@@ -206,6 +207,20 @@ if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaServicios') {
 			}
 			return null;
 		}
+		function plantillaClienteOfima(data) {
+			if (!data.id) {
+				return data.text;
+			}
+			var integrado = 0;
+			if (typeof data.integrado_ofima !== 'undefined') {
+				integrado = parseInt(data.integrado_ofima, 10) || 0;
+			} else if (data.element) {
+				integrado = parseInt($(data.element).attr('data-integrado-ofima') || '0', 10);
+			}
+			var clase = integrado === 1 ? 'cliente-ofima-ok' : 'cliente-ofima-off';
+			return $('<span></span>').addClass(clase).text(data.text || '');
+		}
+		var bloquearClientesNoOfima = <?= !empty($ofimaBloquearClientesNoIntegrados) ? 'true' : 'false'; ?>;
 		[
 			{ nombre: 'cliente', placeholder: 'Escoja un cliente', buscar: 'Buscar cliente' },
 			{ nombre: 'sucursal', placeholder: 'Escoja una sucursal', buscar: 'Buscar sucursal' },
@@ -215,14 +230,49 @@ if (!empty($_POST['action']) && $_POST['action'] === 'generarTablaServicios') {
 			if (!select.length || select.data('select2')) {
 				return;
 			}
-			select.select2({
+			var opciones = {
 				width: '100%',
 				placeholder: campo.placeholder,
 				minimumResultsForSearch: 0,
 				dropdownParent: $(document.body),
 				matcher: filtrarOpcion,
 				language: { noResults: function () { return 'Sin resultados'; } }
-			});
+			};
+			if (campo.nombre === 'cliente') {
+				opciones.minimumInputLength = 2;
+				delete opciones.matcher;
+				opciones.ajax = {
+					url: 'ajax/ajax-buscar-clientes-cotizacion.php',
+					dataType: 'json',
+					delay: 250,
+					cache: true,
+					data: function (params) { return { q: params.term, habilitados: 1 }; },
+					processResults: function (data) {
+						var lista = (data && data.clientes) || [];
+						return {
+							results: lista.map(function (cliente) {
+								return {
+									id: cliente.id,
+									text: String(cliente.nombre || ''),
+									integrado_ofima: cliente.integrado_ofima
+								};
+							})
+						};
+					}
+				};
+				opciones.templateResult = plantillaClienteOfima;
+				opciones.templateSelection = plantillaClienteOfima;
+				opciones.language = {
+					inputTooShort: function () {
+						return bloquearClientesNoOfima
+							? 'Escriba al menos 2 letras. Solo clientes integrados con Ofima.'
+							: 'Escriba al menos 2 letras.';
+					},
+					noResults: function () { return 'Sin resultados'; },
+					searching: function () { return 'Buscando...'; }
+				};
+			}
+			select.select2(opciones);
 			select.on('select2:open', function () {
 				var buscador = document.querySelector('.select2-container--open .select2-search__field');
 				if (buscador) {
@@ -1072,6 +1122,32 @@ include("includes/js-formularios.php");
 		font-weight: 700;
 		background: transparent !important;
 	}
+	.select2-container--default .select2-results__option:has(.cliente-ofima-ok),
+	.select2-container--default .select2-results__option--highlighted:has(.cliente-ofima-ok),
+	.select2-container--default .select2-results__option--highlighted[aria-selected]:has(.cliente-ofima-ok) {
+		background: #fff !important;
+		color: #065f46 !important;
+	}
+	.select2-results__option .cliente-ofima-ok,
+	.select2-container--default .select2-results__option--highlighted .cliente-ofima-ok,
+	.select2-selection__rendered .cliente-ofima-ok {
+		color: #065f46 !important;
+		font-weight: 700;
+		background: transparent !important;
+	}
+	.select2-container--default .select2-results__option:has(.cliente-ofima-off),
+	.select2-container--default .select2-results__option--highlighted:has(.cliente-ofima-off),
+	.select2-container--default .select2-results__option--highlighted[aria-selected]:has(.cliente-ofima-off) {
+		background: #fff !important;
+		color: #991b1b !important;
+	}
+	.select2-results__option .cliente-ofima-off,
+	.select2-container--default .select2-results__option--highlighted .cliente-ofima-off,
+	.select2-selection__rendered .cliente-ofima-off {
+		color: #991b1b !important;
+		font-weight: 700;
+		background: transparent !important;
+	}
 </style>
 
 <div class="layout">
@@ -1310,52 +1386,29 @@ include("includes/js-formularios.php");
 												<select class="cotiz-select" name="cliente" required onChange="clientes(this)" <?=$camposCotizacionDisabled;?>>
 													<option value="">Escoja un cliente</option>
 													<?php
-													$sqlClientesCotiz = "SELECT cli.cli_id, cli.cli_nombre, cli.cli_categoria, 
-														CASE 
-															WHEN cli.cli_categoria = '".CLI_CATEGORIA_DEALER."' THEN '(DEALER)'
-															ELSE ''
-														END AS categoria
-														FROM clientes cli
-														WHERE cli.cli_id_empresa='".$idEmpresa."'
-														AND (cli.cli_integrado_ofima = 1 OR cli.cli_id='".(int) $cliente."')";
-													$sqlClientesCotiz = Cliente::appendFiltrosVisibilidadAnalyticsWhere(
-														$sqlClientesCotiz,
-														(int) ($_SESSION['id'] ?? 0),
-														!Modulos::validarRol([383], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion),
-														(int) $cliente
-													);
-													$sqlClientesCotiz .= " ORDER BY cli.cli_categoria, cli.cli_nombre";
-													$conOp = $conexionBdPrincipal->query($sqlClientesCotiz);
-
-														$categoriaActual = 1;
-														$nombreCategoria = ['','Prospectos', 'Clientes', 'Dealer'];
-														echo '<optgroup label="'.$nombreCategoria[1].'">';
-
-													while($resOp = mysqli_fetch_array($conOp, MYSQLI_BOTH)){
-
-														if ($categoriaActual != $resOp['cli_categoria']) {
-															echo '</optgroup>';
-															echo '<optgroup label="'.$nombreCategoria[$resOp['cli_categoria']].'">';
-															$categoriaActual = $resOp['cli_categoria'];
+													$idClienteSelect = (int) $cliente;
+													$nombreClienteSelect = (string) ($resultadoD['cli_nombre'] ?? '');
+													$integradoClienteSelect = (int) ($resultadoD['cli_integrado_ofima'] ?? 0) === 1 ? 1 : 0;
+													if ($idClienteSelect > 0 && (int) ($resultadoD['cli_id'] ?? 0) !== $idClienteSelect) {
+														$filaClienteSelect = mysqli_fetch_assoc($conexionBdPrincipal->query(
+															"SELECT cli_id, cli_nombre, cli_integrado_ofima FROM clientes WHERE cli_id='".$idClienteSelect."' AND cli_id_empresa='".(int) $idEmpresa."' LIMIT 1"
+														));
+														if ($filaClienteSelect) {
+															$nombreClienteSelect = (string) ($filaClienteSelect['cli_nombre'] ?? '');
+															$integradoClienteSelect = (int) ($filaClienteSelect['cli_integrado_ofima'] ?? 0) === 1 ? 1 : 0;
 														}
-
-														$disabled = '';
-														
-														if(!Modulos::validarRol([393], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) and $resOp['cli_categoria']== CLI_CATEGORIA_DEALER) {
-															$disabled = 'disabled';
-														}	
-														
-
-													?>
-														<option value="<?=$resOp['cli_id'];?>" <?php if($cliente==$resOp['cli_id']){echo "selected";}  echo $disabled; ?>><?=$resOp['cli_nombre']." ".$resOp['categoria'];?></option>
-													<?php
 													}
+													if ($idClienteSelect > 0 && $nombreClienteSelect !== '') {
 													?>
+														<option value="<?= $idClienteSelect; ?>" data-integrado-ofima="<?= $integradoClienteSelect; ?>" selected><?= htmlspecialchars($nombreClienteSelect, ENT_QUOTES, 'UTF-8'); ?></option>
+													<?php } ?>
 												</select>
 												<?php if (Modulos::validarRol([11], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion) && $resultadoD['cotiz_vendida'] != Cotizacion::COTIZACION_VENDIDA) {?>
 													<a href="clientes-editar.php?id=<?=$cliente;?>" class="btn btn-info" target="_blank">Editar cliente</a>
 												<?php } ?>
+												<?php if (!empty($ofimaBloquearClientesNoIntegrados)) { ?>
 												<button type="button" class="btn btn-info" id="btnBuscarClientes">Buscar clientes</button>
+												<?php } ?>
 												</div>
 											</div>
 									</div>

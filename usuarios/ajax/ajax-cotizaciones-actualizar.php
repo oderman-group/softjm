@@ -49,8 +49,8 @@ try {
 		if ((int) ($clienteNuevo['cli_papelera'] ?? 0) === 1) {
 			throw new Exception("Solo puede elegir clientes habilitados.");
 		}
-		if (ofimaIntegracionActiva($conexionBdPrincipal, (int) $idEmpresa) && (int) ($clienteNuevo['cli_integrado_ofima'] ?? 0) !== 1) {
-			throw new Exception("Solo puede elegir clientes habilitados.");
+		if (ofimaBloquearClientesNoIntegrados($conexionBdPrincipal, (int) $idEmpresa) && (int) ($clienteNuevo['cli_integrado_ofima'] ?? 0) !== 1) {
+			throw new Exception("Solo puede elegir clientes integrados con Ofima.");
 		}
 		if (!Modulos::validarRol([393], $conexionBdPrincipal, $conexionBdAdmin, $datosUsuarioActual, $configuracion)
 			&& (int) ($clienteNuevo['cli_categoria'] ?? 0) === (int) CLI_CATEGORIA_DEALER) {

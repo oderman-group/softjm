@@ -19,6 +19,7 @@ function asegurarTablaApiOfimaConexion(mysqli $conexion): void
         aoc_token_expira DATETIME NULL,
         aoc_activo TINYINT(1) NOT NULL DEFAULT 1,
         aoc_bloquear_pedidos TINYINT(1) NOT NULL DEFAULT 0,
+        aoc_bloquear_clientes_no_ofima TINYINT(1) NOT NULL DEFAULT 1,
         aoc_enviar_pedidos_auto TINYINT(1) NOT NULL DEFAULT 0,
         aoc_fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         aoc_fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -28,7 +29,8 @@ function asegurarTablaApiOfimaConexion(mysqli $conexion): void
 
     $conexion->query($sql);
     asegurarColumnaApiOfimaConexion($conexion, 'aoc_bloquear_pedidos', "TINYINT(1) NOT NULL DEFAULT 0 AFTER aoc_activo");
-    asegurarColumnaApiOfimaConexion($conexion, 'aoc_enviar_pedidos_auto', "TINYINT(1) NOT NULL DEFAULT 0 AFTER aoc_bloquear_pedidos");
+    asegurarColumnaApiOfimaConexion($conexion, 'aoc_bloquear_clientes_no_ofima', "TINYINT(1) NOT NULL DEFAULT 1 AFTER aoc_bloquear_pedidos");
+    asegurarColumnaApiOfimaConexion($conexion, 'aoc_enviar_pedidos_auto', "TINYINT(1) NOT NULL DEFAULT 0 AFTER aoc_bloquear_clientes_no_ofima");
 }
 
 /**
@@ -72,6 +74,20 @@ function ofimaPedidosBloqueados(mysqli $conexion, int $idEmpresa): bool
 
     $config = obtenerApiOfimaConexion($conexion, $idEmpresa);
     return (int) ($config['aoc_bloquear_pedidos'] ?? 0) === 1;
+}
+
+/**
+ * True si en cotizaciones solo deben elegirse clientes integrados con Ofima.
+ * Requiere integración activa y el check «Bloquear clientes no integrados con Ofima».
+ */
+function ofimaBloquearClientesNoIntegrados(mysqli $conexion, int $idEmpresa): bool
+{
+    if ($idEmpresa <= 0 || !ofimaIntegracionActiva($conexion, $idEmpresa)) {
+        return false;
+    }
+
+    $config = obtenerApiOfimaConexion($conexion, $idEmpresa);
+    return (int) ($config['aoc_bloquear_clientes_no_ofima'] ?? 1) === 1;
 }
 
 /**
